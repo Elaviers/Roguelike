@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "Vector.h"
 
-class CubeRenderer;
+class ModelManager;
 
 class Light : public GameObject
 {
@@ -18,6 +18,6 @@ public:
 
 	void ToShader(int glArrayIndex);
 
-	void DebugRender(CubeRenderer &);
+	void DebugRender(ModelManager &);
 };
 

@@ -1,6 +1,6 @@
 #pragma once
-#include "CubeRenderer.h"
 #include "GLCubemap.h"
+#include "ModelManager.h"
 
 class Skybox
 {
@@ -18,10 +18,10 @@ public:
 		_cubemap.Bind(unit);
 	}
 
-	inline void Render(const CubeRenderer &cubeRenderer) const
+	inline void Render(const ModelManager &cubeRenderer) const
 	{
 		Bind(0);
-		cubeRenderer.RenderInverse();
+		cubeRenderer.InverseCube().Render();
 	}
 };
 

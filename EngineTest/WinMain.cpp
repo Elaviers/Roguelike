@@ -1,6 +1,5 @@
 #include <Windowsx.h>
 #include <Engine\Camera.h>
-#include <Engine\CubeRenderer.h>
 #include <Engine\GL.h>
 #include <Engine\GLProgram.h>
 #include <Engine\InputManager.h>
@@ -16,7 +15,6 @@
 
 bool running = false;
 
-CubeRenderer cubeRenderer;
 InputManager inputManager;
 ModelManager modelManager;
 TextureManager textureManager;
@@ -192,7 +190,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	window.SetTitle("Manager Init");
 	//
 	textureManager.Initialise();
-	cubeRenderer.Initialise();
+	modelManager.Initialise();
 
 	inputManager.BindKeyAxis(Keycode::A, &axisX, -1);
 	inputManager.BindKeyAxis(Keycode::D, &axisX, 1);
@@ -255,10 +253,10 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	cube.transform.SetScale(Vector3(.5f, .5f, .5f));
 	cube.transform.SetPosition(Vector3(2.f, 0.f, 0.f));
 	cube.SetParent(cubeParent);
-	cube.SetRenderer(cubeRenderer);
+	cube.SetModel(modelManager.Cube());
 
 	renderable.SetParent(cubeParent);
-	renderable.SetRenderer(*modelManager.GetRenderer("MODEL"));
+	renderable.SetModel(*modelManager.GetModel("MODEL"));
 
 	window.SetTitle("Window");
 	
@@ -325,10 +323,10 @@ void Frame()
 		program_Unlit.SetMat4("M_Projection", camera.GetProjectionMatrix());
 		program_Unlit.SetMat4("M_View", camera.MakeInverseTransformationMatrix());
 
-		light1.DebugRender(cubeRenderer);
-		light2.DebugRender(cubeRenderer);
-		light3.DebugRender(cubeRenderer);
-		light4.DebugRender(cubeRenderer);
+		light1.DebugRender(modelManager);
+		light2.DebugRender(modelManager);
+		light3.DebugRender(modelManager);
+		light4.DebugRender(modelManager);
 		//
 
 		//
@@ -369,7 +367,7 @@ void Frame()
 		program_Sky.SetMat4("M_View", skyView);
 
 		glDepthFunc(GL_LEQUAL);
-		sky.Render(cubeRenderer);
+		sky.Render(modelManager);
 		glDepthFunc(GL_LESS);
 		//
 

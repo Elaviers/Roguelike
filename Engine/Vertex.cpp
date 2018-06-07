@@ -1,6 +1,6 @@
 #include "Vertex.h"
 
-void Vertex14F::CalculateTangents(Vertex14F &vertex1, Vertex14F &vertex2, Vertex14F &vertex3)
+void Vertex17F::CalculateTangents(Vertex17F &vertex1, Vertex17F &vertex2, Vertex17F &vertex3)
 {
 	Vector3 edge1 = vertex2.pos - vertex1.pos;
 	Vector2 deltaUV1 = vertex2.uv - vertex1.uv;

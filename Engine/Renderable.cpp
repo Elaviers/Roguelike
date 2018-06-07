@@ -2,9 +2,9 @@
 
 void Renderable::Render()
 {
-	if (_renderer)
+	if (_model)
 	{
 		GameObject::ApplyTransformToShader();
-		_renderer->Render();
+		_model->Render();
 	}
 }

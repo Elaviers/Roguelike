@@ -22,13 +22,11 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Phong.frag">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="Shader.vert" />
-    <None Include="Sky.frag" />
-    <None Include="Sky.vert" />
-    <None Include="Unlit.frag" />
+    <None Include="Data\Phong.frag" />
+    <None Include="Data\Shader.vert" />
+    <None Include="Data\Sky.frag" />
+    <None Include="Data\Sky.vert" />
+    <None Include="Data\Unlit.frag" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

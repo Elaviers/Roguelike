@@ -148,7 +148,6 @@
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="CubeRenderer.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GL.h" />
@@ -157,7 +156,7 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="LevelIO.h" />
     <ClInclude Include="lodepng.h" />
-    <ClInclude Include="ModelRenderer.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="GLProgram.h" />
     <ClInclude Include="GLTexture.h" />
     <ClInclude Include="IO.h" />
@@ -166,9 +165,7 @@
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="ModelManager.h" />
-    <ClInclude Include="PlaneRenderer.h" />
     <ClInclude Include="Renderable.h" />
-    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="TextureManager.h" />
@@ -182,7 +179,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CubeRenderer.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GL.cpp" />
     <ClCompile Include="GLCubemap.cpp" />
@@ -190,7 +186,7 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="LevelIO.cpp" />
     <ClCompile Include="lodepng.cpp" />
-    <ClCompile Include="ModelRenderer.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="GLProgram.cpp" />
     <ClCompile Include="GLTexture.cpp" />
     <ClCompile Include="IO.cpp" />
@@ -198,7 +194,6 @@
     <ClCompile Include="Maths.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="ModelManager.cpp" />
-    <ClCompile Include="PlaneRenderer.cpp" />
     <ClCompile Include="Renderable.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="String.cpp" />

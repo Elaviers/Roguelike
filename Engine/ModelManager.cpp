@@ -11,10 +11,77 @@ ModelManager::ModelManager()
 ModelManager::~ModelManager()
 {
 	_models.ForEach(
-		[](ModelRenderer &model) 
+		[](Model &model) 
 		{
 			model.Delete(); 
 		});
+}
+
+void ModelManager::Initialise()
+{
+	Vertex17F cubeData[36] =
+	{
+		//Bottom
+		VERT14F_TRI(Vector3(1, -1, -1),		Vector3(-1, -1, -1),	Vector3(1, -1, 1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, -1, 0)),
+		VERT14F_TRI(Vector3(-1, -1, 1),		Vector3(1, -1, 1),		Vector3(-1, -1, -1),Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, -1, 0)),
+
+		//Top
+		VERT14F_TRI(Vector3(-1, 1, -1),		Vector3(1, 1, -1),		Vector3(-1, 1, 1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 1, 0)),
+		VERT14F_TRI(Vector3(1, 1, 1),		Vector3(-1, 1, 1),		Vector3(1, 1, -1),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 1, 0)),
+
+		//Front
+		VERT14F_TRI(Vector3(-1, -1, -1),	Vector3(1, -1, -1),		Vector3(-1, 1, -1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 0, -1)),
+		VERT14F_TRI(Vector3(1, 1, -1),		Vector3(-1, 1, -1),		Vector3(1, -1, -1),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 0, -1)),
+
+		//Right
+		VERT14F_TRI(Vector3(1, -1, -1),		Vector3(1, -1, 1),		Vector3(1, 1, -1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(1, 0, 0)),
+		VERT14F_TRI(Vector3(1, 1, 1),		Vector3(1, 1, -1),		Vector3(1, -1, 1),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(1, 0, 0)),
+
+		//Back
+		VERT14F_TRI(Vector3(1, -1, 1),		Vector3(-1, -1, 1),		Vector3(1, 1, 1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 0, 1)),
+		VERT14F_TRI(Vector3(-1, 1, 1),		Vector3(1, 1, 1),		Vector3(-1, -1, 1),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 0, 1)),
+
+		//Left
+		VERT14F_TRI(Vector3(-1, -1, 1),		Vector3(-1, -1, -1),	Vector3(-1, 1, 1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(-1, 0, 0)),
+		VERT14F_TRI(Vector3(-1, 1, -1),		Vector3(-1, 1, 1),		Vector3(-1, -1, -1),Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(-1, 0, 0)),
+	};
+
+	for (int i = 0; i < 36; i += 3)
+		Vertex17F::CalculateTangents(cubeData[i], cubeData[i + 1], cubeData[i + 2]);
+
+	_cube.Create(cubeData, 36);
+
+	for (int i = 0; i < 36; i += 3) {
+		cubeData[i].normal *= -1;
+		cubeData[i + 1].normal *= -1;
+		cubeData[i + 2].normal *= -1;
+
+		Utilities::Swap(cubeData[i + 1], cubeData[i + 2]);
+		Vertex17F::CalculateTangents(cubeData[i], cubeData[i + 1], cubeData[i + 2]);
+	}
+
+	_invCube.Create(cubeData, 36);
+
+	const Vector3 planeColour(1.f, 1.f, 1.f);
+
+	Vertex17F planeVerts[4] =
+	{
+		{ Vector3(-1, 0, -1), Vector2(0, 0), planeColour, Vector3(), Vector3(), Vector3(0, 1, 0) },
+		{ Vector3(1, 0, -1), Vector2(1, 0), planeColour, Vector3(), Vector3(), Vector3(0, 1, 0) },
+		{ Vector3(-1, 0, 1), Vector2(0, 1), planeColour, Vector3(), Vector3(), Vector3(0, 1, 0) },
+		{ Vector3(1, 0, 1), Vector2(1, 1), planeColour, Vector3(), Vector3(), Vector3(0, 1, 0) }
+	};
+
+	uint32 planeElements[6] =
+	{
+		0, 1, 2,
+		3, 2, 1
+	};
+
+	Vertex17F::CalculateTangents(planeVerts[0], planeVerts[1], planeVerts[2]);
+	Vertex17F::CalculateTangents(planeVerts[1], planeVerts[2], planeVerts[3]); //Not good
+
+	_plane.Create(planeVerts, 4, planeElements, 6);
 }
 
 struct OBJVertexDef
@@ -74,7 +141,7 @@ inline const uint32 OBJIndexToCIndex(const Buffer<T> &buf, int32 objIndex)
 	return objIndex - 1;
 }
 
-uint32 GetVertexIndex(Buffer<Vertex14F> &vertices, uint32 &vertexCount, const Buffer<Vector3> &positions, const Buffer<Vector3> &normals, const Buffer<Vector2> &uvs, const char *vertex)
+uint32 GetVertexIndex(Buffer<Vertex17F> &vertices, uint32 &vertexCount, const Buffer<Vector3> &positions, const Buffer<Vector3> &normals, const Buffer<Vector2> &uvs, const char *vertex)
 {
 	OBJVertexDef objVertex = ParseOBJVertex(vertex);
 	const Vector3 &pos = positions[OBJIndexToCIndex(vertices, objVertex.pos_index)];
@@ -104,7 +171,7 @@ void ModelManager::LoadModel(const char *filename, const char *name)
 	String objSrc = IO::ReadFileString(filename);
 	if (objSrc.GetLength())
 	{
-		Buffer<Vertex14F> vertices;
+		Buffer<Vertex17F> vertices;
 		Buffer<uint32> elements;
 
 		Buffer<Vector3> positions;
@@ -158,7 +225,7 @@ void ModelManager::LoadModel(const char *filename, const char *name)
 						elements[last] =		v1;
 						elements[last + 1] =	v3;
 						elements[last + 2] =	v2;
-						Vertex14F::CalculateTangents(vertices[v1], vertices[v3], vertices[v2]);
+						Vertex17F::CalculateTangents(vertices[v1], vertices[v3], vertices[v2]);
 
 						if (tokens.GetSize() == 5)	//Quad, add another triangle
 						{
@@ -170,14 +237,14 @@ void ModelManager::LoadModel(const char *filename, const char *name)
 							elements[last] =		v1;
 							elements[last + 1] =	v4;
 							elements[last + 2] =	v3;
-							Vertex14F::CalculateTangents(vertices[v1], vertices[v4], vertices[v3]);
+							Vertex17F::CalculateTangents(vertices[v1], vertices[v4], vertices[v3]);
 						}
 					}
 				}
 			}
 		}
 
-		ModelRenderer *newModel = _models.New(String(name));
+		Model *newModel = _models.New(String(name));
 
 		if (newModel)
 			newModel->Create(vertices.Data(), vertices.GetSize(), elements.Data(), elements.GetSize());

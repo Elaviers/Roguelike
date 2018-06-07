@@ -7,10 +7,5 @@ out vec4 OutColour;
 
 void main()
 {
-	if (VertexColour == 0)
-		OutColour = Colour;
-	else if (Colour == 0)
-		OutColour = VertexColour;
-	else
-		OutColour = Colour * VertexColour;
+	OutColour = VertexColour * Colour;
 }

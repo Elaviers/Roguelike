@@ -1,16 +1,16 @@
 #pragma once
 #include "GameObject.h"
-#include "Renderer.h"
+#include "Model.h"
 
 class Renderable : public GameObject
 {
 private:
-	const Renderer *_renderer;
+	const Model *_model;
 
 public:
 	Renderable() {}
 	virtual ~Renderable() {}
 
-	void SetRenderer(const Renderer& renderer) { _renderer = &renderer; }
+	void SetModel(const Model& renderer) { _model = &renderer; }
 	virtual void Render();
 };

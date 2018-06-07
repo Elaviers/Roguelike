@@ -23,19 +23,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Phong.frag">
+    <None Include="Data\Phong.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Unlit.frag">
+    <None Include="Data\Shader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shader.vert">
+    <None Include="Data\Sky.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Sky.vert">
+    <None Include="Data\Sky.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Sky.frag">
+    <None Include="Data\Unlit.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -13,13 +13,13 @@ void Light::ToShader(int glArrayIndex)
 	glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName + ".Radius")),		1, &_radius);
 }
 
-#include "CubeRenderer.h"
+#include "ModelManager.h"
 
-void Light::DebugRender(CubeRenderer &cubeRenderer)
+void Light::DebugRender(ModelManager &modelManager)
 {
 	float colour[4] = {_colour[0], _colour[1], _colour[2], 1.f};
 
 	glUniform4fv(GLProgram::Current().GetUniformLocation("Colour"), 1, colour);
 	GameObject::ApplyTransformToShader();
-	cubeRenderer.Render();
+	modelManager.Cube().Render();
 }
