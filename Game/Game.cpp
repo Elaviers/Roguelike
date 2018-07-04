@@ -70,7 +70,7 @@ void Game::_InitGL()
 	glClearColor(0.2f, 0.f, 0.f, 1.f);
 	wglSwapIntervalEXT(0);
 
-	_shader.Load("Data/Shader.vert", "Data/Shader.frag");
+	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Shader.frag");
 }
 
 void Game::Run()

@@ -1,7 +1,7 @@
 #include "Transform.h"
 #include "Maths.h"
 
-Mat4 Transform::MakeTransformationMatrix()
+Mat4 Transform::MakeTransformationMatrix() const
 {
 	return
 		Matrix::Scale(_scale) *
@@ -9,7 +9,7 @@ Mat4 Transform::MakeTransformationMatrix()
 		Matrix::Translation(_position);
 }
 
-Mat4 Transform::MakeInverseTransformationMatrix()
+Mat4 Transform::MakeInverseTransformationMatrix() const
 {
 	return
 		Matrix::Translation(-1.f * _position) *
@@ -17,7 +17,7 @@ Mat4 Transform::MakeInverseTransformationMatrix()
 		Matrix::Scale(1.f / _scale);
 }
 
-Vector3 Transform::GetForwardVector()
+Vector3 Transform::GetForwardVector() const
 {
 	//cos pitch * sin yaw, sin pitch, cos pitch * cos yaw
 	float cosPitch = CosineDegrees(_rotation[0]);
@@ -25,7 +25,7 @@ Vector3 Transform::GetForwardVector()
 	return Vector3(cosPitch * SineDegrees(_rotation[1]), SineDegrees(_rotation[0]), cosPitch * CosineDegrees(_rotation[1]));
 }
 
-Vector3 Transform::GetRightVector()
+Vector3 Transform::GetRightVector() const
 {
 	//cos roll * cos yaw, -sin roll, cos roll * -sin yaw
 	float cosRoll = CosineDegrees(_rotation[2]);
@@ -33,7 +33,7 @@ Vector3 Transform::GetRightVector()
 	return Vector3(cosRoll * CosineDegrees(_rotation[1]), -SineDegrees(_rotation[2]), cosRoll * -SineDegrees(_rotation[1]));
 }
 
-Vector3 Transform::GetUpVector()
+Vector3 Transform::GetUpVector() const
 {
 	//sin roll * cos yaw + -sin pitch * sin yaw, cos pitch * cos roll, -sin pitch * cos yaw + sin roll * sin yaw
 	float sinYaw = SineDegrees(_rotation[1]);

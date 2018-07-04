@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{ae3a502f-ebc7-4bd5-afcd-fe2a18a0bbaa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -26,5 +29,28 @@
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Data\Shaders\basic.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\basic.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\Phong.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\Shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\Sky.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\Sky.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\Unlit.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -11,7 +11,7 @@ ModelManager::ModelManager()
 ModelManager::~ModelManager()
 {
 	_models.ForEach(
-		[](Model &model) 
+		[](GLModel &model) 
 		{
 			model.Delete(); 
 		});
@@ -22,28 +22,28 @@ void ModelManager::Initialise()
 	Vertex17F cubeData[36] =
 	{
 		//Bottom
-		VERT14F_TRI(Vector3(1, -1, -1),		Vector3(-1, -1, -1),	Vector3(1, -1, 1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, -1, 0)),
-		VERT14F_TRI(Vector3(-1, -1, 1),		Vector3(1, -1, 1),		Vector3(-1, -1, -1),Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, -1, 0)),
+		VERT14F_TRI(Vector3(.5f, -.5f, -.5f),	Vector3(-.5f, -.5f, -.5f),	Vector3(.5f, -.5f, .5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, -1, 0)),
+		VERT14F_TRI(Vector3(-.5f, -.5f, .5f),	Vector3(.5f, -.5f, .5f),	Vector3(-.5f, -.5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, -1, 0)),
 
 		//Top
-		VERT14F_TRI(Vector3(-1, 1, -1),		Vector3(1, 1, -1),		Vector3(-1, 1, 1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 1, 0)),
-		VERT14F_TRI(Vector3(1, 1, 1),		Vector3(-1, 1, 1),		Vector3(1, 1, -1),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 1, 0)),
+		VERT14F_TRI(Vector3(-.5f, .5f, -.5f),	Vector3(.5f, .5f, -.5f),	Vector3(-.5f, .5f, .5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 1, 0)),
+		VERT14F_TRI(Vector3(.5f, .5f, .5f),		Vector3(-.5f, .5f, .5f),	Vector3(.5f, .5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 1, 0)),
 
 		//Front
-		VERT14F_TRI(Vector3(-1, -1, -1),	Vector3(1, -1, -1),		Vector3(-1, 1, -1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 0, -1)),
-		VERT14F_TRI(Vector3(1, 1, -1),		Vector3(-1, 1, -1),		Vector3(1, -1, -1),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 0, -1)),
+		VERT14F_TRI(Vector3(-.5f, -.5f, -.5f),	Vector3(.5f, -.5f, -.5f),	Vector3(-.5f, .5f, -.5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 0, -1)),
+		VERT14F_TRI(Vector3(.5f, .5f, -.5f),	Vector3(-.5f, .5f, -.5f),	Vector3(.5f, -.5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 0, -1)),
 
 		//Right
-		VERT14F_TRI(Vector3(1, -1, -1),		Vector3(1, -1, 1),		Vector3(1, 1, -1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(1, 0, 0)),
-		VERT14F_TRI(Vector3(1, 1, 1),		Vector3(1, 1, -1),		Vector3(1, -1, 1),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(1, 0, 0)),
+		VERT14F_TRI(Vector3(.5f, -.5f, -.5f),	Vector3(.5f, -.5f, .5f),	Vector3(.5f, .5f, -.5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(1, 0, 0)),
+		VERT14F_TRI(Vector3(.5f, .5f, .5f),		Vector3(.5f, .5f, -.5f),	Vector3(.5f, -.5f, .5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(1, 0, 0)),
 
 		//Back
-		VERT14F_TRI(Vector3(1, -1, 1),		Vector3(-1, -1, 1),		Vector3(1, 1, 1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 0, 1)),
-		VERT14F_TRI(Vector3(-1, 1, 1),		Vector3(1, 1, 1),		Vector3(-1, -1, 1),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 0, 1)),
+		VERT14F_TRI(Vector3(.5f, -.5f, .5f),	Vector3(-.5f, -.5f, .5f),	Vector3(.5f, .5f, .5f),		Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 0, 1)),
+		VERT14F_TRI(Vector3(-.5f, .5f, .5f),	Vector3(.5f, .5f, .5f),		Vector3(-.5f, -.5f, .5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 0, 1)),
 
 		//Left
-		VERT14F_TRI(Vector3(-1, -1, 1),		Vector3(-1, -1, -1),	Vector3(-1, 1, 1),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(-1, 0, 0)),
-		VERT14F_TRI(Vector3(-1, 1, -1),		Vector3(-1, 1, 1),		Vector3(-1, -1, -1),Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(-1, 0, 0)),
+		VERT14F_TRI(Vector3(-.5f, -.5f, .5f),	Vector3(-.5f, -.5f, -.5f),	Vector3(-.5f, .5f, .5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(-1, 0, 0)),
+		VERT14F_TRI(Vector3(-.5f, .5f, -.5f),	Vector3(-.5f, .5f, .5f),	Vector3(-.5f, -.5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(-1, 0, 0)),
 	};
 
 	for (int i = 0; i < 36; i += 3)
@@ -66,10 +66,10 @@ void ModelManager::Initialise()
 
 	Vertex17F planeVerts[4] =
 	{
-		{ Vector3(-1, 0, -1), Vector2(0, 0), planeColour, Vector3(), Vector3(), Vector3(0, 1, 0) },
-		{ Vector3(1, 0, -1), Vector2(1, 0), planeColour, Vector3(), Vector3(), Vector3(0, 1, 0) },
-		{ Vector3(-1, 0, 1), Vector2(0, 1), planeColour, Vector3(), Vector3(), Vector3(0, 1, 0) },
-		{ Vector3(1, 0, 1), Vector2(1, 1), planeColour, Vector3(), Vector3(), Vector3(0, 1, 0) }
+		{ Vector3(-.5f, -.5f, 0), Vector2(0, 0),	planeColour, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1) },
+		{ Vector3(.5f, -.5f, 0), Vector2(1, 0),		planeColour, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1) },
+		{ Vector3(-.5f, .5f, 0), Vector2(0, 1),		planeColour, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1) },
+		{ Vector3(.5f, .5f, 0), Vector2(1, 1),		planeColour, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1) }
 	};
 
 	uint32 planeElements[6] =
@@ -78,10 +78,17 @@ void ModelManager::Initialise()
 		3, 2, 1
 	};
 
-	Vertex17F::CalculateTangents(planeVerts[0], planeVerts[1], planeVerts[2]);
-	Vertex17F::CalculateTangents(planeVerts[1], planeVerts[2], planeVerts[3]); //Not good
-
 	_plane.Create(planeVerts, 4, planeElements, 6);
+
+	Vector3 basicPlaneVerts[4] =
+	{
+		Vector3(-.5f, -.5f, 0),
+		Vector3(.5f, -.5f, 0),
+		Vector3(-.5f, .5f, 0),
+		Vector3(.5f, .5f, 0)
+	};
+
+	_basicPlane.Create(basicPlaneVerts, 4, planeElements, 6);
 }
 
 struct OBJVertexDef
@@ -244,7 +251,7 @@ void ModelManager::LoadModel(const char *filename, const char *name)
 			}
 		}
 
-		Model *newModel = _models.New(String(name));
+		GLModel *newModel = _models.New(String(name));
 
 		if (newModel)
 			newModel->Create(vertices.Data(), vertices.GetSize(), elements.Data(), elements.GetSize());

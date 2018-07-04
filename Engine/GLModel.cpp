@@ -1,13 +1,13 @@
-#include "Model.h"
+#include "GLModel.h"
 
 
 
-Model::Model()
+GLModel::GLModel()
 {
 }
 
 
-Model::~Model()
+GLModel::~GLModel()
 {
 }
 
@@ -28,7 +28,7 @@ inline void SetGLAttribs()
 	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, normal));
 }
 
-void Model::Create(const Vertex17F *data, uint32 vertexCount)
+void GLModel::Create(const Vertex17F *data, uint32 vertexCount)
 {
 	if (_vao || _vbo || _ebo)
 	{
@@ -51,7 +51,7 @@ void Model::Create(const Vertex17F *data, uint32 vertexCount)
 	SetGLAttribs();
 }
 
-void Model::Create(const Vertex17F *data, uint32 vertexCount, const uint32 *elements, uint32 elementCount)
+void GLModel::Create(const Vertex17F *data, uint32 vertexCount, const uint32 *elements, uint32 elementCount)
 {
 	if (_vao || _vbo || _ebo)
 	{
@@ -75,4 +75,31 @@ void Model::Create(const Vertex17F *data, uint32 vertexCount, const uint32 *elem
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _count * sizeof(uint32), elements, GL_STATIC_DRAW);
 
 	SetGLAttribs();
+}
+
+void GLModel::Create(const Vector3 *basicData, uint32 vertexCount, const uint32 *elements, uint32 elementCount)
+{
+	if (_vao || _vbo || _ebo)
+	{
+		glDeleteVertexArrays(1, &_vao);
+		glDeleteBuffers(1, &_vbo);
+		glDeleteBuffers(1, &_ebo);
+	}
+
+	_count = elementCount;
+
+	glGenVertexArrays(1, &_vao);
+	glGenBuffers(1, &_vbo);
+	glGenBuffers(1, &_ebo);
+
+	glBindVertexArray(_vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex17F), basicData, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, _count * sizeof(uint32), elements, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);	//Position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
 }

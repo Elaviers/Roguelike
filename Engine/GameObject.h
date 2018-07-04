@@ -19,7 +19,7 @@ public:
 
 	inline void SetParent(GameObject &parent)	{ _parent = &parent; }
 
-	Mat4 MakeTransformationMatrix();
-	Mat4 MakeInverseTransformationMatrix();
-	void ApplyTransformToShader();
+	Mat4 MakeTransformationMatrix() const;
+	Mat4 MakeInverseTransformationMatrix() const;
+	void ApplyTransformToShader() const;
 };

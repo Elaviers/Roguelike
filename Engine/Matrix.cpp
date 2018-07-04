@@ -75,13 +75,13 @@ namespace Matrix
 		);
 	}
 
-	Mat4 Ortho(float width, float height, float near, float far)
+	Mat4 Ortho(float width, float height, float near, float far, float scale)
 	{
 		RETURNMAT4(
-			2.f / width,	0.f,			0.f,							0.f,
-			0.f,			2.f / height,	0.f,							0.f,
-			0.f,			0.f,			2.f / (far - near),				0.f,
-			-1.f,			-1.f,			(-far - near) / (far - near),	1.f
+			2.f * scale / width,	0.f,					0.f,							0.f,
+			0.f,					2.f * scale / height,	0.f,							0.f,
+			0.f,					0.f,					2.f / (far - near),				0.f,
+			0.f,					0.f,					(-far - near) / (far - near),	1.f
 		);
 	}
 

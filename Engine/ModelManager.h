@@ -1,16 +1,18 @@
 #pragma once
-#include "Model.h"
+#include "GLModel.h"
 #include "Map.h"
 #include "String.h"
 
 class ModelManager
 {
 private:
-	Map<String, Model> _models;
+	Map<String, GLModel> _models;
 
-	Model _cube;
-	Model _invCube;
-	Model _plane;
+	GLModel _cube;
+	GLModel _invCube;
+	GLModel _plane;
+
+	GLModel _basicPlane;
 
 public:
 	ModelManager();
@@ -20,9 +22,11 @@ public:
 
 	void LoadModel(const char *filepath, const char *name);
 
-	inline Model* GetModel(const char *name) { return _models.Find(name); }
+	inline GLModel* GetModel(const char *name) { return _models.Find(name); }
 
-	inline const Model& Cube() const		{ return _cube; }
-	inline const Model& InverseCube() const { return _invCube; }
-	inline const Model& Plane() const		{ return _plane; }
+	inline const GLModel& Cube() const		{ return _cube; }
+	inline const GLModel& InverseCube() const { return _invCube; }
+	inline const GLModel& Plane() const		{ return _plane; }
+
+	inline const GLModel& BasicPlane() const	{ return _basicPlane; }
 };

@@ -1,5 +1,7 @@
 #pragma once
 #include "GL.h"
+#include "Types.h"
+#include "Vector.h"
 #include <Windows.h>
 
 class Window
@@ -22,7 +24,7 @@ public:
 	void SwapBuffers();
 
 	inline void SetTitle(const char *title) { ::SetWindowTextA(_hwnd, title); }
-	inline void SetSizeAndPos(int x, int y, int width, int height) { ::SetWindowPos(_hwnd, NULL, x, y, width, height, 0); }
-	void SetSize(int width, int height);
-	void SetPos(int x, int y);
+	inline void SetSizeAndPos(uint16 x, uint16 y, uint16 width, uint16 height) { ::SetWindowPos(_hwnd, NULL, x, y, width, height, 0); }
+	void SetSize(uint16 width, uint16 height);
+	void SetPos(uint16 x, uint16 y);
 };

@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DrawUtils.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GL.h" />
@@ -156,7 +157,7 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="LevelIO.h" />
     <ClInclude Include="lodepng.h" />
-    <ClInclude Include="Model.h" />
+    <ClInclude Include="GLModel.h" />
     <ClInclude Include="GLProgram.h" />
     <ClInclude Include="GLTexture.h" />
     <ClInclude Include="IO.h" />
@@ -179,6 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DrawUtils.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GL.cpp" />
     <ClCompile Include="GLCubemap.cpp" />
@@ -186,7 +188,7 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="LevelIO.cpp" />
     <ClCompile Include="lodepng.cpp" />
-    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="GLModel.cpp" />
     <ClCompile Include="GLProgram.cpp" />
     <ClCompile Include="GLTexture.cpp" />
     <ClCompile Include="IO.cpp" />

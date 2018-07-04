@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -72,25 +72,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>
+    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>
+    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>
+    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>
+    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,8 +104,8 @@
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -119,8 +119,8 @@
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -138,8 +138,8 @@
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,8 +157,8 @@
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -167,6 +167,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Data\Shaders\Basic.frag" />
+    <None Include="..\Data\Shaders\Basic.vert" />
+    <None Include="..\Data\Shaders\Phong.frag" />
+    <None Include="..\Data\Shaders\Shader.vert" />
+    <None Include="..\Data\Shaders\Sky.frag" />
+    <None Include="..\Data\Shaders\Sky.vert" />
+    <None Include="..\Data\Shaders\Unlit.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

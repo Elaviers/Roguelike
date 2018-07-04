@@ -62,7 +62,7 @@ public:
 
 	SquareMatrix& operator*=(const SquareMatrix& other)
 	{
-		*this = other * *this;;
+		*this = *this * other;
 		return *this;
 	}
 
@@ -92,7 +92,7 @@ namespace Matrix
 	Mat4 RotationZ(float angle);
 	Mat4 Scale(const Vector3 &scale);
 
-	Mat4 Ortho(float width, float height, float near, float far);
+	Mat4 Ortho(float width, float height, float near, float far, float scale = 1.f);
 	Mat4 Perspective(float fieldOfView, float near, float far, float aspectRatio);
 }
 

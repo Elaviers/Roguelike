@@ -38,9 +38,9 @@ private:
 
 public:
 	Vector() : _data() {}
-	Vector(float x, float y)					{ static_assert(SIZE >= 2, "Vector size is smaller than argument count"); _data[0] = x; _data[1] = y; }
-	Vector(float x, float y, float z)			{ static_assert(SIZE >= 3, "Vector size is smaller than argument count"); _data[0] = x; _data[1] = y; _data[2] = z; }
-	Vector(float x, float y, float z, float w)	{ static_assert(SIZE >= 4, "Vector size is smaller than argument count"); _data[0] = x; _data[1] = y; _data[2] = z; _data[3] = w; }
+	Vector(float x, float y)					{ static_assert(SIZE == 2, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; }
+	Vector(float x, float y, float z)			{ static_assert(SIZE == 3, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; }
+	Vector(float x, float y, float z, float w)	{ static_assert(SIZE == 4, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; _data[3] = w; }
 
 	~Vector() {}
 

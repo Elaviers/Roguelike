@@ -38,5 +38,11 @@
     <None Include="Data\Unlit.frag">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Data\Basic.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Data\Basic.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
 #pragma once
 #include "GL.h"
 #include "Matrix.h"
+#include "Vector.h"
 
 class GLProgram
 {
@@ -28,5 +29,7 @@ public:
 
 	inline void SetInt(const char *name, GLint x) { glUniform1i(GetUniformLocation(name), x); }
 	inline void SetMat4(const char *name, const Mat4 &x) { glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &x[0][0]); }
+	inline void SetVec3(const char *name, const Vector3 &x) { glUniform3fv(GetUniformLocation(name), 1, &x[0]); }
+	inline void SetVec4(const char *name, const Vector4 &x) { glUniform4fv(GetUniformLocation(name), 1, &x[0]); }
 };
 

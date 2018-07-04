@@ -18,6 +18,9 @@ void Window::Create(LPCTSTR className, LPCTSTR title, LPVOID param, DWORD flags,
 
 	_hwnd = ::CreateWindow(className, title, flags, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, parent, NULL, ::GetModuleHandle(NULL), param);
 
+	RECT rect;
+	::GetClientRect(_hwnd, &rect);
+
 	_hdc = GetDC(_hwnd);
 
 	PIXELFORMATDESCRIPTOR pfd = {
@@ -55,7 +58,7 @@ void Window::SwapBuffers()
 	::SwapBuffers(_hdc);
 }
 
-void Window::SetSize(int width, int height)
+void Window::SetSize(uint16 width, uint16 height)
 {
 	RECT rect;
 	::GetWindowRect(_hwnd, &rect);
@@ -63,7 +66,7 @@ void Window::SetSize(int width, int height)
 	SetSizeAndPos(rect.left, rect.top, width, height);
 }
 
-void Window::SetPos(int x, int y)
+void Window::SetPos(uint16 x, uint16 y)
 {
 	RECT rect;
 	::GetClientRect(_hwnd, &rect);

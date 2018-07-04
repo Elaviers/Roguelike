@@ -2,7 +2,7 @@
 #include "GL.h"
 #include "GLProgram.h"
 
-Mat4 GameObject::MakeInverseTransformationMatrix()
+Mat4 GameObject::MakeInverseTransformationMatrix() const
 {
 	if (_parent)
 		return transform.MakeInverseTransformationMatrix() * _parent->MakeInverseTransformationMatrix();
@@ -12,7 +12,7 @@ Mat4 GameObject::MakeInverseTransformationMatrix()
 
 //Public
 
-Mat4 GameObject::MakeTransformationMatrix()
+Mat4 GameObject::MakeTransformationMatrix() const
 {
 	if (_parent)
 		return transform.MakeTransformationMatrix() * _parent->MakeTransformationMatrix();
@@ -20,7 +20,7 @@ Mat4 GameObject::MakeTransformationMatrix()
 	return transform.MakeTransformationMatrix();
 }
 
-void GameObject::ApplyTransformToShader()
+void GameObject::ApplyTransformToShader() const
 {
 	glUniformMatrix4fv(
 		GLProgram::Current().GetUniformLocation("M_Model"),

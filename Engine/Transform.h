@@ -27,10 +27,10 @@ public:
 	inline void Move(const Vector3 &delta)				{ _position += delta; }
 	inline void Rotate(const Vector3 &delta)			{ _rotation += delta; }
 
-	Mat4 MakeTransformationMatrix();
-	Mat4 MakeInverseTransformationMatrix();
+	Mat4 MakeTransformationMatrix() const;
+	Mat4 MakeInverseTransformationMatrix() const;
 
-	Vector3 GetForwardVector();
-	Vector3 GetRightVector();
-	Vector3 GetUpVector();
+	Vector3 GetForwardVector() const;
+	Vector3 GetRightVector() const;
+	Vector3 GetUpVector() const;
 };

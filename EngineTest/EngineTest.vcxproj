@@ -22,6 +22,8 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Data\Basic.frag" />
+    <None Include="Data\Basic.vert" />
     <None Include="Data\Phong.frag" />
     <None Include="Data\Shader.vert" />
     <None Include="Data\Sky.frag" />

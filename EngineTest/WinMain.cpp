@@ -1,5 +1,6 @@
 #include <Windowsx.h>
 #include <Engine\Camera.h>
+#include <Engine\DrawUtils.h>
 #include <Engine\GL.h>
 #include <Engine\GLProgram.h>
 #include <Engine\InputManager.h>
@@ -12,6 +13,8 @@
 #include <Engine\Timer.h>
 #include <Engine\Utilities.h>
 #include <Engine\Window.h>
+
+#define ORTHO 0
 
 bool running = false;
 
@@ -46,6 +49,7 @@ Skybox sky;
 GLProgram program_Lit;
 GLProgram program_Unlit;
 GLProgram program_Sky;
+GLProgram program_UI;
 Window window;
 
 bool cursorLocked = false;
@@ -92,8 +96,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		uint16 h = HIWORD(lParam);
 
 		glViewport(0, 0, w, h);
-
-		camera.SetAspectRatio((float)w / (float)h);
+		camera.SetViewport(w, h);
 
 		if (running) Frame(); //Please pretend this line doesn't exist
 	}
@@ -165,14 +168,13 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	//
 	GL::LoadExtensions(window.GetHDC());
 	wglSwapIntervalEXT(0);
-	glClearColor(0.3f, 0.4f, 0.3f, 1.f);
-	
+
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	glFrontFace(GL_CCW);
-	
+
 	glLineWidth(2);
 	glPointSize(8);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -184,6 +186,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	program_Lit.Load("Data/Shader.vert", "Data/Phong.frag");
 	program_Unlit.Load("Data/Shader.vert", "Data/Unlit.frag");
 	program_Sky.Load("Data/Sky.vert", "Data/Sky.frag");
+	program_UI.Load("Data/Basic.vert", "Data/Basic.frag");
 
 	//
 	//Initialise managers
@@ -194,7 +197,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 
 	inputManager.BindKeyAxis(Keycode::A, &axisX, -1);
 	inputManager.BindKeyAxis(Keycode::D, &axisX, 1);
-	inputManager.BindKeyAxis(Keycode::LCTRL, &axisY, -1);
+	inputManager.BindKeyAxis(Keycode::F, &axisY, -1);
 	inputManager.BindKeyAxis(Keycode::SPACE, &axisY, 1);
 	inputManager.BindKeyAxis(Keycode::S, &axisZ, -1);
 	inputManager.BindKeyAxis(Keycode::W, &axisZ, 1);
@@ -203,8 +206,8 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	inputManager.BindKeyAxis(Keycode::UP, &lookX, 1);
 	inputManager.BindKeyAxis(Keycode::LEFT, &lookY, -1);
 	inputManager.BindKeyAxis(Keycode::RIGHT, &lookY, 1);
-	inputManager.BindKeyAxis(Keycode::Q, &lookX, -1);
-	inputManager.BindKeyAxis(Keycode::E, &lookX, 1);
+	inputManager.BindKeyAxis(Keycode::Q, &lookZ, -1);
+	inputManager.BindKeyAxis(Keycode::E, &lookZ, 1);
 
 	inputManager.BindAxis(AxisType::MOUSE_X, &lookY);
 	inputManager.BindAxis(AxisType::MOUSE_Y, &lookX);
@@ -220,7 +223,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	textureManager.LoadTexture("Data/Normal.png", "NORMAL");
 	textureManager.LoadTexture("Data/Specular.png", "SPECULAR");
 	textureManager.LoadTexture("Data/Reflectivity.png", "REFLECTION");
-	
+
 	const char *faces[6] = { "Data/SkyLeft.png", "Data/SkyRight.png", "Data/SkyUp.png", "Data/SkyDown.png", "Data/SkyFront.png", "Data/SkyBack.png" };
 	sky.Load(faces);
 
@@ -228,7 +231,20 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	//World setup
 	window.SetTitle("Creating World...");
 	//
-	camera.transform.SetPosition(Vector3(0.f, 0.f, -3.f));
+
+	if (ORTHO)
+	{
+		camera.SetProectionType(ProjectionType::ORTHOGRAPHIC);
+		camera.SetZBounds(-100000.f, 100000.f);
+		camera.SetScale(128.f);
+		camera.transform.SetRotation(Vector3(-90.f, 0.f, 0.f));
+	}
+	else
+	{
+		camera.SetProectionType(ProjectionType::PERSPECTIVE);
+		camera.SetZBounds(0.001f, 100000.f);
+		camera.transform.SetPosition(Vector3(0.f, 0.f, -5.f));
+	}
 
 	light1.transform.SetPosition(Vector3(0.f, 0.f, -4.f));
 	light2.transform.SetPosition(Vector3(0.f, 0.f, -3.5f));
@@ -250,7 +266,6 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	light4.SetParent(lightParent4);
 	lightParent4.SetParent(cube);
 
-	cube.transform.SetScale(Vector3(.5f, .5f, .5f));
 	cube.transform.SetPosition(Vector3(2.f, 0.f, 0.f));
 	cube.SetParent(cubeParent);
 	cube.SetModel(modelManager.Cube());
@@ -259,10 +274,9 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	renderable.SetModel(*modelManager.GetModel("MODEL"));
 
 	window.SetTitle("Window");
-	
+
 	//
 	//Windows message loop
-	//
 	running = true;
 	MSG msg;
 	while (running)
@@ -359,16 +373,43 @@ void Frame()
 		//
 
 		//
-		program_Sky.Use();
-		Mat4 skyView = camera.MakeInverseTransformationMatrix();
-		skyView[3][0] = skyView[3][1] = skyView[3][2] = 0;
+		if (camera.GetProjectionType() == ProjectionType::PERSPECTIVE)
+		{
+			program_Sky.Use();
+			Mat4 skyView = camera.MakeInverseTransformationMatrix();
+			skyView[3][0] = skyView[3][1] = skyView[3][2] = 0;
 
-		program_Sky.SetMat4("M_Projection", camera.GetProjectionMatrix());
-		program_Sky.SetMat4("M_View", skyView);
+			program_Sky.SetMat4("M_Projection", camera.GetProjectionMatrix());
+			program_Sky.SetMat4("M_View", skyView);
 
-		glDepthFunc(GL_LEQUAL);
-		sky.Render(modelManager);
-		glDepthFunc(GL_LESS);
+			glDepthFunc(GL_LEQUAL);
+			sky.Render(modelManager);
+			glDepthFunc(GL_LESS);
+		}
+		//
+
+		//
+		{
+			float vpScale = camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC ? 1 : 10;
+			float w = 2.f;
+
+			program_UI.Use();
+			program_UI.SetMat4("M_Projection", camera.GetProjectionMatrix());
+			program_UI.SetMat4("M_View", camera.MakeInverseTransformationMatrix());
+
+			glDisable(GL_CULL_FACE);
+			
+			program_UI.SetVec4("Colour", Vector4(1.f, 0.f, 0.f, 1.f));
+			DrawUtils::DrawGrid(modelManager, camera, Direction::RIGHT, w, 1.f, vpScale);
+
+			program_UI.SetVec4("Colour", Vector4(0.f, 1.f, 0.f, 1.f));
+			DrawUtils::DrawGrid(modelManager, camera, Direction::UP, w, 1.f, vpScale);
+
+			program_UI.SetVec4("Colour", Vector4(0.f, 0.f, 1.f, 1.f));
+			DrawUtils::DrawGrid(modelManager, camera, Direction::FORWARD, w, 1.f, vpScale);
+
+			glEnable(GL_CULL_FACE);
+		}
 		//
 
 		window.SwapBuffers();

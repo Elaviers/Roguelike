@@ -72,25 +72,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>
+    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>
+    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>
+    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>
+    <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -103,6 +103,10 @@
     <Link>
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -114,6 +118,10 @@
     <Link>
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -129,6 +137,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -144,6 +156,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Editor.cpp" />
@@ -152,7 +168,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Editor.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Viewport.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Data\Shaders\Basic.frag" />
+    <None Include="..\Data\Shaders\Basic.vert" />
+    <None Include="..\Data\Shaders\Phong.frag" />
+    <None Include="..\Data\Shaders\Shader.vert" />
+    <None Include="..\Data\Shaders\Sky.frag" />
+    <None Include="..\Data\Shaders\Sky.vert" />
+    <None Include="..\Data\Shaders\Unlit.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

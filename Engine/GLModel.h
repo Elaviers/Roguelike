@@ -3,7 +3,7 @@
 #include "Types.h"
 #include "Vertex.h"
 
-class Model
+class GLModel
 {
 private:
 	GLuint _vao;
@@ -13,11 +13,13 @@ private:
 	uint32 _count; //The amount of elements/verts to draw
 
 public:
-	Model();
-	virtual ~Model();
+	GLModel();
+	virtual ~GLModel();
 
 	void Create(const Vertex17F *data, uint32 vertexCount);
 	void Create(const Vertex17F *data, uint32 vertexCount, const uint32 *elements, uint32 elementCount);
+
+	void Create(const Vector3 *basicData, uint32 vertexCount, const uint32 *elements, uint32 elementCount);
 
 	virtual void Render() const
 	{
