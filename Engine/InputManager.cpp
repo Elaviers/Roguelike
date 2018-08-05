@@ -58,7 +58,7 @@ Keycode StringToKey(const char *string)
 
 void InputManager::KeyDown(Keycode key)
 {
-	auto keyBind = _keyBinds.Find(key);
+	KeyBind *keyBind = _keyBinds.Find(key);
 
 	if (keyBind)
 	{

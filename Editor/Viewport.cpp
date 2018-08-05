@@ -5,6 +5,7 @@
 
 LPCTSTR Viewport::_className = TEXT("VIEWPORTCLASS");
 
+//static
 LRESULT CALLBACK Viewport::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	Viewport *viewport = (Viewport*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
@@ -29,6 +30,7 @@ LRESULT CALLBACK Viewport::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 	return 0;
 }
 
+//static
 void Viewport::Initialise()
 {
 	WNDCLASSEXA windowClass = {};

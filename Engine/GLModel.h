@@ -1,4 +1,5 @@
 #pragma once
+#include "Buffer.h"
 #include "GL.h"
 #include "Types.h"
 #include "Vertex.h"
@@ -30,6 +31,6 @@ public:
 			glDrawArrays(GL_TRIANGLES, 0, _count);
 	}
 
-	inline void Delete() { glDeleteVertexArrays(1, &_vao); glDeleteBuffers(1, &_vbo); }
+	void Delete();
 };
 

@@ -2,6 +2,7 @@
 #include <Engine\Camera.h>
 #include <Engine\DrawUtils.h>
 #include <Engine\GL.h>
+#include <Engine\GLContext.h>
 #include <Engine\GLProgram.h>
 #include <Engine\InputManager.h>
 #include <Engine\Light.h>
@@ -45,6 +46,8 @@ Vector3 cubeRotationOffset(9.f, 23.f, 0.f);
 //
 
 Skybox sky;
+
+GLContext glContext;
 
 GLProgram program_Lit;
 GLProgram program_Unlit;
@@ -159,7 +162,8 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	::RegisterClassEx(&windowClass);
 
 	window.Create(className, "Window", nullptr);
-	window.UseGLContext();
+	glContext.Create(window);
+	glContext.Use(window);
 	window.Show();
 
 	//
@@ -271,7 +275,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	cube.SetModel(modelManager.Cube());
 
 	renderable.SetParent(cubeParent);
-	renderable.SetModel(*modelManager.GetModel("MODEL"));
+	renderable.SetModel(modelManager.GetModel("MODEL"));
 
 	window.SetTitle("Window");
 
@@ -390,7 +394,7 @@ void Frame()
 
 		//
 		{
-			float vpScale = camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC ? 1 : 10;
+			float vpScale = camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC ? 1.f : 10.f;
 			float w = 2.f;
 
 			program_UI.Use();

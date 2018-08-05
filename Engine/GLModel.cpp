@@ -2,7 +2,7 @@
 
 
 
-GLModel::GLModel()
+GLModel::GLModel() : _vao(0), _vbo(0), _ebo(0)
 {
 }
 
@@ -102,4 +102,20 @@ void GLModel::Create(const Vector3 *basicData, uint32 vertexCount, const uint32 
 
 	glEnableVertexAttribArray(0);	//Position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
+}
+
+void GLModel::Delete()
+{
+	_count = 0;
+
+	glDeleteVertexArrays(1, &_vao);
+	glDeleteBuffers(1, &_vbo);
+
+	_vao = _vbo = 0;
+
+	if (_ebo)
+	{
+		glDeleteBuffers(1, &_ebo);
+		_ebo = 0;
+	}
 }

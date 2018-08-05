@@ -15,6 +15,11 @@ ModelManager::~ModelManager()
 		{
 			model.Delete(); 
 		});
+
+	_cube.Delete();
+	_invCube.Delete();
+	_plane.Delete();
+	_basicPlane.Delete();
 }
 
 void ModelManager::Initialise()
@@ -251,10 +256,8 @@ void ModelManager::LoadModel(const char *filename, const char *name)
 			}
 		}
 
-		GLModel *newModel = _models.New(String(name));
-
-		if (newModel)
-			newModel->Create(vertices.Data(), vertices.GetSize(), elements.Data(), elements.GetSize());
+		GLModel &newModel = _models[name];
+		newModel.Create(vertices.Data(), vertices.GetSize(), elements.Data(), elements.GetSize());
 	}
 	else
 		Error(CSTR("OBJ reader could not open \"" + filename + '\"'));

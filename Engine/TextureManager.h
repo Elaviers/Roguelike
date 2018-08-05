@@ -21,7 +21,7 @@ public:
 
 	void LoadTexture(const char *filepath, const char *name);
 
-	inline GLTexture* GetTexture(const char *name) { return _textures.Find(name); }
+	inline const GLTexture* GetTexture(const char *name) const { return _textures.Find(name); }
 
 	inline const GLTexture& White() { return _colours.white; }
 	inline const GLTexture& Grey() { return _colours.grey; }

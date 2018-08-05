@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{910514DF-E498-4CB8-BEC5-304060E649B8}</ProjectGuid>
     <RootNamespace>Engine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -152,6 +152,7 @@
     <ClInclude Include="Error.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GL.h" />
+    <ClInclude Include="GLContext.h" />
     <ClInclude Include="GLCubemap.h" />
     <ClInclude Include="GLDepthMap.h" />
     <ClInclude Include="InputManager.h" />
@@ -163,6 +164,8 @@
     <ClInclude Include="IO.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="ModelManager.h" />
@@ -183,6 +186,7 @@
     <ClCompile Include="DrawUtils.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GL.cpp" />
+    <ClCompile Include="GLContext.cpp" />
     <ClCompile Include="GLCubemap.cpp" />
     <ClCompile Include="GLDepthMap.cpp" />
     <ClCompile Include="InputManager.cpp" />

@@ -21,5 +21,5 @@ void Light::DebugRender(ModelManager &modelManager)
 
 	glUniform4fv(GLProgram::Current().GetUniformLocation("Colour"), 1, colour);
 	GameObject::ApplyTransformToShader();
-	modelManager.Cube().Render();
+	modelManager.Cube()->Render();
 }

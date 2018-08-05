@@ -39,8 +39,7 @@ void TextureManager::LoadTexture(const char *filename, const char *name)
 
 	if (textureData.Valid())
 	{
-		GLTexture *newTexture = _textures.New(name);
-		if (newTexture)
-			newTexture->Create(textureData.width, textureData.height, textureData.data.Data());
+		GLTexture& newTexture = _textures[name];
+		newTexture.Create(textureData.width, textureData.height, textureData.data.Data());
 	}
 }

@@ -4,7 +4,7 @@
 
 namespace LevelMessages
 {
-	enum
+	enum Enum
 	{
 		LAYER = 0,
 		X = 1,
@@ -19,7 +19,7 @@ namespace LevelMessages
 
 namespace LevelDirections
 {
-	enum
+	enum Enum
 	{
 		NORTH = 0,
 		EAST = 1,
@@ -35,7 +35,10 @@ namespace LevelDirections
 
 enum class LevelObjectType
 {
-	TILE, PLANE, RAMP, CONNECTOR
+	TILE = 0,
+	PLANE = 1,
+	RAMP = 2,
+	CONNECTOR = 3
 };
 
 struct LevelObject

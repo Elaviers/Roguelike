@@ -17,6 +17,8 @@ Buffer<byte> IO::ReadFile(const char *filename) {
 		::ReadFile(file, buffer.Data(), fileSize.LowPart, NULL, NULL);
 		::CloseHandle(file);
 	}
+	else
+		Error(CSTR("Could not read file \"" + filename + '\"'));
 
 	return buffer;
 }
@@ -43,9 +45,6 @@ String IO::ReadFileString(const char *filename)
 
 	return string;
 }
-
-#include <vector> //For picopng
-using std::vector;
 
 TextureData IO::ReadPNGFile(const char *filename)
 {

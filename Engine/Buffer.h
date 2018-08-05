@@ -67,4 +67,8 @@ public:
 
 		_data = data; _size = size;
 	}
+
+
+	inline		 T& Last()		 { return _data[_size - 1]; }
+	inline const T& Last() const { return _data[_size - 1]; }
 };

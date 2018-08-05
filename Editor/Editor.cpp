@@ -1,5 +1,6 @@
 #include "Editor.h"
 #include <Engine/DrawUtils.h>
+#include <Engine/Renderable.h>
 #include "resource.h"
 
 LRESULT CALLBACK AboutProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -51,9 +52,6 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 		editor->_viewports[1].SetSizeAndPos(w, 0, w, h);
 		editor->_cameras[1].SetViewport(w, h);
 
-		editor->_viewports[0].UseGLContext();
-		glViewport(0, 0, w, h);
-		editor->_viewports[1].UseGLContext();
 		glViewport(0, 0, w, h);
 
 		editor->Render();
@@ -79,6 +77,17 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			editor->Zoom(1.25f);
 		else
 			editor->Zoom(.75f);
+		break;
+
+	case WM_KEYDOWN:
+		if (lparam & (1 << 30))
+			break; //Key repeats ignored
+
+		editor->_inputManager.KeyDown((Keycode)wparam);
+		break;
+	case WM_KEYUP:
+
+		editor->_inputManager.KeyUp((Keycode)wparam);
 		break;
 
 	default: return ::DefWindowProc(hwnd, msg, wparam, lparam);
@@ -121,40 +130,60 @@ void Editor::_Init()
 	_viewports[0].Create(_window.GetHwnd(), *this, 0);
 	_viewports[1].Create(_window.GetHwnd(), *this, 1);
 
+	_glContext.Create(_viewports[0]);
+	_glContext.Use(_viewports[0]);
+
 	_InitGL();
+
+	_cameras[0].SetProectionType(ProjectionType::PERSPECTIVE);
+	_cameras[0].transform.SetPosition(Vector3(5.f, 5.f, 5.f));
+	_cameras[0].transform.SetRotation(Vector3(-45.f, -135.f, 0.f));
+
+	_cameras[1].SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	_cameras[1].SetZBounds(-10000.f, 10000.f);
+	_cameras[1].transform.SetRotation(Vector3(-90.f, 0.f, 0.f));
+
+	_inputManager.BindKeyAxis(Keycode::W, &_axisMoveY, 1.f);
+	_inputManager.BindKeyAxis(Keycode::S, &_axisMoveY, -1.f);
+	_inputManager.BindKeyAxis(Keycode::D, &_axisMoveX, 1.f);
+	_inputManager.BindKeyAxis(Keycode::A, &_axisMoveX, -1.f);
+
+	_inputManager.BindKeyAxis(Keycode::UP, &_axisLookY, 1.f);
+	_inputManager.BindKeyAxis(Keycode::DOWN, &_axisLookY, -1.f);
+	_inputManager.BindKeyAxis(Keycode::RIGHT, &_axisLookX, 1.f);
+	_inputManager.BindKeyAxis(Keycode::LEFT, &_axisLookX, -1.f);
 
 	_modelManager.Initialise();
 	_textureManager.Initialise();
-
-	_cameras[0].SetProectionType(ProjectionType::PERSPECTIVE);
-	_cameras[1].SetProectionType(ProjectionType::ORTHOGRAPHIC);
-	_cameras[1].transform.SetPosition(Vector3(0.f, 10.f, 0.f));
-	_cameras[1].transform.SetRotation(Vector3(-90.f, 0.f, 0.f));
-
-	_viewports[0].UseGLContext();
-	glClearColor(1.f, 0.f, 0.f, 1.f);
 }
 
 void Editor::_InitGL()
 {
 	for (unsigned int i = 0; i < 2; ++i)
 	{
-		_viewports[i].UseGLContext();
 		GL::LoadExtensions(_viewports[i].GetHDC());
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
 		wglSwapIntervalEXT(0);
 	}
 
-	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Shader.frag");
+	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
 	_basicShader.Load("Data/Shaders/Basic.vert", "Data/Shaders/Basic.frag");
 }
 
 void Editor::Run()
 {
 	_Init();
-
 	_window.Show();
+
+	_modelManager.LoadModel("Data/Models/Model.obj", "Model");
+	_textureManager.LoadTexture("Data/Textures/Diffuse.png", "Diffuse");
+	_materialManager.MakeMaterial(_textureManager, "Model", "Diffuse");
+
+	_currentObject = new Renderable();
+	_gameObjects.Add(_currentObject);
+	((Renderable*)_currentObject)->SetModel(_modelManager.GetModel("Model"));
+	((Renderable*)_currentObject)->SetMaterial(_materialManager.Get("Model"));
 
 	for (int i = 0; i < 4; ++i)
 		_viewports[i].Show();
@@ -175,43 +204,75 @@ void Editor::Run()
 
 void Editor::Frame()
 {
+	const float moveSpeed = 4.f; // units/s
+	const float rotSpeed = 90.f; //	degs/s
+
 	_timer.Start();
 
 	_window.SetTitle(CSTR(String::Convert(_mouseViewport) + " Mouse X:" + String::Convert(_mouseX) + " Mouse Y:" + String::Convert(_mouseY)));
+
+	_cameras[0].transform.Move(
+		_cameras[0].transform.GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed 
+		+ _cameras[0].transform.GetRightVector() * _deltaTime * _axisMoveX * moveSpeed);
+
+	_cameras[0].transform.Rotate(Vector3(_deltaTime * _axisLookY * rotSpeed, _deltaTime * _axisLookX * rotSpeed, 0.f));
 
 	Render();
 
 	_deltaTime = _timer.SecondsSinceStart();
 }
 
+void RenderObjects(const Buffer<GameObject*>& objects)
+{
+	for (uint32 i = 0; i < objects.GetSize(); ++i)
+		((Renderable*)objects[i])->Render();
+}
+
 void Editor::Render()
 {
-	//View 0
-	_viewports[0].UseGLContext();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+	if (_gameObjects.GetSize() == 0) return; //remove this
 
+	//View 0
+	_glContext.Use(_viewports[0]);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	_shader.Use();
+	_shader.SetMat4("M_Projection", _cameras[0].GetProjectionMatrix());
+	_shader.SetMat4("M_View", _cameras[0].MakeInverseTransformationMatrix());
+	_shader.SetVec4("Colour", Vector4(1.f, 1.f, 1.f, 1.f));
+	RenderObjects(_gameObjects);
+
+	_basicShader.Use();
+
+	_basicShader.SetMat4("M_Projection", _cameras[0].GetProjectionMatrix());
+	_basicShader.SetMat4("M_View", _cameras[0].MakeInverseTransformationMatrix());
+
+	_basicShader.SetVec4("Colour", Vector4(.5f, .5f, 1.f, 1.f));
+	DrawUtils::DrawGrid(_modelManager, _cameras[0], Direction::DOWN, 2.f, 10.f, 10.f);
+	_basicShader.SetVec4("Colour", Vector4(.75f, .75f, .75f, 1.f));
+	DrawUtils::DrawGrid(_modelManager, _cameras[0], Direction::DOWN, 2.f, 1.f, 10.f);
 
 	_viewports[0].SwapBuffers();
 
 	//View 1
-	_viewports[1].UseGLContext();
+	_glContext.Use(_viewports[1]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	const uint16 vpw = _cameras[1].GetViewport()[0] / 2;
 	const int gap = 32;
 
-	glDepthFunc(GL_ALWAYS);
-
 	_basicShader.Use();
 	_basicShader.SetMat4("M_Projection", _cameras[1].GetProjectionMatrix());
 	_basicShader.SetMat4("M_View", _cameras[1].MakeInverseTransformationMatrix());
+
+	_basicShader.SetVec4("Colour", Vector4(1.f, 1.f, 1.f, 1.f));
+	RenderObjects(_gameObjects);
+
+	glDepthFunc(GL_ALWAYS);
 	_basicShader.SetVec4("Colour", Vector4(.75f, .75f, .75f, 1.f));
 	DrawUtils::DrawGrid(_modelManager, _cameras[1], Direction::DOWN, 1.f, 1.f);
-
 	_basicShader.SetVec4("Colour", Vector4(.5f, .5f, 1.f, 1.f));
 	DrawUtils::DrawGrid(_modelManager, _cameras[1], Direction::DOWN, 1.f, 10.f);
-
 	glDepthFunc(GL_LESS);
 
 	_viewports[1].SwapBuffers();

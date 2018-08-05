@@ -9,7 +9,6 @@ class Window
 private:
 	HWND	_hwnd;		//Window handle
 	HDC		_hdc;		//Device context handle
-	HGLRC	_hglrc;		//OpenGL rendering context handle
 
 public:
 	Window();
@@ -17,7 +16,6 @@ public:
 
 	inline HWND GetHwnd() const { return _hwnd; }
 	inline HDC GetHDC() const { return _hdc; }
-	inline void UseGLContext() const { wglMakeCurrent(_hdc, _hglrc); }
 
 	void Create(LPCTSTR className, LPCTSTR title, LPVOID param, DWORD flags = WS_OVERLAPPEDWINDOW, HWND parent = NULL);
 	void Show();

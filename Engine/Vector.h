@@ -1,35 +1,6 @@
 #pragma once
 #include "Maths.h"
 
-#define XUNION union {T x, r, u;}
-#define YUNION union {T y, g, v;}
-#define ZUNION union {T z, b;}
-#define WUNION union {T w, a;}
-
-template <typename T, int SIZE>
-struct UnionStruct
-{
-	T x, y, z, w;
-};
-
-template <typename T>
-struct UnionStruct<T, 1>
-{
-	T x, y, z;
-};
-
-template <typename T>
-struct UnionStruct<T, 2>
-{
-	T x, y;
-};
-
-template <typename T>
-struct UnionStruct<T, 3>
-{
-	T x;
-};
-
 template <typename T, int SIZE>
 class Vector
 {

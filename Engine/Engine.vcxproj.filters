@@ -141,6 +141,15 @@
     <ClInclude Include="DrawUtils.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="GLContext.h">
+      <Filter>Header Files\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IO.cpp">
@@ -220,6 +229,9 @@
     </ClCompile>
     <ClCompile Include="DrawUtils.cpp">
       <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="GLContext.cpp">
+      <Filter>Source Files\GL</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

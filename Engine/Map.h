@@ -1,8 +1,5 @@
 #pragma once
-#include "Buffer.h"
 #include <utility>		//For move, of course
-
-#define INVALID_INDEX 0xFFFFFFFF
 
 template <typename KEYTYPE, typename VALUETYPE>
 class Map
@@ -10,91 +7,126 @@ class Map
 private:
 	struct Pair
 	{
-		Pair() {}
-		Pair(const KEYTYPE &key, const VALUETYPE &value) : key(key), value(value) {}
+		Pair(const KEYTYPE &key, const VALUETYPE &value) : key(key), value(value), left(nullptr), right(nullptr) {}
 
 		KEYTYPE key;
 		VALUETYPE value;
+
+		Pair *left;
+		Pair *right;
 	};
 
-	Buffer<Pair> _data;
+	Pair *_data;
 
-	uint32 FindKeyIndex(const KEYTYPE &key) const
+	Pair* _FindPair(Pair *current, const KEYTYPE &key) const //Hmm
 	{
-		for (uint32 i = 0; i < _data.GetSize(); ++i)
+		if (current->key == key)
+			return current;
+
+		if (key < current->key)
 		{
-			if (_data[i].key > key)
-				return INVALID_INDEX;
-
-			if (_data[i].key == key)
-				return i;
+			if (current->left)
+				return _FindPair(current->left, key);
 		}
+		else if (current->right  && key > current->key)
+			return _FindPair(current->right, key);
 
-		return INVALID_INDEX;
+		return nullptr;
 	}
 
-	Pair& AddPair(const KEYTYPE &key, const VALUETYPE &value)
+	Pair& _Set(Pair *current, const KEYTYPE &key, const VALUETYPE &value)
 	{
-		uint32 i = 0;
-		if (_data.GetSize())
-			while (i < _data.GetSize() && key > _data[i].key)
-				i++;
+		if (key < current->key)
+		{
+			if (current->left == nullptr)
+				return *(current->left = new Pair(key, value));
+			
+			return _Set(current->left, key, value);
+		}
+		if (key > current->key)
+		{
+			if (current->right == nullptr)
+				return *(current->right = new Pair(key, value));
 
-		_data.Insert(Pair(key, value), i);
-		return _data[i];
+			return _Set(current->right, key, value);
+		}
+
+		current->value = value;
+		return *current;
+	}
+
+	void _CallFunctionOnChildren(Pair *pair, void(*function)(VALUETYPE &))
+	{
+		function(pair->value);
+
+		if (pair->left)
+			_CallFunctionOnChildren(pair->left, function);
+		if (pair->right)
+			_CallFunctionOnChildren(pair->right, function);
+	}
+
+	void _DeletePair(Pair *pair)
+	{
+		if (pair->left)
+			_DeletePair(pair->left);
+		if (pair->right)
+			_DeletePair(pair->right);
+
+		delete pair;
 	}
 
 public:
 	Map() {}
-	~Map() {}
+	~Map() { if (_data) _DeletePair(_data); }
 
 	void ForEach(void (*function)(VALUETYPE &))
 	{
-		for (uint32 i = 0; i < _data.GetSize(); ++i)
-			function(_data[i].value);
+		if (_data)
+			_CallFunctionOnChildren(_data, function);
 	}
 
 	VALUETYPE* const Find(const KEYTYPE &key)
 	{
-		auto index = FindKeyIndex(key);
-		if (index != INVALID_INDEX)
-			return &_data[index].value;
+		if (_data)
+		{
+			auto pair = _FindPair(_data, key);
+			if (pair)
+				return &pair->value;
+		}
 
 		return nullptr;
 	}
 
 	const VALUETYPE* const Find(const KEYTYPE &key) const
 	{
-		auto index = FindKeyIndex(key);
-		if (index != INVALID_INDEX)
-			return &_data[index].value;
-
-		return nullptr;
-	}
-
-	void Add(const KEYTYPE &key, const VALUETYPE &value)
-	{
-		if (FindKeyIndex(key) == INVALID_INDEX)
-			AddPair(key, value);
-	}
-
-	void Set(const KEYTYPE &key, const VALUETYPE &value)
-	{
-		auto index = FindKeyIndex(key);
-
-		if (index == INVALID_INDEX)
-			AddPair(key, value);
-		else
-			_data[i].value = value;
-	}
-
-	VALUETYPE* New(const KEYTYPE &key)
-	{
-		if (FindKeyIndex(key) == INVALID_INDEX)
+		if (_data)
 		{
-			return &AddPair(key, VALUETYPE()).value;
+			auto pair = _FindPair(_data, key);
+			if (pair)
+				return &pair->value;
 		}
 
 		return nullptr;
+	}
+
+	VALUETYPE& Set(const KEYTYPE &key, const VALUETYPE &value)
+	{
+		if (_data)
+			return _Set(_data, key, value).value;
+		
+		_data = new Pair(key, value);
+		return _data->value;
+	}
+
+	VALUETYPE& operator[](const KEYTYPE &key)
+	{
+		if (_data)
+		{
+			Pair *pair = _FindPair(_data, key);
+			if (pair)
+				return pair->value;
+		}
+		
+		return Set(key, VALUETYPE());
 	}
 };

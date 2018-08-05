@@ -32,7 +32,7 @@ namespace LevelIO
 				switch (fileData[i])
 				{
 				case LevelMessages::MATERIALID:
-					materials.Add(fileData[++i], String((char*)&fileData[++i]));
+					materials.Set(fileData[++i], String((char*)&fileData[++i]));
 					while (fileData[i] != 0)
 						i++;
 					break;
@@ -54,8 +54,6 @@ namespace LevelIO
 					}
 					else
 					{
-						byte y;
-
 						while (fileData[++i])
 						{
 							auto object = NewLevelObject(objects, fileData, i);

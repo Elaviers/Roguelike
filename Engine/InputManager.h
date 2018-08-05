@@ -68,9 +68,9 @@ public:
 	InputManager() {}
 	~InputManager() {}
 
-	inline void BindAxis(AxisType axis, float *axisPtr) { _axisBinds.Add(axis, axisPtr); }
-	inline void BindKey(Keycode key, void(*callback)()) { _keyBinds.Add(key, KeyBind(callback)); }
-	inline void BindKeyAxis(Keycode key, float *axisPtr, float axisDisplacement) { _keyBinds.Add(key, KeyBind(axisPtr, axisDisplacement)); };
+	inline void BindAxis(AxisType axis, float *axisPtr) { _axisBinds.Set(axis, axisPtr); }
+	inline void BindKey(Keycode key, void(*callback)()) { _keyBinds.Set(key, KeyBind(callback)); }
+	inline void BindKeyAxis(Keycode key, float *axisPtr, float axisDisplacement) { _keyBinds.Set(key, KeyBind(axisPtr, axisDisplacement)); };
 
 	void KeyDown(Keycode);
 	void KeyUp(Keycode);

@@ -43,8 +43,6 @@ void Window::Create(LPCTSTR className, LPCTSTR title, LPVOID param, DWORD flags,
 
 	int pfd_id = ChoosePixelFormat(_hdc, &pfd);
 	SetPixelFormat(_hdc, pfd_id, &pfd);
-
-	_hglrc = wglCreateContext(_hdc);
 }
 
 void Window::Show()
@@ -63,7 +61,7 @@ void Window::SetSize(uint16 width, uint16 height)
 	RECT rect;
 	::GetWindowRect(_hwnd, &rect);
 
-	SetSizeAndPos(rect.left, rect.top, width, height);
+	SetSizeAndPos((uint16)rect.left, (uint16)rect.top, width, height);
 }
 
 void Window::SetPos(uint16 x, uint16 y)
@@ -71,5 +69,5 @@ void Window::SetPos(uint16 x, uint16 y)
 	RECT rect;
 	::GetClientRect(_hwnd, &rect);
 
-	SetSizeAndPos(x, y, rect.right, rect.bottom);
+	SetSizeAndPos(x, y, (uint16)rect.right, (uint16)rect.bottom);
 }

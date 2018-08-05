@@ -62,7 +62,8 @@ void Game::_Init()
 
 void Game::_InitGL()
 {
-	_window.UseGLContext();
+	_glContext.Create(_window);
+	_glContext.Use(_window);
 	GL::LoadExtensions(_window.GetHDC());
 
 	glEnable(GL_CULL_FACE);
@@ -70,7 +71,7 @@ void Game::_InitGL()
 	glClearColor(0.2f, 0.f, 0.f, 1.f);
 	wglSwapIntervalEXT(0);
 
-	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Shader.frag");
+	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Phong.frag");
 }
 
 void Game::Run()
