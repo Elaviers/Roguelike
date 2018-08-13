@@ -17,4 +17,6 @@ public:
 	inline void Delete() { glDeleteTextures(1, &_id); }
 
 	static inline void Unbind(byte unit) { glActiveTexture(GL_TEXTURE0 + unit); glBindTexture(GL_TEXTURE_2D, 0); }
+
+	inline bool IsValid() { return _id != 0; }
 };

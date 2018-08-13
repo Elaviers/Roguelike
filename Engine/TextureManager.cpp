@@ -33,13 +33,15 @@ void TextureManager::Initialise()
 	_colours.uvDefault.Create(1, 1, uvDefault, GL_NEAREST);
 }
 
-void TextureManager::LoadTexture(const char *filename, const char *name)
+const GLTexture& TextureManager::GetTexture(const char *filename)
 {
-	TextureData textureData = IO::ReadPNGFile(filename);
+	GLTexture& tex = _textures[filename];
 
-	if (textureData.Valid())
+	if (!tex.IsValid())
 	{
-		GLTexture& newTexture = _textures[name];
-		newTexture.Create(textureData.width, textureData.height, textureData.data.Data());
+		TextureData data = IO::ReadPNGFile(filename);
+		tex.Create(data.width, data.height, data.data.Data());
 	}
+
+	return tex;
 }

@@ -17,6 +17,13 @@
 
 #define ORTHO 0
 
+const char *modelName = "Data/Model.obj";
+const char *texDiffuse = "Data/Diffuse.png";
+const char *texNormal = "Data/Normal.png";
+const char *texSpecular = "Data/Specular.png";
+const char *texReflection = "Data/Reflectivity.png";
+const char *skyFaces[6] = { "Data/SkyLeft.png", "Data/SkyRight.png", "Data/SkyUp.png", "Data/SkyDown.png", "Data/SkyFront.png", "Data/SkyBack.png" };
+
 bool running = false;
 
 InputManager inputManager;
@@ -220,16 +227,14 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	//Load resources
 	//
 	window.SetTitle("Loading Models...");
-	modelManager.LoadModel("Data/Model.obj", "MODEL");
+	modelManager.GetModel(modelName);
 
 	window.SetTitle("Loading Textures...");
-	textureManager.LoadTexture("Data/Diffuse.png", "DIFFUSE");
-	textureManager.LoadTexture("Data/Normal.png", "NORMAL");
-	textureManager.LoadTexture("Data/Specular.png", "SPECULAR");
-	textureManager.LoadTexture("Data/Reflectivity.png", "REFLECTION");
-
-	const char *faces[6] = { "Data/SkyLeft.png", "Data/SkyRight.png", "Data/SkyUp.png", "Data/SkyDown.png", "Data/SkyFront.png", "Data/SkyBack.png" };
-	sky.Load(faces);
+	textureManager.GetTexture(texDiffuse);
+	textureManager.GetTexture(texNormal);
+	textureManager.GetTexture(texSpecular);
+	textureManager.GetTexture(texReflection);
+	sky.Load(skyFaces);
 
 	//
 	//World setup
@@ -272,10 +277,10 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 
 	cube.transform.SetPosition(Vector3(2.f, 0.f, 0.f));
 	cube.SetParent(cubeParent);
-	cube.SetModel(modelManager.Cube());
+	cube.SetModel(&modelManager.Cube());
 
 	renderable.SetParent(cubeParent);
-	renderable.SetModel(modelManager.GetModel("MODEL"));
+	renderable.SetModel(&modelManager.GetModel(modelName));
 
 	window.SetTitle("Window");
 
@@ -363,10 +368,10 @@ void Frame()
 		light4.ToShader(3);
 
 		sky.Bind(UNIT_CUBEMAP);
-		textureManager.GetTexture("DIFFUSE")->Bind(UNIT_DIFFUSE);
-		textureManager.GetTexture("NORMAL")->Bind(UNIT_NORMAL);
-		textureManager.GetTexture("SPECULAR")->Bind(UNIT_SPECULAR);
-		textureManager.GetTexture("REFLECTION")->Bind(UNIT_REFLECTION);
+		textureManager.GetTexture(texDiffuse).Bind(UNIT_DIFFUSE);
+		textureManager.GetTexture(texNormal).Bind(UNIT_NORMAL);
+		textureManager.GetTexture(texSpecular).Bind(UNIT_SPECULAR);
+		textureManager.GetTexture(texReflection).Bind(UNIT_REFLECTION);
 		
 		cube.Render();
 

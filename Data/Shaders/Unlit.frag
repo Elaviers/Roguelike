@@ -9,5 +9,5 @@ out vec4 OutColour;
 
 void main()
 {
-	OutColour = texture(T_Diffuse, UV);
+	OutColour = Colour * VertexColour * texture(T_Diffuse, UV);
 }

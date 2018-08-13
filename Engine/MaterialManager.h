@@ -16,18 +16,18 @@ public:
 	inline const Material* Get(const char *name) const { return _materials.Find(name); }
 	inline void Set(const char *name, const Material& material) { _materials.Set(name, material); }
 
-	inline void MakeMaterial(const TextureManager& textureManager, const char *name, const char *diffuse = "", const char *normal = "", const char *specular = "")
+	inline void MakeMaterial(TextureManager& textureManager, const char *name, const char *diffuse = "", const char *normal = "", const char *specular = "")
 	{
 		Material& mat = _materials[name];
 
 		if (diffuse[0] != '\0')
-			mat.SetDiffuse(textureManager.GetTexture(diffuse));
+			mat.SetDiffuse(&textureManager.GetTexture(diffuse));
 
 		if (normal[0] != '\0')
-			mat.SetNormal(textureManager.GetTexture(normal));
+			mat.SetNormal(&textureManager.GetTexture(normal));
 
 		if (specular[0] != '\0')
-			mat.SetSpecular(textureManager.GetTexture(specular));
+			mat.SetSpecular(&textureManager.GetTexture(specular));
 	}
 };
  

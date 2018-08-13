@@ -1,6 +1,7 @@
 #pragma once
 #include "Buffer.h"
 #include "String.h"
+#include "Vertex.h"
 
 struct TextureData
 {
@@ -11,6 +12,12 @@ struct TextureData
 	inline bool Valid() { return data.GetSize() != 0; }
 };
 
+struct ModelData
+{
+	Buffer<Vertex17F> vertices;
+	Buffer<uint32> elements;
+};
+
 namespace IO {
 	Buffer<byte> ReadFile(const char *filename);
 	bool WriteFile(const char *filename, const byte *data, uint32 dataLength);
@@ -18,4 +25,5 @@ namespace IO {
 	String ReadFileString(const char *filename);
 
 	TextureData ReadPNGFile(const char *filename);
+	ModelData ReadOBJFile(const char *filename);
 }

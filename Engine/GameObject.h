@@ -1,10 +1,13 @@
 #pragma once
 #include "Transform.h"
+#include "ObjectProperties.h"
 
 class GameObject
 {
 protected:
 	GameObject *_parent;
+
+	void _AddBaseProperties(ObjectProperties&);
 
 public:
 	Transform transform;
@@ -14,6 +17,8 @@ public:
 
 	virtual void Update() {}
 	virtual void Render() {}
+
+	virtual void GetProperties(ObjectProperties &properties) { _AddBaseProperties(properties); }
 
 	inline GameObject* GetParent() const		{ return _parent; }
 

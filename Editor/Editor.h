@@ -6,6 +6,7 @@
 #include <Engine/InputManager.h>
 #include <Engine/MaterialManager.h>
 #include <Engine/ModelManager.h>
+#include <Engine/Registry.h>
 #include <Engine/TextureManager.h>
 #include <Engine/Timer.h>
 #include <Engine/Window.h>
@@ -21,6 +22,8 @@ private:
 
 	Timer _timer;
 	Window _window;
+
+	Registry _registry;
 
 	GLContext _glContext;
 

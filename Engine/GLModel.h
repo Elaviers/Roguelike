@@ -32,5 +32,7 @@ public:
 	}
 
 	void Delete();
+
+	inline bool IsValid() { return _vao != 0; }
 };
 

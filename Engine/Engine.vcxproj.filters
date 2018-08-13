@@ -150,6 +150,12 @@
     <ClInclude Include="MaterialManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
+    <ClInclude Include="Registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectProperties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IO.cpp">
@@ -232,6 +238,12 @@
     </ClCompile>
     <ClCompile Include="GLContext.cpp">
       <Filter>Source Files\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Registry.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

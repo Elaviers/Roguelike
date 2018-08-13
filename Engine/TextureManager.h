@@ -19,9 +19,7 @@ public:
 
 	void Initialise();
 
-	void LoadTexture(const char *filepath, const char *name);
-
-	inline const GLTexture* GetTexture(const char *name) const { return _textures.Find(name); }
+	const GLTexture& GetTexture(const char *name);
 
 	inline const GLTexture& White() { return _colours.white; }
 	inline const GLTexture& Grey() { return _colours.grey; }

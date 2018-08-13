@@ -155,6 +155,8 @@ void Editor::_Init()
 
 	_modelManager.Initialise();
 	_textureManager.Initialise();
+
+	_registry.RegisterEngineObjects();
 }
 
 void Editor::_InitGL()
@@ -176,14 +178,14 @@ void Editor::Run()
 	_Init();
 	_window.Show();
 
-	_modelManager.LoadModel("Data/Models/Model.obj", "Model");
-	_textureManager.LoadTexture("Data/Textures/Diffuse.png", "Diffuse");
-	_materialManager.MakeMaterial(_textureManager, "Model", "Diffuse");
+	_materialManager.MakeMaterial(_textureManager, "Model", "Data/Textures/Diffuse.png");
 
-	_currentObject = new Renderable();
+	Renderable *r = new Renderable();
+	r->SetModel(&_modelManager.GetModel("Data/Models/Model.obj"));
+	r->SetMaterial(_materialManager.Get("Model"));
+
+	_currentObject = r;
 	_gameObjects.Add(_currentObject);
-	((Renderable*)_currentObject)->SetModel(_modelManager.GetModel("Model"));
-	((Renderable*)_currentObject)->SetMaterial(_materialManager.Get("Model"));
 
 	for (int i = 0; i < 4; ++i)
 		_viewports[i].Show();

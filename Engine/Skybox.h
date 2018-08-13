@@ -21,7 +21,7 @@ public:
 	inline void Render(const ModelManager &cubeRenderer) const
 	{
 		Bind(0);
-		cubeRenderer.InverseCube()->Render();
+		cubeRenderer.InverseCube().Render();
 	}
 };
 

@@ -20,13 +20,11 @@ public:
 
 	void Initialise();
 
-	void LoadModel(const char *filepath, const char *name);
+	const GLModel& GetModel(const char *name);
 
-	inline GLModel* GetModel(const char *name)	{ return _models.Find(name); }
+	inline const GLModel& Cube() const			{ return _cube; }
+	inline const GLModel& InverseCube() const	{ return _invCube; }
+	inline const GLModel& Plane() const			{ return _plane; }
 
-	inline const GLModel* Cube() const			{ return &_cube; }
-	inline const GLModel* InverseCube() const	{ return &_invCube; }
-	inline const GLModel* Plane() const			{ return &_plane; }
-
-	inline const GLModel* BasicPlane() const	{ return &_basicPlane; }
+	inline const GLModel& BasicPlane() const	{ return _basicPlane; }
 };

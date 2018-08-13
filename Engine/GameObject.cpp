@@ -2,6 +2,14 @@
 #include "GL.h"
 #include "GLProgram.h"
 
+void GameObject::_AddBaseProperties(ObjectProperties &properties)
+{
+	properties.Add<Transform, Vector3>("Position", &transform, &Transform::GetPosition, &Transform::SetPosition);
+	//properties.Add<Vector3>("Rotation", transform.GetRotation, transform.SetRotation);
+	//properties.Add<Vector3>("Scale", transform.GetScale, transform.SetScale);
+
+}
+
 Mat4 GameObject::MakeInverseTransformationMatrix() const
 {
 	if (_parent)

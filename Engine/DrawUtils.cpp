@@ -84,14 +84,14 @@ namespace DrawUtils
 		{
 			transformX[3][axisX] = pos;
 			GLProgram::Current().SetMat4("M_Model", transformX);
-			modelManager.Plane()->Render();
+			modelManager.Plane().Render();
 		}
 
 		for (float pos = startY; pos < maxY; pos += gap)
 		{
 			transformY[3][axisY] = pos;
 			GLProgram::Current().SetMat4("M_Model", transformY);
-			modelManager.Plane()->Render();
+			modelManager.Plane().Render();
 		}
 	}
 
