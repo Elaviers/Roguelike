@@ -1,5 +1,20 @@
 #include "Window.h"
 
+void WindowFunctions::ResizeHWND(HWND hwnd, uint16 w, uint16 h)
+{
+	RECT rect;
+	::GetWindowRect(hwnd, &rect);
+	::MapWindowPoints(HWND_DESKTOP, ::GetParent(hwnd), (LPPOINT)&rect, 2);
+	SetHWNDSizeAndPos(hwnd, rect.left, rect.top, w, h);
+}
+
+void WindowFunctions::RepositionHWND(HWND hwnd, uint16 x, uint16 y)
+{
+	RECT rect;
+	::GetClientRect(hwnd, &rect);
+	SetHWNDSizeAndPos(hwnd, x, y, rect.right, rect.bottom);
+}
+
 Window::Window() : _hwnd(NULL)
 {
 }
@@ -17,9 +32,6 @@ void Window::Create(LPCTSTR className, LPCTSTR title, LPVOID param, DWORD flags,
 		::DestroyWindow(_hwnd);
 
 	_hwnd = ::CreateWindow(className, title, flags, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, parent, NULL, ::GetModuleHandle(NULL), param);
-
-	RECT rect;
-	::GetClientRect(_hwnd, &rect);
 
 	_hdc = GetDC(_hwnd);
 
@@ -54,20 +66,4 @@ void Window::Show()
 void Window::SwapBuffers()
 {
 	::SwapBuffers(_hdc);
-}
-
-void Window::SetSize(uint16 width, uint16 height)
-{
-	RECT rect;
-	::GetWindowRect(_hwnd, &rect);
-
-	SetSizeAndPos((uint16)rect.left, (uint16)rect.top, width, height);
-}
-
-void Window::SetPos(uint16 x, uint16 y)
-{
-	RECT rect;
-	::GetClientRect(_hwnd, &rect);
-
-	SetSizeAndPos(x, y, (uint16)rect.right, (uint16)rect.bottom);
 }

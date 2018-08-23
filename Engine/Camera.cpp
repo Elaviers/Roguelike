@@ -1,5 +1,10 @@
 #include "Camera.h"
 
+void Camera::GetProperties(ObjectProperties &properties)
+{
+	_AddBaseProperties(properties);
+}
+
 void Camera::UpdateProjectionMatrix()
 {
 	switch (_type)

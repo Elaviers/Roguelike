@@ -29,5 +29,7 @@ public:
 		if (_specular)
 			_specular->Bind(2);
 	}
+
+	inline bool operator==(const Material &other) { return _diffuse == other._diffuse && _normal == other._normal && _specular == other._specular; }
 };
 

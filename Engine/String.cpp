@@ -73,7 +73,7 @@ inline bool IsPartOfToken(char c, const char *delimiters, unsigned int delimiter
 	return true;
 }
 
-Buffer<String> String::Split(const char *delimiters)
+Buffer<String> String::Split(const char *delimiters) const
 {
 	unsigned int delimiterCount = StringLength(delimiters);
 
@@ -135,13 +135,24 @@ const String& String::operator=(const String &other)
 {
 	_length = other._length;
 
-	delete[]_data;
+	delete[] _data;
 	_data = new char[_length + 1];
 
 	for (unsigned int i = 0; i < _length; ++i)
 		_data[i] = other._data[i];
 
 	_data[_length] = '\0';
+	return *this;
+}
+
+const String& String::operator=(String &&other)
+{
+	delete[] _data;
+
+	_length = other._length;
+	_data = other._data;
+	other._data = nullptr;
+
 	return *this;
 }
 
@@ -255,14 +266,29 @@ bool String::operator==(const char *string) const
 ////
 #include <stdlib.h>
 
-int String::ToInt()
+int String::ToInt() const
 {
 	return atoi(GetData());
 }
 
-float String::ToFloat()
+float String::ToFloat() const
 {
 	return (float)atof(GetData());
+}
+
+Vector3 String::ToVector3() const
+{
+	Buffer<String> tokens = Split(",");
+	Vector3 result;
+
+	if (tokens.GetSize() >= 1)
+		result[0] = tokens[0].ToFloat();
+	if (tokens.GetSize() >= 2)
+		result[1] = tokens[1].ToFloat();
+	if (tokens.GetSize() >= 3)
+		result[2] = tokens[2].ToFloat();
+
+	return result;
 }
 
 ////Conversion
@@ -330,7 +356,16 @@ String String::ConvertFloat(double number, unsigned int minimum, byte base)
 		fraction -= digit;
 	}
 
-	return whole_string + '.' + fraction_string;
+	if (fraction_string.GetLength() > 0)
+		return whole_string + '.' + fraction_string;
+
+	return whole_string;
+}
+
+String String::ConvertVector3(const Vector3 &vector, unsigned int minimum, byte base)
+{
+	const char *seperator = ", ";
+	return ConvertFloat(vector[0], minimum, base) + seperator + ConvertFloat(vector[1], minimum, base) + seperator + ConvertFloat(vector[2], minimum, base);
 }
 
 //Other

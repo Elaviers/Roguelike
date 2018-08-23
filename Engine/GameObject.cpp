@@ -5,9 +5,8 @@
 void GameObject::_AddBaseProperties(ObjectProperties &properties)
 {
 	properties.Add<Transform, Vector3>("Position", &transform, &Transform::GetPosition, &Transform::SetPosition);
-	//properties.Add<Vector3>("Rotation", transform.GetRotation, transform.SetRotation);
-	//properties.Add<Vector3>("Scale", transform.GetScale, transform.SetScale);
-
+	properties.Add<Transform, Vector3>("Rotation", &transform, &Transform::GetRotation, &Transform::SetRotation);
+	properties.Add<Transform, Vector3>("Scale",	   &transform, &Transform::GetScale, &Transform::SetScale);
 }
 
 Mat4 GameObject::MakeInverseTransformationMatrix() const

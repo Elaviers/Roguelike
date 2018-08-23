@@ -13,6 +13,8 @@ private:
 
 	uint32 _count; //The amount of elements/verts to draw
 
+	void _CreateNewObjects();
+
 public:
 	GLModel();
 	virtual ~GLModel();
@@ -34,5 +36,7 @@ public:
 	void Delete();
 
 	inline bool IsValid() { return _vao != 0; }
+
+	inline bool operator==(const GLModel &other) const { return _vao == other._vao; }
 };
 

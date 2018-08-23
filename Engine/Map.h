@@ -4,7 +4,7 @@
 template <typename KEYTYPE, typename VALUETYPE>
 class Map
 {
-private:
+public:
 	struct Pair
 	{
 		Pair(const KEYTYPE &key, const VALUETYPE &value) : key(key), value(value), left(nullptr), right(nullptr) {}
@@ -16,6 +16,7 @@ private:
 		Pair *right;
 	};
 
+private:
 	Pair *_data;
 
 	Pair* _FindPair(Pair *current, const KEYTYPE &key) const //Hmm
@@ -30,6 +31,22 @@ private:
 		}
 		else if (current->right  && key > current->key)
 			return _FindPair(current->right, key);
+
+		return nullptr;
+	}
+
+	Pair* _FindFirstPairWithValue(Pair *current, const VALUETYPE &value) const
+	{
+		if (current->value == value)
+			return current;
+
+		Pair *pair;
+
+		if (current->left && (pair = _FindFirstPairWithValue(current->left, value)) != nullptr)
+			return pair;
+
+		if (current->right && (pair = _FindFirstPairWithValue(current->right, value)) != nullptr)
+			return pair;
 
 		return nullptr;
 	}
@@ -55,9 +72,9 @@ private:
 		return *current;
 	}
 
-	void _CallFunctionOnChildren(Pair *pair, void(*function)(VALUETYPE &))
+	void _CallFunctionOnChildren(Pair *pair, void (*function)(const KEYTYPE&, VALUETYPE&))
 	{
-		function(pair->value);
+		function(pair->key, pair->value);
 
 		if (pair->left)
 			_CallFunctionOnChildren(pair->left, function);
@@ -77,15 +94,27 @@ private:
 
 public:
 	Map() {}
-	~Map() { if (_data) _DeletePair(_data); }
+	~Map() { Clear(); }
 
-	void ForEach(void (*function)(VALUETYPE &))
+	void ForEach(void (*function)(const KEYTYPE&, VALUETYPE&))
 	{
 		if (_data)
 			_CallFunctionOnChildren(_data, function);
 	}
 
-	VALUETYPE* const Find(const KEYTYPE &key)
+	const KEYTYPE* const FindFirstKey(const VALUETYPE &value) const
+	{
+		if (_data)
+		{
+			auto pair = _FindFirstPairWithValue(_data, value);
+			if (pair)
+				return &pair->key;
+		}
+
+		return nullptr;
+	}
+
+	VALUETYPE* Find(const KEYTYPE &key)
 	{
 		if (_data)
 		{
@@ -97,7 +126,7 @@ public:
 		return nullptr;
 	}
 
-	const VALUETYPE* const Find(const KEYTYPE &key) const
+	const VALUETYPE* Find(const KEYTYPE &key) const
 	{
 		if (_data)
 		{
@@ -128,5 +157,14 @@ public:
 		}
 		
 		return Set(key, VALUETYPE());
+	}
+
+	inline void Clear()
+	{
+		if (_data)
+		{
+			_DeletePair(_data);
+			_data = nullptr;
+		}
 	}
 };

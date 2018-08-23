@@ -4,6 +4,13 @@
 #include "Vector.h"
 #include <Windows.h>
 
+namespace WindowFunctions
+{
+	inline void SetHWNDSizeAndPos(HWND hwnd, uint16 x, uint16 y, uint16 w, uint16 h) { ::SetWindowPos(hwnd, NULL, x, y, w, h, 0); }
+	void ResizeHWND(HWND, uint16 w, uint16 h);
+	void RepositionHWND(HWND, uint16 x, uint16 y);
+}
+
 class Window
 {
 private:
@@ -22,7 +29,7 @@ public:
 	void SwapBuffers();
 
 	inline void SetTitle(const char *title) { ::SetWindowTextA(_hwnd, title); }
-	inline void SetSizeAndPos(uint16 x, uint16 y, uint16 width, uint16 height) { ::SetWindowPos(_hwnd, NULL, x, y, width, height, 0); }
-	void SetSize(uint16 width, uint16 height);
-	void SetPos(uint16 x, uint16 y);
+	inline void SetSizeAndPos(uint16 x, uint16 y, uint16 width, uint16 height)	{ WindowFunctions::SetHWNDSizeAndPos(_hwnd, x, y, width, height); }
+	inline void SetSize(uint16 width, uint16 height)							{ WindowFunctions::ResizeHWND(_hwnd, width, height); }
+	inline void SetPos(uint16 x, uint16 y)										{ WindowFunctions::RepositionHWND(_hwnd, x, y); }
 };

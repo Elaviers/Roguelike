@@ -28,7 +28,8 @@ inline void SetGLAttribs()
 	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, normal));
 }
 
-void GLModel::Create(const Vertex17F *data, uint32 vertexCount)
+//Creates a VAO/VBO and gets rid of any old objects
+void GLModel::_CreateNewObjects()
 {
 	if (_vao || _vbo || _ebo)
 	{
@@ -37,11 +38,17 @@ void GLModel::Create(const Vertex17F *data, uint32 vertexCount)
 		glDeleteBuffers(1, &_ebo);
 	}
 
-	_count = vertexCount;
-	_ebo = 0;
-
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);
+}
+
+void GLModel::Create(const Vertex17F *data, uint32 vertexCount)
+{
+	_CreateNewObjects();
+	_ebo = 0;
+
+	_count = vertexCount;
+
 
 	glBindVertexArray(_vao);
 
@@ -53,18 +60,11 @@ void GLModel::Create(const Vertex17F *data, uint32 vertexCount)
 
 void GLModel::Create(const Vertex17F *data, uint32 vertexCount, const uint32 *elements, uint32 elementCount)
 {
-	if (_vao || _vbo || _ebo)
-	{
-		glDeleteVertexArrays(1, &_vao);
-		glDeleteBuffers(1, &_vbo);
-		glDeleteBuffers(1, &_ebo);
-	}
+	_CreateNewObjects();
+	glGenBuffers(1, &_ebo);
 
 	_count = elementCount;
 
-	glGenVertexArrays(1, &_vao);
-	glGenBuffers(1, &_vbo);
-	glGenBuffers(1, &_ebo);
 
 	glBindVertexArray(_vao);
 
@@ -79,18 +79,11 @@ void GLModel::Create(const Vertex17F *data, uint32 vertexCount, const uint32 *el
 
 void GLModel::Create(const Vector3 *basicData, uint32 vertexCount, const uint32 *elements, uint32 elementCount)
 {
-	if (_vao || _vbo || _ebo)
-	{
-		glDeleteVertexArrays(1, &_vao);
-		glDeleteBuffers(1, &_vbo);
-		glDeleteBuffers(1, &_ebo);
-	}
+	_CreateNewObjects();
+	glGenBuffers(1, &_ebo);
 
 	_count = elementCount;
 
-	glGenVertexArrays(1, &_vao);
-	glGenBuffers(1, &_vbo);
-	glGenBuffers(1, &_ebo);
 
 	glBindVertexArray(_vao);
 

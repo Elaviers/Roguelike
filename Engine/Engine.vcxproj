@@ -202,6 +202,7 @@
     <ClCompile Include="Maths.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="ModelManager.cpp" />
+    <ClCompile Include="ObjectProperties.cpp" />
     <ClCompile Include="ObjReader.cpp" />
     <ClCompile Include="Registry.cpp" />
     <ClCompile Include="Renderable.cpp" />

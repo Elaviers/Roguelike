@@ -163,8 +163,6 @@ ModelData IO::ReadOBJFile(const char *filename)
 			}
 		}
 	}
-	else
-		Error(CSTR("OBJ reader could not open \"" + filename + '\"'));
 
 	return data;
 }

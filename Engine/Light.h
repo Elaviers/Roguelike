@@ -19,5 +19,7 @@ public:
 	void ToShader(int glArrayIndex);
 
 	void DebugRender(ModelManager &);
+
+	virtual void GetProperties(ObjectProperties&) override;
 };
 

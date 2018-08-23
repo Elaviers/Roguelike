@@ -1,7 +1,10 @@
 #pragma once
+#include "Error.h"
 #include "Map.h"
 #include "String.h"
 #include "Vector.h"
+
+#define PROPERTY_ADDITION_ERROR "Addition attempted without a valid base!"
 
 enum class PropertyType
 {
@@ -10,7 +13,10 @@ enum class PropertyType
 	BYTE,
 	FLOAT,
 
-	VECTOR3
+	VECTOR3,
+	STRING,
+
+	NONE
 };
 
 inline PropertyType TypenameToEnum(const float&) { return PropertyType::FLOAT; }
@@ -22,6 +28,7 @@ inline PropertyType TypenameToEnum(const uint16) { return PropertyType::UINT16; 
 inline PropertyType TypenameToEnum(const uint32&) { return PropertyType::UINT32; }
 inline PropertyType TypenameToEnum(const uint64&) { return PropertyType::UINT64; }
 inline PropertyType TypenameToEnum(const Vector3&) { return PropertyType::VECTOR3; }
+inline PropertyType TypenameToEnum(const String&) { return PropertyType::STRING; }
 //Ideally this would be done with templates but it was being smelly so function overloading it is
 
 template <typename T> inline PropertyType TypenameToEnum() { return TypenameToEnum(T()); }
@@ -74,7 +81,19 @@ struct PropertyPointer
 	PropertyType type;
 	void *property; //ALWAYS points to a PropertyBase
 
-	PropertyPointer(PropertyType type, void *propertyPtr) : type(type), property(propertyPtr) {}
+	int index;
+
+	PropertyPointer(PropertyType type, void *propertyPtr, int index) : type(type), property(propertyPtr), index(index) {}
+	PropertyPointer() : type(PropertyType::NONE), index(-1) {}
+
+	void SetByString(const String &value);
+	String GetAsString() const;
+};
+
+struct PropertyInfo
+{
+	String name;
+	PropertyPointer propertyPointer;
 };
 
 class ObjectProperties
@@ -82,15 +101,21 @@ class ObjectProperties
 	void *_base;
 	Map<String, PropertyPointer> _properties;
 
+	int _count;
+
 public:
-	ObjectProperties() {}
-	ObjectProperties(void *base) : _base(base) {}
+	ObjectProperties() : _base(nullptr), _count(0) {}
 	~ObjectProperties() {}
+
+	template <typename Base>
+	inline void SetObject(Base &object) { _base = &object; }
+
+	inline const PropertyPointer* FindRaw(const char *name) { return _properties.Find(name); }
 
 	template <typename Type>
 	PropertyBase<Type>* Find(const char *name)
 	{
-		PropertyPointer *property = _properties.Find(name);
+		auto property = FindRaw(name);
 
 		if (property && property->type == TypenameToEnum<Type>())
 			return (PropertyBase<Type>*)property->property;
@@ -101,17 +126,47 @@ public:
 	template <typename Type>
 	void Add(const char *name, const Type& value)
 	{
-		Property<void, Type> *property = new Property<void, Type>(&_base, &value - _base);
+		if (_base)
+		{
+			Property<void, Type> *property = new Property<void, Type>(&_base, &value - _base);
 
-		_properties.Set(name, PropertyPointer(TypenameToEnum<Type>(), property));
-
+			_properties.Set(name, PropertyPointer(TypenameToEnum<Type>(), property, _count++));
+		}
+		else Error(PROPERTY_ADDITION_ERROR);
 	}
 
 	template <typename Base, typename Type>
 	void Add(const char *name, Base *member, Type(Base::*getter)() const, void(Base::*setter)(const Type&))
 	{
-		Property<Base, Type> *property = new Property<Base, Type>(&_base, member, getter, setter);
+		if (_base)
+		{
+			Property<Base, Type> *property = new Property<Base, Type>(&_base, member, getter, setter);
 
-		_properties.Set(name, PropertyPointer(TypenameToEnum<Type>(), property));
+			_properties.Set(name, PropertyPointer(TypenameToEnum<Type>(), property, _count++));
+		}
+		else Error(PROPERTY_ADDITION_ERROR);
+	}
+
+	inline void Clear() { _properties.Clear(); _count = 0; }
+
+	//Caution: uses a static member
+	Buffer<PropertyInfo> GetAll()
+	{
+		static Buffer<PropertyInfo> propertyArray; //Yuck
+		static int nodeCount;
+
+		nodeCount = 0;
+		
+		_properties.ForEach([](const String&, PropertyPointer&) { ++nodeCount; });
+
+		propertyArray.SetSize(nodeCount);
+
+		_properties.ForEach([](const String &name, PropertyPointer &property)
+		{
+			propertyArray[property.index].name = name;
+			propertyArray[property.index].propertyPointer = property;
+		});
+
+		return propertyArray;
 	}
 };

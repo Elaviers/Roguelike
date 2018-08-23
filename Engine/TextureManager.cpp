@@ -16,7 +16,7 @@ TextureManager::~TextureManager()
 	_colours.uvDefault.Delete();
 
 	_textures.ForEach(
-		[](GLTexture &tex)
+		[](const String&, GLTexture &tex)
 		{
 			tex.Delete();
 		});
@@ -33,15 +33,21 @@ void TextureManager::Initialise()
 	_colours.uvDefault.Create(1, 1, uvDefault, GL_NEAREST);
 }
 
-const GLTexture& TextureManager::GetTexture(const char *filename)
+const GLTexture* TextureManager::GetTexture(const char *name)
 {
-	GLTexture& tex = _textures[filename];
-
-	if (!tex.IsValid())
+	GLTexture *tex = _textures.Find(name);
+	if (tex) return tex;
+	else
 	{
-		TextureData data = IO::ReadPNGFile(filename);
-		tex.Create(data.width, data.height, data.data.Data());
+		TextureData data = IO::ReadPNGFile((_rootPath + name).GetData());
+
+		if (data.IsValid())
+		{
+			GLTexture &newTex = _textures[name];
+			newTex.Create(data.width, data.height, data.data.Data());
+			return &newTex;
+		}
 	}
 
-	return tex;
+	return nullptr;
 }

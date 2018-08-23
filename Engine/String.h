@@ -1,5 +1,6 @@
 #pragma once
 #include "Buffer.h"
+#include "Vector.h"
 
 inline bool StringsEqual(const char *a, const char *b);
 
@@ -18,7 +19,7 @@ public:
 	String(char character);
 	String(unsigned int length);
 
-	Buffer<String> Split(const char *delimiters);
+	Buffer<String> Split(const char *delimiters) const;
 
 	void SetLength(unsigned int length);
 	inline void Clear() { SetLength(0); }
@@ -28,6 +29,7 @@ public:
 	inline char& operator[](unsigned int position) const { return _data[position]; }
 
 	const String& operator=(const String&);
+	const String& operator=(String&&);
 	const String& operator=(const char*);
 	const String& operator+=(const String&);
 	const String& operator+=(const char*);
@@ -42,12 +44,14 @@ public:
 
 	bool operator==(const char*) const;
 
-	int ToInt();
-	float ToFloat();
+	int ToInt() const;
+	float ToFloat() const;
+	Vector3 ToVector3() const;
 
 	//
 	static String Convert(__int64,	unsigned int minimun = 0, byte base = 10);
 	static String ConvertFloat(double, unsigned int minimum = 0, byte base = 10);
+	static String ConvertVector3(const Vector3&, unsigned int minimum = 0, byte base = 10);
 };
 
 #define CSTR(BODY) ((String)BODY).GetData()

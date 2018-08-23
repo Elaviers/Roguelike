@@ -37,4 +37,6 @@ public:
 	inline float GetScale() const						{ return _scale; }
 
 	inline Mat4 GetProjectionMatrix() const				{ return _projection; }
+
+	virtual void GetProperties(ObjectProperties&) override;
 };

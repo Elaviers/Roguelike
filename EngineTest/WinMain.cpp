@@ -223,6 +223,8 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	inputManager.BindAxis(AxisType::MOUSE_X, &lookY);
 	inputManager.BindAxis(AxisType::MOUSE_Y, &lookX);
 
+	Renderable::SetManagers(nullptr, &modelManager);
+
 	//
 	//Load resources
 	//
@@ -280,7 +282,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	cube.SetModel(&modelManager.Cube());
 
 	renderable.SetParent(cubeParent);
-	renderable.SetModel(&modelManager.GetModel(modelName));
+	renderable.SetModel(modelName);
 
 	window.SetTitle("Window");
 
@@ -368,10 +370,10 @@ void Frame()
 		light4.ToShader(3);
 
 		sky.Bind(UNIT_CUBEMAP);
-		textureManager.GetTexture(texDiffuse).Bind(UNIT_DIFFUSE);
-		textureManager.GetTexture(texNormal).Bind(UNIT_NORMAL);
-		textureManager.GetTexture(texSpecular).Bind(UNIT_SPECULAR);
-		textureManager.GetTexture(texReflection).Bind(UNIT_REFLECTION);
+		textureManager.GetTexture(texDiffuse)->Bind(UNIT_DIFFUSE);
+		textureManager.GetTexture(texNormal)->Bind(UNIT_NORMAL);
+		textureManager.GetTexture(texSpecular)->Bind(UNIT_SPECULAR);
+		textureManager.GetTexture(texReflection)->Bind(UNIT_REFLECTION);
 		
 		cube.Render();
 

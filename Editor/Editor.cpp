@@ -126,6 +126,9 @@ void Editor::_Init()
 		_window.Create(className, "Window", this);
 	}
 
+	PropertyWindow::Initialise();
+	_propertyWindow.Create();
+
 	Viewport::Initialise();
 	_viewports[0].Create(_window.GetHwnd(), *this, 0);
 	_viewports[1].Create(_window.GetHwnd(), *this, 1);
@@ -154,7 +157,13 @@ void Editor::_Init()
 	_inputManager.BindKeyAxis(Keycode::LEFT, &_axisLookX, -1.f);
 
 	_modelManager.Initialise();
+	_modelManager.SetRootPath("Data/Models/");
+
 	_textureManager.Initialise();
+	_textureManager.SetRootPath("Data/Textures/");
+
+	//oof
+	Renderable::SetManagers(&_materialManager, &_modelManager);
 
 	_registry.RegisterEngineObjects();
 }
@@ -178,17 +187,21 @@ void Editor::Run()
 	_Init();
 	_window.Show();
 
-	_materialManager.MakeMaterial(_textureManager, "Model", "Data/Textures/Diffuse.png");
+	_materialManager.MakeMaterial(_textureManager, "Model", "Diffuse.png");
+	_materialManager.MakeMaterial(_textureManager, "Model2", "Specular.png");
 
 	Renderable *r = new Renderable();
-	r->SetModel(&_modelManager.GetModel("Data/Models/Model.obj"));
-	r->SetMaterial(_materialManager.Get("Model"));
+	r->SetModel("Model.obj");
+	r->SetMaterial("Model");
+	_propertyWindow.SetObject(r);
 
 	_currentObject = r;
 	_gameObjects.Add(_currentObject);
 
 	for (int i = 0; i < 4; ++i)
 		_viewports[i].Show();
+
+	_propertyWindow.Show();
 
 	MSG msg;
 	_running = true;

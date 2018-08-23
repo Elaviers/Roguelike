@@ -21,13 +21,24 @@ public:
 		Material& mat = _materials[name];
 
 		if (diffuse[0] != '\0')
-			mat.SetDiffuse(&textureManager.GetTexture(diffuse));
+			mat.SetDiffuse(textureManager.GetTexture(diffuse));
 
 		if (normal[0] != '\0')
-			mat.SetNormal(&textureManager.GetTexture(normal));
+			mat.SetNormal(textureManager.GetTexture(normal));
 
 		if (specular[0] != '\0')
-			mat.SetSpecular(&textureManager.GetTexture(specular));
+			mat.SetSpecular(textureManager.GetTexture(specular));
+	}
+	
+	String FindNameOfMaterial(const Material& material)
+	{
+		String name;
+
+		auto found = _materials.FindFirstKey(material);
+		if (found) name = *found;
+		else name = "None";
+
+		return name;
 	}
 };
  

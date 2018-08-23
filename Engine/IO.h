@@ -9,13 +9,15 @@ struct TextureData
 	uint32 width;
 	uint32 height;
 
-	inline bool Valid() { return data.GetSize() != 0; }
+	inline bool IsValid() { return data.GetSize() != 0; }
 };
 
 struct ModelData
 {
 	Buffer<Vertex17F> vertices;
 	Buffer<uint32> elements;
+
+	inline bool IsValid() { return vertices.GetSize() != 0; }
 };
 
 namespace IO {

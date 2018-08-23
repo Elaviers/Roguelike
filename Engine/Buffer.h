@@ -12,6 +12,15 @@ public:
 	Buffer() : _data(nullptr), _size(0) {}
 	~Buffer() { delete[] _data; }
 
+	Buffer(const Buffer& buffer)
+	{
+		_size = buffer._size;
+		_data = new T[_size];
+		
+		for (uint32 i = 0; i < _size; ++i)
+			_data[i] = buffer._data[i];
+	}
+
 	Buffer(Buffer&& buffer) : _data(buffer._data), _size(buffer._size) { buffer._data = nullptr; }
 
 	void SetSize(uint32 size)

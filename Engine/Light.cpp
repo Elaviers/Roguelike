@@ -3,6 +3,11 @@
 #include "GLProgram.h"
 #include "String.h"
 
+void Light::GetProperties(ObjectProperties &properties)
+{
+	_AddBaseProperties(properties);
+}
+
 void Light::ToShader(int glArrayIndex)
 {
 	Mat4 worldTransform = MakeTransformationMatrix();

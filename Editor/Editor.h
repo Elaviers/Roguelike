@@ -10,6 +10,7 @@
 #include <Engine/TextureManager.h>
 #include <Engine/Timer.h>
 #include <Engine/Window.h>
+#include "PropertyWindow.h"
 #include "Viewport.h"
 
 #define VIEWPORTCOUNT 2
@@ -34,6 +35,8 @@ private:
 	MaterialManager _materialManager;
 	ModelManager _modelManager;
 	TextureManager _textureManager;
+
+	PropertyWindow _propertyWindow;
 
 	Viewport _viewports[VIEWPORTCOUNT];
 	Camera _cameras[VIEWPORTCOUNT];

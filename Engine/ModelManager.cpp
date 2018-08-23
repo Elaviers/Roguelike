@@ -11,7 +11,7 @@ ModelManager::ModelManager()
 ModelManager::~ModelManager()
 {
 	_models.ForEach(
-		[](GLModel &model) 
+		[](const String&, GLModel &model) 
 		{
 			model.Delete(); 
 		});
@@ -96,15 +96,32 @@ void ModelManager::Initialise()
 	_basicPlane.Create(basicPlaneVerts, 4, planeElements, 6);
 }
 
-const GLModel& ModelManager::GetModel(const char *filename)
+const GLModel* ModelManager::GetModel(const char *name)
 {
-	GLModel& model = _models[filename];
-
-	if (!model.IsValid())
+	GLModel *model = _models.Find(name);
+	if (model) return model;
+	else
 	{
-		ModelData data = IO::ReadOBJFile(filename);
-		model.Create(data.vertices.Data(), data.vertices.GetSize(), data.elements.Data(), data.elements.GetSize());
-	}
+		ModelData data = IO::ReadOBJFile((_rootPath + name).GetData());
 
-	return model;
+		if (data.IsValid())
+		{
+			GLModel &newModel = _models[name];
+			newModel.Create(data.vertices.Data(), data.vertices.GetSize(), data.elements.Data(), data.elements.GetSize());
+			return &newModel;
+		}
+	}
+	
+	return nullptr;
+}
+
+String ModelManager::FindNameOfModel(const GLModel &model) const
+{
+	String name;
+
+	const String* found = _models.FindFirstKey(model);
+	if (found) name = *found;
+	else name = "None";
+
+	return name;
 }

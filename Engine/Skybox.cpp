@@ -20,7 +20,7 @@ void Skybox::Load(const char *faces[6])
 	for (int i = 0; i < 6; ++i) {
 		TextureData td = IO::ReadPNGFile(faces[i]);
 
-		if (!td.Valid())
+		if (!td.IsValid())
 			return;
 
 		if (i == 0)
