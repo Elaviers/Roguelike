@@ -9,11 +9,13 @@ namespace WindowFunctions
 	inline void SetHWNDSizeAndPos(HWND hwnd, uint16 x, uint16 y, uint16 w, uint16 h) { ::SetWindowPos(hwnd, NULL, x, y, w, h, 0); }
 	void ResizeHWND(HWND, uint16 w, uint16 h);
 	void RepositionHWND(HWND, uint16 x, uint16 y);
+
+	void SetDefaultPixelFormat(HDC hdc);
 }
 
 class Window
 {
-private:
+protected:
 	HWND	_hwnd;		//Window handle
 	HDC		_hdc;		//Device context handle
 

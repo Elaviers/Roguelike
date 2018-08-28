@@ -1,0 +1,4 @@
+diffuse=Diffuse.png
+normal=Normal.png
+specular=Specular.png
+reflection=Reflectivity.png

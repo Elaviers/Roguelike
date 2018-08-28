@@ -1,7 +1,6 @@
 #pragma once
 #include "GL.h"
-
-class Window;
+#include "Window.h"
 
 class GLContext
 {
@@ -12,6 +11,9 @@ public:
 	GLContext();
 	~GLContext();
 
-	void Create(const Window&);
-	void Use(const Window&);
+	void Create(HDC);
+	void Use(HDC) const;
+
+	inline void Create(const Window &window) { Create(window.GetHDC()); }
+	inline void Use(const Window &window) const { Use(window.GetHDC()); }
 };

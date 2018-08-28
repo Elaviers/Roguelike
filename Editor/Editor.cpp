@@ -1,7 +1,9 @@
 #include "Editor.h"
 #include <Engine/DrawUtils.h>
+#include <Engine/IO.h>
 #include <Engine/Renderable.h>
 #include "resource.h"
+#include "ResourceSelect.h"
 
 LRESULT CALLBACK AboutProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -44,17 +46,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 	case WM_SIZE:
 	{
-		uint16 w = LOWORD(lparam) / 2;
-		uint16 h = HIWORD(lparam);
-
-		editor->_viewports[0].SetSizeAndPos(0, 0, w, h);
-		editor->_cameras[0].SetViewport(w, h);
-		editor->_viewports[1].SetSizeAndPos(w, 0, w, h);
-		editor->_cameras[1].SetViewport(w, h);
-
-		glViewport(0, 0, w, h);
-
-		editor->Render();
+		editor->Resize(LOWORD(lparam), HIWORD(lparam));
 		break;
 	}
 
@@ -64,6 +56,18 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 		case 0:
 			switch (LOWORD(wparam))
 			{
+			case ID_VIEW_PROPERTIES:
+				editor->_propertyWindow.Show();
+				break;
+
+			case ID_VIEW_MATERIALS:
+				editor->SelectMaterialDialog();
+				break;
+
+			case ID_VIEW_MODELS:
+				editor->SelectModelDialog();
+			break;
+
 			case ID_HELP_ABOUT:
 				::DialogBox(NULL, MAKEINTRESOURCE(IDD_ABOUT), hwnd, AboutProc);
 				break;
@@ -97,7 +101,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 }
 
 
-Editor::Editor()
+Editor::Editor() : _propertyWindow(this)
 {
 }
 
@@ -126,15 +130,14 @@ void Editor::_Init()
 		_window.Create(className, "Window", this);
 	}
 
+	ResourceSelect::Initialise();
+
 	PropertyWindow::Initialise();
 	_propertyWindow.Create();
 
 	Viewport::Initialise();
 	_viewports[0].Create(_window.GetHwnd(), *this, 0);
 	_viewports[1].Create(_window.GetHwnd(), *this, 1);
-
-	_glContext.Create(_viewports[0]);
-	_glContext.Use(_viewports[0]);
 
 	_InitGL();
 
@@ -162,6 +165,8 @@ void Editor::_Init()
 	_textureManager.Initialise();
 	_textureManager.SetRootPath("Data/Textures/");
 
+	_materialManager.SetRootPath("Data/Materials/");
+
 	//oof
 	Renderable::SetManagers(&_materialManager, &_modelManager);
 
@@ -170,15 +175,16 @@ void Editor::_Init()
 
 void Editor::_InitGL()
 {
-	for (unsigned int i = 0; i < 2; ++i)
-	{
-		GL::LoadExtensions(_viewports[i].GetHDC());
-		glEnable(GL_CULL_FACE);
-		glEnable(GL_DEPTH_TEST);
-		wglSwapIntervalEXT(0);
-	}
+	_glContext.Create(_viewports[0]);
+	_glContext.Use(_viewports[0]);
 
-	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
+	GL::LoadExtensions(_window.GetHDC());
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	wglSwapIntervalEXT(0);
+
+	_shaderLit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Phong.frag");
+	_shaderUnlit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
 	_basicShader.Load("Data/Shaders/Basic.vert", "Data/Shaders/Basic.frag");
 }
 
@@ -187,12 +193,30 @@ void Editor::Run()
 	_Init();
 	_window.Show();
 
-	_materialManager.MakeMaterial(_textureManager, "Model", "Diffuse.png");
-	_materialManager.MakeMaterial(_textureManager, "Model2", "Specular.png");
+	//Preload materials
+	Buffer<String> filenames = IO::FindFilesInDirectory("Data/Materials/*.txt");
+	for (uint32 i = 0; i < filenames.GetSize(); ++i)
+	{
+		Utilities::StripExtension(filenames[i]);
+
+		_window.SetTitle(CSTR("Loading material \"" + filenames[i] + "\"..."));
+		_materialManager.GetMaterial(_textureManager, filenames[i]);
+	}
+
+	//Preload models
+	filenames = IO::FindFilesInDirectory("Data/Models/*.txt");
+	for (uint32 i = 0; i < filenames.GetSize(); ++i)
+	{
+		Utilities::StripExtension(filenames[i]);
+
+		_window.SetTitle(CSTR("Loading model \"" + filenames[i] + "\"..."));
+		_modelManager.GetModel(filenames[i]);
+	}
+
+	_window.SetTitle("Editor");
 
 	Renderable *r = new Renderable();
-	r->SetModel("Model.obj");
-	r->SetMaterial("Model");
+	r->SetModel("sphere");
 	_propertyWindow.SetObject(r);
 
 	_currentObject = r;
@@ -251,20 +275,20 @@ void Editor::Render()
 	_glContext.Use(_viewports[0]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	_shader.Use();
-	_shader.SetMat4("M_Projection", _cameras[0].GetProjectionMatrix());
-	_shader.SetMat4("M_View", _cameras[0].MakeInverseTransformationMatrix());
-	_shader.SetVec4("Colour", Vector4(1.f, 1.f, 1.f, 1.f));
+	_shaderUnlit.Use();
+	_shaderUnlit.SetMat4(DefaultUniformVars::mat4Projection, _cameras[0].GetProjectionMatrix());
+	_shaderUnlit.SetMat4(DefaultUniformVars::mat4View, _cameras[0].MakeInverseTransformationMatrix());
+	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
 	RenderObjects(_gameObjects);
 
 	_basicShader.Use();
 
-	_basicShader.SetMat4("M_Projection", _cameras[0].GetProjectionMatrix());
-	_basicShader.SetMat4("M_View", _cameras[0].MakeInverseTransformationMatrix());
+	_basicShader.SetMat4(DefaultUniformVars::mat4Projection, _cameras[0].GetProjectionMatrix());
+	_basicShader.SetMat4(DefaultUniformVars::mat4View, _cameras[0].MakeInverseTransformationMatrix());
 
-	_basicShader.SetVec4("Colour", Vector4(.5f, .5f, 1.f, 1.f));
+	_basicShader.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.5f, .5f, 1.f, 1.f));
 	DrawUtils::DrawGrid(_modelManager, _cameras[0], Direction::DOWN, 2.f, 10.f, 10.f);
-	_basicShader.SetVec4("Colour", Vector4(.75f, .75f, .75f, 1.f));
+	_basicShader.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.75f, .75f, .75f, 1.f));
 	DrawUtils::DrawGrid(_modelManager, _cameras[0], Direction::DOWN, 2.f, 1.f, 10.f);
 
 	_viewports[0].SwapBuffers();
@@ -277,16 +301,16 @@ void Editor::Render()
 	const int gap = 32;
 
 	_basicShader.Use();
-	_basicShader.SetMat4("M_Projection", _cameras[1].GetProjectionMatrix());
-	_basicShader.SetMat4("M_View", _cameras[1].MakeInverseTransformationMatrix());
+	_basicShader.SetMat4(DefaultUniformVars::mat4Projection, _cameras[1].GetProjectionMatrix());
+	_basicShader.SetMat4(DefaultUniformVars::mat4View, _cameras[1].MakeInverseTransformationMatrix());
 
-	_basicShader.SetVec4("Colour", Vector4(1.f, 1.f, 1.f, 1.f));
+	_basicShader.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
 	RenderObjects(_gameObjects);
 
 	glDepthFunc(GL_ALWAYS);
-	_basicShader.SetVec4("Colour", Vector4(.75f, .75f, .75f, 1.f));
+	_basicShader.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.75f, .75f, .75f, 1.f));
 	DrawUtils::DrawGrid(_modelManager, _cameras[1], Direction::DOWN, 1.f, 1.f);
-	_basicShader.SetVec4("Colour", Vector4(.5f, .5f, 1.f, 1.f));
+	_basicShader.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.5f, .5f, 1.f, 1.f));
 	DrawUtils::DrawGrid(_modelManager, _cameras[1], Direction::DOWN, 1.f, 10.f);
 	glDepthFunc(GL_LESS);
 
@@ -312,3 +336,42 @@ void Editor::Zoom(float amount)
 		camera.SetScale(_cameras[_mouseViewport].GetScale() * amount);
 	}
 }
+
+void Editor::Resize(uint16 w, uint16 h)
+{
+	uint16 vpW = w / 2;
+
+	_viewports[0].SetSizeAndPos(0, 0, vpW, h);
+	_cameras[0].SetViewport(vpW, h);
+	_viewports[1].SetSizeAndPos(vpW, 0, vpW, h);
+	_cameras[1].SetViewport(vpW, h);
+
+	glViewport(0, 0, vpW, h);
+
+	Render();
+}
+
+String Editor::SelectMaterialDialog()
+{
+	String string = ResourceSelect::Dialog(_materialManager, _modelManager, "Data/Materials/*.txt", _propertyWindow.GetHwnd(),
+		ResourceType::MATERIAL, _glContext, _shaderLit);
+
+	RECT rect;
+	::GetClientRect(_window.GetHwnd(), &rect);
+	Resize(rect.right, rect.bottom);
+
+	return string;
+}
+
+String Editor::SelectModelDialog()
+{
+	String string = ResourceSelect::Dialog(_materialManager, _modelManager, "Data/Models/*.txt", _propertyWindow.GetHwnd(),
+		ResourceType::MODEL, _glContext, _shaderLit);
+
+	RECT rect;
+	::GetClientRect(_window.GetHwnd(), &rect);
+	Resize(rect.right, rect.bottom);
+
+	return string;
+}
+

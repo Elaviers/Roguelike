@@ -17,7 +17,7 @@ uniform samplerCube Cubemap;
 uniform sampler2D T_Diffuse;
 uniform sampler2D T_Normal;
 uniform sampler2D T_Specular;
-uniform sampler2D T_Reflectivity;
+uniform sampler2D T_Reflection;
 
 layout(location = 0) in vec3 WorldPosition;
 layout(location = 1) in vec2 UV_IN;
@@ -42,7 +42,7 @@ void main()
 	vec3 CameraPosition = vec3(CameraTransform[3][0], CameraTransform[3][1], CameraTransform[3][2]);
 	
 	float SurfaceSpecular  = texture(T_Specular, UV).r;
-	float SurfaceReflectivity = texture(T_Reflectivity, UV).r;
+	float SurfaceReflectivity = texture(T_Reflection, UV).r;
 	vec3 SurfaceToCamera = normalize(CameraPosition - WorldPosition);
 	vec3 SurfaceColour = (1.0 - SurfaceReflectivity) * texture(T_Diffuse, UV).rgb;
 

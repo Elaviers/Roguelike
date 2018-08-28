@@ -28,4 +28,7 @@ namespace IO {
 
 	TextureData ReadPNGFile(const char *filename);
 	ModelData ReadOBJFile(const char *filename);
+
+	//searchPath must have a wildcard in it, like C:/Example/*.poo
+	Buffer<String> FindFilesInDirectory(const char *searchPath);
 }

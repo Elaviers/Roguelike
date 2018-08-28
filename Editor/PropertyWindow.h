@@ -3,12 +3,14 @@
 #include <Engine/Buffer.h>
 #include <Engine/ObjectProperties.h>
 
+class Editor;
 class GameObject;
 
 struct PropertyHWND
 {
 	HWND label;
 	HWND box;
+	HWND button;
 	
 	PropertyPointer property;
 };
@@ -25,10 +27,10 @@ class PropertyWindow : public Window
 
 	Buffer<PropertyHWND> _child_hwnds;
 
-	HFONT _font;
+	Editor* const _owner;
 
 public:
-	PropertyWindow();
+	PropertyWindow(Editor *owner);
 	virtual ~PropertyWindow();
 
 	static void Initialise();
@@ -38,7 +40,7 @@ public:
 		Window::Create(_className, TEXT("Properties"), this);
 		Window::SetSize(256, 512);
 
-		_font = ::CreateFont(18, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, TEXT("Arial"));
+		//_font = ::CreateFont(18, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, TEXT("Arial"));
 	}
 
 	void SetObject(GameObject*);

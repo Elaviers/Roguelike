@@ -164,6 +164,7 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
   <ItemGroup>
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="PropertyWindow.cpp" />
+    <ClCompile Include="ResourceSelect.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
@@ -171,6 +172,7 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
     <ClInclude Include="Editor.h" />
     <ClInclude Include="PropertyWindow.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourceSelect.h" />
     <ClInclude Include="Viewport.h" />
   </ItemGroup>
   <ItemGroup>
@@ -184,6 +186,10 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
     <None Include="..\Data\Shaders\Sky.frag" />
     <None Include="..\Data\Shaders\Sky.vert" />
     <None Include="..\Data\Shaders\Unlit.frag" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="TreeNode.bmp" />
+    <Image Include="TreeNode2.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

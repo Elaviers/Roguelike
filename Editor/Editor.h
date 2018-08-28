@@ -28,7 +28,8 @@ private:
 
 	GLContext _glContext;
 
-	GLProgram _shader;
+	GLProgram _shaderLit;
+	GLProgram _shaderUnlit;
 	GLProgram _basicShader;
 
 	InputManager _inputManager;
@@ -58,9 +59,6 @@ private:
 	void _Init();
 	void _InitGL();
 
-	void _LoadModel(const char *filepath, const char *name);
-	void _LoadTexture(const char *filepath, const char *name);
-
 public:
 	Editor();
 	~Editor();
@@ -77,4 +75,9 @@ public:
 		_mouseX = x;
 		_mouseY = y;
 	}
+
+	void Resize(uint16 w, uint16 h);
+
+	String SelectMaterialDialog();
+	String SelectModelDialog();
 };

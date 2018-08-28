@@ -3,7 +3,7 @@
 #include "String.h"
 #include "IO.h"
 
-GLProgram* GLProgram::_currentProgram = nullptr;
+const GLProgram* GLProgram::_currentProgram = nullptr;
 
 void CompileShader(GLuint shader, const char *src)
 {
@@ -68,7 +68,7 @@ void GLProgram::Load(const char *vertFile, const char *fragFile)
 	Create(vertSrc.GetData(), fragSrc.GetData());
 }
 
-GLint GLProgram::GetUniformLocation(const char *name)
+GLint GLProgram::GetUniformLocation(const char *name) const
 {
 	GLint location = glGetUniformLocation(_id, name);
 

@@ -8,7 +8,7 @@ void Light::GetProperties(ObjectProperties &properties)
 	_AddBaseProperties(properties);
 }
 
-void Light::ToShader(int glArrayIndex)
+void Light::ToShader(int glArrayIndex) const
 {
 	Mat4 worldTransform = MakeTransformationMatrix();
 
@@ -20,7 +20,7 @@ void Light::ToShader(int glArrayIndex)
 
 #include "ModelManager.h"
 
-void Light::DebugRender(ModelManager &modelManager)
+void Light::DebugRender(ModelManager &modelManager) const
 {
 	float colour[4] = {_colour[0], _colour[1], _colour[2], 1.f};
 

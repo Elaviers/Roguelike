@@ -4,22 +4,24 @@
 #include "Utilities.h"
 #include "Vector.h"
 
+constexpr const char *extension = ".txt";
+
 ModelManager::ModelManager()
 {
 }
 
 ModelManager::~ModelManager()
 {
-	_models.ForEach(
-		[](const String&, GLModel &model) 
+	_map.ForEach(
+		[](const String&, Model &model) 
 		{
-			model.Delete(); 
+			model.model.Delete(); 
 		});
 
-	_cube.Delete();
-	_invCube.Delete();
-	_plane.Delete();
-	_basicPlane.Delete();
+	_cube.model.Delete();
+	_invCube.model.Delete();
+	_plane.model.Delete();
+	_basicPlane.model.Delete();
 }
 
 void ModelManager::Initialise()
@@ -54,7 +56,7 @@ void ModelManager::Initialise()
 	for (int i = 0; i < 36; i += 3)
 		Vertex17F::CalculateTangents(cubeData[i], cubeData[i + 1], cubeData[i + 2]);
 
-	_cube.Create(cubeData, 36);
+	_cube.model.Create(cubeData, 36);
 
 	for (int i = 0; i < 36; i += 3) {
 		cubeData[i].normal *= -1;
@@ -65,7 +67,7 @@ void ModelManager::Initialise()
 		Vertex17F::CalculateTangents(cubeData[i], cubeData[i + 1], cubeData[i + 2]);
 	}
 
-	_invCube.Create(cubeData, 36);
+	_invCube.model.Create(cubeData, 36);
 
 	const Vector3 planeColour(1.f, 1.f, 1.f);
 
@@ -83,7 +85,7 @@ void ModelManager::Initialise()
 		3, 2, 1
 	};
 
-	_plane.Create(planeVerts, 4, planeElements, 6);
+	_plane.model.Create(planeVerts, 4, planeElements, 6);
 
 	Vector3 basicPlaneVerts[4] =
 	{
@@ -93,35 +95,44 @@ void ModelManager::Initialise()
 		Vector3(.5f, .5f, 0)
 	};
 
-	_basicPlane.Create(basicPlaneVerts, 4, planeElements, 6);
+	_basicPlane.model.Create(basicPlaneVerts, 4, planeElements, 6);
+
+	_cube.defaultMaterial = _invCube.defaultMaterial = _plane.defaultMaterial = _basicPlane.defaultMaterial = "";
 }
 
-const GLModel* ModelManager::GetModel(const char *name)
+const Model* ModelManager::GetModel(const String &nameIn)
 {
-	GLModel *model = _models.Find(name);
+	String name = nameIn.ToLower();
+
+	Model *model = _map.Find(name);
 	if (model) return model;
 	else
 	{
-		ModelData data = IO::ReadOBJFile((_rootPath + name).GetData());
+		String fs = IO::ReadFileString((_rootPath + name + extension).ToLower().GetData());
+		Utilities::LowerString(fs);
+		Buffer<String> lines = fs.Split("\r\n");
+
+		ModelData data;
+		String materialName;
+
+		for (uint32 i = 0; i < lines.GetSize(); ++i)
+		{
+			Buffer<String> tokens = lines[i].Split("=");
+
+			if (tokens[0] == "model")
+				data = IO::ReadOBJFile((_rootPath + tokens[1]).GetData());
+			if (tokens[0] == "material")
+				materialName = tokens[1];
+		}
 
 		if (data.IsValid())
 		{
-			GLModel &newModel = _models[name];
-			newModel.Create(data.vertices.Data(), data.vertices.GetSize(), data.elements.Data(), data.elements.GetSize());
+			Model &newModel = _map[name];
+			newModel.model.Create(data.vertices.Data(), data.vertices.GetSize(), data.elements.Data(), data.elements.GetSize());
+			newModel.defaultMaterial = materialName;
 			return &newModel;
 		}
 	}
 	
 	return nullptr;
-}
-
-String ModelManager::FindNameOfModel(const GLModel &model) const
-{
-	String name;
-
-	const String* found = _models.FindFirstKey(model);
-	if (found) name = *found;
-	else name = "None";
-
-	return name;
 }

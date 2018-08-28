@@ -29,10 +29,5 @@ Mat4 GameObject::MakeTransformationMatrix() const
 
 void GameObject::ApplyTransformToShader() const
 {
-	glUniformMatrix4fv(
-		GLProgram::Current().GetUniformLocation("M_Model"),
-		1,
-		GL_FALSE,
-		&MakeTransformationMatrix()[0][0]
-	);
+	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, MakeTransformationMatrix());
 }

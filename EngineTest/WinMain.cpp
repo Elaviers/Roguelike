@@ -17,7 +17,7 @@
 
 #define ORTHO 0
 
-const char *modelName = "Data/Model.obj";
+const char *modelName = "Data/Model";
 const char *texDiffuse = "Data/Diffuse.png";
 const char *texNormal = "Data/Normal.png";
 const char *texSpecular = "Data/Specular.png";
@@ -345,8 +345,8 @@ void Frame()
 
 		//
 		program_Unlit.Use();
-		program_Unlit.SetMat4("M_Projection", camera.GetProjectionMatrix());
-		program_Unlit.SetMat4("M_View", camera.MakeInverseTransformationMatrix());
+		program_Unlit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
+		program_Unlit.SetMat4(DefaultUniformVars::mat4View, camera.MakeInverseTransformationMatrix());
 
 		light1.DebugRender(modelManager);
 		light2.DebugRender(modelManager);
@@ -356,13 +356,13 @@ void Frame()
 
 		//
 		program_Lit.Use();
-		program_Lit.SetMat4("M_Projection", camera.GetProjectionMatrix());
-		program_Lit.SetMat4("M_View", camera.MakeInverseTransformationMatrix());
-		program_Lit.SetInt("Cubemap", UNIT_CUBEMAP);
-		program_Lit.SetInt("T_Diffuse", UNIT_DIFFUSE);
-		program_Lit.SetInt("T_Normal", UNIT_NORMAL);
-		program_Lit.SetInt("T_Specular", UNIT_SPECULAR);
-		program_Lit.SetInt("T_Reflectivity", UNIT_REFLECTION);
+		program_Lit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
+		program_Lit.SetMat4(DefaultUniformVars::mat4View, camera.MakeInverseTransformationMatrix());
+		program_Lit.SetInt(DefaultUniformVars::intCubemap, UNIT_CUBEMAP);
+		program_Lit.SetInt(DefaultUniformVars::intTextureDiffuse, UNIT_DIFFUSE);
+		program_Lit.SetInt(DefaultUniformVars::intTextureNormal, UNIT_NORMAL);
+		program_Lit.SetInt(DefaultUniformVars::intTextureSpecular, UNIT_SPECULAR);
+		program_Lit.SetInt(DefaultUniformVars::intTextureReflection, UNIT_REFLECTION);
 
 		light1.ToShader(0);
 		light2.ToShader(1);
@@ -390,8 +390,8 @@ void Frame()
 			Mat4 skyView = camera.MakeInverseTransformationMatrix();
 			skyView[3][0] = skyView[3][1] = skyView[3][2] = 0;
 
-			program_Sky.SetMat4("M_Projection", camera.GetProjectionMatrix());
-			program_Sky.SetMat4("M_View", skyView);
+			program_Sky.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
+			program_Sky.SetMat4(DefaultUniformVars::mat4View, skyView);
 
 			glDepthFunc(GL_LEQUAL);
 			sky.Render(modelManager);
@@ -405,18 +405,18 @@ void Frame()
 			float w = 2.f;
 
 			program_UI.Use();
-			program_UI.SetMat4("M_Projection", camera.GetProjectionMatrix());
-			program_UI.SetMat4("M_View", camera.MakeInverseTransformationMatrix());
+			program_UI.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
+			program_UI.SetMat4(DefaultUniformVars::mat4View, camera.MakeInverseTransformationMatrix());
 
 			glDisable(GL_CULL_FACE);
 			
-			program_UI.SetVec4("Colour", Vector4(1.f, 0.f, 0.f, 1.f));
+			program_UI.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 0.f, 0.f, 1.f));
 			DrawUtils::DrawGrid(modelManager, camera, Direction::RIGHT, w, 1.f, vpScale);
 
-			program_UI.SetVec4("Colour", Vector4(0.f, 1.f, 0.f, 1.f));
+			program_UI.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
 			DrawUtils::DrawGrid(modelManager, camera, Direction::UP, w, 1.f, vpScale);
 
-			program_UI.SetVec4("Colour", Vector4(0.f, 0.f, 1.f, 1.f));
+			program_UI.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 0.f, 1.f, 1.f));
 			DrawUtils::DrawGrid(modelManager, camera, Direction::FORWARD, w, 1.f, vpScale);
 
 			glEnable(GL_CULL_FACE);

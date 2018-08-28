@@ -168,10 +168,12 @@
     <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="ModelManager.h" />
     <ClInclude Include="ObjectProperties.h" />
     <ClInclude Include="Registry.h" />
     <ClInclude Include="Renderable.h" />
+    <ClInclude Include="ResourceManagerBase.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="TextureManager.h" />
@@ -199,6 +201,7 @@
     <ClCompile Include="GLTexture.cpp" />
     <ClCompile Include="IO.cpp" />
     <ClCompile Include="Light.cpp" />
+    <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="Maths.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="ModelManager.cpp" />

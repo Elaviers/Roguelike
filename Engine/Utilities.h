@@ -19,4 +19,21 @@ namespace Utilities
 		for (uint32 i = 0; i < length; ++i)
 			reinterpret_cast<byte*>(dest)[i] = reinterpret_cast<const byte*>(src)[i];
 	}
+
+	inline void StripExtension(String &string)
+	{
+		for (unsigned int i = string.GetLength() - 1; i > 0; --i)
+			if (string[i] == '.')
+			{
+				string.SetLength(i);
+				break;
+			}
+	}
+
+	inline void LowerString(String &string)
+	{
+		for (unsigned int i = 0; i < string.GetLength(); ++i)
+			if (string[i] >= 'A' && string[i] <= 'Z')
+				string[i] += ('a' - 'A');
+	}
 }

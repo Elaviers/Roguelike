@@ -1,20 +1,15 @@
 #pragma once
-#include "GLModel.h"
-#include "Map.h"
-#include "String.h"
+#include "ResourceManagerBase.h"
+#include "Model.h"
 
-class ModelManager
+class ModelManager : public ResourceManagerBase<Model>
 {
 private:
-	String _rootPath;
+	Model _cube;
+	Model _invCube;
+	Model _plane;
 
-	Map<String, GLModel> _models;
-
-	GLModel _cube;
-	GLModel _invCube;
-	GLModel _plane;
-
-	GLModel _basicPlane;
+	Model _basicPlane;
 
 public:
 	ModelManager();
@@ -22,15 +17,11 @@ public:
 
 	void Initialise();
 
-	const GLModel* GetModel(const char *name);
+	const Model* GetModel(const String &name);
 
-	inline const GLModel& Cube() const			{ return _cube; }
-	inline const GLModel& InverseCube() const	{ return _invCube; }
-	inline const GLModel& Plane() const			{ return _plane; }
+	inline const Model& Cube() const			{ return _cube; }
+	inline const Model& InverseCube() const	{ return _invCube; }
+	inline const Model& Plane() const			{ return _plane; }
 
-	inline const GLModel& BasicPlane() const	{ return _basicPlane; }
-
-	String FindNameOfModel(const GLModel& model) const;
-
-	inline void SetRootPath(const char *root) { _rootPath = root; }
+	inline const Model& BasicPlane() const	{ return _basicPlane; }
 };

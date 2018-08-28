@@ -10,12 +10,12 @@ GLContext::~GLContext()
 	wglDeleteContext(_id);
 }
 
-void GLContext::Create(const Window &window)
+void GLContext::Create(HDC hdc)
 {
-	_id = wglCreateContext(window.GetHDC());
+	_id = wglCreateContext(hdc);
 }
 
-void GLContext::Use(const Window &window)
+void GLContext::Use(HDC hdc) const
 {
-	wglMakeCurrent(window.GetHDC(), _id);
+	wglMakeCurrent(hdc, _id);
 }

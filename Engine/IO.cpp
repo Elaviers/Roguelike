@@ -68,3 +68,21 @@ TextureData IO::ReadPNGFile(const char *filename)
 
 	return out;
 }
+
+Buffer<String> IO::FindFilesInDirectory(const char *search)
+{
+	Buffer<String> filenames;
+
+	WIN32_FIND_DATAA data;
+	HANDLE hFile = ::FindFirstFileA(search, &data);
+
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			filenames.Add(data.cFileName);
+		} while (::FindNextFile(hFile, &data));
+	}
+
+	return filenames;
+}

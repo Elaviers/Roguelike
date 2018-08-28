@@ -4,7 +4,7 @@
 template <typename KEYTYPE, typename VALUETYPE>
 class Map
 {
-public:
+private:
 	struct Pair
 	{
 		Pair(const KEYTYPE &key, const VALUETYPE &value) : key(key), value(value), left(nullptr), right(nullptr) {}
@@ -16,7 +16,6 @@ public:
 		Pair *right;
 	};
 
-private:
 	Pair *_data;
 
 	Pair* _FindPair(Pair *current, const KEYTYPE &key) const //Hmm

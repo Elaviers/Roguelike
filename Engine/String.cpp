@@ -121,17 +121,21 @@ Buffer<String> String::Split(const char *delimiters) const
 
 void String::SetLength(unsigned int length)
 {
-	if (length < _length)
-		_data[length] = '\0';
+	unsigned int minLength = length < _length ? length : _length;
 
-	_length = length;
+	char *new_data = new char[length + 1]();
+
+	for (unsigned int i = 0; i < minLength; ++i)
+		new_data[i] = _data[i];
+
 	delete[] _data;
-	_data = new char[_length + 1]();
+	_length = length;
+	_data = new_data;
 }
 
 ////
 
-const String& String::operator=(const String &other)
+String& String::operator=(const String &other)
 {
 	_length = other._length;
 
@@ -145,7 +149,7 @@ const String& String::operator=(const String &other)
 	return *this;
 }
 
-const String& String::operator=(String &&other)
+String& String::operator=(String &&other)
 {
 	delete[] _data;
 
@@ -156,7 +160,7 @@ const String& String::operator=(String &&other)
 	return *this;
 }
 
-const String& String::operator=(const char* string)
+String& String::operator=(const char* string)
 {
 	_length = StringLength(string);
 
@@ -170,7 +174,7 @@ const String& String::operator=(const char* string)
 	return *this;
 }
 
-const String& String::operator+=(const String &other)
+String& String::operator+=(const String &other)
 {
 	char *new_data = new char[_length + other._length + 1];
 
@@ -188,7 +192,7 @@ const String& String::operator+=(const String &other)
 	return *this;
 }
 
-const String& String::operator+=(const char *string)
+String& String::operator+=(const char *string)
 {
 	unsigned int length = StringLength(string);
 	char *new_data = new char[_length + length + 1];
@@ -205,7 +209,7 @@ const String& String::operator+=(const char *string)
 	return *this;
 }
 
-const String& String::operator+=(char character)
+String& String::operator+=(char character)
 {
 	char *new_data = new char[_length + 2];
 
@@ -223,13 +227,13 @@ const String& String::operator+=(char character)
 
 ////
 
-String String::operator+(const String& other)
+String String::operator+(const String& other) const
 {
 	String product(_length + other._length);
 
 	for (unsigned int i = 0; i < _length; ++i)
 		product[i] = _data[i];
-	
+
 	for (unsigned int i = 0; i < other._length; ++i)
 		product[_length + i] = other._data[i];
 
@@ -264,6 +268,23 @@ bool String::operator==(const char *string) const
 }
 
 ////
+
+String String::ToLower() const
+{
+	String string;
+	string.SetLength(_length);
+
+	for (unsigned int i = 0; i < _length; ++i)
+		if (_data[i] >= 'A' && _data[i] <= 'Z')
+			string._data[i] += _data[i] + ('a' - 'A');
+		else
+			string._data[i] = _data[i];
+
+	return string;
+}
+
+////
+
 #include <stdlib.h>
 
 int String::ToInt() const
@@ -332,7 +353,7 @@ String String::ConvertFloat(double number, unsigned int minimum, byte base)
 	if (number == NAN)
 		return "NAN";
 
-	
+
 	int64 whole_number = (int64)number;
 	double fraction = number - whole_number;
 

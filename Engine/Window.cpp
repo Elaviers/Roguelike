@@ -15,6 +15,30 @@ void WindowFunctions::RepositionHWND(HWND hwnd, uint16 x, uint16 y)
 	SetHWNDSizeAndPos(hwnd, x, y, rect.right, rect.bottom);
 }
 
+void WindowFunctions::SetDefaultPixelFormat(HDC hdc)
+{
+	PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR),
+		1,
+		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+		PFD_TYPE_RGBA,
+		24,							//cColorBits
+		0, 0, 0, 0, 0, 0, 0, 0,		//*
+		0, 0, 0, 0, 0,				//*
+		32,							//cDepthBits
+		0,							//*
+		0,							//*
+		0,							//Ignored
+		0,							//*
+		0,							//*	
+		0,							//*
+		0							//* - Not relevant for finding PFD
+	};
+
+	int pfd_id = ChoosePixelFormat(hdc, &pfd);
+	SetPixelFormat(hdc, pfd_id, &pfd);
+}
+
 Window::Window() : _hwnd(NULL)
 {
 }
@@ -34,27 +58,7 @@ void Window::Create(LPCTSTR className, LPCTSTR title, LPVOID param, DWORD flags,
 	_hwnd = ::CreateWindow(className, title, flags, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, parent, NULL, ::GetModuleHandle(NULL), param);
 
 	_hdc = GetDC(_hwnd);
-
-	PIXELFORMATDESCRIPTOR pfd = {
-		sizeof(PIXELFORMATDESCRIPTOR),
-		1,
-		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-		PFD_TYPE_RGBA,
-		24,							//cColorBits
-		0, 0, 0, 0, 0, 0, 0, 0,		//*
-		0, 0, 0, 0, 0,				//*
-		32,							//cDepthBits
-		0,							//*
-		0,							//*
-		0,							//Ignored
-		0,							//*
-		0,							//*	
-		0,							//*
-		0							//* - Not relevant for finding PFD
-	};
-
-	int pfd_id = ChoosePixelFormat(_hdc, &pfd);
-	SetPixelFormat(_hdc, pfd_id, &pfd);
+	WindowFunctions::SetDefaultPixelFormat(_hdc);
 }
 
 void Window::Show()

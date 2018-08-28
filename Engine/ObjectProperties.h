@@ -19,6 +19,15 @@ enum class PropertyType
 	NONE
 };
 
+namespace PropertyFlags
+{
+	enum PropertyFlag
+	{
+		MODEL = 0x01, 
+		MATERIAL = 0x02
+	};
+}
+
 inline PropertyType TypenameToEnum(const float&) { return PropertyType::FLOAT; }
 inline PropertyType TypenameToEnum(const byte&) { return PropertyType::BYTE; }
 inline PropertyType TypenameToEnum(const int16&) { return PropertyType::INT16; }
@@ -79,12 +88,13 @@ public:
 struct PropertyPointer
 {
 	PropertyType type;
+	byte flags;
 	void *property; //ALWAYS points to a PropertyBase
 
 	int index;
 
-	PropertyPointer(PropertyType type, void *propertyPtr, int index) : type(type), property(propertyPtr), index(index) {}
-	PropertyPointer() : type(PropertyType::NONE), index(-1) {}
+	PropertyPointer(PropertyType type, byte flags, void *propertyPtr, int index) : type(type), flags(flags), property(propertyPtr), index(index) {}
+	PropertyPointer() : type(PropertyType::NONE), flags(0), index(-1) {}
 
 	void SetByString(const String &value);
 	String GetAsString() const;
@@ -124,25 +134,25 @@ public:
 	}
 
 	template <typename Type>
-	void Add(const char *name, const Type& value)
+	void Add(const char *name, const Type& value, byte flags = 0)
 	{
 		if (_base)
 		{
 			Property<void, Type> *property = new Property<void, Type>(&_base, &value - _base);
 
-			_properties.Set(name, PropertyPointer(TypenameToEnum<Type>(), property, _count++));
+			_properties.Set(name, PropertyPointer(TypenameToEnum<Type>(), flags, property, _count++));
 		}
 		else Error(PROPERTY_ADDITION_ERROR);
 	}
 
 	template <typename Base, typename Type>
-	void Add(const char *name, Base *member, Type(Base::*getter)() const, void(Base::*setter)(const Type&))
+	void Add(const char *name, Base *member, Type(Base::*getter)() const, void(Base::*setter)(const Type&), byte flags = 0)
 	{
 		if (_base)
 		{
 			Property<Base, Type> *property = new Property<Base, Type>(&_base, member, getter, setter);
 
-			_properties.Set(name, PropertyPointer(TypenameToEnum<Type>(), property, _count++));
+			_properties.Set(name, PropertyPointer(TypenameToEnum<Type>(), flags, property, _count++));
 		}
 		else Error(PROPERTY_ADDITION_ERROR);
 	}

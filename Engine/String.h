@@ -28,14 +28,14 @@ public:
 	inline unsigned int GetLength() const { return _length; }
 	inline char& operator[](unsigned int position) const { return _data[position]; }
 
-	const String& operator=(const String&);
-	const String& operator=(String&&);
-	const String& operator=(const char*);
-	const String& operator+=(const String&);
-	const String& operator+=(const char*);
-	const String& operator+=(char);
-	
-	String operator+(const String&);
+	String& operator=(const String&);
+	String& operator=(String&&);
+	String& operator=(const char*);
+	String& operator+=(const String&);
+	String& operator+=(const char*);
+	String& operator+=(char);
+
+	String operator+(const String&) const;
 
 	int Compare(const String &other) const;
 	bool operator==(const String &other) const			{ return StringsEqual(_data, other._data);	}
@@ -43,6 +43,9 @@ public:
 	inline bool operator>(const String &other) const	{ return Compare(other) > 0;	}
 
 	bool operator==(const char*) const;
+	//inline operator bool() { return _length != 0; }
+
+	String ToLower() const;
 
 	int ToInt() const;
 	float ToFloat() const;
