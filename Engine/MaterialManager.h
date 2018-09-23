@@ -6,10 +6,12 @@ class TextureManager;
 
 class MaterialManager : public ResourceManagerBase<Material>
 {
+	TextureManager *_textureManager;
+
 public:
-	MaterialManager() {}
+	MaterialManager(TextureManager &textureManager) : _textureManager(&textureManager) {}
 	~MaterialManager() {}
 
-	const Material* GetMaterial(TextureManager&, const String &name);
+	const Material* GetMaterial(const String &name);
 };
  

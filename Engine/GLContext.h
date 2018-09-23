@@ -16,4 +16,6 @@ public:
 
 	inline void Create(const Window &window) { Create(window.GetHDC()); }
 	inline void Use(const Window &window) const { Use(window.GetHDC()); }
+
+	inline bool IsValid() { return _id != 0; }
 };

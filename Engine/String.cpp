@@ -258,17 +258,6 @@ int String::Compare(const String &other) const
 
 ////
 
-bool String::operator==(const char *string) const
-{
-	for (unsigned int i = 0; i < _length; ++i)
-		if (string[i] == '\0' || _data[i] != string[i])
-			return false;
-
-	return true;
-}
-
-////
-
 String String::ToLower() const
 {
 	String string;
@@ -295,6 +284,19 @@ int String::ToInt() const
 float String::ToFloat() const
 {
 	return (float)atof(GetData());
+}
+
+Vector2 String::ToVector2() const
+{
+	Buffer<String> tokens = Split(",");
+	Vector2 result;
+
+	if (tokens.GetSize() >= 1)
+		result[0] = tokens[0].ToFloat();
+	if (tokens.GetSize() >= 2)
+		result[1] = tokens[1].ToFloat();
+
+	return result;
 }
 
 Vector3 String::ToVector3() const
@@ -346,21 +348,26 @@ String String::Convert(__int64 number, unsigned int minimum, byte base)
 
 #include <math.h>
 
-String String::ConvertFloat(double number, unsigned int minimum, byte base)
+String String::ConvertFloat(double number, unsigned int minimum, unsigned int maxDecimal, byte base)
 {
 	if (number == INFINITY)
 		return "infinity";
 	if (number == NAN)
 		return "NAN";
 
-
 	int64 whole_number = (int64)number;
 	double fraction = number - whole_number;
 
-	String whole_string = Convert(whole_number, minimum, base);
+	String whole_string;
+
+	//This is here because negative numbers with a whole part of zero would return as if positive otherwise
+	if (number < 0.0)
+		whole_string = String('-') + Convert(-whole_number, minimum, base);
+	else
+		whole_string = Convert(whole_number, minimum, base);
 
 	unsigned int fraction_digit_count = 0;
-	for (double d = fraction; d;) {
+	for (double d = fraction; d != 0.f && fraction_digit_count < maxDecimal;) {
 		d *= base;
 		d -= (int)d;
 		++fraction_digit_count;
@@ -368,6 +375,8 @@ String String::ConvertFloat(double number, unsigned int minimum, byte base)
 
 	String fraction_string(fraction_digit_count);
 	int digit;
+
+	if (fraction < 0.0) fraction *= -1.0;
 
 	for (unsigned int i = 0; i < fraction_digit_count; ++i) {
 		fraction *= base;
@@ -383,13 +392,45 @@ String String::ConvertFloat(double number, unsigned int minimum, byte base)
 	return whole_string;
 }
 
-String String::ConvertVector3(const Vector3 &vector, unsigned int minimum, byte base)
+String String::ConvertVector2(const Vector2 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
 {
 	const char *seperator = ", ";
-	return ConvertFloat(vector[0], minimum, base) + seperator + ConvertFloat(vector[1], minimum, base) + seperator + ConvertFloat(vector[2], minimum, base);
+	return ConvertFloat(vector[0], minimum, maxDecimal, base) + seperator + ConvertFloat(vector[1], minimum, maxDecimal, base);
+}
+
+String String::ConvertVector3(const Vector3 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
+{
+	const char *seperator = ", ";
+	return ConvertFloat(vector[0], minimum, maxDecimal, base) + seperator + ConvertFloat(vector[1], minimum, maxDecimal, base) + seperator + ConvertFloat(vector[2], minimum, maxDecimal, base);
 }
 
 //Other
+
+bool StringsInequal(const char *a, const char *b)
+{
+	unsigned int i = 0;
+	while (1)
+	{
+		if (a[i] != b[i])
+			return true;
+		if (a[i] == '\0')
+			return false;
+		i++;
+	}
+}
+
+bool StringsEqual(const char *a, const char *b)
+{
+	unsigned int i = 0;
+	while (1)
+	{
+		if (a[i] != b[i])
+			return false;
+		if (a[i] == '\0')
+			return true;
+		i++;
+	}
+}
 
 bool StringContains(const char *string, const char *phrase)
 {

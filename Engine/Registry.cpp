@@ -1,6 +1,5 @@
 #include "Registry.h"
-
-
+#include "Brush2D.h"
 #include "Camera.h"
 #include "Light.h"
 #include "Renderable.h"
@@ -10,7 +9,8 @@
 void Registry::RegisterEngineObjects()
 {
 	QUICKREGISTER(Camera);
-	QUICKREGISTER(Light);
 	QUICKREGISTER(Renderable);
+	QUICKREGISTER(Brush2D);
+	QUICKREGISTER(Light);
 
 }

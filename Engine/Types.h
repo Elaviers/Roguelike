@@ -9,4 +9,4 @@ typedef unsigned __int16 uint16;
 typedef unsigned __int32 uint32;
 typedef unsigned __int64 uint64;
 
-enum class Direction {RIGHT, LEFT, UP, DOWN, FORWARD, BACK};
+enum class Direction {RIGHT, UP, FORWARD};

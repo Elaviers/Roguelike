@@ -12,7 +12,7 @@ struct PropertyHWND
 	HWND box;
 	HWND button;
 	
-	PropertyPointer property;
+	Property *property;
 };
 
 class PropertyWindow : public Window
@@ -29,20 +29,26 @@ class PropertyWindow : public Window
 
 	Editor* const _owner;
 
+	void _CreateHWNDs(bool readOnly);
+
 public:
 	PropertyWindow(Editor *owner);
 	virtual ~PropertyWindow();
 
-	static void Initialise();
+	static void Initialise(HBRUSH);
 
-	inline void Create()
+	inline void Create(const Window &parent)
 	{
-		Window::Create(_className, TEXT("Properties"), this);
+		Window::Create(_className, TEXT("Properties"), this, WS_CHILD, parent.GetHwnd());
 		Window::SetSize(256, 512);
-
-		//_font = ::CreateFont(18, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, TEXT("Arial"));
 	}
 
-	void SetObject(GameObject*);
-};
+	void SetProperties(const ObjectProperties&, bool readOnly = false);
 
+	void SetObject(GameObject*, bool readOnly = false);
+	void ChangeBase(GameObject*);
+
+	void Refresh();
+
+	void Clear();
+};

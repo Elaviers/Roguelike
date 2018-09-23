@@ -1,6 +1,7 @@
 #include "GameObject.h"
 #include "GL.h"
 #include "GLProgram.h"
+#include "ObjectProperties.h"
 
 void GameObject::_AddBaseProperties(ObjectProperties &properties)
 {

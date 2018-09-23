@@ -1,7 +1,6 @@
 #pragma once
 #include "GameObject.h"
-#include "MaterialManager.h"
-#include "ModelManager.h"
+#include "Engine.h"
 
 class Renderable : public GameObject
 {
@@ -9,24 +8,17 @@ private:
 	const Model *_model;
 	const Material *_material;
 
-	static MaterialManager* _materialManager;
-	static ModelManager* _modelManager;
+	bool _materialIsDefault;
 
 public:
 	Renderable() {}
 	virtual ~Renderable() {}
 
-	inline static void SetManagers(MaterialManager* materialManager, ModelManager* modelManager)
-	{
-		_materialManager = materialManager;
-		_modelManager = modelManager;
-	}
+	inline void SetModel(const String &name) { if (Engine::modelManager) SetModel(Engine::modelManager->GetModel(name)); }
+	inline void SetModel(const Model *model) { _model = model; if (model->defaultMaterial.GetLength() != 0) { SetMaterial(model->defaultMaterial); _materialIsDefault = true; } }
 
-	inline void SetModel(const String &name) { if (_modelManager) SetModel(_modelManager->GetModel(name)); }
-	inline void SetModel(const Model *model) { _model = model; if (model->defaultMaterial.GetLength() != 0) SetMaterial(model->defaultMaterial); }
-
-	inline void SetMaterial(const String &name) { if (_materialManager) SetMaterial(_materialManager->Find(name)); }
-	inline void SetMaterial(const Material *material) { _material = material; }
+	inline void SetMaterial(const String &name) { if (Engine::materialManager) SetMaterial(Engine::materialManager->GetMaterial(name)); }
+	inline void SetMaterial(const Material *material) { _material = material; _materialIsDefault = false; }
 
 	virtual void Render() const override;
 
@@ -35,4 +27,9 @@ public:
 	//These are for properties really
 	String GetModelName() const;
 	String GetMaterialName() const;
+
+	virtual void SaveToFile(BufferIterator<byte>&, const Map<String, uint16> &strings) const override;
+	virtual void LoadFromFile(BufferIterator<byte>&, const Map<uint16, String> &strings) override;
+
+	inline bool MaterialIsDefault() const { return _materialIsDefault; }
 };

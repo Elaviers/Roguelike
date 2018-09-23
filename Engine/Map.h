@@ -91,9 +91,29 @@ private:
 		delete pair;
 	}
 
+	Pair* _CopyPair(Pair *src)
+	{
+		Pair *newPair = new Pair(src->key, src->value);
+
+		if (src->left)
+			newPair->left = _CopyPair(src->left);
+		if (src->right)
+			newPair->right = _CopyPair(src->right);
+
+		return newPair;
+	}
+
 public:
-	Map() {}
+	Map() : _data(nullptr) {}
 	~Map() { Clear(); }
+
+	//Hello future me that actually wants a copy constructor and totally does not remember making a certain silly mistake...
+	Map(const Map &other) : _data(nullptr)
+	{
+		if (other._data) _data = _CopyPair(other._data);
+	}
+
+	Map(Map&& other) : _data(other._data) { other._data = nullptr; }
 
 	void ForEach(void (*function)(const KEYTYPE&, VALUETYPE&))
 	{
@@ -113,18 +133,6 @@ public:
 		return nullptr;
 	}
 
-	VALUETYPE* Find(const KEYTYPE &key)
-	{
-		if (_data)
-		{
-			auto pair = _FindPair(_data, key);
-			if (pair)
-				return &pair->value;
-		}
-
-		return nullptr;
-	}
-
 	const VALUETYPE* Find(const KEYTYPE &key) const
 	{
 		if (_data)
@@ -136,6 +144,8 @@ public:
 
 		return nullptr;
 	}
+
+	inline VALUETYPE* Find(const KEYTYPE &key) { return const_cast<VALUETYPE*>(((const Map*)this)->Find(key)); }
 
 	VALUETYPE& Set(const KEYTYPE &key, const VALUETYPE &value)
 	{
@@ -165,5 +175,13 @@ public:
 			_DeletePair(_data);
 			_data = nullptr;
 		}
+	}
+
+	inline Map& operator=(const Map &other)
+	{
+		Clear();
+
+		if (other._data) _data = _CopyPair(other._data);
+		return *this;
 	}
 };

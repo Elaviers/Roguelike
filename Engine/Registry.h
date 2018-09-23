@@ -1,6 +1,7 @@
 #pragma once
 #include "Buffer.h"
 #include "GameObject.h"
+#include "ObjectProperties.h"
 #include "String.h"
 #include "Utilities.h"
 

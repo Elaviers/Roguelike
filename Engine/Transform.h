@@ -1,4 +1,5 @@
 #pragma once
+#include "BufferIterator.h"
 #include "Vector.h"
 #include "Matrix.h"
 
@@ -33,4 +34,7 @@ public:
 	Vector3 GetForwardVector() const;
 	Vector3 GetRightVector() const;
 	Vector3 GetUpVector() const;
+
+	void WriteToBuffer(BufferIterator<byte> &buffer) const;
+	void ReadFromBuffer(BufferIterator<byte> &buffer);
 };

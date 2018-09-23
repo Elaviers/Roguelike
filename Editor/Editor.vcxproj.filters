@@ -33,6 +33,12 @@
     <ClCompile Include="ResourceSelect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EditorIO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Viewport.h">
@@ -48,6 +54,12 @@
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="ResourceSelect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -84,6 +96,18 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="TreeNode2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="ToolEdit.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="ToolSelect.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="ToolEntity.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="ToolConnector.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

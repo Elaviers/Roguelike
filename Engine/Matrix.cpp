@@ -4,6 +4,8 @@
 #define RETURNMAT4(A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P) \
 	float data[4][4] = {A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P}; return Mat4(data)
 
+using namespace Maths;
+
 namespace Matrix
 {
 	Mat4 Identity()

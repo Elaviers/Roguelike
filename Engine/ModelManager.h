@@ -5,11 +5,10 @@
 class ModelManager : public ResourceManagerBase<Model>
 {
 private:
+	Model _line;
 	Model _cube;
 	Model _invCube;
 	Model _plane;
-
-	Model _basicPlane;
 
 public:
 	ModelManager();
@@ -19,9 +18,8 @@ public:
 
 	const Model* GetModel(const String &name);
 
-	inline const Model& Cube() const			{ return _cube; }
-	inline const Model& InverseCube() const	{ return _invCube; }
+	inline const Model& Line() const			{ return _line; }
 	inline const Model& Plane() const			{ return _plane; }
-
-	inline const Model& BasicPlane() const	{ return _basicPlane; }
+	inline const Model& Cube() const			{ return _cube; }
+	inline const Model& InverseCube() const		{ return _invCube; }
 };

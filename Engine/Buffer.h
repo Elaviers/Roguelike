@@ -1,7 +1,7 @@
 #pragma once
 #include "Types.h"
 
-template<typename T>
+template <typename T>
 class Buffer
 {
 private:

@@ -223,7 +223,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	inputManager.BindAxis(AxisType::MOUSE_X, &lookY);
 	inputManager.BindAxis(AxisType::MOUSE_Y, &lookX);
 
-	Renderable::SetManagers(nullptr, &modelManager);
+	Engine::modelManager = &modelManager;
 
 	//
 	//Load resources

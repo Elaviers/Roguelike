@@ -2,7 +2,8 @@
 #include "Buffer.h"
 #include "Vector.h"
 
-inline bool StringsEqual(const char *a, const char *b);
+bool StringsEqual(const char *a, const char *b);
+bool StringsInequal(const char *a, const char *b);
 
 class String {
 private:
@@ -38,47 +39,35 @@ public:
 	String operator+(const String&) const;
 
 	int Compare(const String &other) const;
-	bool operator==(const String &other) const			{ return StringsEqual(_data, other._data);	}
 	inline bool operator<(const String &other) const	{ return Compare(other) < 0;	}
 	inline bool operator>(const String &other) const	{ return Compare(other) > 0;	}
 
-	bool operator==(const char*) const;
-	//inline operator bool() { return _length != 0; }
+	inline bool operator==(const String &other) const { return StringsEqual(_data, other._data); }
+	inline bool operator==(const char *other) const { return StringsEqual(_data, other); }
+	inline bool operator!=(const String &other) const { return StringsInequal(_data, other._data); }
+	inline bool operator!=(const char *other) const { return StringsInequal(_data, other); }
 
 	String ToLower() const;
 
 	int ToInt() const;
 	float ToFloat() const;
+	Vector2 ToVector2() const;
 	Vector3 ToVector3() const;
 
 	//
-	static String Convert(__int64,	unsigned int minimun = 0, byte base = 10);
-	static String ConvertFloat(double, unsigned int minimum = 0, byte base = 10);
-	static String ConvertVector3(const Vector3&, unsigned int minimum = 0, byte base = 10);
+	static String Convert(__int64,	unsigned int minimunDigits = 0, byte base = 10);
+	static String ConvertFloat(double, unsigned int minimumDigits = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
+	static String ConvertVector2(const Vector2&, unsigned int minimum = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
+	static String ConvertVector3(const Vector3&, unsigned int minimum = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
 };
 
 #define CSTR(BODY) ((String)BODY).GetData()
 
 inline unsigned int StringLength(const char *string) {
 	unsigned int length = 0;
-	while (string[++length] != '\0');
+	while (string[length] != '\0') length++;
 	return length;
 }
 
-inline bool StringsEqual(const char *a, const char *b)
-{
-	unsigned int i = 0;
-
-	while (1)
-	{
-		if (a[i] != b[i])
-			return false;
-
-		if (a[i] == '\0')
-			return true;
-
-		i++;
-	}
-}
-
 bool StringContains(const char *string, const char *phrase);
+ 

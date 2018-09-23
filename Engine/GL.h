@@ -48,6 +48,7 @@ extern PFNGLCOMPILESHADERPROC		glCompileShader;
 
 //Textures
 extern PFNGLACTIVETEXTUREPROC		glActiveTexture;
+extern PFNGLGENERATEMIPMAPPROC		glGenerateMipmap;
 
 //Uniform variables
 extern PFNGLGETACTIVEUNIFORMPROC	glGetActiveUniform;

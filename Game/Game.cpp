@@ -29,7 +29,7 @@ LRESULT CALLBACK Game::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 	return 0;
 }
 
-Game::Game()
+Game::Game() : _materialManager(_textureManager)
 {
 }
 

@@ -5,14 +5,14 @@ void WindowFunctions::ResizeHWND(HWND hwnd, uint16 w, uint16 h)
 	RECT rect;
 	::GetWindowRect(hwnd, &rect);
 	::MapWindowPoints(HWND_DESKTOP, ::GetParent(hwnd), (LPPOINT)&rect, 2);
-	SetHWNDSizeAndPos(hwnd, rect.left, rect.top, w, h);
+	SetHWNDSizeAndPos(hwnd, (uint16)rect.left, (uint16)rect.top, w, h);
 }
 
 void WindowFunctions::RepositionHWND(HWND hwnd, uint16 x, uint16 y)
 {
 	RECT rect;
 	::GetClientRect(hwnd, &rect);
-	SetHWNDSizeAndPos(hwnd, x, y, rect.right, rect.bottom);
+	SetHWNDSizeAndPos(hwnd, x, y, (uint16)rect.right, (uint16)rect.bottom);
 }
 
 void WindowFunctions::SetDefaultPixelFormat(HDC hdc)

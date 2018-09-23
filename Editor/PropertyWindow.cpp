@@ -4,6 +4,7 @@
 #include "Editor.h"
 
 constexpr int buttonW = 20;
+constexpr int boxH = 18;
 
 LPCTSTR PropertyWindow::_className = TEXT("PWCLASS");
 WNDPROC PropertyWindow::_defaultEditProc;
@@ -32,16 +33,15 @@ LRESULT PropertyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 		uint16 label_w = w / 2;
 		uint16 box_w = w / 2;
-		const uint16 h = 18;
-		uint16 y = h;
+		uint16 y = 0;
 
-		for (int i = 0; i < pw->_child_hwnds.GetSize(); ++i)
+		for (uint32 i = 0; i < pw->_child_hwnds.GetSize(); ++i)
 		{
-			WindowFunctions::SetHWNDSizeAndPos(pw->_child_hwnds[i].label, 0, y, label_w, h);
-			WindowFunctions::SetHWNDSizeAndPos(pw->_child_hwnds[i].box, label_w, y, box_w - (pw->_child_hwnds[i].button ? buttonW : 0), h);
+			WindowFunctions::SetHWNDSizeAndPos(pw->_child_hwnds[i].label, 0, y, label_w, boxH);
+			WindowFunctions::SetHWNDSizeAndPos(pw->_child_hwnds[i].box, label_w, y, box_w - (pw->_child_hwnds[i].button ? buttonW : 0), boxH);
 			WindowFunctions::RepositionHWND(pw->_child_hwnds[i].button, label_w + box_w - buttonW, y);
 
-			y += h;
+			y += boxH;
 		}
 	}
 		break;
@@ -53,7 +53,7 @@ LRESULT PropertyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 			char string[32];
 			::GetWindowText((HWND)lparam, string, 32);
 
-			pw->_child_hwnds[LOWORD(wparam)].property.SetByString(String(string));
+			pw->_child_hwnds[LOWORD(wparam)].property->SetByString(String(string));
 		}
 		else if (HIWORD(wparam) == BN_CLICKED)
 		{
@@ -61,14 +61,17 @@ LRESULT PropertyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 			String string;
 
-			if (pw->_child_hwnds[id].property.flags & PropertyFlags::MATERIAL)
+			if (pw->_child_hwnds[id].property->GetFlags() & PropertyFlags::MATERIAL)
 				string = pw->_owner->SelectMaterialDialog();
-			else if (pw->_child_hwnds[id].property.flags & PropertyFlags::MODEL)
+			else if (pw->_child_hwnds[id].property->GetFlags() & PropertyFlags::MODEL)
 				string = pw->_owner->SelectModelDialog();
 			else break;
 
-			::SetWindowTextA(pw->_child_hwnds[id].box, string.GetData());
-			pw->_child_hwnds[id].property.SetByString(string);
+			if (string.GetLength() > 0)
+			{
+				::SetWindowTextA(pw->_child_hwnds[id].box, string.GetData());
+				pw->_child_hwnds[id].property->SetByString(string);
+			}
 		}
 	}
 		break;
@@ -96,7 +99,7 @@ LRESULT PropertyWindow::_EditProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpa
 			char string[32];
 			::GetWindowText(hwnd, string, 32);
 
-			pw->_child_hwnds[(int)::GetMenu(hwnd)].property.SetByString(String(string));
+			pw->_child_hwnds[(int)::GetMenu(hwnd)].property->SetByString(String(string));
 		}
 		else return ::CallWindowProc(_defaultEditProc, hwnd, msg, wparam, lparam);
 
@@ -110,13 +113,13 @@ LRESULT PropertyWindow::_EditProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpa
 }
 
 //static
-void PropertyWindow::Initialise()
+void PropertyWindow::Initialise(HBRUSH brush)
 {
 	WNDCLASSEXA windowClass = {};
 	windowClass.cbSize = sizeof(WNDCLASSEXA);
 	windowClass.lpfnWndProc = _WindowProc;
 	windowClass.hInstance = ::GetModuleHandle(NULL);
-	windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	windowClass.hbrBackground = brush;
 	windowClass.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
 	windowClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	windowClass.hCursor = ::LoadCursor(NULL, IDC_ARROW);
@@ -133,41 +136,84 @@ PropertyWindow::~PropertyWindow()
 {
 }
 
-void PropertyWindow::SetObject(GameObject *object)
+void PropertyWindow::_CreateHWNDs(bool readOnly)
 {
-	_child_hwnds.SetSize(0);
-
-	_objProperties.Clear();
-	_objProperties.SetObject(*object);
-	object->GetProperties(_objProperties);
-
 	auto properties = _objProperties.GetAll();
 
-	const int w = 150;
-	const int h = 18;
-	int y = h;
+	RECT rect;
+	::GetClientRect(_hwnd, &rect);
 
-	for (int i = 0; i < properties.GetSize(); ++i)
+	const int w = rect.right / 2;
+	int y = 0;
+
+	for (uint32 i = 0; i < properties.GetSize(); ++i)
 	{
-		const char *name = properties[i].name.GetData();
+		const char *name = properties[i].first.GetData();
 
 		HINSTANCE instance = ::GetModuleHandle(NULL);
-		
-		HWND label = ::CreateWindow(WC_STATIC, name, WS_CHILD | WS_VISIBLE, 0, y, w, h, _hwnd, (HMENU)i, instance, NULL);
+
+		HWND label = ::CreateWindow(WC_STATIC, name, WS_CHILD | WS_VISIBLE, 0, y, w, boxH, _hwnd, (HMENU)i, instance, NULL);
 
 		HWND button = 0;
-		if (properties[i].propertyPointer.flags & (PropertyFlags::MODEL | PropertyFlags::MATERIAL))
-			button = ::CreateWindow(WC_BUTTON, "...", WS_CHILD | WS_VISIBLE, w * 2 - buttonW, y, 20, h, _hwnd, (HMENU)i, instance, NULL);
+		if (properties[i].second->GetFlags() & (PropertyFlags::MODEL | PropertyFlags::MATERIAL))
+			button = ::CreateWindow(WC_BUTTON, "...", WS_CHILD | WS_VISIBLE, w * 2 - buttonW, y, 20, boxH, _hwnd, (HMENU)i, instance, NULL);
 
-		HWND box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, properties[i].propertyPointer.GetAsString().GetData(), ES_LOWERCASE | WS_CHILD | WS_VISIBLE, w, y, w - (button ? buttonW : 0), h, _hwnd, (HMENU)i, instance, NULL);
+		DWORD boxStyle = ES_LOWERCASE | WS_CHILD | WS_VISIBLE;
+		if (readOnly) boxStyle |= ES_READONLY;
+
+		HWND box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, properties[i].second->GetAsString().GetData(), boxStyle, w, y, w - (button ? buttonW : 0), boxH, _hwnd, (HMENU)i, instance, NULL);
 
 		if (!_defaultEditProc)
 			_defaultEditProc = (WNDPROC)::GetWindowLongPtr(box, GWLP_WNDPROC);
 
 		::SetWindowLongPtr(box, GWLP_WNDPROC, (LONG_PTR)_EditProc);
 
-		_child_hwnds.Add(PropertyHWND{label, box, button, *_objProperties.FindRaw(name)});
+		_child_hwnds.Add(PropertyHWND{ label, box, button, *_objProperties.FindRaw(name) });
 
-		y += h;
+		y += boxH;
 	}
+}
+
+void PropertyWindow::SetProperties(const ObjectProperties &properties, bool readOnly)
+{
+	Clear();
+
+	_objProperties = properties;
+	_CreateHWNDs(readOnly);
+}
+
+void PropertyWindow::SetObject(GameObject *object, bool readOnly)
+{
+	Clear();
+
+	_objProperties.SetBase(object);
+	object->GetProperties(_objProperties);
+	_CreateHWNDs(readOnly);
+}
+
+void PropertyWindow::ChangeBase(GameObject *object)
+{
+	_objProperties.SetBase(object);
+	Refresh();
+}
+
+void PropertyWindow::Refresh()
+{
+	for (uint32 i = 0; i < _child_hwnds.GetSize(); ++i)
+		::SetWindowTextA(_child_hwnds[i].box, _child_hwnds[i].property->GetAsString().GetData());}
+
+void PropertyWindow::Clear()
+{
+	_objProperties.Clear(); 
+	
+	for (uint32 i = 0; i < _child_hwnds.GetSize(); ++i)
+	{
+		::DestroyWindow(_child_hwnds[i].box);
+		::DestroyWindow(_child_hwnds[i].label);
+
+		if (_child_hwnds[i].button)
+			::DestroyWindow(_child_hwnds[i].button);
+	}
+
+	_child_hwnds.SetSize(0);
 }

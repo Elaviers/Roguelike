@@ -2,6 +2,7 @@
 uniform mat4 M_Model;
 uniform mat4 M_View;
 uniform mat4 M_Projection;
+uniform vec2 UVScale = vec2(1);
 
 layout(location = 0) in vec3 WorldPosition_IN;
 layout(location = 1) in vec2 UV_IN;
@@ -20,7 +21,7 @@ void main()
 	WorldPosition = (M_Model * vec4(WorldPosition_IN, 1)).xyz;
 	gl_Position = M_Projection * M_View * vec4(WorldPosition, 1);
 
-	UV = UV_IN;
+	UV = UV_IN * UVScale;
 	VertexColour = VertexColour_IN;
 	TBN = mat3(vec3(M_Model * vec4(ModelTangent_IN, 0)), vec3(M_Model * vec4(ModelBitangent_IN, 0)), vec3(M_Model * vec4(ModelNormal_IN, 0)));
 }

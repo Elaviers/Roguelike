@@ -99,13 +99,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -114,13 +115,14 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -131,6 +133,7 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -138,8 +141,8 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -150,6 +153,7 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -157,8 +161,8 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /r /s /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /r /s /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

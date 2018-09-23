@@ -47,6 +47,8 @@ public:
 	HDC viewportDC;
 	VPInfo viewportInfo;
 
+	HIMAGELIST imageList;
+
 	RSDialog(const GLContext &context, const GLProgram &program, MaterialManager& materialManager, ModelManager &modelManager) : 
 		glContext(&context), glProgram(&program), materialManager(&materialManager), modelManager(&modelManager) {}
 
@@ -82,7 +84,7 @@ public:
 		if (isModelSelect)
 			_object.SetModel(modelManager->GetModel(paths[selection]));
 		else
-			_object.SetMaterial(materialManager->Find(paths[selection]));
+			_object.SetMaterial(materialManager->GetMaterial(paths[selection]));
 	}
 
 	void Draw() const
@@ -126,20 +128,20 @@ INT_PTR DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		//ImageList
 		const int imageCount = 2;
 
-		HIMAGELIST imageList = ::ImageList_Create(16, 16, FALSE, imageCount, 0);
+		rs->imageList = ::ImageList_Create(16, 16, FALSE, imageCount, 0);
 
 		HBITMAP bmp = ::LoadBitmap(instance, MAKEINTRESOURCE(IDB_TREENODE));
-		::ImageList_Add(imageList, bmp, NULL);
+		::ImageList_Add(rs->imageList, bmp, NULL);
 		::DeleteObject(bmp);
 
 		bmp = ::LoadBitmap(instance, MAKEINTRESOURCE(IDB_TREENODE2));
-		::ImageList_Add(imageList, bmp, NULL);
+		::ImageList_Add(rs->imageList, bmp, NULL);
 		::DeleteObject(bmp);
 
-		if (::ImageList_GetImageCount(imageList) < imageCount)
+		if (::ImageList_GetImageCount(rs->imageList) < imageCount)
 			Error("Oh dear. Somehow the tree view's imagelist could not be created properly.");
 
-		::SendDlgItemMessage(hwnd, IDC_TREE, TVM_SETIMAGELIST, (WPARAM)TVSIL_NORMAL, (LPARAM)imageList);
+		::SendDlgItemMessage(hwnd, IDC_TREE, TVM_SETIMAGELIST, (WPARAM)TVSIL_NORMAL, (LPARAM)rs->imageList);
 
 		TVINSERTSTRUCT insertStruct = {};
 		insertStruct.hParent = NULL;
@@ -179,6 +181,10 @@ INT_PTR DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			::EndDialog(hwnd, 1);
 			break;
 		}
+		break;
+
+	case WM_DESTROY:
+		::ImageList_Destroy(rs->imageList);
 		break;
 
 	case WM_NOTIFY:
@@ -244,7 +250,7 @@ LPARAM viewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 			if (vpInfo->moving)
 			{
-				vpInfo->transform->Rotate(Vector3(-deltaY, -deltaX, 0));
+				vpInfo->transform->Rotate(Vector3((float)-deltaY, (float)-deltaX, 0));
 			}
 			else
 			{
@@ -289,9 +295,7 @@ String ResourceSelect::Dialog(MaterialManager &materialManager, ModelManager &mo
 		Utilities::StripExtension(rs.paths[i]);
 
 	if (::DialogBoxParam(NULL, MAKEINTRESOURCE(IDD_RES_SELECT), parent, DialogProc, (LPARAM)&rs) == 1)
-	{
 		return rs.paths[rs.selection];
-	}
 
-	return "None";
+	return "";
 }

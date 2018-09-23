@@ -1,30 +1,33 @@
 #include "Maths.h"
 #include <math.h>
 
-float Round(float x)
+namespace Maths
 {
-	if (x <= 0.0001f && x >= -0.0001f)
-		x = 0.f;
+	float Round(float x)
+	{
+		if (x <= 0.0001f && x >= -0.0001f)
+			x = 0.f;
 
-	return x;
-}
+		return x;
+	}
 
-float SquareRoot(float x)
-{
-	return sqrtf(x);
-}
+	float SquareRoot(float x)
+	{
+		return sqrtf(x);
+	}
 
-float Sine(float radians)
-{
-	return Round(sinf(radians));
-}
+	float Sine(float radians)
+	{
+		return Round(sinf(radians));
+	}
 
-float Cosine(float radians)
-{
-	return Round(cosf(radians));
-}
+	float Cosine(float radians)
+	{
+		return Round(cosf(radians));
+	}
 
-float Tangent(float radians)
-{
-	return Round(tanf(radians));
+	float Tangent(float radians)
+	{
+		return Round(tanf(radians));
+	}
 }

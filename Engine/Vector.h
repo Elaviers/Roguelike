@@ -24,7 +24,7 @@ public:
 		return lengthSq;
 	}
 
-	inline float Length() const { return SquareRoot(LengthSquared()); }
+	inline float Length() const { return Maths::SquareRoot(LengthSquared()); }
 	inline void Normalise() { *this /= Length(); }
 
 	inline T&		operator[](int index)		{ return _data[index]; }

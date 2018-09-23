@@ -1,6 +1,8 @@
 #include "Transform.h"
 #include "Maths.h"
 
+using namespace Maths;
+
 Mat4 Transform::MakeTransformationMatrix() const
 {
 	return
@@ -42,4 +44,30 @@ Vector3 Transform::GetUpVector() const
 	float sinRoll = SineDegrees(_rotation[2]);
 
 	return Vector3(sinRoll * cosYaw + nSinPitch * sinYaw, CosineDegrees(_rotation[0]) * CosineDegrees(_rotation[2]), nSinPitch * cosYaw + sinRoll * sinYaw);
+}
+
+void Transform::WriteToBuffer(BufferIterator<byte> &buffer) const
+{
+	buffer.Write_float(_position[0]);
+	buffer.Write_float(_position[1]);
+	buffer.Write_float(_position[2]);
+	buffer.Write_float(_rotation[0]);
+	buffer.Write_float(_rotation[1]);
+	buffer.Write_float(_rotation[2]);
+	buffer.Write_float(_scale[0]);
+	buffer.Write_float(_scale[2]);
+	buffer.Write_float(_scale[2]);
+}
+
+void Transform::ReadFromBuffer(BufferIterator<byte> &buffer)
+{
+	_position[0] = buffer.Read_float();
+	_position[1] = buffer.Read_float();
+	_position[2] = buffer.Read_float();
+	_rotation[0] = buffer.Read_float();
+	_rotation[1] = buffer.Read_float();
+	_rotation[2] = buffer.Read_float();
+	_scale[0] = buffer.Read_float();
+	_scale[1] = buffer.Read_float();
+	_scale[2] = buffer.Read_float();
 }

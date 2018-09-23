@@ -5,14 +5,14 @@
 
 constexpr const char *extension = ".txt";
 
-const Material* MaterialManager::GetMaterial(TextureManager &textureManager, const String &nameIn)
+const Material* MaterialManager::GetMaterial(const String &nameIn)
 {
 	String name = nameIn.ToLower();
 
 	Material *mat = _map.Find(name);
 
 	if (mat) return mat;
-	else
+	else if (nameIn.GetLength() > 0)
 	{
 		String fs = IO::ReadFileString((_rootPath + name + extension).ToLower().GetData());
 
@@ -28,13 +28,13 @@ const Material* MaterialManager::GetMaterial(TextureManager &textureManager, con
 				Buffer<String> tokens = lines[i].Split("=");
 
 				if (tokens[0] == "diffuse")
-					newMat.SetDiffuse(textureManager.GetTexture(tokens[1]));
+					newMat.SetDiffuse(_textureManager->GetTexture(tokens[1]));
 				else if (tokens[0] == "normal")
-					newMat.SetNormal(textureManager.GetTexture(tokens[1]));
+					newMat.SetNormal(_textureManager->GetTexture(tokens[1]));
 				else if (tokens[0] == "specular")
-					newMat.SetSpecular(textureManager.GetTexture(tokens[1]));
+					newMat.SetSpecular(_textureManager->GetTexture(tokens[1]));
 				else if (tokens[0] == "reflection")
-					newMat.SetReflection(textureManager.GetTexture(tokens[1]));
+					newMat.SetReflection(_textureManager->GetTexture(tokens[1]));
 			}
 
 			return &newMat;

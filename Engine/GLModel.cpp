@@ -2,7 +2,7 @@
 
 
 
-GLModel::GLModel() : _vao(0), _vbo(0), _ebo(0)
+GLModel::GLModel() : _vao(0), _vbo(0), _ebo(0), _drawMode(GL_TRIANGLES)
 {
 }
 

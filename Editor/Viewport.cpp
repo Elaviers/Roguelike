@@ -24,6 +24,14 @@ LRESULT CALLBACK Viewport::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 
 		break;
 
+	case WM_LBUTTONDOWN:
+		viewport->_editor->LeftMouseDown();
+		break;
+
+	case WM_LBUTTONUP:
+		viewport->_editor->LeftMouseUp();
+		break;
+
 	default: return ::DefWindowProc(hwnd, msg, wparam, lparam);
 	}
 
