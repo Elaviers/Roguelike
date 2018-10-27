@@ -53,11 +53,11 @@ class Property
 public:
 	int index;
 
-	Property(PropertyType type, byte flags) : _type(type), _flags(flags) {}
+	Property(PropertyType type, byte flags) : _type(type), _flags(flags), index(-1) {}
 	Property(const Property&);
 	virtual ~Property() {}
 
-	virtual uint32 SizeOf() = 0;
+	virtual size_t SizeOf() = 0;
 
 	void SetByString(const String &value);
 	String GetAsString() const;
@@ -75,8 +75,6 @@ public:
 
 	virtual T Get() const = 0;
 	virtual void Set(const T&) = 0;
-
-	
 };
 
 template <typename T>
@@ -100,7 +98,7 @@ public:
 		else		*(T*)_offset = value;
 	}
 
-	virtual uint32 SizeOf() { return sizeof(*this); }
+	virtual size_t SizeOf() { return sizeof(*this); }
 };
 
 template <typename Base, typename T>
@@ -109,7 +107,7 @@ class Property_FPointer : public PropertyBase<T>
 	void **_base;
 	uint16 _offset;
 
-	T(Base::*_getter)() const;
+	T (Base::*_getter)() const;
 	void (Base::*_setter)(const T&);
 public:
 	
@@ -128,7 +126,7 @@ public:
 			((Base*)((byte*)*_base + _offset)->*_setter)(value);
 	}
 
-	virtual uint32 SizeOf() { return sizeof(*this); }
+	virtual size_t SizeOf() { return sizeof(*this); }
 };
 
 class ObjectProperties
@@ -143,12 +141,12 @@ public:
 	~ObjectProperties() {}
 
 	template <typename Base>
-	inline void SetBase(Base object) { _base = object; }
+	inline void SetBase(Base &object) { _base = &object; }
 
-	inline Property** FindRaw(const char *name) { return _properties.Find(name); }
+	inline Property** FindRaw(const String &name) { return _properties.Find(name); }
 
 	template <typename Type>
-	PropertyBase<Type>* Find(const char *name)
+	PropertyBase<Type>* Find(const String &name)
 	{
 		Property** property = FindRaw(name);
 
@@ -159,7 +157,7 @@ public:
 	}
 
 	template <typename Type>
-	void Add(const char *name, Type& value, byte flags = 0)
+	void Add(const String &name, Type& value, byte flags = 0)
 	{
 		Property_Raw<Type> *property = new Property_Raw<Type>(&_base, &value, flags);
 		property->index = _count++;
@@ -167,7 +165,7 @@ public:
 	}
 
 	template <typename Base, typename Type>
-	void Add(const char *name, Base *member, Type(Base::*getter)() const, void(Base::*setter)(const Type&), byte flags = 0)
+	void Add(const String &name, Base *member, Type(Base::*getter)() const, void(Base::*setter)(const Type&), byte flags = 0)
 	{
 		Property_FPointer<Base, Type> *property = new Property_FPointer<Base, Type>(&_base, member, getter, setter, flags);
 		property->index = _count++;
@@ -199,7 +197,7 @@ public:
 		return propertyArray;
 	}
 
-	inline ObjectProperties& operator=(const ObjectProperties &other)
+	ObjectProperties& operator=(const ObjectProperties &other)
 	{
 		Clear();
 
@@ -211,9 +209,9 @@ public:
 		_properties.ForEach(
 		[](const String &key, Property* &property) {
 			Property* old = property;
-			property = (Property*)new byte[old->SizeOf()];
-
-			Utilities::CopyBytes(old, property, old->SizeOf());
+			uint32 size = (uint32)old->SizeOf();
+			property = (Property*)new byte[size];
+			Utilities::CopyBytes(old, property, size);
 		});
 
 		return *this;

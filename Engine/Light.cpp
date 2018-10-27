@@ -8,9 +8,9 @@ void Light::GetProperties(ObjectProperties &properties)
 	_AddBaseProperties(properties);
 }
 
-void Light::ToShader(int glArrayIndex) const
+void Light::ToShader(int glArrayIndex)
 {
-	Mat4 worldTransform = MakeTransformationMatrix();
+	Mat4 worldTransform = GetTransformationMatrix();
 
 	String arrayElemName = String("Lights[") + String::Convert(glArrayIndex) + ']';
 	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName + ".Position")),		1, worldTransform[3]);

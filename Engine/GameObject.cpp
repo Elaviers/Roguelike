@@ -10,6 +10,16 @@ void GameObject::_AddBaseProperties(ObjectProperties &properties)
 	properties.Add<Transform, Vector3>("Scale",	   &transform, &Transform::GetScale, &Transform::SetScale);
 }
 
+//Public
+
+Mat4 GameObject::GetTransformationMatrix()
+{
+	if (_parent)
+		return Mat4(transform.GetTransformationMatrix()) * _parent->GetTransformationMatrix();
+
+	return Mat4(transform.GetTransformationMatrix());
+}
+
 Mat4 GameObject::MakeInverseTransformationMatrix() const
 {
 	if (_parent)
@@ -18,17 +28,8 @@ Mat4 GameObject::MakeInverseTransformationMatrix() const
 	return transform.MakeInverseTransformationMatrix();
 }
 
-//Public
-
-Mat4 GameObject::MakeTransformationMatrix() const
-{
-	if (_parent)
-		return transform.MakeTransformationMatrix() * _parent->MakeTransformationMatrix();
-
-	return transform.MakeTransformationMatrix();
-}
-
 void GameObject::ApplyTransformToShader() const
 {
-	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, MakeTransformationMatrix());
+	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, transform.MakeTransformationMatrix());
+	//															TODO - ANYTHING BUT THIS ^
 }

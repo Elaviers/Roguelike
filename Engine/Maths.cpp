@@ -30,4 +30,19 @@ namespace Maths
 	{
 		return Round(tanf(radians));
 	}
+
+	float ArcSine(float x)
+	{
+		return Round(asinf(x));
+	}
+
+	float ArcCosine(float x)
+	{
+		return Round(asinf(x));
+	}
+
+	float ArcTangent(float x)
+	{
+		return Round(atanf(x));
+	}
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "Types.h"
+#include <initializer_list>
 
 template <typename T>
 class Buffer
@@ -10,15 +11,21 @@ private:
 
 public:
 	Buffer() : _data(nullptr), _size(0) {}
+
+	Buffer(std::initializer_list<T> array) : _size(array.size())
+	{
+		_data = new T[_size];
+
+		for (uint32 i = 0; i < _size; ++i)
+			_data[i] = array.begin()[i];
+	}
+
 	~Buffer() { delete[] _data; }
 
-	Buffer(const Buffer& buffer)
+	Buffer(const Buffer& other) : _size(other._size), _data(new T[other._size])
 	{
-		_size = buffer._size;
-		_data = new T[_size];
-		
 		for (uint32 i = 0; i < _size; ++i)
-			_data[i] = buffer._data[i];
+			_data[i] = other._data[i];
 	}
 
 	Buffer(Buffer&& buffer) : _data(buffer._data), _size(buffer._size) { buffer._data = nullptr; }
@@ -37,13 +44,33 @@ public:
 
 	inline void Append(uint32 elements) { SetSize(_size + elements); }
 
-	inline uint32 GetSize() const { return _size; }
-	inline T* const Data() const { return _data; }
+	inline uint32 GetSize() const	{ return _size; }
+	inline T* const Data() const	{ return _data; }
 
 	inline T&		operator[](uint32 index)		{ return _data[index]; }
 	inline const T& operator[](uint32 index) const	{ return _data[index]; }
 
-	inline Buffer&	operator=(Buffer &&other) { _data = other._data; _size = other._size; other._data = nullptr; other._size = 0; return *this; }
+	Buffer& operator=(const Buffer &other)
+	{
+		delete[] _data;
+		_size = other._size;
+		_data = new T[_size];
+
+		for (uint32 i = 0; i < _size; ++i)
+			_data[i] = other._data[i];
+
+		return *this;
+	}
+
+	inline Buffer& operator=(Buffer &&other) noexcept 
+	{ 
+		_data = other._data;
+		_size = other._size;
+		other._data = nullptr;
+		other._size = 0;
+
+		return *this; 
+	}
 
 	void Add(const T &item)
 	{
@@ -70,13 +97,39 @@ public:
 		_size++;
 	}
 
+	void RemoveIndex(uint32 index)
+	{
+		if (index < _size) return;
+		_size--;
+
+		T *newData = new T[_size];
+		for (uint32 i = 0; i < index; ++i)
+			newData[i] = _data[i];
+
+		for (uint32 i = index; i < _size; ++i)
+			newData[i] = _data[i + 1];
+
+		delete[] _data;
+		_data = newData;
+	}
+
+	void Remove(const T &item)
+	{
+		for (uint32 i = 0; i < _size;)
+		{
+			if (_data[i] == item)
+				RemoveIndex(i);
+			else
+				++i;
+		}
+	}
+
 	inline void _SetRaw(T *data, uint32 size)
 	{ 
 		if (_size) delete[] _data;
 
 		_data = data; _size = size;
 	}
-
 
 	inline		 T& Last()		 { return _data[_size - 1]; }
 	inline const T& Last() const { return _data[_size - 1]; }

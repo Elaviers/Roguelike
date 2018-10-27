@@ -53,7 +53,7 @@ void Viewport::Initialise()
 	::RegisterClassEx(&windowClass);
 }
 
-Viewport::Viewport()
+Viewport::Viewport() : _editor(nullptr), _index(-1)
 {
 }
 

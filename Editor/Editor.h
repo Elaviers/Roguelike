@@ -1,5 +1,6 @@
 #pragma once
 #include <Engine/Brush2D.h>
+#include <Engine/Brush3D.h>
 #include <Engine/Camera.h>
 #include <Engine/GameObject.h>
 #include <Engine/GLContext.h>
@@ -24,6 +25,7 @@ enum class Tool
 {
 	SELECT,
 	EDIT,
+	BRUSH,
 	ENTITY,
 	CONNECTOR
 };
@@ -66,29 +68,29 @@ private:
 	Tool _tool;
 	
 	Level _level;
-	Brush2D _brush;
 
 	struct
 	{
 		struct
 		{
+			Brush2D object;
 			ObjectProperties properties;
-			String material;
+		} brush2D;
 
-			float level;
+		struct
+		{
+			Brush3D object;
+			ObjectProperties properties;
+		} brush3D;
 
-		} brush;
+		struct
+		{
+			Connector object;
+			ObjectProperties properties;
+		} connector;
 
-
+		bool placing;
 	} _toolData;
-
-
-	//Callbacks for brush tool
-	void SetBrushMaterial(const String &material) { _toolData.brush.material = material; _brush.SetMaterial(material); _propertyWindow.Refresh(); }
-	String GetBrushMaterial() const { return _toolData.brush.material; }
-
-	void SetBrushLevel(const float &level) { _toolData.brush.level = level; _brush.level = level; _propertyWindow.Refresh(); }
-	float GetBrushLevel() const { return _toolData.brush.level; }
 
 	struct
 	{
@@ -130,6 +132,8 @@ public:
 	void UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y);
 	void LeftMouseDown();
 	void LeftMouseUp();
+
+	void Submit();
 
 	void ResizeViews(uint16 w, uint16 h);
 

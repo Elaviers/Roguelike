@@ -9,9 +9,9 @@ private:
 
 public:
 	Vector() : _data() {}
-	Vector(float x, float y)					{ static_assert(SIZE == 2, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; }
-	Vector(float x, float y, float z)			{ static_assert(SIZE == 3, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; }
-	Vector(float x, float y, float z, float w)	{ static_assert(SIZE == 4, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; _data[3] = w; }
+	Vector(T x, T y)					{ static_assert(SIZE == 2, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; }
+	Vector(T x, T y, T z)			{ static_assert(SIZE == 3, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; }
+	Vector(T x, T y, T z, T w)	{ static_assert(SIZE == 4, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; _data[3] = w; }
 
 	~Vector() {}
 
@@ -25,10 +25,19 @@ public:
 	}
 
 	inline float Length() const { return Maths::SquareRoot(LengthSquared()); }
-	inline void Normalise() { *this /= Length(); }
+	inline Vector Normal() { return *this / Length(); }
+	inline Vector& Normalise() { *this /= Length(); return *this; }
 
 	inline T&		operator[](int index)		{ return _data[index]; }
 	inline const T& operator[](int index) const { return _data[index]; }
+
+	Vector& operator=(const Vector& other)
+	{
+		for (int i = 0; i < SIZE; ++i)
+			_data[i] = other._data[i];
+
+		return *this;
+	}
 
 	Vector& operator*=(T other)
 	{
@@ -110,6 +119,15 @@ public:
 				return false; 
 		
 		return true; }
+
+	static T Dot(const Vector &a, const Vector &b)
+	{
+		float result = 0.f;
+		for (int i = 0; i < SIZE; ++i)
+			result += a[i] * b[i];
+
+		return result;
+	}
 };
 
 template<typename T, int SIZE>
@@ -131,3 +149,12 @@ Vector<T, SIZE> operator/(T x, const Vector<T, SIZE> &vec)
 typedef Vector<float, 2> Vector2;
 typedef Vector<float, 3> Vector3;
 typedef Vector<float, 4> Vector4;
+
+namespace VectorMaths
+{
+	Vector3 GetForwardVector(const Vector3 &rotation);
+	Vector3 GetRightVector(const Vector3 &rotation);
+	Vector3 GetUpVector(const Vector3 &rotation);
+
+	Vector3 Rotate(const Vector3 &vector, const Vector3 &rotation);
+}

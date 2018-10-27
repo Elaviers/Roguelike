@@ -24,7 +24,7 @@ struct VPInfo
 	bool moving;
 	bool sizing;
 
-	const RSDialog *parent;
+	RSDialog *parent;
 };
 
 class RSDialog
@@ -50,7 +50,7 @@ public:
 	HIMAGELIST imageList;
 
 	RSDialog(const GLContext &context, const GLProgram &program, MaterialManager& materialManager, ModelManager &modelManager) : 
-		glContext(&context), glProgram(&program), materialManager(&materialManager), modelManager(&modelManager) {}
+		glContext(&context), glProgram(&program), materialManager(&materialManager), modelManager(&modelManager), viewportDC(0) {}
 
 	inline const String &GetRootPath() { return isModelSelect ? modelManager->GetRootPath() : materialManager->GetRootPath(); }
 
@@ -87,7 +87,7 @@ public:
 			_object.SetMaterial(materialManager->GetMaterial(paths[selection]));
 	}
 
-	void Draw() const
+	void Draw()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -255,7 +255,7 @@ LPARAM viewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			else
 			{
 				float scaling = deltaY / -50.f;
-				Vector3 currentScale = vpInfo->transform->GetScale();
+				const Vector3& currentScale = vpInfo->transform->Scale();
 				vpInfo->transform->SetScale(Vector3(currentScale[0] + scaling, currentScale[1] + scaling, currentScale[2] + scaling));
 			}
 

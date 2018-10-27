@@ -102,11 +102,11 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib; ComCtl32.lib; ComDlg32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /r /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -118,11 +118,11 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib; ComCtl32.lib; ComDlg32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /r /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -138,11 +138,11 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib; ComCtl32.lib; ComDlg32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /r /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,11 +158,11 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib; ComCtl32.lib; ComDlg32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /r /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -187,15 +187,30 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Data\Shaders\Basic.frag" />
-    <None Include="..\Data\Shaders\Basic.vert" />
-    <None Include="..\Data\Shaders\Phong.frag" />
-    <None Include="..\Data\Shaders\Shader.vert" />
-    <None Include="..\Data\Shaders\Sky.frag" />
-    <None Include="..\Data\Shaders\Sky.vert" />
-    <None Include="..\Data\Shaders\Unlit.frag" />
+    <None Include="..\Data\Shaders\Basic.frag">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Basic.vert">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Phong.frag">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Shader.vert">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Sky.frag">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Sky.vert">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Unlit.frag">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="ToolBrush.bmp" />
     <Image Include="ToolConnector.bmp" />
     <Image Include="ToolEdit.bmp" />
     <Image Include="ToolEntity.bmp" />

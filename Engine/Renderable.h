@@ -11,7 +11,7 @@ private:
 	bool _materialIsDefault;
 
 public:
-	Renderable() {}
+	Renderable() : _model(nullptr), _material(nullptr) {}
 	virtual ~Renderable() {}
 
 	inline void SetModel(const String &name) { if (Engine::modelManager) SetModel(Engine::modelManager->GetModel(name)); }

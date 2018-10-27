@@ -1,7 +1,9 @@
 #pragma once
 #include "Buffer.h"
+#include "RaycastResult.h"
 
 class GameObject;
+struct Ray;
 
 class Collection
 {
@@ -12,25 +14,13 @@ public:
 	Collection() : _nextSlot(-1) {}
 	~Collection() {}
 
+	void InsertObject(GameObject*);
+
 	template <typename T>
-	T* NewObject()
+	inline T* NewObject()
 	{
 		GameObject *object = new T();
-
-		if (_nextSlot < 0) _objects.Add(object);
-		else
-		{
-			_objects[_nextSlot] = object;
-
-			_nextSlot = -1;
-			for (uint32 i = 0; i < _objects.GetSize(); ++i)
-				if (_objects[i] == nullptr)
-				{
-					_nextSlot = i;
-					break;
-				}
-		}
-
+		InsertObject(object);
 		return dynamic_cast<T*>(object);
 	}
 
@@ -40,4 +30,6 @@ public:
 
 	inline Buffer<GameObject*>& Objects() { return _objects; }
 	inline const Buffer<GameObject*>& Objects() const { return _objects; }
+
+	Buffer<RaycastResult> Raycast(const Ray&);
 };

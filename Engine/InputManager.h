@@ -43,34 +43,85 @@ enum class AxisType
 	LTRIGGER, RTRIGGER
 };
 
-struct KeyBind
+class KeyBind
 {
-	float *axis;	//If null, callback must be set
+protected:
+	KeyBind() {}
 
-	union
+public:
+	virtual ~KeyBind() {}
+
+	virtual void KeyDown() {}
+	virtual void KeyUp() {}
+};
+
+class KeyBind_Axis : public KeyBind
+{
+	float *_axis;
+	float _displacement;
+
+public:
+	KeyBind_Axis(float *axis, float displacement) : _axis(axis), _displacement(displacement) {}
+	virtual ~KeyBind_Axis() {}
+
+	virtual void KeyDown()
 	{
-		float displacement;
-		void (*callback)();
-	};
+		*_axis += _displacement;
+	}
 
-	KeyBind() {};
-	KeyBind(void(*callback)()) : axis(nullptr), callback(callback) {}
-	KeyBind(float *axis, float displacement) : axis(axis), displacement(displacement) {}
+	virtual void KeyUp()
+	{
+		*_axis -= _displacement;
+	}
+};
+
+class KeyBind_Callback : public KeyBind
+{
+	void (*_callback)();
+
+public:
+	KeyBind_Callback(void(*callback)()) : _callback(callback) {}
+	virtual ~KeyBind_Callback() {}
+
+	virtual void KeyDown()
+	{
+		_callback();
+	}
+};
+
+template <typename T>
+class KeyBind_MemberCallback : public KeyBind
+{
+	T* _base;
+	void (T::*_callback)();
+
+public:
+	KeyBind_MemberCallback(T &base, void (T::*callback)()) : _base(&base), _callback(callback) {}
+	virtual ~KeyBind_MemberCallback() {}
+
+	virtual void KeyDown()
+	{
+		(_base->*_callback)();
+	}
 };
 
 class InputManager
 {
 private:
-	Map<Keycode, KeyBind> _keyBinds;
+	Map<Keycode, KeyBind*> _keyBinds;
 	Map<AxisType, float*> _axisBinds;
 
 public:
 	InputManager() {}
-	~InputManager() {}
+	~InputManager();
 
 	inline void BindAxis(AxisType axis, float *axisPtr) { _axisBinds.Set(axis, axisPtr); }
-	inline void BindKey(Keycode key, void(*callback)()) { _keyBinds.Set(key, KeyBind(callback)); }
-	inline void BindKeyAxis(Keycode key, float *axisPtr, float axisDisplacement) { _keyBinds.Set(key, KeyBind(axisPtr, axisDisplacement)); };
+
+	template <typename T>
+	inline void BindKey(Keycode key, T &base, void (T::*callback)()) { _keyBinds.Set(key, new KeyBind_MemberCallback<T>(base, callback)); }
+
+	inline void BindKey(Keycode key, void(*callback)()) { _keyBinds.Set(key, new KeyBind_Callback(callback)); }
+	inline void BindKeyAxis(Keycode key, float *axisPtr, float axisDisplacement) { _keyBinds.Set(key, new KeyBind_Axis(axisPtr, axisDisplacement)); }
 
 	void KeyDown(Keycode);
 	void KeyUp(Keycode);

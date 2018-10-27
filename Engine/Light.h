@@ -16,7 +16,7 @@ public:
 	inline void SetColour(const Vector3 &colour) { _colour = colour; }
 	inline void SetRadius(float radius) { _radius = radius; }
 
-	void ToShader(int glArrayIndex) const;
+	void ToShader(int glArrayIndex);
 
 	void DebugRender(ModelManager &) const;
 

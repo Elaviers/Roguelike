@@ -154,10 +154,16 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Brush.h" />
     <ClInclude Include="Brush2D.h" />
+    <ClInclude Include="Brush3D.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="BufferIterator.h" />
+    <ClInclude Include="Callback.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Collider.h" />
+    <ClInclude Include="Connector.h" />
+    <ClInclude Include="ColliderAABB.h" />
     <ClInclude Include="DrawUtils.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Error.h" />
@@ -183,10 +189,13 @@
     <ClInclude Include="ModelManager.h" />
     <ClInclude Include="ObjectProperties.h" />
     <ClInclude Include="Pair.h" />
+    <ClInclude Include="Ray.h" />
+    <ClInclude Include="RaycastResult.h" />
     <ClInclude Include="Registry.h" />
     <ClInclude Include="Renderable.h" />
     <ClInclude Include="ResourceManagerBase.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="ColliderSphere.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Timer.h" />
@@ -200,7 +209,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Brush2D.cpp" />
+    <ClCompile Include="Brush3D.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Connector.cpp" />
+    <ClCompile Include="ColliderAABB.cpp" />
     <ClCompile Include="DrawUtils.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -225,10 +237,12 @@
     <ClCompile Include="Registry.cpp" />
     <ClCompile Include="Renderable.cpp" />
     <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="ColliderSphere.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Vector.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="Collection.cpp" />

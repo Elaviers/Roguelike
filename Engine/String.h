@@ -59,6 +59,7 @@ public:
 	static String ConvertFloat(double, unsigned int minimumDigits = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
 	static String ConvertVector2(const Vector2&, unsigned int minimum = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
 	static String ConvertVector3(const Vector3&, unsigned int minimum = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
+	static String ConvertWideString(const wchar_t *string);
 };
 
 #define CSTR(BODY) ((String)BODY).GetData()

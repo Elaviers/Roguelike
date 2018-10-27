@@ -173,13 +173,27 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
     <ClInclude Include="Game.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Data\Shaders\Basic.frag" />
-    <None Include="..\Data\Shaders\Basic.vert" />
-    <None Include="..\Data\Shaders\Phong.frag" />
-    <None Include="..\Data\Shaders\Shader.vert" />
-    <None Include="..\Data\Shaders\Sky.frag" />
-    <None Include="..\Data\Shaders\Sky.vert" />
-    <None Include="..\Data\Shaders\Unlit.frag" />
+    <None Include="..\Data\Shaders\Basic.frag">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Basic.vert">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Phong.frag">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Shader.vert">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Sky.frag">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Sky.vert">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\Data\Shaders\Unlit.frag">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

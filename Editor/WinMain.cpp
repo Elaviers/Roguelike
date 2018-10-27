@@ -7,7 +7,7 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-int APIENTRY WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR cmdString, int cmdShow)
+int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev, _In_ LPSTR cmdString, _In_ int cmdShow)
 {
 	::InitCommonControls();
 

@@ -14,6 +14,8 @@
 #define IDB_TOOLSELECTMASK              115
 #define IDB_TOOLENTITY                  116
 #define IDB_TOOLCONNECTOR               118
+#define IDB_                            119
+#define IDB_TOOLBRUSH                   119
 #define IDC_TREE                        1001
 #define IDC_VIEWPORT                    1006
 #define IDC_INFO                        1010
@@ -33,7 +35,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        119
+#define _APS_NEXT_RESOURCE_VALUE        120
 #define _APS_NEXT_COMMAND_VALUE         40010
 #define _APS_NEXT_CONTROL_VALUE         1014
 #define _APS_NEXT_SYMED_VALUE           101

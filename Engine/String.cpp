@@ -404,6 +404,26 @@ String String::ConvertVector3(const Vector3 &vector, unsigned int minimum, unsig
 	return ConvertFloat(vector[0], minimum, maxDecimal, base) + seperator + ConvertFloat(vector[1], minimum, maxDecimal, base) + seperator + ConvertFloat(vector[2], minimum, maxDecimal, base);
 }
 
+String String::ConvertWideString(const wchar_t *string)
+{
+	unsigned int i = 0;
+
+	while (string[++i] != 0x0000);
+	String result(i);
+
+	i = 0;
+	do
+	{
+		if (string[i] <= 0xFF)
+			result[i] = string[i];
+		else
+			result[i] = '?';
+
+	} while (string[++i] != '\0');
+
+	return result;
+}
+
 //Other
 
 bool StringsInequal(const char *a, const char *b)

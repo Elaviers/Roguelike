@@ -1,8 +1,6 @@
 #include "Brush2D.h"
-#include "Engine.h"
 #include "GLProgram.h"
-#include "Maths.h"
-#include "ObjectProperties.h"
+#include "Utilities.h"
 
 void Brush2D::_UpdateTransform()
 {
@@ -13,6 +11,61 @@ void Brush2D::_UpdateTransform()
 
 	transform.SetPosition(Vector3(x, level, z));
 	transform.SetScale(Vector3(w, h, 0));
+
+	using namespace Utilities;
+	_collider.min = Vector3(Min(_point1[0], _point2[0]), 0.f, Max(_point1[1], _point2[1]));
+	_collider.max = Vector3(Max(_point1[0], _point2[0]), 0.f, Max(_point1[1], _point2[1]));
+}
+
+void Brush2D::Render() const
+{
+	if (Engine::modelManager && _material)
+	{
+		_material->Apply();
+		this->ApplyTransformToShader();
+		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(transform.Scale()[0], transform.Scale()[1]));
+		Engine::modelManager->Plane().Render();
+		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
+	}
+}
+
+
+void Brush2D::SaveToFile(BufferIterator<byte> &buffer, const Map<String, uint16> &strings) const
+{
+	buffer.Write_byte(Engine::ObjectIDs::BRUSH2D);
+
+	if (Engine::materialManager && _material)
+	{
+		const uint16 *id = strings.Find(Engine::materialManager->FindNameOf(*_material));
+		if (id) buffer.Write_uint16(*id);
+		else buffer.Write_uint16(0);
+	}
+	else buffer.Write_uint16(0);
+
+	buffer.Write_vector3(transform.Position());
+
+	buffer.Write_float(transform.Scale()[0]);
+	buffer.Write_float(transform.Scale()[1]);
+}
+
+void Brush2D::LoadFromFile(BufferIterator<byte> &buffer, const Map<uint16, String> &strings)
+{
+	const String *materialName = strings.Find(buffer.Read_uint16());
+	if (materialName)
+		SetMaterial(*materialName);
+
+	transform.SetPosition(buffer.Read_vector3());
+
+	float scaleX = buffer.Read_float();
+	float scaleY = buffer.Read_float();
+
+	transform.SetScale(Vector3(scaleX, scaleY, 0.f));
+
+	level = transform.Position()[1];
+	_point1[0] = transform.Position()[0] - transform.Scale()[0] / 2.f;
+	_point1[1] = transform.Position()[2] - transform.Scale()[1] / 2.f;
+	_point2[0] = transform.Position()[0] + transform.Scale()[0] / 2.f;
+	_point2[1] = transform.Position()[2] + transform.Scale()[1] / 2.f;
 }
 
 void Brush2D::GetProperties(ObjectProperties &properties)
@@ -23,68 +76,4 @@ void Brush2D::GetProperties(ObjectProperties &properties)
 	properties.Add<Vector2>("Point 1", _point1);
 	properties.Add<Vector2>("Point 2", _point2);
 	properties.Add<float>("Level", level);
-}
-
-void Brush2D::Render() const
-{
-	if (Engine::modelManager && _material)
-	{
-		_material->Apply();
-		this->ApplyTransformToShader();
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(transform.GetScale()[0], transform.GetScale()[1]));
-		Engine::modelManager->Plane().Render();
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
-	}
-}
-
-String Brush2D::GetMaterialName() const
-{
-	if (Engine::materialManager && _material) return Engine::materialManager->FindNameOf(*_material);
-	return "Unknown";
-}
-
-void Brush2D::SaveToFile(BufferIterator<byte> &buffer, const Map<String, uint16> &strings) const
-{
-	buffer.Write_byte(Engine::ObjectIDs::BRUSH2D);
-	
-	if (Engine::materialManager && _material)
-	{
-		const uint16 *id = strings.Find(Engine::materialManager->FindNameOf(*_material));
-		if (id) buffer.Write_uint16(*id);
-		else buffer.Write_uint16(0);
-	}
-	else buffer.Write_uint16(0);
-
-	Vector3 pos = transform.GetPosition();
-	buffer.Write_float(pos[0]);
-	buffer.Write_float(pos[1]);
-	buffer.Write_float(pos[2]);
-
-	Vector3 scale = transform.GetScale();
-	buffer.Write_float(scale[0]);
-	buffer.Write_float(scale[1]);
-}
-
-void Brush2D::LoadFromFile(BufferIterator<byte> &buffer, const Map<uint16, String> &strings)
-{
-	const String *materialName = strings.Find(buffer.Read_uint16());
-	if (materialName)
-		SetMaterial(*materialName);
-
-	Vector3 pos;
-	pos[0] = buffer.Read_float();
-	pos[1] = buffer.Read_float();
-	pos[2] = buffer.Read_float();
-	transform.SetPosition(pos);
-
-	Vector3 scale;
-	scale[0] = buffer.Read_float();
-	scale[1] = buffer.Read_float();
-	transform.SetScale(scale);
-
-	level = pos[1];
-	_point1[0] = pos[0] - scale[0] / 2.f;
-	_point1[1] = pos[2] - scale[1] / 2.f;
-	_point2[0] = pos[0] + scale[0] / 2.f;
-	_point1[1] = pos[2] + scale[1] / 2.f;
 }

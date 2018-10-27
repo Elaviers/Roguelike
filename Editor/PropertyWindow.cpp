@@ -186,7 +186,7 @@ void PropertyWindow::SetObject(GameObject *object, bool readOnly)
 {
 	Clear();
 
-	_objProperties.SetBase(object);
+	_objProperties.SetBase(*object);
 	object->GetProperties(_objProperties);
 	_CreateHWNDs(readOnly);
 }

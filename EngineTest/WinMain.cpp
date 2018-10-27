@@ -319,7 +319,7 @@ void Frame()
 	if (cursorLocked) {
 		POINT cursorPos;
 		::GetCursorPos(&cursorPos);
-		inputManager.MouseMove(cursorPos.x - lockPos.x, cursorPos.y - lockPos.y);
+		inputManager.MouseMove((short)(cursorPos.x - lockPos.x), (short)(cursorPos.y - lockPos.y));
 		::SetCursorPos(lockPos.x, lockPos.y);
 	}
 

@@ -5,29 +5,8 @@
 #include "Map.h"
 
 #include "Brush2D.h"
+#include "Brush3D.h"
 #include "Renderable.h"
-
-void Connector::SaveToFile(BufferIterator<byte> &buffer) const
-{
-	buffer.Write_byte((byte)direction);
-	buffer.Write_uint16(point1[0]);
-	buffer.Write_uint16(point1[1]);
-	buffer.Write_uint16(point1[2]);
-	buffer.Write_uint16(point2[0]);
-	buffer.Write_uint16(point2[1]);
-	buffer.Write_uint16(point2[2]);
-}
-
-void Connector::LoadFromFile(BufferIterator<byte> &buffer)
-{
-	direction = (ConnectorDirection)buffer.Read_byte();
-	point1[0] = buffer.Read_uint16();
-	point1[1] = buffer.Read_uint16();
-	point1[2] = buffer.Read_uint16();
-	point2[0] = buffer.Read_uint16();
-	point2[1] = buffer.Read_uint16();
-	point2[2] = buffer.Read_uint16();
-}
 
 constexpr const char *levelPrefix = "POO";
 
@@ -74,6 +53,8 @@ void Level::WriteToFile(const char *filename) const
 
 		if (dynamic_cast<Brush2D*>(objects[i]))
 			WriteStringMessage(iterator, strings, ((Brush2D*)objects[i])->GetMaterialName(), nextStringID++);
+		else if (dynamic_cast<Brush3D*>(objects[i]))
+			WriteStringMessage(iterator, strings, ((Brush3D*)objects[i])->GetMaterialName(), nextStringID++);
 		else if (dynamic_cast<Renderable*>(objects[i]))
 		{
 			WriteStringMessage(iterator, strings, ((Renderable*)objects[i])->GetMaterialName(), nextStringID++);
@@ -151,11 +132,13 @@ void Level::ReadFromFile(const char *filename)
 				CreateObject<Brush2D>(_collection, iterator, strings);
 				break;
 
+			case Engine::ObjectIDs::BRUSH3D:
+				CreateObject<Brush3D>(_collection, iterator, strings);
+				break;
+
 			default:
 				Error("There's something very wrong with this level file. Has someone been playing with notepad?");
 			}
 		}
-
 	}
-	else Error("Why not try opening an actual level file, clever clogs?");
 }

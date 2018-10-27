@@ -138,6 +138,19 @@ public:
 			_pointer[-(int)i] = string[len - i];
 	}
 
+	inline void Write_vector2(const Vector2 &v)
+	{
+		Write_float(v[0]);
+		Write_float(v[1]);
+	}
+
+	inline void Write_vector3(const Vector3 &v)
+	{
+		Write_float(v[0]);
+		Write_float(v[1]);
+		Write_float(v[2]);
+	}
+
 	inline byte Read_byte()
 	{
 		byte value = *_pointer;
@@ -180,5 +193,22 @@ public:
 			string += next;
 
 		return string;
+	}
+
+	inline Vector2 Read_vector2()
+	{
+		Vector2 v;
+		v[0] = Read_float();
+		v[1] = Read_float();
+		return v;
+	}
+
+	inline Vector3 Read_vector3()
+	{
+		Vector3 v;
+		v[0] = Read_float();
+		v[1] = Read_float();
+		v[2] = Read_float();
+		return v;
 	}
 };

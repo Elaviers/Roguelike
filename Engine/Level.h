@@ -1,5 +1,6 @@
 #pragma once
 #include "BufferIterator.h"
+#include "Connector.h"
 #include "Types.h"
 #include "Vector.h"
 #include "Collection.h"
@@ -13,25 +14,6 @@ namespace LevelVersions
 	};
 }
 
-enum class ConnectorDirection
-{
-	NORTH = 0,
-	EAST = 1,
-	SOUTH = 2,
-	WEST = 3
-};
-
-struct Connector
-{
-	Vector<int16, 2> point1;
-	Vector<int16, 2> point2;
-
-	ConnectorDirection direction;
-
-	void SaveToFile(BufferIterator<byte>&) const;
-	void LoadFromFile(BufferIterator<byte>&);
-};
-
 class Level
 {
 	Collection _collection;
@@ -43,4 +25,6 @@ public:
 
 	inline Collection& ObjectCollection() { return _collection; }
 	inline const Collection& ObjectCollection() const { return _collection; }
+
+	inline Buffer<Connector>& Connectors() { return _connectors; }
 };

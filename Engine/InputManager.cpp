@@ -56,25 +56,29 @@ Keycode StringToKey(const char *string)
 	return Keycode::NONE;
 }
 
+InputManager::~InputManager()
+{
+	_keyBinds.ForEach( [](const Keycode&, KeyBind* &keyBind)
+	{
+		delete keyBind;
+	}
+	);
+}
+
 void InputManager::KeyDown(Keycode key)
 {
-	KeyBind *keyBind = _keyBinds.Find(key);
+	KeyBind **keyBind = _keyBinds.Find(key);
 
 	if (keyBind)
-	{
-		if (keyBind->axis)
-			*keyBind->axis += keyBind->displacement;
-		else
-			keyBind->callback();
-	}
+		(*keyBind)->KeyDown();
 }
 
 void InputManager::KeyUp(Keycode key)
 {
-	auto keyBind = _keyBinds.Find(key);
+	KeyBind **keyBind = _keyBinds.Find(key);
 
-	if (keyBind && keyBind->axis)
-		*keyBind->axis -= keyBind->displacement;
+	if (keyBind)
+		(*keyBind)->KeyUp();
 }
 
 void InputManager::MouseMove(short x, short y)

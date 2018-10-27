@@ -42,23 +42,23 @@ namespace DrawUtils
 			break;
 		}
 
-		transformX[3][axisY] = camera.transform.GetPosition()[axisY];
-		transformY[3][axisX] = camera.transform.GetPosition()[axisX];
+		transformX[3][axisY] = camera.transform.Position()[axisY];
+		transformY[3][axisX] = camera.transform.Position()[axisX];
 
 		float halfScreenUnitsX = vpW / 2.f;
 		float halfScreenUnitsY = vpH / 2.f;
 
-		float startX = (int)((camera.transform.GetPosition()[axisX] - halfScreenUnitsX) / gap) * gap + offset;
-		float startY = (int)((camera.transform.GetPosition()[axisY] - halfScreenUnitsY) / gap) * gap + offset;
+		float startX = (int)((camera.transform.Position()[axisX] - halfScreenUnitsX) / gap) * gap + offset;
+		float startY = (int)((camera.transform.Position()[axisY] - halfScreenUnitsY) / gap) * gap + offset;
 
-		if (camera.transform.GetPosition()[axisX] - halfScreenUnitsX > 0)
+		if (camera.transform.Position()[axisX] - halfScreenUnitsX > 0)
 			startX += gap;
 
-		if (camera.transform.GetPosition()[axisY] - halfScreenUnitsY > 0)
+		if (camera.transform.Position()[axisY] - halfScreenUnitsY > 0)
 			startY += gap;
 
-		float maxX = (camera.transform.GetPosition()[axisX] + halfScreenUnitsX);
-		float maxY = (camera.transform.GetPosition()[axisY] + halfScreenUnitsY);
+		float maxX = (camera.transform.Position()[axisX] + halfScreenUnitsX);
+		float maxY = (camera.transform.Position()[axisY] + halfScreenUnitsY);
 
 		for (float pos = startX; pos < maxX; pos += gap)
 		{
@@ -75,4 +75,20 @@ namespace DrawUtils
 		}
 	}
 
+	void DrawLine(const ModelManager &modelManager, const Vector3 &a, const Vector3 &b)
+	{
+		Transform t;
+		t.SetPosition((a + b) / 2);
+		t.SetScale(Vector3(0, (b - a).Length(), 0));
+
+		Vector3 dir = (b - a).Normalise();
+
+		if (dir[2] >= 0.f)
+			t.SetRotation(Vector3(90 + Maths::ArcSineDegrees(dir[1]), Maths::ArcTangentDegrees2(dir[2], dir[0]), 0.f));
+		else
+			t.SetRotation(Vector3(90 - Maths::ArcSineDegrees(dir[1]), Maths::ArcTangentDegrees2(dir[2], dir[0]), 0.f));
+
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
+		modelManager.Line().Render();
+	}
 }

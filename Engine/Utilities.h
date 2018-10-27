@@ -12,6 +12,9 @@ namespace Utilities
 	}
 
 	template <typename T>
+	inline T Min(const T &a, const T &b) { return a < b ? a : b; }
+
+	template <typename T>
 	inline T Max(const T &a, const T &b) { return a > b ? a : b; }
 
 	inline void CopyBytes(const void *src, void *dest, uint32 length)

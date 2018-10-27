@@ -22,7 +22,7 @@ inline void SetGLAttribs()
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, pos));
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, uv));
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, colour));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, colour));
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, tangent));
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, bitangent));
 	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, normal));

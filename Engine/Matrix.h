@@ -48,7 +48,7 @@ public:
 	
 	inline			T* operator[](int index)		{ return _data[index]; }
 	inline const	T* operator[](int index) const	{ return _data[index]; }
-
+	
 	SquareMatrix operator*(const SquareMatrix &other) const
 	{
 		SquareMatrix result;
@@ -75,6 +75,8 @@ public:
 		return *this;
 	}
 
+	friend Vector3 operator*(const Vector3&, const SquareMatrix<float, 4>&);
+
 	friend SquareMatrix<float, 3> Inverse(const SquareMatrix<float, 3>&);
 	friend SquareMatrix<float, 4> Inverse(const SquareMatrix<float, 4>&);
 };
@@ -95,5 +97,7 @@ namespace Matrix
 	Mat4 Ortho(float width, float height, float near, float far, float scale = 1.f);
 	Mat4 Perspective(float fieldOfView, float near, float far, float aspectRatio);
 }
+
+Vector3 operator*(const Vector3&, const SquareMatrix<float, 4>&);
 
 SquareMatrix<float, 3> Inverse(const SquareMatrix<float, 3>&);

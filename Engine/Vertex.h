@@ -1,19 +1,6 @@
 #pragma once
 #include "Vector.h"
 
-struct Vertex6F
-{
-	float pos[3];
-	float normal[3];
-};
-
-struct Vertex8F
-{
-	float pos[3];
-	float normal[3];
-	float uv[2];
-};
-
 struct Vertex17F
 {
 	Vector3 pos;

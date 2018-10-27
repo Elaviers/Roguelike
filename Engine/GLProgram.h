@@ -29,7 +29,7 @@ private:
 	static const GLProgram* _currentProgram;
 
 public:
-	GLProgram() {}
+	GLProgram() : _id(0) {}
 	~GLProgram() {}
 	GLProgram(const GLProgram &) = delete;
 
