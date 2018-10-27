@@ -99,7 +99,7 @@ public:
 
 	void RemoveIndex(uint32 index)
 	{
-		if (index < _size) return;
+		if (index > _size) return;
 		_size--;
 
 		T *newData = new T[_size];

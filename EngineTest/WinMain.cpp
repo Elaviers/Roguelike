@@ -271,17 +271,17 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	light3.SetRadius(5.f);
 	light4.SetRadius(10.f);
 
-	light1.SetParent(lightParent1);
-	light2.SetParent(lightParent2);
-	light3.SetParent(lightParent3);
-	light4.SetParent(lightParent4);
-	lightParent4.SetParent(cube);
+	light1.SetParent(&lightParent1);
+	light2.SetParent(&lightParent2);
+	light3.SetParent(&lightParent3);
+	light4.SetParent(&lightParent4);
+	lightParent4.SetParent(&cube);
 
 	cube.transform.SetPosition(Vector3(2.f, 0.f, 0.f));
-	cube.SetParent(cubeParent);
+	cube.SetParent(&cubeParent);
 	cube.SetModel(&modelManager.Cube());
 
-	renderable.SetParent(cubeParent);
+	renderable.SetParent(&cubeParent);
 	renderable.SetModel(modelName);
 
 	window.SetTitle("Window");
@@ -401,7 +401,7 @@ void Frame()
 
 		//
 		{
-			float vpScale = camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC ? 1.f : 10.f;
+			float vpScale = camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC ? 1.f : 1.f;
 			float w = 2.f;
 
 			program_UI.Use();

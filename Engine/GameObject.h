@@ -19,6 +19,7 @@ protected:
 
 public:
 	Transform transform;
+	//Note: transform is relative to parent!
 
 	GameObject() : _parent(nullptr), transform(Callback(this, &GameObject::_OnTransformChanged)) {}
 	virtual ~GameObject()
@@ -48,12 +49,13 @@ public:
 		SetParent(other._parent);
 
 		_children.SetSize(0);
+
 		transform = other.transform;
+		transform.SetCallback(Callback(this, &GameObject::_OnTransformChanged));
 
 		return *this;
 	}
 
-	//
 	virtual void Update() {}
 	virtual void Render() const {}
 

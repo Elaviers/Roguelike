@@ -38,7 +38,7 @@ Game::~Game()
 {
 }
 
-void Game::_Init()
+void Game::_InitWindow()
 {
 	{
 		LPCTSTR className = TEXT("GAMEWINDOW");
@@ -56,8 +56,6 @@ void Game::_Init()
 
 		_window.Create(className, "Window", this);
 	}
-
-	_textureManager.Initialise();
 }
 
 void Game::_InitGL()
@@ -74,10 +72,16 @@ void Game::_InitGL()
 	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Phong.frag");
 }
 
+void Game::_Init()
+{
+	_textureManager.Initialise();
+}
+
 void Game::Run()
 {
-	_Init();
+	_InitWindow();
 	_InitGL();
+	_Init();
 
 	_window.Show();
 

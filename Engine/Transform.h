@@ -43,6 +43,7 @@ public:
 	inline void SetPosition(const Vector3 &position)	{ _position = position; _Update(); }
 	inline void SetRotation(const Vector3 &rotation)	{ _rotation = rotation; _Update(); }
 	inline void SetScale(const Vector3 &scale)			{ _scale = scale;		_Update(); }
+	inline void SetCallback(const Callback &callback)	{ _onChanged = callback; }
 
 	inline void Move(const Vector3 &delta)				{ _position += delta;	_Update(); }
 	inline void Rotate(const Vector3 &delta)			{ _rotation += delta;	_Update(); }

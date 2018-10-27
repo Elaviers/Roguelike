@@ -30,6 +30,11 @@ Mat4 GameObject::MakeInverseTransformationMatrix() const
 
 void GameObject::ApplyTransformToShader() const
 {
-	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, transform.MakeTransformationMatrix());
-	//															TODO - ANYTHING BUT THIS ^
+	if (_parent)
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, const_cast<Transform&>(transform).GetTransformationMatrix() * _parent->GetTransformationMatrix());
+	//											TODO - ANYTHING BUT THIS ^
+
+	else
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, const_cast<Transform&>(transform).GetTransformationMatrix());
+	//																Yuck yuck yuck yuck yuck
 }

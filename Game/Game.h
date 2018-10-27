@@ -28,8 +28,9 @@ private:
 
 	static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
 
-	void _Init();
+	void _InitWindow();
 	void _InitGL();
+	void _Init();
 public:
 	Game();
 	~Game();

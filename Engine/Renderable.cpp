@@ -10,9 +10,11 @@ void Renderable::GetProperties(ObjectProperties &properties)
 
 void Renderable::Render() const
 {
-	if (_model && _material)
+	if (_model)
 	{
-		_material->Apply();
+		if (_material)
+			_material->Apply();
+
 		GameObject::ApplyTransformToShader();
 		_model->model.Render();
 	}
