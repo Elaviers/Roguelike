@@ -18,7 +18,7 @@ protected:
 	virtual void _UpdateTransform() = 0;
 
 public:
-	Brush() : _collider(this), _material(nullptr) { }
+	Brush() : _material(nullptr) { }
 	virtual ~Brush() {}
 
 	inline void SetPoint1(const Vector<float, SIZE> &position) { _point1 = position; _UpdateTransform(); }
@@ -35,5 +35,10 @@ public:
 		return "Unknown";
 	}
 
+	//Collision
+	virtual const Collider* GetCollider() const override { return &_collider; }
 	virtual bool Raycast(const Ray &ray, RaycastResult &result) const override { return _collider.IntersectsRay(ray, result); }
+	virtual bool Overlaps(const Collider &collider, const Transform &transform) const override { return _collider.Overlaps(collider, transform); }
+
+	virtual Bounds GetBounds() const override { return Bounds(_collider.min, _collider.max); }
 };

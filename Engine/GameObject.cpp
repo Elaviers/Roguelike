@@ -1,4 +1,5 @@
 #include "GameObject.h"
+#include "Collider.h"
 #include "GL.h"
 #include "GLProgram.h"
 #include "ObjectProperties.h"
@@ -37,4 +38,20 @@ void GameObject::ApplyTransformToShader() const
 	else
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, const_cast<Transform&>(transform).GetTransformationMatrix());
 	//																Yuck yuck yuck yuck yuck
+}
+
+bool GameObject::Raycast(const Ray &ray, RaycastResult &result) const
+{
+	if (this->GetCollider())
+		return this->GetCollider()->IntersectsRay(ray, result, transform);
+
+	return false;
+}
+
+bool GameObject::Overlaps(const Collider &other, const Transform &otherTransform) const
+{
+	if (this->GetCollider())
+		return this->GetCollider()->Overlaps(other, otherTransform, transform);
+
+	return false;
 }

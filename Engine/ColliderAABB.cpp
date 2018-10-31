@@ -1,5 +1,6 @@
 #include "ColliderAABB.h"
 #include "ColliderSphere.h"
+#include "Collision.h"
 #include "GameObject.h"
 #include "Maths.h"
 #include "RaycastResult.h"
@@ -37,12 +38,15 @@ inline void FindT(const float &originComponent, const float &directionComponent,
 	}
 }
 
-bool ColliderAABB::IntersectsRay(const Ray &ray, RaycastResult &result) const
+bool ColliderAABB::IntersectsRay(const Ray &ray, RaycastResult &result, const Transform &transform) const
 {
+	Vector3 worldMin = transform.Position() + min;
+	Vector3 worldMax = transform.Position() + max;
+
 	float minT, maxT;
 	float minT_y, maxT_y;
-	FindT(ray.origin[0], ray.direction[0], min[0], max[0], minT, maxT);
-	FindT(ray.origin[1], ray.direction[1], min[1], max[1], minT_y, maxT_y);
+	FindT(ray.origin[0], ray.direction[0], worldMin[0], worldMax[0], minT, maxT);
+	FindT(ray.origin[1], ray.direction[1], worldMin[1], worldMax[1], minT_y, maxT_y);
 
 	if (minT > maxT_y || minT_y > maxT)
 		return false;
@@ -51,7 +55,7 @@ bool ColliderAABB::IntersectsRay(const Ray &ray, RaycastResult &result) const
 	maxT = Utilities::Min(maxT, maxT_y);
 
 	float minT_z, maxT_z;
-	FindT(ray.origin[2], ray.direction[2], min[2], max[2], minT_z, maxT_z);
+	FindT(ray.origin[2], ray.direction[2], worldMin[2], worldMax[2], minT_z, maxT_z);
 
 	if (minT > maxT_z || minT_z > maxT)
 		return false;
@@ -62,18 +66,8 @@ bool ColliderAABB::IntersectsRay(const Ray &ray, RaycastResult &result) const
 	if (maxT < 0.f) return false; //Should probably check if behind a bit earlier
 
 	result.entryTime = minT < 0.f ? 0.f : minT;
-	//result.exitTime = maxT;
 	return true;
 }
-
-bool ColliderAABB::Overlaps(const ColliderAABB &other) const
-{
-	if (other.max[0] < min[0] || other.max[1] < min[1] || other.max[2] < min[2] || other.min[0] > max[0] || other.min[1] > max[1] || other.min[2] > max[2])
-		return false;
-
-	return true;
-}
-
 
 /*
 	R = O + dt

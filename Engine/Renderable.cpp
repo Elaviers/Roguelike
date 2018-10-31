@@ -20,6 +20,14 @@ void Renderable::Render() const
 	}
 }
 
+const Collider* Renderable::GetCollider() const
+{
+	if (_model)
+		return _model->collider;
+
+	return nullptr;
+}
+
 String Renderable::GetModelName() const
 {
 	if (Engine::modelManager && _model) return Engine::modelManager->FindNameOf(*_model);

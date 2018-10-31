@@ -40,6 +40,9 @@ public:
 
 	inline Mat4 GetProjectionMatrix() const				{ return _projection; }
 
+	//coords are between -.5f(top-left) and .5f(bottom-right)
+	Vector3 ScreenCoordsToDirection(const Vector2 &coords) const;
+
 	Vector2 GetZPlaneDimensions() const;
 
 	virtual void GetProperties(ObjectProperties&) override;

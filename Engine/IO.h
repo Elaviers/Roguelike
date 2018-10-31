@@ -1,4 +1,5 @@
 #pragma once
+#include "Bounds.h"
 #include "Buffer.h"
 #include "String.h"
 #include "Vertex.h"
@@ -16,6 +17,7 @@ struct ModelData
 {
 	Buffer<Vertex17F> vertices;
 	Buffer<uint32> elements;
+	Bounds bounds;
 
 	inline bool IsValid() { return vertices.GetSize() != 0; }
 };

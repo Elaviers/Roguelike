@@ -21,4 +21,3 @@ public:
 
 	virtual void GetProperties(ObjectProperties&) override;
 };
-

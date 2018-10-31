@@ -1,5 +1,6 @@
 #pragma once
 #include "Buffer.h"
+#include "Collider.h"
 #include "RaycastResult.h"
 
 class GameObject;
@@ -32,4 +33,6 @@ public:
 	inline const Buffer<GameObject*>& Objects() const { return _objects; }
 
 	Buffer<RaycastResult> Raycast(const Ray&);
+
+	Buffer<GameObject*> FindOverlaps(const Collider&, const Transform& = Transform());
 };

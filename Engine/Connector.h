@@ -1,6 +1,6 @@
 #pragma once
+#include "Box.h"
 #include "BufferIterator.h"
-#include "Vector.h"
 
 enum class ConnectorDirection
 {
@@ -10,18 +10,13 @@ enum class ConnectorDirection
 	WEST = 3
 };
 
-class Connector
+class Connector : public Box
 {
 public:
 	Connector() : direction(ConnectorDirection::NORTH) {}
-	~Connector() {}
-
-	Vector<int16, 3> point1;
-	Vector<int16, 3> point2;
+	virtual ~Connector() {}
 
 	ConnectorDirection direction;
-
-	void Render() const;
 
 	void SaveToFile(BufferIterator<byte>&) const;
 	void LoadFromFile(BufferIterator<byte>&);

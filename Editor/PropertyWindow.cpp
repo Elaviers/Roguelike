@@ -155,7 +155,7 @@ void PropertyWindow::_CreateHWNDs(bool readOnly)
 		HWND label = ::CreateWindow(WC_STATIC, name, WS_CHILD | WS_VISIBLE, 0, y, w, boxH, _hwnd, (HMENU)i, instance, NULL);
 
 		HWND button = 0;
-		if (properties[i].second->GetFlags() & (PropertyFlags::MODEL | PropertyFlags::MATERIAL))
+		if (!readOnly && properties[i].second->GetFlags() & (PropertyFlags::MODEL | PropertyFlags::MATERIAL))
 			button = ::CreateWindow(WC_BUTTON, "...", WS_CHILD | WS_VISIBLE, w * 2 - buttonW, y, 20, boxH, _hwnd, (HMENU)i, instance, NULL);
 
 		DWORD boxStyle = ES_LOWERCASE | WS_CHILD | WS_VISIBLE;

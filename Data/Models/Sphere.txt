@@ -1,2 +1,3 @@
 model=sphere.obj
 material=bricks
+collision=sphere 1

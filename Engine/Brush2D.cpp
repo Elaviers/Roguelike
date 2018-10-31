@@ -12,9 +12,11 @@ void Brush2D::_UpdateTransform()
 	transform.SetPosition(Vector3(x, level, z));
 	transform.SetScale(Vector3(w, h, 0));
 
-	using namespace Utilities;
-	_collider.min = Vector3(Min(_point1[0], _point2[0]), 0.f, Max(_point1[1], _point2[1]));
-	_collider.max = Vector3(Max(_point1[0], _point2[0]), 0.f, Max(_point1[1], _point2[1]));
+	w /= 2.f;
+	h /= 2.f;
+
+	_collider.min = Vector3(x - w, level, z - h);
+	_collider.max = Vector3(x + w, level, z + h);
 }
 
 void Brush2D::Render() const

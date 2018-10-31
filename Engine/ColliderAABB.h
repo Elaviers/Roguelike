@@ -2,19 +2,17 @@
 #include "Collider.h"
 #include "ColliderSphere.h"
 
+#undef min
+#undef max
+
 class ColliderAABB : public Collider
 {
 public:
-	ColliderAABB(const GameObject *parent) : Collider(parent) {}
+	ColliderAABB(Vector3 min = Vector3(), Vector3 max = Vector3()) : Collider(ColliderType::AABB), min(min), max(max) {}
 	virtual ~ColliderAABB() {}
 
 	Vector3 min;
 	Vector3 max;
 
-	virtual bool IntersectsRay(const Ray&, RaycastResult&) const override;
-	
-	virtual bool Overlaps(const ColliderAABB&) const override;
-	virtual bool Overlaps(const ColliderSphere &other) const override { return other.Overlaps(*this); }
-
-	friend virtual bool ColliderSphere::Overlaps(const ColliderAABB&) const;
+	virtual bool IntersectsRay(const Ray&, RaycastResult&, const Transform& = Transform()) const override;
 };

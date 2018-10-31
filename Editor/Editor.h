@@ -73,6 +73,12 @@ private:
 	{
 		struct
 		{
+			Box box;
+			Buffer<GameObject*> selectedObjects;
+		} select;
+
+		struct
+		{
 			Brush2D object;
 			ObjectProperties properties;
 		} brush2D;

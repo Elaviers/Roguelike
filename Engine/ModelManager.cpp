@@ -1,4 +1,6 @@
 #include "ModelManager.h"
+#include "ColliderAABB.h"
+#include "ColliderSphere.h"
 #include "Error.h"
 #include "IO.h"
 #include "Utilities.h"
@@ -16,6 +18,7 @@ ModelManager::~ModelManager()
 		[](const String&, Model &model) 
 		{
 			model.model.Delete(); 
+			delete model.collider;
 		});
 
 	_line.model.Delete();
@@ -112,12 +115,14 @@ const Model* ModelManager::GetModel(const String &nameIn)
 	if (model) return model;
 	else
 	{
-		String fs = IO::ReadFileString((_rootPath + name + extension).ToLower().GetData());
+		String path = (_rootPath + name + extension).ToLower();
+		String fs = IO::ReadFileString(path.GetData());
 		Utilities::LowerString(fs);
 		Buffer<String> lines = fs.Split("\r\n");
 
 		ModelData data;
 		String materialName;
+		Collider *collision = nullptr;
 
 		for (uint32 i = 0; i < lines.GetSize(); ++i)
 		{
@@ -125,17 +130,44 @@ const Model* ModelManager::GetModel(const String &nameIn)
 
 			if (tokens[0] == "model")
 				data = IO::ReadOBJFile((_rootPath + tokens[1]).GetData());
-			if (tokens[0] == "material")
+			else if (tokens[0] == "material")
 				materialName = tokens[1];
+			else if (tokens[0] == "collision")
+				if (tokens.GetSize() > 1)
+				{
+					Buffer<String> args = tokens[1].Split(" ");
+
+					if (args[0] == "sphere")
+					{
+						if (args.GetSize() >= 2)
+						{
+							delete collision;
+							collision = new ColliderSphere(args[1].ToFloat());
+						}
+						else Error(CSTR(path + ": Insufficient sphere arguments"));
+					}
+					else if (args[0] == "aabb")
+					{
+						if (data.IsValid())
+						{
+							delete collision;
+							collision = new ColliderAABB(data.bounds.min, data.bounds.max);
+						}
+						else Error(CSTR(path + ": AABB collision cannot be used without model data"));
+					}
+				}
 		}
 
 		if (data.IsValid())
 		{
 			Model &newModel = _map[name];
 			newModel.model.Create(data.vertices.Data(), data.vertices.GetSize(), data.elements.Data(), data.elements.GetSize());
+			newModel.bounds = data.bounds;
 			newModel.defaultMaterial = materialName;
+			newModel.collider = collision;
 			return &newModel;
 		}
+		else delete collision;
 	}
 	
 	return nullptr;

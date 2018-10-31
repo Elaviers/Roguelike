@@ -91,4 +91,23 @@ namespace DrawUtils
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
 		modelManager.Line().Render();
 	}
+
+	void DrawBox(const ModelManager &modelManager, const Vector3 &p1, const Vector3 &p2)
+	{
+		DrawLine(modelManager, p1, Vector3(p2[0], p1[1], p1[2]));
+		DrawLine(modelManager, p1, Vector3(p1[0], p2[1], p1[2]));
+		DrawLine(modelManager, p1, Vector3(p1[0], p1[1], p2[2]));
+
+		DrawLine(modelManager, p2, Vector3(p1[0], p2[1], p2[2]));
+		DrawLine(modelManager, p2, Vector3(p2[0], p1[1], p2[2]));
+		DrawLine(modelManager, p2, Vector3(p2[0], p2[1], p1[2]));
+
+		DrawLine(modelManager, Vector3(p1[0], p2[1], p1[2]), Vector3(p2[0], p2[1], p1[2]));
+		DrawLine(modelManager, Vector3(p1[0], p2[1], p1[2]), Vector3(p1[0], p2[1], p2[2]));
+		DrawLine(modelManager, Vector3(p2[0], p1[1], p2[2]), Vector3(p2[0], p1[1], p1[2]));
+		DrawLine(modelManager, Vector3(p2[0], p1[1], p2[2]), Vector3(p1[0], p1[1], p2[2]));
+
+		DrawLine(modelManager, Vector3(p2[0], p1[1], p1[2]), Vector3(p2[0], p2[1], p1[2]));
+		DrawLine(modelManager, Vector3(p1[0], p1[1], p2[2]), Vector3(p1[0], p2[1], p2[2]));
+	}
 }

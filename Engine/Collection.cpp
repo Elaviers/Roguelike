@@ -60,3 +60,15 @@ Buffer<RaycastResult> Collection::Raycast(const Ray &ray)
 	
 	return results;
 }
+
+Buffer<GameObject*> Collection::FindOverlaps(const Collider &collider, const Transform &transform)
+{
+	Buffer<GameObject*> results;
+
+	for (uint32 i = 0; i < _objects.GetSize(); ++i)
+		if (_objects[i])
+			if (_objects[i]->Overlaps(collider, transform))
+				results.Add(_objects[i]);
+
+	return results;
+}

@@ -112,7 +112,29 @@ ModelData IO::ReadOBJFile(const char *filename)
 					if (tokens[0].GetLength() == 1) //Vertex position
 					{
 						if (tokens.GetSize() >= 4)
+						{
 							positions.Add(Vector3(tokens[1].ToFloat() * scale, tokens[2].ToFloat() * scale, tokens[3].ToFloat() * scale));
+
+							const Vector3 &newPos = positions.Last();
+
+							if (newPos[0] < data.bounds.min[0])
+								data.bounds.min[0] = newPos[0];
+
+							if (newPos[1] < data.bounds.min[1])
+								data.bounds.min[1] = newPos[1];
+
+							if (newPos[2] < data.bounds.min[2])
+								data.bounds.min[2] = newPos[2];
+
+							if (newPos[0] > data.bounds.max[0])
+								data.bounds.max[0] = newPos[0];
+
+							if (newPos[1] > data.bounds.max[1])
+								data.bounds.max[1] = newPos[1];
+
+							if (newPos[2] > data.bounds.max[2])
+								data.bounds.max[2] = newPos[2];
+						}
 					}
 
 					else if (tokens[0][1] == 'n')	//Vertex normal

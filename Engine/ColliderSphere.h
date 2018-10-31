@@ -6,11 +6,10 @@ class ColliderSphere : public Collider
 	float _radius;
 
 public:
-	ColliderSphere(const GameObject *parent, float radius = 0.f) : Collider(parent), _radius(radius) {}
+	ColliderSphere(float radius = 0.f) : Collider(ColliderType::SPHERE), _radius(radius) {}
 	virtual ~ColliderSphere() {}
 
-	virtual bool IntersectsRay(const Ray&, RaycastResult&) const override;
+	inline float GetRadius() const { return _radius; }
 
-	virtual bool Overlaps(const ColliderAABB&) const override;
-	virtual bool Overlaps(const ColliderSphere&) const override;
+	virtual bool IntersectsRay(const Ray&, RaycastResult&, const Transform& = Transform()) const override;
 };

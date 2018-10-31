@@ -31,6 +31,16 @@ public:
 	inline T&		operator[](int index)		{ return _data[index]; }
 	inline const T& operator[](int index) const { return _data[index]; }
 
+	template <typename CAST>
+	operator Vector<CAST, SIZE>() 
+	{
+		Vector<CAST, SIZE> result;
+		for (int i = 0; i < SIZE; ++i)
+			result[i] = (CAST)_data[i];
+
+		return result;
+	}
+
 	Vector& operator=(const Vector& other)
 	{
 		for (int i = 0; i < SIZE; ++i)

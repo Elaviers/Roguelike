@@ -154,6 +154,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Bounds.h" />
+    <ClInclude Include="Box.h" />
     <ClInclude Include="Brush.h" />
     <ClInclude Include="Brush2D.h" />
     <ClInclude Include="Brush3D.h" />
@@ -162,6 +164,7 @@
     <ClInclude Include="Callback.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Collider.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="Connector.h" />
     <ClInclude Include="ColliderAABB.h" />
     <ClInclude Include="DrawUtils.h" />
@@ -208,9 +211,12 @@
     <ClInclude Include="Collection.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Box.cpp" />
     <ClCompile Include="Brush2D.cpp" />
     <ClCompile Include="Brush3D.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Connector.cpp" />
     <ClCompile Include="ColliderAABB.cpp" />
     <ClCompile Include="DrawUtils.cpp" />

@@ -1,8 +1,10 @@
 #pragma once
+#include "Bounds.h"
 #include "BufferIterator.h"
 #include "Map.h"
 #include "Transform.h"
 
+class Collider;
 class ObjectProperties;
 struct Ray;
 struct RaycastResult;
@@ -28,6 +30,7 @@ public:
 			_parent->_children.Remove(this);
 	}
 
+	//Hierachy
 	inline GameObject* GetParent() const { return _parent; }
 	inline void SetParent(GameObject *parent)
 	{ 
@@ -40,10 +43,27 @@ public:
 			_parent->_children.Add(this); 
 	}
 
+	//Transform
 	Mat4 GetTransformationMatrix();
 	Mat4 MakeInverseTransformationMatrix() const;
 	void ApplyTransformToShader() const;
 
+	//General
+	virtual void Update() {}
+	virtual void Render() const {}
+
+	virtual void GetProperties(ObjectProperties &properties) { _AddBaseProperties(properties); }
+
+	//File IO
+	virtual void SaveToFile(BufferIterator<byte>&, const Map<String, uint16> &strings) const {}
+	virtual void LoadFromFile(BufferIterator<byte>&, const Map<uint16, String> &strings) {}
+
+	//Collision
+	virtual const Collider* GetCollider() const { return nullptr; }
+	virtual bool Raycast(const Ray&, RaycastResult&) const;
+	virtual bool Overlaps(const Collider&, const Transform&) const;
+
+	//Other
 	inline GameObject& operator=(const GameObject &other)
 	{
 		SetParent(other._parent);
@@ -56,13 +76,5 @@ public:
 		return *this;
 	}
 
-	virtual void Update() {}
-	virtual void Render() const {}
-
-	virtual void GetProperties(ObjectProperties &properties) { _AddBaseProperties(properties); }
-
-	virtual void SaveToFile(BufferIterator<byte>&, const Map<String, uint16> &strings) const {}
-	virtual void LoadFromFile(BufferIterator<byte>&, const Map<uint16, String> &strings) {}
-
-	virtual bool Raycast(const Ray&, RaycastResult&) const { return false; }
+	virtual Bounds GetBounds() const { return Bounds(); }
 };

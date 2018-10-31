@@ -2,27 +2,29 @@
 #include "Ray.h"
 #include "Transform.h"
 
-//Forward declaring these is kinda dumb but oh well
-class ColliderAABB;
-class ColliderSphere;
 
-class GameObject;
+enum class ColliderType
+{
+	CUSTOM,
+	AABB,
+	SPHERE
+};
 
 struct RaycastResult;
 
 class Collider
 {
 protected:
-	Collider(const GameObject *parent) : _parent(parent) {}
+	const ColliderType _type;
 
-	const GameObject *_parent;
+	Collider(ColliderType type) : _type(type) {}
 
 public:
 	virtual ~Collider() {}
 
-	virtual bool IntersectsRay(const Ray&, RaycastResult&) const = 0;
+	inline const ColliderType& GetType() const { return _type; }
 
-	virtual bool Overlaps(const ColliderAABB&) const = 0;
-	virtual bool Overlaps(const ColliderSphere&) const = 0;
+	virtual bool IntersectsRay(const Ray&, RaycastResult&, const Transform& = Transform()) const = 0;
+
+	bool Overlaps(const Collider &other, const Transform &otherTransform, const Transform &thisTransform = Transform()) const;
 };
-
