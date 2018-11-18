@@ -36,3 +36,15 @@ String Property::GetAsString() const
 
 	return "UNSUPPORTED";
 }
+
+#define TRANSFERCASE(ENUM, TYPE) case ENUM: ((PropertyBase<TYPE>*)this)->Set(((PropertyBase<TYPE>*)this)->Get(), otherBase); break
+void Property::Transfer(void *otherBase)
+{
+	switch (_type)
+	{
+		TRANSFERCASE(PropertyType::STRING, String);
+		TRANSFERCASE(PropertyType::FLOAT, float);
+		TRANSFERCASE(PropertyType::VECTOR2, Vector2);
+		TRANSFERCASE(PropertyType::VECTOR3, Vector3);
+	}
+}

@@ -23,6 +23,12 @@ public:
 	void WriteToFile(const char *filename) const;
 	void ReadFromFile(const char *filename);
 
+	inline void Clear()
+	{
+		_collection.Clear();
+		_connectors.SetSize(0);
+	}
+
 	inline Collection& ObjectCollection() { return _collection; }
 	inline const Collection& ObjectCollection() const { return _collection; }
 

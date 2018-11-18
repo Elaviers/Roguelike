@@ -1,11 +1,17 @@
 #include "Light.h"
 #include "GL.h"
 #include "GLProgram.h"
+#include "ObjectProperties.h"
 #include "String.h"
+
+bool Light::drawLights = true;
 
 void Light::GetProperties(ObjectProperties &properties)
 {
 	_AddBaseProperties(properties);
+
+	properties.Add<Vector3>("Colour", _colour);
+	properties.Add<float>("Attenuation Radius", _radius);
 }
 
 void Light::ToShader(int glArrayIndex)

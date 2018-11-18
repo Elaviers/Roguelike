@@ -13,6 +13,8 @@ public:
 	Light() : _radius(-1.f), _colour(1.f, 1.f, 1.f) { transform.SetScale(Vector3(.1f, .1f, .1f)); }
 	~Light() {};
 
+	static bool drawLights;
+
 	inline void SetColour(const Vector3 &colour) { _colour = colour; }
 	inline void SetRadius(float radius) { _radius = radius; }
 

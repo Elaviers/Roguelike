@@ -2,6 +2,14 @@
 #include "GLProgram.h"
 #include "Utilities.h"
 
+void Brush2D::_OnTransformChanged()
+{
+	Vector3 halfSz = Vector3(transform.Scale()[0] / 2.f ,0.f, transform.Scale()[1] / 2.f);
+
+	_collider.min = transform.Position() - halfSz;
+	_collider.max = transform.Position() + halfSz;
+}
+
 void Brush2D::_UpdateTransform()
 {
 	float x = (_point1[0] + _point2[0]) / 2.f;
@@ -11,12 +19,6 @@ void Brush2D::_UpdateTransform()
 
 	transform.SetPosition(Vector3(x, level, z));
 	transform.SetScale(Vector3(w, h, 0));
-
-	w /= 2.f;
-	h /= 2.f;
-
-	_collider.min = Vector3(x - w, level, z - h);
-	_collider.max = Vector3(x + w, level, z + h);
 }
 
 void Brush2D::Render() const

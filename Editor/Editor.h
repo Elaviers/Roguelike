@@ -1,8 +1,4 @@
 #pragma once
-#include <Engine/Brush2D.h>
-#include <Engine/Brush3D.h>
-#include <Engine/Camera.h>
-#include <Engine/GameObject.h>
 #include <Engine/GLContext.h>
 #include <Engine/GLProgram.h>
 #include <Engine/InputManager.h>
@@ -13,22 +9,19 @@
 #include <Engine/TextureManager.h>
 #include <Engine/Timer.h>
 #include <Engine/Window.h>
+#include "MouseData.h"
 #include "PropertyWindow.h"
+#include "ToolBrush2D.h"
+#include "ToolBrush3D.h"
+#include "ToolConnector.h"
+#include "ToolEntity.h"
+#include "ToolSelect.h"
 #include "ToolWindow.h"
 #include "Viewport.h"
-
 #include <CommCtrl.h>
 
 #define VIEWPORTCOUNT 4
 
-enum class Tool
-{
-	SELECT,
-	EDIT,
-	BRUSH,
-	ENTITY,
-	CONNECTOR
-};
 
 class Editor
 {
@@ -57,7 +50,6 @@ private:
 	HIMAGELIST _tbImages;
 
 	Viewport _viewports[VIEWPORTCOUNT];
-	Camera _cameras[VIEWPORTCOUNT];
 
 	//OpenGL
 	GLContext _glContext;
@@ -65,53 +57,23 @@ private:
 	GLProgram _shaderUnlit;
 
 	//Editor
-	Tool _tool;
-	
 	Level _level;
 
-	struct
+	Tool *_currentTool;
+
+	struct _EditorTools
 	{
-		struct
-		{
-			Box box;
-			Buffer<GameObject*> selectedObjects;
-		} select;
+		ToolSelect select;
+		ToolBrush2D brush2D;
+		ToolBrush3D brush3D;
+		ToolEntity entity;
+		ToolConnector connector;
 
-		struct
-		{
-			Brush2D object;
-			ObjectProperties properties;
-		} brush2D;
+		_EditorTools(Editor &editor) : select(editor), brush2D(editor), brush3D(editor), entity(editor), connector(editor) {}
+	} _tools;
 
-		struct
-		{
-			Brush3D object;
-			ObjectProperties properties;
-		} brush3D;
 
-		struct
-		{
-			Connector object;
-			ObjectProperties properties;
-		} connector;
-
-		bool placing;
-	} _toolData;
-
-	struct
-	{
-		int viewport;
-		int x;
-		int y;
-		float unitX;
-		float unitY;
-		int unitX_rounded;
-		int unitY_rounded;
-
-		bool isLeftDown;
-		int heldUnitX_rounded;
-		int heldUnitY_rounded;
-	} _mouseData;
+	MouseData _mouseData;
 
 	float _axisMoveX;
 	float _axisMoveY;
@@ -125,8 +87,8 @@ private:
 	void _InitGL();
 
 public:
-	Editor();
-	~Editor();
+	Editor() : _propertyWindow(this), _toolWindow(this), _materialManager(_textureManager), _tools(*this) {}
+	~Editor() {}
 
 	void Run();
 	void Frame();
@@ -139,12 +101,17 @@ public:
 	void LeftMouseDown();
 	void LeftMouseUp();
 
-	void Submit();
+	void KeySubmit();
+	void KeyDelete();
 
 	void ResizeViews(uint16 w, uint16 h);
 
-	void SetTool(Tool);
-
 	String SelectMaterialDialog();
 	String SelectModelDialog();
+
+	//For Tools
+	inline Level& LevelRef() { return _level; }
+	inline Viewport& ViewportRef(int id) { return _viewports[id]; }
+	inline Camera& CameraRef(int id) { return _viewports[id].CameraRef(); }
+	inline PropertyWindow& PropertyWindowRef() { return _propertyWindow; }
 };

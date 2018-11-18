@@ -11,9 +11,6 @@ constexpr int tbImageSize = 32;
 
 constexpr GLfloat lineW = 1;
 constexpr GLfloat lineW_Connector = 2;
-constexpr GLfloat lineW_ConnectorSelected = 3;
-
-Vector3 rcp1, rcp2; //For raycast debug
 
 const Buffer<Pair<const wchar_t*>> fdFilter({ Pair<const wchar_t*>(L"Level File", L"*.lvl"), Pair<const wchar_t*>(L"All Files", L"*.*") });
 
@@ -25,15 +22,6 @@ enum
 	TBITEM_ENTITY = 3,
 	TBITEM_CONNECTOR = 4
 };
-
-Editor::Editor() : _propertyWindow(this), _toolWindow(this), _materialManager(_textureManager)
-{
-}
-
-
-Editor::~Editor()
-{
-}
 
 #pragma region Init
 
@@ -80,21 +68,21 @@ void Editor::_Init()
 
 	_InitGL();
 
-	_cameras[0].SetProectionType(ProjectionType::PERSPECTIVE);
-	_cameras[0].transform.SetPosition(Vector3(-5.f, 5.f, -5.f));
-	_cameras[0].transform.SetRotation(Vector3(-45.f, 45.f, 0.f));
+	CameraRef(0).SetProectionType(ProjectionType::PERSPECTIVE);
+	CameraRef(0).transform.SetPosition(Vector3(-5.f, 5.f, -5.f));
+	CameraRef(0).transform.SetRotation(Vector3(-45.f, 45.f, 0.f));
 
-	_cameras[1].SetProectionType(ProjectionType::ORTHOGRAPHIC);
-	_cameras[1].SetZBounds(-10000.f, 10000.f);
-	_cameras[1].transform.SetRotation(Vector3(-90.f, 0.f, 0.f));
+	CameraRef(1).SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	CameraRef(1).SetZBounds(-10000.f, 10000.f);
+	CameraRef(1).transform.SetRotation(Vector3(-90.f, 0.f, 0.f));
 
-	_cameras[2].SetProectionType(ProjectionType::ORTHOGRAPHIC);
-	_cameras[2].SetZBounds(-10000.f, 10000.f);
-	_cameras[2].transform.SetRotation(Vector3(0.f, 0.f, 0.f));
+	CameraRef(2).SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	CameraRef(2).SetZBounds(-10000.f, 10000.f);
+	CameraRef(2).transform.SetRotation(Vector3(0.f, 0.f, 0.f));
 
-	_cameras[3].SetProectionType(ProjectionType::ORTHOGRAPHIC);
-	_cameras[3].SetZBounds(-10000.f, 10000.f);
-	_cameras[3].transform.SetRotation(Vector3(0.f, -90.f, 0.f));
+	CameraRef(3).SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	CameraRef(3).SetZBounds(-10000.f, 10000.f);
+	CameraRef(3).transform.SetRotation(Vector3(0.f, -90.f, 0.f));
 
 
 	_inputManager.BindKeyAxis(Keycode::W, &_axisMoveY, 1.f);
@@ -107,7 +95,8 @@ void Editor::_Init()
 	_inputManager.BindKeyAxis(Keycode::RIGHT, &_axisLookX, 1.f);
 	_inputManager.BindKeyAxis(Keycode::LEFT, &_axisLookX, -1.f);
 
-	_inputManager.BindKey(Keycode::ENTER, *this, &Editor::Submit);
+	_inputManager.BindKey(Keycode::ENTER, *this, &Editor::KeySubmit);
+	_inputManager.BindKey(Keycode::DEL, *this, &Editor::KeyDelete);
 
 	_modelManager.Initialise();
 	_modelManager.SetRootPath("Data/Models/");
@@ -118,22 +107,18 @@ void Editor::_Init()
 	_materialManager.SetRootPath("Data/Materials/");
 
 	//oof
+	Engine::registry.RegisterEngineObjects();
+	Engine::inputManager = &_inputManager;
 	Engine::materialManager = &_materialManager;
 	Engine::modelManager = &_modelManager;
 
-	_registry.RegisterEngineObjects();
-
 
 	//Tool data init
-
-	_toolData.brush2D.object.SetMaterial("bricks");
-	_toolData.brush2D.properties.SetBase(_toolData.brush2D.object);
-	_toolData.brush2D.properties.Add<Brush2D, String>("Material", &_toolData.brush2D.object, &Brush2D::GetMaterialName, &Brush2D::SetMaterial, PropertyFlags::MATERIAL);
-	_toolData.brush2D.properties.Add<float>("Level", _toolData.brush2D.object.level);
-
-	_toolData.brush3D.object.SetMaterial("alt");
-	_toolData.brush3D.properties.SetBase(_toolData.brush3D.object);
-	_toolData.brush3D.properties.Add<Brush3D, String>("Material", &_toolData.brush3D.object, &Brush3D::GetMaterialName, &Brush3D::SetMaterial, PropertyFlags::MATERIAL);
+	_tools.brush2D.Initialise();
+	_tools.brush3D.Initialise();
+	_tools.connector.Initialise();
+	_tools.entity.Initialise();
+	_tools.select.Initialise();
 }
 
 void Editor::_InitGL()
@@ -183,9 +168,6 @@ void Editor::Run()
 	}
 
 	_window.SetTitle("Editor");
-	
-	//hm
-	SetTool(Tool::EDIT);
 
 	for (int i = 0; i < VIEWPORTCOUNT; ++i)
 		_viewports[i].Show();
@@ -218,11 +200,12 @@ void Editor::Frame()
 
 	_timer.Start();
 
-	_cameras[0].transform.Move(
-		_cameras[0].transform.GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed 
-		+ _cameras[0].transform.GetRightVector() * _deltaTime * _axisMoveX * moveSpeed);
+	Camera &perspCam = CameraRef(0);
+	perspCam.transform.Move(
+		perspCam.transform.GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed
+		+ perspCam.transform.GetRightVector() * _deltaTime * _axisMoveX * moveSpeed);
 
-	_cameras[0].transform.Rotate(Vector3(_deltaTime * _axisLookY * rotSpeed, _deltaTime * _axisLookX * rotSpeed, 0.f));
+	perspCam.transform.Rotate(Vector3(_deltaTime * _axisLookY * rotSpeed, _deltaTime * _axisLookX * rotSpeed, 0.f));
 
 	Render();
 
@@ -242,7 +225,8 @@ void Editor::Render()
 
 void Editor::RenderViewport(int index, Direction dir)
 {
-	bool persp = _cameras[index].GetProjectionType() == ProjectionType::PERSPECTIVE;
+	auto camera = CameraRef(index);
+	bool persp = camera.GetProjectionType() == ProjectionType::PERSPECTIVE;
 	float boundsScale = persp ? 10.f : 1.f;
 
 	_glContext.Use(_viewports[index]);
@@ -250,21 +234,10 @@ void Editor::RenderViewport(int index, Direction dir)
 	glDepthFunc(GL_LESS);
 
 	_shaderUnlit.Use();
-	_shaderUnlit.SetMat4(DefaultUniformVars::mat4Projection, _cameras[index].GetProjectionMatrix());
-	_shaderUnlit.SetMat4(DefaultUniformVars::mat4View, _cameras[index].MakeInverseTransformationMatrix());
+	_shaderUnlit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
+	_shaderUnlit.SetMat4(DefaultUniformVars::mat4View, camera.MakeInverseTransformationMatrix());
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
 	_level.ObjectCollection().Render();
-
-	if (_tool == Tool::EDIT)
-	{
-		if (persp) _shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.8f, .8f, .8f, .5f));
-		_toolData.brush2D.object.Render();
-	}
-	else if (_tool == Tool::BRUSH)
-	{
-		if (persp) _shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.8f, .8f, .8f, .5f));
-		_toolData.brush3D.object.Render();
-	}
 
 	if (!persp) glDepthFunc(GL_ALWAYS);
 	
@@ -272,53 +245,21 @@ void Editor::RenderViewport(int index, Direction dir)
 
 	_textureManager.White().Bind(0);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.75f, .75f, .75f, 1.f));
-	DrawUtils::DrawGrid(_modelManager, _cameras[index], dir, 1.f, 1.f, boundsScale);
+	DrawUtils::DrawGrid(_modelManager, camera, dir, 1.f, 1.f, boundsScale);
 
 	if (persp) glDepthFunc(GL_LEQUAL);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.5f, .5f, 1.f, 1.f));
-	DrawUtils::DrawGrid(_modelManager, _cameras[index], dir, 1.f, 10.f, boundsScale);
+	DrawUtils::DrawGrid(_modelManager, camera, dir, 1.f, 10.f, boundsScale);
 	if (persp) glDepthFunc(GL_LESS);
-
-	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.8f, .2f, 0.f, 1.f));
-	DrawUtils::DrawLine(_modelManager, rcp1, rcp2);
 
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
 
-	if (_tool == Tool::CONNECTOR)
-	{
-		if (_toolData.placing)
-		{
-			glLineWidth(lineW_ConnectorSelected);
-			_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
-			_toolData.connector.object.Render();
-		}
-	}
-	else if (_tool == Tool::SELECT)
-	{
-		glLineWidth(lineW_ConnectorSelected);
-		glDepthFunc(GL_ALWAYS);
-
-		if (_toolData.placing)
-		{
-			_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 1.f, 1.f));
-			_toolData.select.box.Render();
-		}
-
-		_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 0.f, 1.f));
-		for (uint32 i = 0; i < _toolData.select.selectedObjects.GetSize(); ++i)
-		{
-			Bounds bounds = _toolData.select.selectedObjects[i]->GetBounds();
-
-			DrawUtils::DrawBox(*Engine::modelManager, bounds.min, bounds.max);
-		}
-
-		glDepthFunc(GL_LESS);
-	}
-
 	glLineWidth(lineW_Connector);
+	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
 	for (uint32 i = 0; i < _level.Connectors().GetSize(); ++i)
 		_level.Connectors()[i].Render();
 
+	if (_currentTool) _currentTool->Render();
 
 	_viewports[index].SwapBuffers();
 }
@@ -333,11 +274,6 @@ void Editor::ResizeViews(uint16 w, uint16 h)
 	_viewports[1].SetSizeAndPos(vpW + border, 0, vpW, vpH);
 	_viewports[2].SetSizeAndPos(0, vpH + border, vpW, vpH);
 	_viewports[3].SetSizeAndPos(vpW + border, vpH + border, vpW, vpH);
-
-	_cameras[0].SetViewport(vpW, vpH);
-	_cameras[1].SetViewport(vpW, vpH);
-	_cameras[2].SetViewport(vpW, vpH);
-	_cameras[3].SetViewport(vpW, vpH);
 
 	glViewport(0, 0, vpW, vpH);
 
@@ -368,181 +304,38 @@ String Editor::SelectModelDialog()
 	return string;
 }
 
-void Editor::SetTool(Tool newTool)
-{
-	_propertyWindow.Clear();
-
-	switch (newTool)
-	{
-
-	case Tool::EDIT:
-		_propertyWindow.SetObject(&_toolData.brush2D.object, true);
-		_toolWindow.PropertyWindow().SetProperties(_toolData.brush2D.properties);
-		break;
-		
-	case Tool::BRUSH:
-		_propertyWindow.SetObject(&_toolData.brush3D.object, true);
-		_toolWindow.PropertyWindow().SetProperties(_toolData.brush3D.properties);
-		break;
-
-	case Tool::CONNECTOR:
-		_propertyWindow.Clear();
-		_toolWindow.PropertyWindow().Clear();
-		break;
-
-	default:
-		_propertyWindow.Clear();
-		_toolWindow.PropertyWindow().Clear();
-	}
-
-	_tool = newTool;
-	_toolData.placing = false;
-}
-
 #pragma region Input
 
 void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y)
 {
-	Camera& camera = _cameras[vpIndex];
+	Camera& camera = CameraRef(vpIndex);
 	Vector3 right = camera.transform.GetRightVector();
 	Vector3 up = camera.transform.GetUpVector();
-	int rightAxis = right[0] ? 0 : right[1] ? 1 : 2;
-	int upAxis = up[0] ? 0 : up[1] ? 1 : 2;
-	int otherAxis = (rightAxis != 0 && upAxis != 0) ? 0 : (rightAxis != 1 && upAxis != 1) ? 1 : 2;
+
+	if (camera.GetProjectionType() == ProjectionType::PERSPECTIVE)
+		_mouseData.rightElement = _mouseData.upElement = _mouseData.forwardElement = 0;
+	else
+	{
+		_mouseData.rightElement = right[0] ? 0 : right[1] ? 1 : 2;
+		_mouseData.upElement = up[0] ? 0 : up[1] ? 1 : 2;
+		_mouseData.forwardElement = (_mouseData.rightElement != 0 && _mouseData.upElement != 0) ? 0 : (_mouseData.rightElement != 1 && _mouseData.upElement != 1) ? 1 : 2;
+	}
 
 	_mouseData.viewport = vpIndex;
 	_mouseData.x = x - (camera.GetViewport()[0] / 2);
 	_mouseData.y = -(y - (camera.GetViewport()[1] / 2));
-	_mouseData.unitX = camera.transform.Position()[rightAxis] + (float)_mouseData.x / camera.GetScale();
-	_mouseData.unitY = camera.transform.Position()[upAxis] + (float)_mouseData.y / camera.GetScale();
+	_mouseData.unitX = camera.transform.Position()[_mouseData.rightElement] + (float)_mouseData.x / camera.GetScale();
+	_mouseData.unitY = camera.transform.Position()[_mouseData.upElement] + (float)_mouseData.y / camera.GetScale();
 	_mouseData.unitX_rounded = _mouseData.unitX < 0.f ? (int)(_mouseData.unitX - 1.f) : (int)_mouseData.unitX;
 	_mouseData.unitY_rounded = _mouseData.unitY < 0.f ? (int)(_mouseData.unitY - 1.f) : (int)_mouseData.unitY;
 
 	if (camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
-	{
 		_window.SetTitle(CSTR(String::Convert(_mouseData.viewport) + " Mouse X:" + String::Convert(_mouseData.x) + " (" + String::ConvertFloat(_mouseData.unitX, 0, 2) + " ) Mouse Y:" + String::Convert(_mouseData.y) + " (" + String::ConvertFloat(_mouseData.unitY, 0, 2) + ')'));
-
-		if (!_mouseData.isLeftDown)
-		{
-			switch (_tool)
-			{
-			case Tool::EDIT:
-				_toolData.brush2D.object.SetPoint1(Vector2((float)_mouseData.unitX_rounded, (float)_mouseData.unitY_rounded));
-				_toolData.brush2D.object.SetPoint2(Vector2((float)(_mouseData.unitX_rounded + 1), (float)(_mouseData.unitY_rounded + 1)));
-				break;
-
-			case Tool::BRUSH:
-				if (!_toolData.placing)
-				{
-					Vector3 p1;
-					p1[rightAxis] = (float)_mouseData.unitX_rounded;
-					p1[upAxis] = (float)_mouseData.unitY_rounded;
-					p1[otherAxis] = -100;
-
-					Vector3 p2;
-					p2[rightAxis] = (float)(_mouseData.unitX_rounded + 1);
-					p2[upAxis] = (float)(_mouseData.unitY_rounded + 1);
-					p2[otherAxis] = 100;
-
-					_toolData.brush3D.object.SetPoint1(p1);
-					_toolData.brush3D.object.SetPoint2(p2);
-				}
-				break;
-
-			case Tool::SELECT:
-				if (!_toolData.placing)
-				{
-					_toolData.select.box.point1[rightAxis] = _mouseData.unitX_rounded;
-					_toolData.select.box.point1[upAxis] = _mouseData.unitY_rounded;
-					_toolData.select.box.point1[otherAxis] = -100;
-					_toolData.select.box.point2[rightAxis] = _mouseData.unitX_rounded + 1;
-					_toolData.select.box.point2[upAxis] = _mouseData.unitY_rounded + 1;
-					_toolData.select.box.point2[otherAxis] = 100;
-				}
-				break;
-
-			case Tool::CONNECTOR:
-				if (!_toolData.placing)
-				{
-					_toolData.connector.object.point1[rightAxis] = _mouseData.unitX_rounded;
-					_toolData.connector.object.point1[upAxis] = _mouseData.unitY_rounded;
-					_toolData.connector.object.point1[otherAxis] = -100;
-					_toolData.connector.object.point2[rightAxis] = _mouseData.unitX_rounded + 1;
-					_toolData.connector.object.point2[upAxis] = _mouseData.unitY_rounded + 1;
-					_toolData.connector.object.point2[otherAxis] = 100;
-				}
-				break;
-			}
-		}
-		else
-		{
-			int p1x;
-			int p1y;
-			int p2x;
-			int p2y;
-
-			if (_mouseData.unitX_rounded <= _mouseData.heldUnitX_rounded)
-			{
-				p1x = _mouseData.heldUnitX_rounded + 1;
-				p2x = _mouseData.unitX_rounded;
-			}
-			else
-			{
-				p1x = _mouseData.heldUnitX_rounded;
-				p2x = _mouseData.unitX_rounded + 1;
-			}
-
-			if (_mouseData.unitY_rounded <= _mouseData.heldUnitY_rounded)
-			{
-				p1y = _mouseData.heldUnitY_rounded + 1;
-				p2y = _mouseData.unitY_rounded;
-			}
-			else
-			{
-				p1y = _mouseData.heldUnitY_rounded;
-				p2y = _mouseData.unitY_rounded + 1;
-			}
-
-			switch (_tool)
-			{
-			case Tool::EDIT:
-				_toolData.brush2D.object.SetPoint1(Vector2((float)p1x, (float)p1y));
-				_toolData.brush2D.object.SetPoint2(Vector2(((float)p2x), (float)(p2y)));
-				break;
-
-			case Tool::BRUSH:
-			{
-				Vector3 p1 = _toolData.brush3D.object.GetPoint1();
-				Vector3 p2 = _toolData.brush3D.object.GetPoint2();
-
-				p1[rightAxis] = (float)p1x;
-				p1[upAxis] = (float)p1y;
-				p2[rightAxis] = (float)p2x;
-				p2[upAxis] = (float)p2y;
-
-				_toolData.brush3D.object.SetPoint1(p1);
-				_toolData.brush3D.object.SetPoint2(p2);
-			}
-			break;
-
-			case Tool::SELECT:
-				_toolData.select.box.point1[rightAxis] = p1x;
-				_toolData.select.box.point1[upAxis] = p1y;
-				_toolData.select.box.point2[rightAxis] = p2x;
-				_toolData.select.box.point2[upAxis] = p2y;
-				break;
-
-			case Tool::CONNECTOR:
-				_toolData.connector.object.point1[rightAxis] = p1x;
-				_toolData.connector.object.point1[upAxis] = p1y;
-				_toolData.connector.object.point2[rightAxis] = p2x;
-				_toolData.connector.object.point2[upAxis] = p2y;
-				break;
-			}
-		}
-	}
 	else
 		_window.SetTitle(CSTR(String::Convert(_mouseData.viewport) + " Mouse X:" + String::Convert(_mouseData.x) + " Mouse Y:" + String::Convert(_mouseData.y)));
+
+	if (_currentTool)
+		_currentTool->MouseMove(_mouseData);
 
 	_propertyWindow.Refresh();
 }
@@ -555,79 +348,33 @@ void Editor::LeftMouseDown()
 	_mouseData.heldUnitX_rounded = _mouseData.unitX_rounded;
 	_mouseData.heldUnitY_rounded = _mouseData.unitY_rounded;
 
-	if (_cameras[_mouseData.viewport].GetProjectionType() == ProjectionType::PERSPECTIVE)
-	{
-		if (_tool == Tool::SELECT || _tool == Tool::ENTITY)
-		{
-			Camera &camera = _cameras[_mouseData.viewport];
-
-			RECT windowDims;
-			::GetClientRect(_viewports[0].GetHwnd(), &windowDims);
-
-			Ray r(camera.transform.Position(), camera.ScreenCoordsToDirection(Vector2((float)_mouseData.x / (float)windowDims.right, (float)_mouseData.y / (float)windowDims.bottom)));
-
-			rcp1 = r.origin;
-			rcp2 = r.origin + r.direction * 20.f;
-
-			Buffer<RaycastResult> results = _level.ObjectCollection().Raycast(r);
-
-			if (_tool == Tool::SELECT)
-			{
-				_toolData.select.selectedObjects.SetSize(0);
-				_toolData.placing = false;
-
-				if (results.GetSize() > 0)
-				{
-					_propertyWindow.SetObject(results[0].object);
-					_toolData.select.selectedObjects.Add(results[0].object);
-				}
-				else
-				{
-					_propertyWindow.Clear();
-					_toolData.select.box.point1 = _toolData.select.box.point2 = Vector<uint16, 3>(0, 0, 0);
-				}
-			}
-			else if (results.GetSize() > 0)
-			{
-				Renderable *newObj = _level.ObjectCollection().NewObject<Renderable>();
-				newObj->SetMaterial("bricks");
-				newObj->SetModel("sphere");
-
-				Vector3 pos = r.origin + r.direction * results[0].entryTime;
-				pos[1] -= newObj->GetBounds().min[1];
-
-				newObj->transform.SetPosition(pos);
-				_propertyWindow.SetObject(results[0].object);
-			}
-		}
-
-		
-	}
-	else _toolData.placing = true;
+	if (_currentTool)
+		_currentTool->MouseDown(_mouseData);
 }
 
 void Editor::LeftMouseUp()
 {
 	_mouseData.isLeftDown = false;
 
-	if (_cameras[_mouseData.viewport].GetProjectionType() == ProjectionType::ORTHOGRAPHIC) {
-		switch (_tool)
-		{
-		case Tool::EDIT:
-			if (_mouseData.viewport != 0)
-			{
-				GameObject *brush = new Brush2D(_toolData.brush2D.object);
+	if (_currentTool)
+		_currentTool->MouseUp(_mouseData);
+}
 
-				_level.ObjectCollection().InsertObject(brush);
-			}
-			break;
-		}
-	}
+void Editor::KeySubmit()
+{
+	if (_currentTool)
+		_currentTool->KeySubmit();
+}
+
+void Editor::KeyDelete()
+{
+	if (_currentTool)
+		_currentTool->KeyDelete();
 }
 
 void Editor::Zoom(float amount)
 {
-	Camera& camera = _cameras[_mouseData.viewport];
+	Camera& camera = CameraRef(_mouseData.viewport);
 
 	if (camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
 	{
@@ -640,45 +387,6 @@ void Editor::Zoom(float amount)
 		camera.transform.Move(camera.transform.GetRightVector() * moveX + camera.transform.GetUpVector() * moveY);
 	}
 
-}
-
-void Editor::Submit()
-{
-	_toolData.placing = false;
-
-	switch (_tool)
-	{
-	case Tool::SELECT:
-	{
-		ColliderAABB aabb;
-		aabb.min = Vector3(
-			Utilities::Min(_toolData.select.box.point1[0], _toolData.select.box.point2[0]),
-			Utilities::Min(_toolData.select.box.point1[1], _toolData.select.box.point2[1]),
-			Utilities::Min(_toolData.select.box.point1[2], _toolData.select.box.point2[2]));
-
-		aabb.max = Vector3(
-			Utilities::Max(_toolData.select.box.point1[0], _toolData.select.box.point2[0]),
-			Utilities::Max(_toolData.select.box.point1[1], _toolData.select.box.point2[1]),
-			Utilities::Max(_toolData.select.box.point1[2], _toolData.select.box.point2[2]));
-
-		_toolData.select.selectedObjects = _level.ObjectCollection().FindOverlaps(aabb);
-	}
-		break;
-
-	case Tool::CONNECTOR:
-		_level.Connectors().Add(_toolData.connector.object);
-		_toolData.connector.object.point1 = Vector<int16, 3>(0, 0, 0);
-		_toolData.connector.object.point2 = Vector<int16, 3>(0, 0, 0);
-		break;
-
-	case Tool::BRUSH:
-	{
-		GameObject *brush = new Brush3D(_toolData.brush3D.object);
-
-		_level.ObjectCollection().InsertObject(brush);
-	}
-		break;
-	}
 }
 
 #pragma endregion
@@ -697,19 +405,6 @@ LRESULT CALLBACK AboutProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			break;
 
 		}
-
-	default:
-		return ::DefWindowProc(hwnd, msg, wparam, lparam);
-	}
-
-	return 0;
-}
-
-LRESULT CALLBACK tbProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-{
-	switch (msg)
-	{
-
 
 	default:
 		return ::DefWindowProc(hwnd, msg, wparam, lparam);
@@ -787,7 +482,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 				char cd[MAX_PATH];
 				::GetCurrentDirectoryA(MAX_PATH, cd);
 				String filename = EditorIO::OpenFileDialog(L"\\Data\\Levels", fdFilter);
-				editor->_level.ObjectCollection().Objects().SetSize(0);
+				editor->_level.Clear();
 				editor->_level.ReadFromFile(filename.GetData());
 			}
 			break;
@@ -802,7 +497,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			break;
 
 			case ID_FILE_CLEAR:
-				editor->_level.ObjectCollection().Objects().SetSize(0);
+				editor->_level.Clear();
 				break;
 
 			case ID_VIEW_MATERIALS:
@@ -817,25 +512,13 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			}
 			break;
 
-			case TBITEM_SELECT:
-				editor->SetTool(Tool::SELECT);
-				break;
+#define SETTOOL(NAME) editor->_currentTool = &editor->_tools.NAME; editor->_currentTool->Activate(editor->_propertyWindow, editor->_toolWindow.PropertyWindow())
 
-			case TBITEM_EDIT:
-				editor->SetTool(Tool::EDIT);
-				break;
-
-			case TBITEM_BRUSH:
-				editor->SetTool(Tool::BRUSH);
-				break;
-
-			case TBITEM_ENTITY:
-				editor->SetTool(Tool::ENTITY);
-				break;
-
-			case TBITEM_CONNECTOR:
-				editor->SetTool(Tool::CONNECTOR);
-				break;
+			case TBITEM_SELECT:	SETTOOL(select);	break;
+			case TBITEM_EDIT:	SETTOOL(brush2D);	break;
+			case TBITEM_BRUSH:	SETTOOL(brush3D);	break;
+			case TBITEM_ENTITY:	SETTOOL(entity);	break;
+			case TBITEM_CONNECTOR: SETTOOL(connector); break;
 			}
 			break;
 		}

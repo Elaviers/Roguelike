@@ -1,6 +1,7 @@
 #include "PropertyWindow.h"
 #include <CommCtrl.h>
 #include <Engine/GameObject.h>
+#include <Engine/Registry.h>
 #include "Editor.h"
 
 constexpr int buttonW = 20;
@@ -48,14 +49,18 @@ LRESULT PropertyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 	case WM_COMMAND:
 	{
-		if (HIWORD(wparam) == EN_KILLFOCUS)
+		switch (HIWORD(wparam))
+		{
+		case EN_KILLFOCUS:
 		{
 			char string[32];
 			::GetWindowText((HWND)lparam, string, 32);
 
 			pw->_child_hwnds[LOWORD(wparam)].property->SetByString(String(string));
 		}
-		else if (HIWORD(wparam) == BN_CLICKED)
+			break;
+
+		case BN_CLICKED:
 		{
 			uint32 id = LOWORD(wparam);
 
@@ -72,6 +77,19 @@ LRESULT PropertyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 				::SetWindowTextA(pw->_child_hwnds[id].box, string.GetData());
 				pw->_child_hwnds[id].property->SetByString(string);
 			}
+		}
+			break;
+
+		case CBN_SELCHANGE:
+		{
+			int cbIndex = ::SendMessage((HWND)lparam, CB_GETCURSEL, 0, 0);
+
+			char selectedString[256];
+			::SendMessage((HWND)lparam, CB_GETLBTEXT, (WPARAM)cbIndex, (LPARAM)selectedString);
+
+			pw->_child_hwnds[LOWORD(wparam)].property->SetByString(String(selectedString));
+		}
+			break;
 		}
 	}
 		break;
@@ -148,25 +166,45 @@ void PropertyWindow::_CreateHWNDs(bool readOnly)
 
 	for (uint32 i = 0; i < properties.GetSize(); ++i)
 	{
-		const char *name = properties[i].first.GetData();
+		const char *name = properties[i].first->GetData();
 
 		HINSTANCE instance = ::GetModuleHandle(NULL);
 
 		HWND label = ::CreateWindow(WC_STATIC, name, WS_CHILD | WS_VISIBLE, 0, y, w, boxH, _hwnd, (HMENU)i, instance, NULL);
 
-		HWND button = 0;
-		if (!readOnly && properties[i].second->GetFlags() & (PropertyFlags::MODEL | PropertyFlags::MATERIAL))
-			button = ::CreateWindow(WC_BUTTON, "...", WS_CHILD | WS_VISIBLE, w * 2 - buttonW, y, 20, boxH, _hwnd, (HMENU)i, instance, NULL);
+		HWND box, button = 0;
 
-		DWORD boxStyle = ES_LOWERCASE | WS_CHILD | WS_VISIBLE;
-		if (readOnly) boxStyle |= ES_READONLY;
+		if ((*properties[i].second)->GetFlags() & PropertyFlags::CLASSNAME)
+		{
+			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_COMBOBOXA, (*properties[i].second)->GetAsString().GetData(), WS_CHILD | WS_VISIBLE | CBS_HASSTRINGS | CBS_DROPDOWNLIST, w, y, w, boxH, _hwnd, (HMENU)i, instance, NULL);
 
-		HWND box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, properties[i].second->GetAsString().GetData(), boxStyle, w, y, w - (button ? buttonW : 0), boxH, _hwnd, (HMENU)i, instance, NULL);
+			auto listItems = Engine::registry.GetRegisteredTypes();
 
-		if (!_defaultEditProc)
-			_defaultEditProc = (WNDPROC)::GetWindowLongPtr(box, GWLP_WNDPROC);
+			String value = (*properties[i].second)->GetAsString();
 
-		::SetWindowLongPtr(box, GWLP_WNDPROC, (LONG_PTR)_EditProc);
+			for (uint32 i = 0; i < listItems.GetSize(); ++i)
+			{
+				::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)listItems[i].first->GetData());
+			
+				if (*listItems[i].first == value)
+					::SendMessage(box, CB_SETCURSEL, i, 0);
+			}
+		}
+		else
+		{
+			if (!readOnly && (*properties[i].second)->GetFlags() & (PropertyFlags::MODEL | PropertyFlags::MATERIAL))
+				button = ::CreateWindow(WC_BUTTON, "...", WS_CHILD | WS_VISIBLE, w * 2 - buttonW, y, 20, boxH, _hwnd, (HMENU)i, instance, NULL);
+
+			DWORD boxStyle = ES_LOWERCASE | WS_CHILD | WS_VISIBLE;
+			if (readOnly) boxStyle |= ES_READONLY;
+
+			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, (*properties[i].second)->GetAsString().GetData(), boxStyle, w, y, w - (button ? buttonW : 0), boxH, _hwnd, (HMENU)i, instance, NULL);
+
+			if (!_defaultEditProc)
+				_defaultEditProc = (WNDPROC)::GetWindowLongPtr(box, GWLP_WNDPROC);
+
+			::SetWindowLongPtr(box, GWLP_WNDPROC, (LONG_PTR)_EditProc);
+		}
 
 		_child_hwnds.Add(PropertyHWND{ label, box, button, *_objProperties.FindRaw(name) });
 

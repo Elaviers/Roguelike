@@ -25,7 +25,9 @@ public:
 		return dynamic_cast<T*>(object);
 	}
 
-	void DeleteObject(GameObject*);
+	void Clear();
+
+	void RemoveObject(GameObject*);
 
 	void Render() const;
 

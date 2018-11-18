@@ -1,7 +1,7 @@
 #pragma once
 #include "Error.h"
-#include "Map.h"
 #include "Pair.h"
+#include "Map.h"
 #include "String.h"
 #include "Vector.h"
 #include "Utilities.h"
@@ -24,8 +24,10 @@ namespace PropertyFlags
 {
 	enum PropertyFlag
 	{
-		MODEL = 0x01, 
-		MATERIAL = 0x02
+		READONLY = 0x01,
+		MODEL = 0x02,
+		MATERIAL = 0x04,
+		CLASSNAME = 0x08
 	};
 }
 
@@ -50,10 +52,13 @@ class Property
 	PropertyType _type;
 	byte _flags;
 
+protected:
+	void **_base;
+
 public:
 	int index;
 
-	Property(PropertyType type, byte flags) : _type(type), _flags(flags), index(-1) {}
+	Property(void **base, PropertyType type, byte flags) : _base(base), _type(type), _flags(flags), index(-1) {}
 	Property(const Property&);
 	virtual ~Property() {}
 
@@ -61,6 +66,8 @@ public:
 
 	void SetByString(const String &value);
 	String GetAsString() const;
+
+	void Transfer(void *otherBase);
 
 	inline byte GetFlags() { return _flags; }
 	inline PropertyType GetType() { return _type; }
@@ -70,32 +77,41 @@ template <typename T>
 class PropertyBase : public Property
 {
 public:
-	PropertyBase(byte flags) : Property(TypenameToEnum<T>(), flags) {}
+	PropertyBase(void **base, byte flags) :  Property(base, TypenameToEnum<T>(), flags) {}
 	virtual ~PropertyBase() {}
 
-	virtual T Get() const = 0;
-	virtual void Set(const T&) = 0;
+	virtual T Get(void *base) const = 0;
+	virtual void Set(const T&, void *base) = 0;
+
+	inline T Get() const { return Get(*_base); }
+	inline void Set(const T &value) { Set(value, *_base); }
 };
 
 template <typename T>
 class Property_Raw : public PropertyBase<T>
 {
-	void **_base;
-	void *_offset;
+	bool _isOffset;
+
+	union
+	{
+		T *_ptr;
+		uint16 _offset;
+	};
 
 public:
-	Property_Raw(void **base, T *pointer, byte flags = 0) : PropertyBase<T>(flags), _base(base), _offset((void*)((byte*)pointer - (byte*)*_base)) {}
-	
-	virtual T Get() const override
+	Property_Raw(void **base, uint16 offset, byte flags = 0) : PropertyBase<T>(base, flags), _isOffset(true), _offset(offset) {}
+	Property_Raw(void **base, T *ptr, byte flags = 0) : PropertyBase<T>(base, flags), _isOffset(false), _ptr(ptr) {}
+
+	virtual T Get(void *base) const override
 	{
-		if (*_base)	return *((T*)((byte*)*_base + (int)_offset));
-		else		return *(T*)_offset;
+		if (_isOffset)	return *((T*)((byte*)base + _offset));
+		else			return *_ptr;
 	}
 
-	virtual void Set(const T &value) override
+	virtual void Set(const T &value, void *base) override
 	{
-		if (*_base) *((T*)((byte*)*_base + (int)_offset)) = value;
-		else		*(T*)_offset = value;
+		if (_isOffset) *((T*)((byte*)base + _offset)) = value;
+		else		*_ptr = value;
 	}
 
 	virtual size_t SizeOf() { return sizeof(*this); }
@@ -104,26 +120,24 @@ public:
 template <typename Base, typename T>
 class Property_FPointer : public PropertyBase<T>
 {
-	void **_base;
 	uint16 _offset;
 
 	T (Base::*_getter)() const;
 	void (Base::*_setter)(const T&);
 public:
 	
-	Property_FPointer(void **base, Base *pointer, T(Base::*getter)() const, void(Base::*setter)(const T&), byte flags = 0) : PropertyBase<T>(flags), _base(base),
-		_getter(getter), _setter(setter), _offset((uint16)((uint64)pointer - (uint64)*_base)) {}
+	Property_FPointer(void **base, uint16 offset, T(Base::*getter)() const, void(Base::*setter)(const T&), byte flags = 0) : PropertyBase<T>(base, flags), _getter(getter), _setter(setter), _offset(offset) {}
 
-	virtual T Get() const override
+	virtual T Get(void *base) const override
 	{
-		if (_getter) return ((Base*)((byte*)*_base + _offset)->*_getter)();
+		if (_getter) return ((Base*)((byte*)base + _offset)->*_getter)();
 		else return T();
 	}
 
-	virtual void Set(const T &value) override
+	virtual void Set(const T &value, void *base) override
 	{
 		if (_setter)
-			((Base*)((byte*)*_base + _offset)->*_setter)(value);
+			((Base*)((byte*)base + _offset)->*_setter)(value);
 	}
 
 	virtual size_t SizeOf() { return sizeof(*this); }
@@ -159,7 +173,11 @@ public:
 	template <typename Type>
 	void Add(const String &name, Type& value, byte flags = 0)
 	{
-		Property_Raw<Type> *property = new Property_Raw<Type>(&_base, &value, flags);
+		Property_Raw<Type> *property;
+
+		if (_base) property = new Property_Raw<Type>(&_base, (uint16)((uint64)&value - (uint64)_base), flags);
+		else property = new Property_Raw<Type>(&_base, &value, flags);
+		
 		property->index = _count++;
 		_properties.Set(name, property);
 	}
@@ -167,34 +185,32 @@ public:
 	template <typename Base, typename Type>
 	void Add(const String &name, Base *member, Type(Base::*getter)() const, void(Base::*setter)(const Type&), byte flags = 0)
 	{
-		Property_FPointer<Base, Type> *property = new Property_FPointer<Base, Type>(&_base, member, getter, setter, flags);
+		Property_FPointer<Base, Type> *property = new Property_FPointer<Base, Type>(&_base, (uint16)((uint64)member - (uint64)_base), getter, setter, flags);
 		property->index = _count++;
 		_properties.Set(name, property);
 	}
 
+	template <typename T>
+	void Set(const String &name, const T &value)
+	{
+		auto property = _properties.Find(name);
+		if (property)
+		{
+			if ((*property)->GetType() == TypenameToEnum<T>())
+				(*reinterpret_cast<PropertyBase<T>*>(property))->Set(value);
+		}
+	}
+
 	inline void Clear() { _properties.Clear(); _count = 0; }
 
-	
+	inline Buffer<Pair<const String*, Property* const *>> GetAll() { return _properties.ToBuffer();}
 
-	//Caution: uses a static member
-	Buffer<Pair<String, Property*>> GetAll()
+	void Apply(void *object)
 	{
-		static Buffer<Pair<String, Property*>> propertyArray; //Yuck
-		static int nodeCount;
+		auto props = GetAll();
 
-		nodeCount = 0;
-		
-		_properties.ForEach([](const String&, Property*&) { ++nodeCount; });
-
-		propertyArray.SetSize(nodeCount);
-
-		_properties.ForEach([](const String &name, Property* &property)
-		{
-			propertyArray[property->index].first = name;
-			propertyArray[property->index].second = property;
-		});
-
-		return propertyArray;
+		for (uint32 i = 0; i < props.GetSize(); ++i)
+			(*props[i].second)->Transfer(object);
 	}
 
 	ObjectProperties& operator=(const ObjectProperties &other)

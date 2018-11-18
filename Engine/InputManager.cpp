@@ -11,8 +11,11 @@ const struct KeyName { Keycode key; String name; } keyNames[] =
 	KEYNAME(NUM0, 0), KEYNAME(NUM1, 1),KEYNAME(NUM2, 2),KEYNAME(NUM3, 3),KEYNAME(NUM4, 4),KEYNAME(NUM5, 5),KEYNAME(NUM6, 6),KEYNAME(NUM7, 7),KEYNAME(NUM8, 8), KEYNAME(NUM9, 9),
 
 	KEYNAME(SPACE, space),
-	KEYNAME(LCTRL, lctrl), KEYNAME(LSHIFT, lshift), KEYNAME(LALT, lalt),
-	KEYNAME(RCTRL, rctrl), KEYNAME(RSHIFT, rshift), KEYNAME(RALT, ralt),
+	KEYNAME(CTRL, ctrl),
+	KEYNAME(SHIFT, shift),
+	KEYNAME(ALT, alt),
+	//KEYNAME(LCTRL, lctrl), KEYNAME(LSHIFT, lshift), KEYNAME(LALT, lalt),
+	//KEYNAME(RCTRL, rctrl), KEYNAME(RSHIFT, rshift), KEYNAME(RALT, ralt),
 	KEYNAME(ENTER, enter),
 	KEYNAME(CAPSLOCK, caps),
 	KEYNAME(TAB, tab),
@@ -67,6 +70,8 @@ InputManager::~InputManager()
 
 void InputManager::KeyDown(Keycode key)
 {
+	_keyStates[(byte)key] = 1;
+
 	KeyBind **keyBind = _keyBinds.Find(key);
 
 	if (keyBind)
@@ -75,6 +80,8 @@ void InputManager::KeyDown(Keycode key)
 
 void InputManager::KeyUp(Keycode key)
 {
+	_keyStates[(byte)key] = 0;
+
 	KeyBind **keyBind = _keyBinds.Find(key);
 
 	if (keyBind)

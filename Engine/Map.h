@@ -1,24 +1,26 @@
 #pragma once
-#include <utility>		//For move, of course
+#include "Buffer.h"
+#include "Pair.h"
 
 template <typename KEYTYPE, typename VALUETYPE>
 class Map
 {
-private:
-	struct Pair
+public:
+	struct MapNode
 	{
-		Pair(const KEYTYPE &key, const VALUETYPE &value) : key(key), value(value), left(nullptr), right(nullptr) {}
+		MapNode(const KEYTYPE &key, const VALUETYPE &value) : key(key), value(value), left(nullptr), right(nullptr) {}
 
 		KEYTYPE key;
 		VALUETYPE value;
 
-		Pair *left;
-		Pair *right;
+		MapNode *left;
+		MapNode *right;
 	};
 
-	Pair *_data;
+private:
+	MapNode *_data;
 
-	Pair* _FindPair(Pair *current, const KEYTYPE &key) const //Hmm
+	MapNode* _FindNode(MapNode *current, const KEYTYPE &key) const //Hmm
 	{
 		if (current->key == key)
 			return current;
@@ -26,43 +28,43 @@ private:
 		if (key < current->key)
 		{
 			if (current->left)
-				return _FindPair(current->left, key);
+				return _FindNode(current->left, key);
 		}
 		else if (current->right  && key > current->key)
-			return _FindPair(current->right, key);
+			return _FindNode(current->right, key);
 
 		return nullptr;
 	}
 
-	Pair* _FindFirstPairWithValue(Pair *current, const VALUETYPE &value) const
+	MapNode* _FindFirstNodeWithValue(MapNode *current, const VALUETYPE &value) const
 	{
 		if (current->value == value)
 			return current;
 
-		Pair *pair;
+		MapNode *pair;
 
-		if (current->left && (pair = _FindFirstPairWithValue(current->left, value)) != nullptr)
+		if (current->left && (pair = _FindFirstNodeWithValue(current->left, value)) != nullptr)
 			return pair;
 
-		if (current->right && (pair = _FindFirstPairWithValue(current->right, value)) != nullptr)
+		if (current->right && (pair = _FindFirstNodeWithValue(current->right, value)) != nullptr)
 			return pair;
 
 		return nullptr;
 	}
 
-	Pair& _Set(Pair *current, const KEYTYPE &key, const VALUETYPE &value)
+	MapNode& _Set(MapNode *current, const KEYTYPE &key, const VALUETYPE &value)
 	{
 		if (key < current->key)
 		{
 			if (current->left == nullptr)
-				return *(current->left = new Pair(key, value));
+				return *(current->left = new MapNode(key, value));
 			
 			return _Set(current->left, key, value);
 		}
 		if (key > current->key)
 		{
 			if (current->right == nullptr)
-				return *(current->right = new Pair(key, value));
+				return *(current->right = new MapNode(key, value));
 
 			return _Set(current->right, key, value);
 		}
@@ -71,49 +73,60 @@ private:
 		return *current;
 	}
 
-	void _CallFunctionOnChildren(Pair *pair, void (*function)(const KEYTYPE&, VALUETYPE&))
+	void _CallFunctionOnChildren(MapNode *node, void (*function)(const KEYTYPE&, VALUETYPE&))
 	{
-		function(pair->key, pair->value);
+		function(node->key, node->value);
 
-		if (pair->left)
-			_CallFunctionOnChildren(pair->left, function);
-		if (pair->right)
-			_CallFunctionOnChildren(pair->right, function);
+		if (node->left)
+			_CallFunctionOnChildren(node->left, function);
+		if (node->right)
+			_CallFunctionOnChildren(node->right, function);
 	}
 
-	void _DeletePair(Pair *pair)
+	void _DeleteNode(MapNode *node)
 	{
-		if (pair->left)
-			_DeletePair(pair->left);
-		if (pair->right)
-			_DeletePair(pair->right);
+		if (node->left)
+			_DeleteNode(node->left);
+		if (node->right)
+			_DeleteNode(node->right);
 
-		delete pair;
+		delete node;
 	}
 
-	Pair* _CopyPair(Pair *src)
+	MapNode* _CopyNode(MapNode *src)
 	{
-		Pair *newPair = new Pair(src->key, src->value);
+		MapNode *newPair = new MapNode(src->key, src->value);
 
 		if (src->left)
-			newPair->left = _CopyPair(src->left);
+			newPair->left = _CopyNode(src->left);
 		if (src->right)
-			newPair->right = _CopyPair(src->right);
+			newPair->right = _CopyNode(src->right);
 
 		return newPair;
+	}
+
+	void _AddNodeToBuffer(const MapNode *node, Buffer<Pair<const KEYTYPE*, const VALUETYPE*>> &buffer) const
+	{
+		buffer.Add(Pair<const KEYTYPE*, const VALUETYPE*>(&node->key, &node->value));
+
+		if (node->left)
+			_AddNodeToBuffer(node->left, buffer);
+		if (node->right)
+			_AddNodeToBuffer(node->right, buffer);
 	}
 
 public:
 	Map() : _data(nullptr) {}
 	~Map() { Clear(); }
 
-	//Hello future me that actually wants a copy constructor and totally does not remember making a certain silly mistake...
 	Map(const Map &other) : _data(nullptr)
 	{
-		if (other._data) _data = _CopyPair(other._data);
+		if (other._data) _data = _CopyNode(other._data);
 	}
 
 	Map(Map&& other) : _data(other._data) { other._data = nullptr; }
+	
+	inline MapNode* GetFirstNode() { return _data; }
 
 	void ForEach(void (*function)(const KEYTYPE&, VALUETYPE&))
 	{
@@ -125,9 +138,9 @@ public:
 	{
 		if (_data)
 		{
-			auto pair = _FindFirstPairWithValue(_data, value);
-			if (pair)
-				return &pair->key;
+			auto node = _FindFirstNodeWithValue(_data, value);
+			if (node)
+				return &node->key;
 		}
 
 		return nullptr;
@@ -137,9 +150,9 @@ public:
 	{
 		if (_data)
 		{
-			auto pair = _FindPair(_data, key);
-			if (pair)
-				return &pair->value;
+			auto node = _FindNode(_data, key);
+			if (node)
+				return &node->value;
 		}
 
 		return nullptr;
@@ -152,7 +165,7 @@ public:
 		if (_data)
 			return _Set(_data, key, value).value;
 		
-		_data = new Pair(key, value);
+		_data = new MapNode(key, value);
 		return _data->value;
 	}
 
@@ -160,9 +173,9 @@ public:
 	{
 		if (_data)
 		{
-			Pair *pair = _FindPair(_data, key);
-			if (pair)
-				return pair->value;
+			MapNode *node = _FindNode(_data, key);
+			if (node)
+				return node->value;
 		}
 		
 		return Set(key, VALUETYPE());
@@ -172,7 +185,7 @@ public:
 	{
 		if (_data)
 		{
-			_DeletePair(_data);
+			_DeleteNode(_data);
 			_data = nullptr;
 		}
 	}
@@ -181,7 +194,17 @@ public:
 	{
 		Clear();
 
-		if (other._data) _data = _CopyPair(other._data);
+		if (other._data) _data = _CopyNode(other._data);
 		return *this;
+	}
+
+	inline Buffer<Pair<const KEYTYPE*, const VALUETYPE*>> ToBuffer() const
+	{
+		Buffer<Pair<const KEYTYPE*, const VALUETYPE*>> buffer;
+
+		if (_data)
+			_AddNodeToBuffer(_data, buffer);
+
+		return buffer;
 	}
 };

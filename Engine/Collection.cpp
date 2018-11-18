@@ -19,16 +19,25 @@ void Collection::InsertObject(GameObject *object)
 	}
 }
 
-void Collection::DeleteObject(GameObject *object)
+void Collection::RemoveObject(GameObject *object)
 {
 	for (uint32 i = 0; i < _objects.GetSize(); ++i)
 		if (_objects[i] == object)
 		{
 			_objects[i] = nullptr;
-			break;
-		}
 
-	delete object;
+			if (i < _nextSlot || _nextSlot == -1)
+				_nextSlot = i;
+		}
+}
+
+void Collection::Clear()
+{
+	for (uint32 i = 0; i < _objects.GetSize(); ++i)
+		delete _objects[i];
+
+	_objects.SetSize(0);
+	_nextSlot = -1;
 }
 
 void Collection::Render() const

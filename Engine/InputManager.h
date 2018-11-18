@@ -6,15 +6,18 @@ enum class Keycode
 {
 	NONE = 0,
 
-	A = 'A', B = 'B', C = 'C', D = 'D', E = 'E', F = 'F', G = 'G', H = 'H', I = 'I', J = 'J', K = 'K', L = 'L', M = 'M', 
+	A = 'A', B = 'B', C = 'C', D = 'D', E = 'E', F = 'F', G = 'G', H = 'H', I = 'I', J = 'J', K = 'K', L = 'L', M = 'M',
 	N = 'N', O = 'O', P = 'P', Q = 'Q', R = 'R', S = 'S', T = 'T', U = 'U', V = 'V', W = 'W', X = 'X', Y = 'Y', Z = 'Z',
 
 	NUM0 = '0', NUM1 = '1', NUM2 = '2', NUM3 = '3', NUM4 = '4', NUM5 = '5', NUM6 = '6', NUM7 = '7', NUM8 = '8', NUM9 = '9',
 	F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
 
 	SPACE = VK_SPACE,
-	LCTRL = VK_LCONTROL, LSHIFT = VK_LSHIFT, LALT = VK_LMENU,
-	RCTRL = VK_RCONTROL, RSHIFT = VK_RSHIFT, RALT = VK_RMENU,
+	CTRL = VK_CONTROL,
+	SHIFT = VK_SHIFT,
+	ALT = VK_MENU,
+	//LCTRL = VK_LCONTROL, LSHIFT = VK_LSHIFT, LALT = VK_LMENU,
+	//RCTRL = VK_RCONTROL, RSHIFT = VK_RSHIFT, RALT = VK_RMENU,
 	ENTER = VK_RETURN,
 	CAPSLOCK = VK_CAPITAL,
 	TAB = VK_TAB,
@@ -108,6 +111,8 @@ public:
 class InputManager
 {
 private:
+	byte _keyStates[256];
+
 	Map<Keycode, KeyBind*> _keyBinds;
 	Map<AxisType, float*> _axisBinds;
 
@@ -122,6 +127,8 @@ public:
 
 	inline void BindKey(Keycode key, void(*callback)()) { _keyBinds.Set(key, new KeyBind_Callback(callback)); }
 	inline void BindKeyAxis(Keycode key, float *axisPtr, float axisDisplacement) { _keyBinds.Set(key, new KeyBind_Axis(axisPtr, axisDisplacement)); }
+
+	inline bool IsKeyDown(Keycode key) const { return _keyStates[(byte)key] == 1; }
 
 	void KeyDown(Keycode);
 	void KeyUp(Keycode);

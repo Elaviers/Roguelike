@@ -2,6 +2,9 @@
 
 namespace Engine
 {
+	Registry registry;
+
+	InputManager *inputManager;
 	MaterialManager *materialManager;
 	ModelManager *modelManager;
 }

@@ -17,6 +17,8 @@ private:
 	Editor *_editor;
 	int _index;
 
+	Camera _camera;
+
 public:
 	Viewport();
 	~Viewport();
@@ -29,4 +31,8 @@ public:
 	}
 
 	static void Initialise();
+
+	inline void SetSizeAndPos(uint16 x, uint16 y, uint16 width, uint16 height) { WindowFunctions::SetHWNDSizeAndPos(_hwnd, x, y, width, height); _camera.SetViewport(width, height); }
+
+	inline Camera& CameraRef() { return _camera; }
 };

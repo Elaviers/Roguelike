@@ -1,53 +1,67 @@
 #pragma once
-#include "Buffer.h"
+#include "Map.h"
 #include "GameObject.h"
-#include "ObjectProperties.h"
 #include "String.h"
 #include "Utilities.h"
 
 class RegistryNodeBase
 {
-	String _name;
-
 public:
-	ObjectProperties properties;
-
-	RegistryNodeBase(const char *name) : _name(name) {}
 	virtual ~RegistryNodeBase() {}
 
-	inline String GetName() const { return _name; };
+	virtual GameObject* New() = 0;
+	virtual GameObject *Object() = 0;
 
-	virtual GameObject* Create() = 0;
-	
 	virtual bool IsType(GameObject *basePointer) = 0;
 };
 
 template <typename T>
 class RegistryNode : public RegistryNodeBase
 {
+	T object;
+
 public:
-	RegistryNode(const char *name) : RegistryNodeBase(name) {}
+	RegistryNode() {}
 	virtual ~RegistryNode() {}
 
-	virtual GameObject* Create() override { return (GameObject*)(new T()); }
+	virtual GameObject* New() override { return (GameObject*)(new T()); }
+	virtual GameObject* Object() override { return &object; }
 
 	virtual bool IsType(GameObject *basePointer) override { return dynamic_cast<T*>(basePointer) != nullptr; }
 };
 
 class Registry
 {
-	Buffer<RegistryNodeBase*> _registry;
+	Map<String, RegistryNodeBase*> _registry;
 
 public:
 	Registry() {};
 	~Registry() {};
 
 	template <typename T>
-	void RegisterObjectClass(const char *name)
+	void RegisterObjectClass(const String &name)
 	{
-		RegistryNode<T> *newNode = new RegistryNode<T>(name);
-		_registry.Add(newNode);
+		RegistryNode<T> *newNode = new RegistryNode<T>();
+		_registry[name] = newNode;
 	}
+
+	inline GameObject* NewObjectFromClassName(const String &className) const
+	{
+		auto regNode = _registry.Find(className);
+		if (regNode)
+			return (*regNode)->New();
+
+		return nullptr;
+	}
+
+	inline GameObject* GetObjectInstanceFromClassName(const String &className)
+	{
+		auto regNode = _registry.Find(className);
+		if (regNode)
+			return (*regNode)->Object();
+	}
+
+	inline Buffer<Pair<const String*, RegistryNodeBase* const *>> GetRegisteredTypes() const { return _registry.ToBuffer(); }
 
 	void RegisterEngineObjects();
 };

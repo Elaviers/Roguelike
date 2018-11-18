@@ -168,8 +168,14 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /r /y</Command>
   <ItemGroup>
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EditorIO.cpp" />
+    <ClCompile Include="EditorUtil.cpp" />
     <ClCompile Include="PropertyWindow.cpp" />
     <ClCompile Include="ResourceSelect.cpp" />
+    <ClCompile Include="ToolBrush2D.cpp" />
+    <ClCompile Include="ToolBrush3D.cpp" />
+    <ClCompile Include="ToolConnector.cpp" />
+    <ClCompile Include="ToolEntity.cpp" />
+    <ClCompile Include="ToolSelect.cpp" />
     <ClCompile Include="ToolWindow.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="WinMain.cpp" />
@@ -177,9 +183,17 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /r /y</Command>
   <ItemGroup>
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EditorIO.h" />
+    <ClInclude Include="EditorUtil.h" />
+    <ClInclude Include="MouseData.h" />
     <ClInclude Include="PropertyWindow.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceSelect.h" />
+    <ClInclude Include="Tool.h" />
+    <ClInclude Include="ToolBrush2D.h" />
+    <ClInclude Include="ToolBrush3D.h" />
+    <ClInclude Include="ToolConnector.h" />
+    <ClInclude Include="ToolEntity.h" />
+    <ClInclude Include="ToolSelect.h" />
     <ClInclude Include="ToolWindow.h" />
     <ClInclude Include="Viewport.h" />
   </ItemGroup>

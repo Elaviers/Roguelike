@@ -15,7 +15,15 @@ public:
 	virtual ~Renderable() {}
 
 	inline void SetModel(const String &name) { if (Engine::modelManager) SetModel(Engine::modelManager->GetModel(name)); }
-	inline void SetModel(const Model *model) { _model = model; if (model->defaultMaterial.GetLength() != 0) { SetMaterial(model->defaultMaterial); _materialIsDefault = true; } }
+	inline void SetModel(const Model *model) 
+	{ 
+		_model = model; 
+		if (_model && model->defaultMaterial.GetLength() != 0) 
+		{ 
+			SetMaterial(model->defaultMaterial); 
+			_materialIsDefault = true; 
+		} 
+	}
 
 	inline void SetMaterial(const String &name) { if (Engine::materialManager) SetMaterial(Engine::materialManager->GetMaterial(name)); }
 	inline void SetMaterial(const Material *material) { _material = material; _materialIsDefault = false; }

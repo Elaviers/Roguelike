@@ -43,6 +43,7 @@ public:
 		Window::SetSize(256, 512);
 	}
 
+	inline ObjectProperties& GetProperties() { return _objProperties; }
 	void SetProperties(const ObjectProperties&, bool readOnly = false);
 
 	void SetObject(GameObject*, bool readOnly = false);
