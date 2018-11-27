@@ -85,8 +85,8 @@ void Brush3D::SaveToFile(BufferIterator<byte> &buffer, const Map<String, uint16>
 	buffer.Write_byte(Engine::ObjectIDs::BRUSH3D);
 
 	if (Engine::materialManager && _material)
-	{
-		const uint16 *id = strings.Find(Engine::materialManager->FindNameOf(*_material));
+	{																	//todo: const cast removal
+		const uint16 *id = strings.Find(Engine::materialManager->FindNameOf(const_cast<Material*>(_material)));
 		if (id) buffer.Write_uint16(*id);
 		else buffer.Write_uint16(0);
 	}

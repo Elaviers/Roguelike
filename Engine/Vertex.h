@@ -4,7 +4,7 @@
 struct Vertex17F
 {
 	Vector3 pos;
-	Vector2 uv;
+	Vector2 uvOffset;
 	Vector3 colour = Vector3(1.f, 1.f, 1.f);
 
 	Vector3 tangent;

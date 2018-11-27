@@ -1,3 +1,4 @@
+SURFACE
 diffuse=Normal.png
 normal=Normal.png
 specular=Diffuse.png

@@ -21,6 +21,9 @@ public:
 	String(unsigned int length);
 
 	Buffer<String> Split(const char *delimiters) const;
+	String SubString(unsigned int start, unsigned int end) const;
+	inline String SubString(unsigned int start) const { return SubString(start, _length); }
+	int IndexOf(char) const;
 
 	void SetLength(unsigned int length);
 	inline void Clear() { SetLength(0); }
@@ -55,11 +58,11 @@ public:
 	Vector3 ToVector3() const;
 
 	//
-	static String Convert(__int64,	unsigned int minimunDigits = 0, byte base = 10);
-	static String ConvertFloat(double, unsigned int minimumDigits = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
-	static String ConvertVector2(const Vector2&, unsigned int minimum = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
-	static String ConvertVector3(const Vector3&, unsigned int minimum = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
-	static String ConvertWideString(const wchar_t *string);
+	static String FromInt(__int64,	unsigned int minimunDigits = 0, byte base = 10);
+	static String FromFloat(double, unsigned int minimumDigits = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
+	static String FromVector2(const Vector2&, unsigned int minimum = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
+	static String FromVector3(const Vector3&, unsigned int minimum = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
+	static String FromWideString(const wchar_t *string);
 };
 
 #define CSTR(BODY) ((String)BODY).GetData()

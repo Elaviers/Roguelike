@@ -6,6 +6,8 @@ class GLTexture
 private:
 	GLuint _id;
 
+	GLsizei _w, _h;
+
 public:
 	GLTexture();
 	~GLTexture();
@@ -18,5 +20,7 @@ public:
 
 	static inline void Unbind(byte unit) { glActiveTexture(GL_TEXTURE0 + unit); glBindTexture(GL_TEXTURE_2D, 0); }
 
-	inline bool IsValid() { return _id != 0; }
+	inline bool IsValid() const { return _id != 0; }
+	inline GLsizei GetWidth() const { return _w; }
+	inline GLsizei GetHeight() const { return _h; }
 };

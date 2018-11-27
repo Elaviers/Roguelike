@@ -1,16 +1,12 @@
 #pragma once
-#include "ResourceManagerBase.h"
+#include "ResourceManager.h"
 #include "Material.h"
 
-class TextureManager;
-
-class MaterialManager : public ResourceManagerBase<Material>
+class MaterialManager : public ResourceManager<Material*>
 {
-	TextureManager *_textureManager;
-
 public:
-	MaterialManager(TextureManager &textureManager) : _textureManager(&textureManager) {}
-	~MaterialManager() {}
+	MaterialManager() {}
+	virtual ~MaterialManager() {}
 
 	const Material* GetMaterial(const String &name);
 };

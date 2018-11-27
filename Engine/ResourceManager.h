@@ -3,18 +3,18 @@
 #include "String.h"
 
 template<typename T>
-class ResourceManagerBase
+class ResourceManager
 {
 protected:
 	String _rootPath;
 	Map<String, T> _map;
 
-	ResourceManagerBase() {}
-	~ResourceManagerBase() {}
+	ResourceManager() {}
+	virtual ~ResourceManager() {}
 public:
 	inline const T* Find(const String &name) { return _map.Find(name.ToLower()); };
 
-	inline String FindNameOf(const T &resource) const
+	inline String FindNameOf(const T& resource) const
 	{
 		String string;
 

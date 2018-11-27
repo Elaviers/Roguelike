@@ -68,7 +68,7 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 		Camera &camera = _owner.CameraRef(mouseData.viewport);
 		RECT windowDims;
 		::GetClientRect(_owner.ViewportRef(mouseData.viewport).GetHwnd(), &windowDims);
-		Ray r(camera.transform.Position(), camera.ScreenCoordsToDirection(Vector2((float)mouseData.x / (float)windowDims.right, (float)mouseData.y / (float)windowDims.bottom)));
+		Ray r(camera.transform.Position(), camera.ScreenCoordsToDirection(Vector2((float)mouseData.x / (float)windowDims.right, (float)mouseData.y / (float)windowDims.bottom)), RayChannel::CAMERA);
 		Buffer<RaycastResult> results = _owner.LevelRef().ObjectCollection().Raycast(r);
 
 		if (results.GetSize() > 0)

@@ -3,9 +3,9 @@
 void Vertex17F::CalculateTangents(Vertex17F &vertex1, Vertex17F &vertex2, Vertex17F &vertex3)
 {
 	Vector3 edge1 = vertex2.pos - vertex1.pos;
-	Vector2 deltaUV1 = vertex2.uv - vertex1.uv;
+	Vector2 deltaUV1 = vertex2.uvOffset - vertex1.uvOffset;
 	Vector3 edge2 = vertex3.pos - vertex1.pos;
-	Vector2 deltaUV2 = vertex3.uv - vertex1.uv;
+	Vector2 deltaUV2 = vertex3.uvOffset - vertex1.uvOffset;
 
 	float f = 1.0f / (deltaUV1[0] * deltaUV2[1] - deltaUV2[0] * deltaUV1[1]);
 

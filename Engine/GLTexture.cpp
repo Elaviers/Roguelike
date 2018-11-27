@@ -11,6 +11,9 @@ GLTexture::~GLTexture()
 
 void GLTexture::Create(GLsizei width, GLsizei height, const GLvoid *data, GLint filter)
 {
+	_w = width;
+	_h = height;
+
 	glGenTextures(1, &_id);
 
 	glBindTexture(GL_TEXTURE_2D, _id);

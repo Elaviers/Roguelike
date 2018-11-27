@@ -30,8 +30,8 @@ public:
 	inline const Vector<float, SIZE>& GetPoint2() const { return _point2; }
 	inline const Material* GetMaterial() const { return _material; }
 	String GetMaterialName() const
-	{
-		if (Engine::materialManager && _material) return Engine::materialManager->FindNameOf(*_material);
+	{																						//todo: const cast removal
+		if (Engine::materialManager && _material) return Engine::materialManager->FindNameOf(const_cast<Material*>(_material));
 		return "Unknown";
 	}
 

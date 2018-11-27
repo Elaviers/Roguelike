@@ -87,7 +87,7 @@ private:
 	void _InitGL();
 
 public:
-	Editor() : _propertyWindow(this), _toolWindow(this), _materialManager(_textureManager), _tools(*this) {}
+	Editor() : _propertyWindow(this), _toolWindow(this), _tools(*this) {}
 	~Editor() {}
 
 	void Run();

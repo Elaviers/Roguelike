@@ -105,8 +105,9 @@
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+mklink /d $(ProjectDir)Data ..\Data
+EXIT 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -121,8 +122,9 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+mklink /d $(ProjectDir)Data ..\Data
+EXIT 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,8 +143,9 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+mklink /d $(ProjectDir)Data ..\Data
+EXIT 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -161,16 +164,19 @@ xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
       <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /t /r /y
-xcopy $(SolutionDir)Data\* $(ProjectDir)Data\* /q /s /e /t /r /y</Command>
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+mklink /d $(ProjectDir)Data ..\Data
+EXIT 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
+    <ClInclude Include="MainMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Data\Shaders\Basic.frag">

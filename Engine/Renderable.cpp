@@ -35,8 +35,8 @@ String Renderable::GetModelName() const
 }
 
 String Renderable::GetMaterialName() const
-{
-	if (Engine::materialManager && _material) return Engine::materialManager->FindNameOf(*_material);
+{																						//todo: remove Smelly const cast
+	if (Engine::materialManager && _material) return Engine::materialManager->FindNameOf(const_cast<Material*>(_material));
 	return "Unknown";
 }
 
@@ -53,8 +53,8 @@ void Renderable::SaveToFile(BufferIterator<byte> &buffer, const Map<String, uint
 	else buffer.Write_uint16(0);
 
 	if (!_materialIsDefault && Engine::materialManager && _material)
-	{
-		const uint16 *id = strings.Find(Engine::materialManager->FindNameOf(*_material));
+	{																	//todo: const cast removal
+		const uint16 *id = strings.Find(Engine::materialManager->FindNameOf(const_cast<Material*>(_material)));
 		if (id) buffer.Write_uint16(*id);
 		else buffer.Write_uint16(0);
 	}

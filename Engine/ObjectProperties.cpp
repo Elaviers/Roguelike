@@ -27,9 +27,9 @@ String Property::GetAsString() const
 	switch (_type)
 	{
 	case PropertyType::STRING: return GETASTYPE(String);
-	case PropertyType::FLOAT: return String::ConvertFloat(GETASTYPE(float));
-	case PropertyType::VECTOR2: return String::ConvertVector2(GETASTYPE(Vector2));
-	case PropertyType::VECTOR3: return String::ConvertVector3(GETASTYPE(Vector3));
+	case PropertyType::FLOAT: return String::FromFloat(GETASTYPE(float));
+	case PropertyType::VECTOR2: return String::FromVector2(GETASTYPE(Vector2));
+	case PropertyType::VECTOR3: return String::FromVector3(GETASTYPE(Vector3));
 	}
 
 	//TODO: You know.

@@ -1,8 +1,8 @@
 #pragma once
-#include "ResourceManagerBase.h"
+#include "ResourceManager.h"
 #include "Model.h"
 
-class ModelManager : public ResourceManagerBase<Model>
+class ModelManager : public ResourceManager<Model>
 {
 private:
 	Model _line;
@@ -12,7 +12,7 @@ private:
 
 public:
 	ModelManager();
-	~ModelManager();
+	virtual ~ModelManager();
 
 	void Initialise();
 

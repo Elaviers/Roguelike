@@ -348,10 +348,10 @@ void Frame()
 		program_Unlit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
 		program_Unlit.SetMat4(DefaultUniformVars::mat4View, camera.MakeInverseTransformationMatrix());
 
-		light1.DebugRender(modelManager);
-		light2.DebugRender(modelManager);
-		light3.DebugRender(modelManager);
-		light4.DebugRender(modelManager);
+		light1.Render();
+		light2.Render();
+		light3.Render();
+		light4.Render();
 		//
 
 		//

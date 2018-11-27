@@ -11,6 +11,7 @@ namespace DefaultUniformVars
 
 	constexpr const char *vec4Colour = "Colour";
 
+	constexpr const char *vec2UVOffset = "UVOffset";
 	constexpr const char *vec2UVScale = "UVScale";
 
 	constexpr const char *intTextureDiffuse = "T_Diffuse";

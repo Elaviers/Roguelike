@@ -23,7 +23,7 @@ private:
 
 	void UpdateProjectionMatrix();
 public:
-	Camera() : _type(ProjectionType::PERSPECTIVE), _fov(90.f), _scale(32.f), _near(.001f), _far(100.f) { }
+	Camera() : _type(ProjectionType::PERSPECTIVE), _fov(90.f), _scale(1.f), _near(.001f), _far(100.f) { }
 	~Camera() {}
 
 	inline void SetProectionType(ProjectionType type)	{ _type = type; UpdateProjectionMatrix(); }

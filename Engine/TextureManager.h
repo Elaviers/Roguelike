@@ -1,8 +1,8 @@
 #pragma once
-#include "ResourceManagerBase.h"
+#include "ResourceManager.h"
 #include "GLTexture.h"
 
-class TextureManager : public ResourceManagerBase<GLTexture>
+class TextureManager : public ResourceManager<GLTexture>
 {
 private:
 	struct
@@ -12,7 +12,7 @@ private:
 
 public:
 	TextureManager();
-	~TextureManager();
+	virtual ~TextureManager();
 
 	void Initialise();
 

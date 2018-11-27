@@ -117,6 +117,30 @@ Buffer<String> String::Split(const char *delimiters) const
 	return result;
 }
 
+String String::SubString(unsigned int start, unsigned int end) const
+{
+	if (start > _length)
+		return "";
+
+	if (end > _length)
+		end = _length;
+
+	String string(end - start);
+	for (unsigned int i = start; i < end; ++i)
+		string._data[i - start] = _data[i];
+
+	return string;
+}
+
+int String::IndexOf(char c) const
+{
+	for (int i = 0; i < _length; ++i)
+		if (_data[i] == c)
+			return i;
+
+	return -1;
+}
+
 ////
 
 void String::SetLength(unsigned int length)
@@ -278,12 +302,12 @@ String String::ToLower() const
 
 int String::ToInt() const
 {
-	return atoi(GetData());
+	return atoi(_data);
 }
 
 float String::ToFloat() const
 {
-	return (float)atof(GetData());
+	return (float)atof(_data);
 }
 
 Vector2 String::ToVector2() const
@@ -316,7 +340,7 @@ Vector3 String::ToVector3() const
 
 ////Conversion
 
-String String::Convert(__int64 number, unsigned int minimum, byte base)
+String String::FromInt(__int64 number, unsigned int minimum, byte base)
 {
 	unsigned int digit_count = 1;
 
@@ -348,7 +372,7 @@ String String::Convert(__int64 number, unsigned int minimum, byte base)
 
 #include <math.h>
 
-String String::ConvertFloat(double number, unsigned int minimum, unsigned int maxDecimal, byte base)
+String String::FromFloat(double number, unsigned int minimum, unsigned int maxDecimal, byte base)
 {
 	if (number == INFINITY)
 		return "infinity";
@@ -362,9 +386,9 @@ String String::ConvertFloat(double number, unsigned int minimum, unsigned int ma
 
 	//This is here because negative numbers with a whole part of zero would return as if positive otherwise
 	if (number < 0.0)
-		whole_string = String('-') + Convert(-whole_number, minimum, base);
+		whole_string = String('-') + FromInt(-whole_number, minimum, base);
 	else
-		whole_string = Convert(whole_number, minimum, base);
+		whole_string = FromInt(whole_number, minimum, base);
 
 	unsigned int fraction_digit_count = 0;
 	for (double d = fraction; d != 0.f && fraction_digit_count < maxDecimal;) {
@@ -392,19 +416,19 @@ String String::ConvertFloat(double number, unsigned int minimum, unsigned int ma
 	return whole_string;
 }
 
-String String::ConvertVector2(const Vector2 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
+String String::FromVector2(const Vector2 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
 {
 	const char *seperator = ", ";
-	return ConvertFloat(vector[0], minimum, maxDecimal, base) + seperator + ConvertFloat(vector[1], minimum, maxDecimal, base);
+	return FromFloat(vector[0], minimum, maxDecimal, base) + seperator + FromFloat(vector[1], minimum, maxDecimal, base);
 }
 
-String String::ConvertVector3(const Vector3 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
+String String::FromVector3(const Vector3 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
 {
 	const char *seperator = ", ";
-	return ConvertFloat(vector[0], minimum, maxDecimal, base) + seperator + ConvertFloat(vector[1], minimum, maxDecimal, base) + seperator + ConvertFloat(vector[2], minimum, maxDecimal, base);
+	return FromFloat(vector[0], minimum, maxDecimal, base) + seperator + FromFloat(vector[1], minimum, maxDecimal, base) + seperator + FromFloat(vector[2], minimum, maxDecimal, base);
 }
 
-String String::ConvertWideString(const wchar_t *string)
+String String::FromWideString(const wchar_t *string)
 {
 	unsigned int i = 0;
 

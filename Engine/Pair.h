@@ -1,9 +1,8 @@
 #pragma once
 
 template <typename T1, typename T2 = T1>
-class Pair
+struct Pair
 {
-public:
 	T1 first;
 	T2 second;
 

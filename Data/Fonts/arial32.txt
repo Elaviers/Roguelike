@@ -1,0 +1,69 @@
+texture=fonts/arial32.png
+y_offset=6
+divs_x=8
+divs_y=8
+
+//character_id advance
+GLYPHS
+0 19
+1 12
+2 18
+3 19
+4 19
+5 19
+6 19
+7 18
+8 19
+9 19
+A 24
+B 20
+C 24
+D 20
+E 19
+F 19
+G 25
+H 20
+I 6
+J 15
+K 22
+L 17
+M 24
+N 20
+O 26
+P 20
+Q 26
+R 21
+S 21
+T 22
+U 20
+V 24
+W 34
+X 24
+Y 24
+Z 22
+a 18
+b 17
+c 17
+d 17
+e 18
+f 12
+g 17
+h 17
+i 6
+j 9
+k 17
+l 6
+m 26
+n 17
+o 18
+p 17
+q 17
+r 12
+s 17
+t 11
+u 17
+v 18
+w 26
+x 17
+y 18
+z 17

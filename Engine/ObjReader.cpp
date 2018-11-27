@@ -66,11 +66,11 @@ uint32 GetVertexIndex(Buffer<Vertex17F> &vertices, uint32 &vertexCount, const Bu
 	OBJVertexDef objVertex = ParseOBJVertex(vertex);
 	const Vector3 &pos = positions[OBJIndexToCIndex(vertices, objVertex.pos_index)];
 	const Vector3 &normal = normals[OBJIndexToCIndex(normals, objVertex.normal_index)];
-	const Vector2 &uv = uvs[OBJIndexToCIndex(uvs, objVertex.uv_index)];
+	const Vector2 &uvOffset = uvs[OBJIndexToCIndex(uvs, objVertex.uv_index)];
 
 	uint32 i = 0;
 	for (; i < vertexCount; ++i)
-		if (vertices[i].pos == pos && vertices[i].normal == normal && vertices[i].uv == uv)
+		if (vertices[i].pos == pos && vertices[i].normal == normal && vertices[i].uvOffset == uvOffset)
 			return i;
 
 	if (i == vertices.GetSize())
@@ -78,7 +78,7 @@ uint32 GetVertexIndex(Buffer<Vertex17F> &vertices, uint32 &vertexCount, const Bu
 
 	vertices[i].pos = pos;
 	vertices[i].normal = normal;
-	vertices[i].uv = uv;
+	vertices[i].uvOffset = uvOffset;
 
 	vertexCount++;
 	return i;

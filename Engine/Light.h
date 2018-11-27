@@ -13,15 +13,14 @@ public:
 	Light() : _radius(-1.f), _colour(1.f, 1.f, 1.f) { transform.SetScale(Vector3(.1f, .1f, .1f)); }
 	~Light() {};
 
-	static bool drawLights;
+	static bool drawLightSources;
 
 	inline void SetColour(const Vector3 &colour) { _colour = colour; }
 	inline void SetRadius(float radius) { _radius = radius; }
 
 	void ToShader(int glArrayIndex);
 
-	void DebugRender(ModelManager &) const;
+	void Render() const override;
 
 	virtual void GetProperties(ObjectProperties&) override;
 };
-

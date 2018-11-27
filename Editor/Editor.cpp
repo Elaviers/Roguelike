@@ -73,14 +73,17 @@ void Editor::_Init()
 	CameraRef(0).transform.SetRotation(Vector3(-45.f, 45.f, 0.f));
 
 	CameraRef(1).SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	CameraRef(1).SetScale(32.f);
 	CameraRef(1).SetZBounds(-10000.f, 10000.f);
 	CameraRef(1).transform.SetRotation(Vector3(-90.f, 0.f, 0.f));
 
 	CameraRef(2).SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	CameraRef(2).SetScale(32.f);
 	CameraRef(2).SetZBounds(-10000.f, 10000.f);
 	CameraRef(2).transform.SetRotation(Vector3(0.f, 0.f, 0.f));
 
 	CameraRef(3).SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	CameraRef(3).SetScale(32.f);
 	CameraRef(3).SetZBounds(-10000.f, 10000.f);
 	CameraRef(3).transform.SetRotation(Vector3(0.f, -90.f, 0.f));
 
@@ -111,6 +114,7 @@ void Editor::_Init()
 	Engine::inputManager = &_inputManager;
 	Engine::materialManager = &_materialManager;
 	Engine::modelManager = &_modelManager;
+	Engine::textureManager = &_textureManager;
 
 
 	//Tool data init
@@ -330,9 +334,9 @@ void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y
 	_mouseData.unitY_rounded = _mouseData.unitY < 0.f ? (int)(_mouseData.unitY - 1.f) : (int)_mouseData.unitY;
 
 	if (camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
-		_window.SetTitle(CSTR(String::Convert(_mouseData.viewport) + " Mouse X:" + String::Convert(_mouseData.x) + " (" + String::ConvertFloat(_mouseData.unitX, 0, 2) + " ) Mouse Y:" + String::Convert(_mouseData.y) + " (" + String::ConvertFloat(_mouseData.unitY, 0, 2) + ')'));
+		_window.SetTitle(CSTR(String::FromInt(_mouseData.viewport) + " Mouse X:" + String::FromInt(_mouseData.x) + " (" + String::FromFloat(_mouseData.unitX, 0, 2) + " ) Mouse Y:" + String::FromInt(_mouseData.y) + " (" + String::FromFloat(_mouseData.unitY, 0, 2) + ')'));
 	else
-		_window.SetTitle(CSTR(String::Convert(_mouseData.viewport) + " Mouse X:" + String::Convert(_mouseData.x) + " Mouse Y:" + String::Convert(_mouseData.y)));
+		_window.SetTitle(CSTR(String::FromInt(_mouseData.viewport) + " Mouse X:" + String::FromInt(_mouseData.x) + " Mouse Y:" + String::FromInt(_mouseData.y)));
 
 	if (_currentTool)
 		_currentTool->MouseMove(_mouseData);
