@@ -163,6 +163,7 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Connector.h" />
     <ClInclude Include="ColliderAABB.h" />
+    <ClInclude Include="Direction2D.h" />
     <ClInclude Include="DrawUtils.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Error.h" />
@@ -215,6 +216,7 @@
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="UVRect.h" />
     <ClInclude Include="Vector.h" />
+    <ClInclude Include="Vector4.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Collection.h" />
@@ -228,6 +230,7 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Connector.cpp" />
     <ClCompile Include="ColliderAABB.cpp" />
+    <ClCompile Include="Direction2D.cpp" />
     <ClCompile Include="DrawUtils.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Font.cpp" />

@@ -48,14 +48,22 @@ public:
 	inline void Move(const Vector3 &delta)				{ _position += delta;	_Update(); }
 	inline void Rotate(const Vector3 &delta)			{ _rotation += delta;	_Update(); }
 
-	const Mat4& GetTransformationMatrix();
-	const Mat4& GetInverseTransformationMatrix();
+	const Mat4& GetTransformationMatrix() const;
+	const Mat4& GetInverseTransformationMatrix() const;
 	Mat4 MakeTransformationMatrix() const;
 	Mat4 MakeInverseTransformationMatrix() const;
 
 	inline Vector3 GetForwardVector() const		{ return VectorMaths::GetForwardVector(_rotation); }
 	inline Vector3 GetRightVector() const		{ return VectorMaths::GetRightVector(_rotation); }
 	inline Vector3 GetUpVector() const			{ return VectorMaths::GetUpVector(_rotation); }
+
+	Transform& operator*=(const Transform &other);
+	inline Transform operator*(const Transform &other) const
+	{
+		Transform t = *this;
+		t *= other;
+		return t;
+	}
 
 	void WriteToBuffer(BufferIterator<byte> &buffer) const;
 	void ReadFromBuffer(BufferIterator<byte> &buffer);

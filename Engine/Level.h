@@ -33,4 +33,5 @@ public:
 	inline const Collection& ObjectCollection() const { return _collection; }
 
 	inline Buffer<Connector>& Connectors() { return _connectors; }
+	inline const Buffer<Connector>& Connectors() const { return _connectors; }
 };

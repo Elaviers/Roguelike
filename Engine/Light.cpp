@@ -34,7 +34,7 @@ void Light::Render() const
 	if (drawLightSources)
 	{
 		glUniform4fv(GLProgram::Current().GetUniformLocation("Colour"), 1, colour);
-		GameObject::ApplyTransformToShader();
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
 		Engine::modelManager->Cube().Render();
 	}
 }

@@ -23,5 +23,6 @@ public:
 	float CalculateStringWidth(const char *string, float scaleX) const;
 
 	void RenderString(const char *string, const Transform &transform) const;
-};
 
+	inline void BindTexture() const { if (_texture) _texture->Bind(0); }
+};

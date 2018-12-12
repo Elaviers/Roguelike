@@ -14,20 +14,24 @@ void MaterialSurface::FromString(const String &stringIn)
 
 		if (Engine::textureManager)
 		{
-			if (tokens[0] == "diffuse")
-				_diffuse = Engine::textureManager->GetTexture(tokens[1]);
-			else if (tokens[0] == "normal")
-				_normal = Engine::textureManager->GetTexture(tokens[1]);
-			else if (tokens[0] == "specular")
-				_specular = Engine::textureManager->GetTexture(tokens[1]);
-			else if (tokens[0] == "reflection")
-				_reflection = Engine::textureManager->GetTexture(tokens[1]);
+			if (tokens.GetSize() > 1)
+			{
+				if (tokens[0] == "diffuse")
+					_diffuse = Engine::textureManager->GetTexture(tokens[1]);
+				else if (tokens[0] == "normal")
+					_normal = Engine::textureManager->GetTexture(tokens[1]);
+				else if (tokens[0] == "specular")
+					_specular = Engine::textureManager->GetTexture(tokens[1]);
+				else if (tokens[0] == "reflection")
+					_reflection = Engine::textureManager->GetTexture(tokens[1]);
+			}
+			else Engine::materialManager->HandleCommand(lines[i]);
 		}
 		else Error("Texture manager not set!");
 	}
 }
 
-void MaterialSurface::Apply(const RenderParam *unused) const
+void MaterialSurface::BindTextures() const
 {
 	if (_diffuse)
 		_diffuse->Bind(0);

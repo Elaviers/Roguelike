@@ -13,7 +13,7 @@ void GameObject::_AddBaseProperties(ObjectProperties &properties)
 
 //Public
 
-Mat4 GameObject::GetTransformationMatrix()
+Mat4 GameObject::GetTransformationMatrix() const
 {
 	if (_parent)
 		return Mat4(transform.GetTransformationMatrix()) * _parent->GetTransformationMatrix();
@@ -21,23 +21,12 @@ Mat4 GameObject::GetTransformationMatrix()
 	return Mat4(transform.GetTransformationMatrix());
 }
 
-Mat4 GameObject::MakeInverseTransformationMatrix() const
+Mat4 GameObject::GetInverseTransformationMatrix() const
 {
 	if (_parent)
-		return transform.MakeInverseTransformationMatrix() * _parent->MakeInverseTransformationMatrix();
+		return transform.GetInverseTransformationMatrix() * _parent->GetInverseTransformationMatrix();
 
-	return transform.MakeInverseTransformationMatrix();
-}
-
-void GameObject::ApplyTransformToShader() const
-{
-	if (_parent)
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, const_cast<Transform&>(transform).GetTransformationMatrix() * _parent->GetTransformationMatrix());
-	//											TODO - ANYTHING BUT THIS ^
-
-	else
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, const_cast<Transform&>(transform).GetTransformationMatrix());
-	//																Yuck yuck yuck yuck yuck
+	return transform.GetInverseTransformationMatrix();
 }
 
 bool GameObject::Raycast(const Ray &ray, RaycastResult &result) const

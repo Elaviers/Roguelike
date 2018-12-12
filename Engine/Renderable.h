@@ -51,4 +51,6 @@ public:
 		if (_model) return Bounds(transform.Position() + _model->bounds.min, transform.Position() + _model->bounds.max);
 		else return Bounds(transform.Position(), transform.Position());
 	}
+
+	GAMEOBJ_STD_OVERRIDES;
 };

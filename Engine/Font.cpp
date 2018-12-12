@@ -32,6 +32,7 @@ void Font::FromString(const String &string)
 				else if (tokens[0] == "divs_y")
 					_divsY = tokens[1].ToInt();
 			}
+			else Engine::materialManager->HandleCommand(lines[i]);
 		}
 		else
 		{

@@ -12,5 +12,6 @@ protected:
 public:
 	virtual void FromString(const String &string) {}
 
-	virtual void Apply(const RenderParam *param = nullptr) const = 0;
+	virtual void Apply(const RenderParam *param = nullptr) const {}
+	virtual void BindTextures() const {}
 };

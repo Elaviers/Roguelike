@@ -99,6 +99,7 @@ void Editor::_Init()
 	_inputManager.BindKeyAxis(Keycode::LEFT, &_axisLookX, -1.f);
 
 	_inputManager.BindKey(Keycode::ENTER, *this, &Editor::KeySubmit);
+	_inputManager.BindKey(Keycode::ESCAPE, *this, &Editor::KeyCancel);
 	_inputManager.BindKey(Keycode::DEL, *this, &Editor::KeyDelete);
 
 	_modelManager.Initialise();
@@ -239,7 +240,7 @@ void Editor::RenderViewport(int index, Direction dir)
 
 	_shaderUnlit.Use();
 	_shaderUnlit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
-	_shaderUnlit.SetMat4(DefaultUniformVars::mat4View, camera.MakeInverseTransformationMatrix());
+	_shaderUnlit.SetMat4(DefaultUniformVars::mat4View, camera.GetInverseTransformationMatrix());
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
 	_level.ObjectCollection().Render();
 
@@ -370,6 +371,12 @@ void Editor::KeySubmit()
 		_currentTool->KeySubmit();
 }
 
+void Editor::KeyCancel()
+{
+	if (_currentTool)
+		_currentTool->Cancel();
+}
+
 void Editor::KeyDelete()
 {
 	if (_currentTool)
@@ -486,6 +493,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 				char cd[MAX_PATH];
 				::GetCurrentDirectoryA(MAX_PATH, cd);
 				String filename = EditorIO::OpenFileDialog(L"\\Data\\Levels", fdFilter);
+				editor->KeyCancel();
 				editor->_level.Clear();
 				editor->_level.ReadFromFile(filename.GetData());
 			}
@@ -501,6 +509,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			break;
 
 			case ID_FILE_CLEAR:
+				editor->KeyCancel();
 				editor->_level.Clear();
 				break;
 

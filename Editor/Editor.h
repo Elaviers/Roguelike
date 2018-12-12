@@ -102,6 +102,7 @@ public:
 	void LeftMouseUp();
 
 	void KeySubmit();
+	void KeyCancel();
 	void KeyDelete();
 
 	void ResizeViews(uint16 w, uint16 h);

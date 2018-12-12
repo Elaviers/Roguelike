@@ -4,7 +4,7 @@
 template <typename T, int SIZE>
 class Vector
 {
-private:
+protected:
 	T _data[SIZE];
 
 public:
@@ -12,8 +12,6 @@ public:
 	Vector(T x, T y)					{ static_assert(SIZE == 2, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; }
 	Vector(T x, T y, T z)			{ static_assert(SIZE == 3, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; }
 	Vector(T x, T y, T z, T w)	{ static_assert(SIZE == 4, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; _data[3] = w; }
-
-	~Vector() {}
 
 	T LengthSquared() const
 	{
@@ -65,22 +63,6 @@ public:
 		return *this;
 	}
 
-	Vector& operator+=(T other)
-	{
-		for (int i = 0; i < SIZE; ++i)
-			_data[i] += other;
-
-		return *this;
-	}
-
-	Vector& operator-=(T other)
-	{
-		for (int i = 0; i < SIZE; ++i)
-			_data[i] -= other;
-
-		return *this;
-	}
-
 	Vector& operator*=(const Vector& other)
 	{
 		for (int i = 0; i < SIZE; ++i)
@@ -115,8 +97,6 @@ public:
 
 	Vector operator*(T other) const				{ Vector v(*this); v *= other; return v; }
 	Vector operator/(T other) const				{ Vector v(*this); v /= other; return v; }
-	Vector operator+(T other) const				{ Vector v(*this); v += other; return v; }
-	Vector operator-(T other) const				{ Vector v(*this); v -= other; return v; }
 	Vector operator*(const Vector& other) const { Vector v(*this); v *= other; return v; }
 	Vector operator/(const Vector& other) const { Vector v(*this); v /= other; return v; }
 	Vector operator+(const Vector& other) const { Vector v(*this); v += other; return v; }
@@ -158,7 +138,6 @@ Vector<T, SIZE> operator/(T x, const Vector<T, SIZE> &vec)
 
 typedef Vector<float, 2> Vector2;
 typedef Vector<float, 3> Vector3;
-typedef Vector<float, 4> Vector4;
 
 namespace VectorMaths
 {

@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector.h"
+#include "Vector4.h"
 
 template <typename T, int SIZE>
 class SquareMatrix
@@ -48,23 +49,10 @@ public:
 	
 	inline			T* operator[](int index)		{ return _data[index]; }
 	inline const	T* operator[](int index) const	{ return _data[index]; }
-	
-	SquareMatrix operator*(const SquareMatrix &other) const
-	{
-		SquareMatrix result;
 
-		for (int r = 0; r < SIZE; ++r)
-			for (int c = 0; c < SIZE; ++c)
-				result[r][c] = Dot(other, r, c);
+	friend SquareMatrix operator*(const SquareMatrix &a, const SquareMatrix &b);
 
-		return result;
-	}
-
-	SquareMatrix& operator*=(const SquareMatrix& other)
-	{
-		*this = *this * other;
-		return *this;
-	}
+	SquareMatrix& operator*=(const SquareMatrix& other) { return *this = *this * other; }
 
 	SquareMatrix& operator*=(const T &other)
 	{
@@ -76,6 +64,7 @@ public:
 	}
 
 	friend Vector3 operator*(const Vector3&, const SquareMatrix<float, 4>&);
+	friend Vector4 operator*(const Vector4&, const SquareMatrix<float, 4>&);
 
 	friend SquareMatrix<float, 3> Inverse(const SquareMatrix<float, 3>&);
 	friend SquareMatrix<float, 4> Inverse(const SquareMatrix<float, 4>&);
@@ -83,6 +72,32 @@ public:
 
 typedef SquareMatrix<float, 3> Mat3;
 typedef SquareMatrix<float, 4> Mat4;
+
+template<typename T, int SIZE>
+SquareMatrix<T, SIZE> operator*(const SquareMatrix<T, SIZE> &other)
+{
+	SquareMatrix<T, SIZE> result;
+
+	for (int r = 0; r < SIZE; ++r)
+		for (int c = 0; c < SIZE; ++c)
+			result[r][c] = Dot(other, r, c);
+
+	return result;
+}
+
+Mat4 operator*(const Mat4 &a, const Mat4 &b);
+
+Vector4 operator*(const Vector4&, const Mat4&);
+
+inline Vector3 operator*(const Vector3 &v, const Mat4 &m)
+{
+	Vector4 v4 = Vector4(v[0], v[1], v[2]) * m;
+	return Vector3(v4.x, v4.y, v4.z);
+}
+
+Vector4 operator*(const Vector4&, const Mat4&);
+
+Mat3 Inverse(const Mat3&);
 
 namespace Matrix
 {
@@ -94,10 +109,8 @@ namespace Matrix
 	Mat4 RotationZ(float angle);
 	Mat4 Scale(const Vector3 &scale);
 
+	Mat4 Transformation(Vector3 translation, Vector3 rotation, Vector3 scale);
+
 	Mat4 Ortho(float width, float height, float near, float far, float scale = 1.f);
 	Mat4 Perspective(float fieldOfView, float near, float far, float aspectRatio);
 }
-
-Vector3 operator*(const Vector3&, const SquareMatrix<float, 4>&);
-
-SquareMatrix<float, 3> Inverse(const SquareMatrix<float, 3>&);

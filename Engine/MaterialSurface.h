@@ -23,7 +23,8 @@ public:
 
 	virtual void FromString(const String &string) override;
 
-	virtual void Apply(const RenderParam *param = nullptr) const override;
+	virtual void Apply(const RenderParam *param = nullptr) const override { BindTextures(); }
+	virtual void BindTextures() const override;
 
 	inline bool operator==(const MaterialSurface &other) { return _diffuse == other._diffuse && _normal == other._normal && _specular == other._specular; }
 };

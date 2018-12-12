@@ -1,4 +1,5 @@
 #include "Maths.h"
+#include <stdlib.h>
 #include <math.h>
 
 namespace Maths
@@ -44,5 +45,10 @@ namespace Maths
 	float ArcTangent(float x)
 	{
 		return Round(atanf(x));
+	}
+
+	float Random()
+	{
+		return (float)rand() / (float)RAND_MAX;
 	}
 }

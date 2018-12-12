@@ -4,6 +4,8 @@
 #include "Map.h"
 #include "Transform.h"
 
+#define GAMEOBJ_STD_OVERRIDES virtual size_t SizeOf() const override { return sizeof(this); }
+
 class Collider;
 class ObjectProperties;
 struct Ray;
@@ -26,6 +28,9 @@ public:
 	GameObject() : _parent(nullptr), transform(Callback(this, &GameObject::_OnTransformChanged)) {}
 	virtual ~GameObject()
 	{ 
+		while (_children.GetSize() > 0)
+			_children[0]->SetParent(nullptr);
+
 		if (_parent) 
 			_parent->_children.Remove(this);
 	}
@@ -44,9 +49,17 @@ public:
 	}
 
 	//Transform
-	Mat4 GetTransformationMatrix();
-	Mat4 MakeInverseTransformationMatrix() const;
-	void ApplyTransformToShader() const;
+	Mat4 GetTransformationMatrix() const;
+	Mat4 GetInverseTransformationMatrix() const;
+
+
+	inline Transform GetWorldTransform() const
+	{
+		if (_parent)
+			return transform * _parent->transform;
+
+		return transform;
+	}
 
 	//General
 	virtual void Update() {}
@@ -77,4 +90,12 @@ public:
 	}
 
 	virtual Bounds GetBounds() const { return Bounds(); }
+	inline Bounds GetWorldBounds() const 
+	{
+		Bounds b = GetBounds();
+		const Mat4& wt = GetWorldTransform().GetTransformationMatrix();
+		return Bounds(b.min * wt, b.max * wt);
+	}
+
+	virtual size_t SizeOf() const { return sizeof(this); }
 };

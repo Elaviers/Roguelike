@@ -77,6 +77,31 @@ namespace Matrix
 		);
 	}
 
+	Mat4 Transformation(Vector3 translation, Vector3 rotation, Vector3 scale)
+	{
+		float sinRX = SineDegrees(rotation[0]);
+		float nsinRX = -sinRX;
+		float sinRY = SineDegrees(rotation[1]);
+		float nsinRY = -sinRY;
+		float sinRZ = SineDegrees(rotation[2]);
+		float cosRX = CosineDegrees(rotation[0]);
+		float cosRY = CosineDegrees(rotation[1]);
+		float cosRZ = CosineDegrees(rotation[2]);
+
+		float f1 = scale[0] * cosRZ;
+		float f2 = scale[0] * -sinRZ;
+		float f3 = scale[1] * sinRZ;
+		float f4 = scale[1] * cosRZ;
+		float f5 = scale[2] * cosRX;
+
+		RETURNMAT4(
+			f1 * cosRY + f2 * nsinRX * sinRY, 			f2 * cosRX,			f1 * nsinRY + f2 * nsinRX * cosRY,					0.f,
+			f3 * cosRY + f4 * nsinRX *sinRY,			f4 * cosRX,			f3 * nsinRY + f4 * nsinRX * cosRY, 					0.f,
+			f5 * sinRY,									scale[2] * sinRX,	f5 * cosRY,											0.f,
+			translation[0],								translation[1],		translation[2],										1.f
+		);
+	}
+
 	Mat4 Ortho(float width, float height, float near, float far, float scale)
 	{
 		RETURNMAT4(
@@ -101,7 +126,8 @@ namespace Matrix
 	}
 }
 
-Vector3 operator*(const Vector3 &v, const SquareMatrix<float, 4> &m)
+/*
+Vector3 operator*(const Vector3 &v, const Mat4 &m)
 {
 	return Vector3(
 		v[0] * m[0][0] + v[1] * m[1][0] + v[2] * m[2][0] + m[3][0],
@@ -109,8 +135,50 @@ Vector3 operator*(const Vector3 &v, const SquareMatrix<float, 4> &m)
 		v[0] * m[0][2] + v[1] * m[1][2] + v[2] * m[2][2] + m[3][2]
 	);
 }
+*/
 
-SquareMatrix<float, 3> Inverse(const SquareMatrix<float, 3> &matrix)
+#define SHUFFLE_PARAM(X, Y, Z, W) (X) | (Y << 2) | (Z << 4) | (W << 6)
+#define MM_SHUFFLE_X(v) _mm_shuffle_ps(v, v, SHUFFLE_PARAM(0, 0, 0, 0))
+#define MM_SHUFFLE_Y(v) _mm_shuffle_ps(v, v, SHUFFLE_PARAM(1, 1, 1, 1))
+#define MM_SHUFFLE_Z(v) _mm_shuffle_ps(v, v, SHUFFLE_PARAM(2, 2, 2, 2))
+#define MM_SHUFFLE_W(v) _mm_shuffle_ps(v, v, SHUFFLE_PARAM(3, 3, 3, 3))
+
+inline void VectorTimesMatrixSIMD(float out[4], __m128 simd, __m128 row1, __m128 row2, __m128 row3, __m128 row4)
+{
+	row1 = _mm_mul_ps(MM_SHUFFLE_X(simd), row1);
+	row2 = _mm_mul_ps(MM_SHUFFLE_Y(simd), row2);
+	row3 = _mm_mul_ps(MM_SHUFFLE_Z(simd), row3);
+	row4 = _mm_mul_ps(MM_SHUFFLE_W(simd), row4);
+
+	simd = _mm_add_ps(row1, row2);
+	simd = _mm_add_ps(simd, row3);
+	simd = _mm_add_ps(simd, row4);
+	_mm_store_ps(out, simd);
+}
+
+Vector4 operator*(const Vector4 &v, const Mat4 &m)
+{
+	Vector4 result;
+	VectorTimesMatrixSIMD(&result[0], v.LoadSIMD(), _mm_load_ps(m[0]), _mm_load_ps(m[1]), _mm_load_ps(m[2]), _mm_load_ps(m[3]));
+	return result;
+}
+
+inline void MultiplyRow(float out[4], const float row[4], const Mat4 &m)
+{
+	return VectorTimesMatrixSIMD(out, _mm_load_ps(row), _mm_load_ps(m[0]), _mm_load_ps(m[1]), _mm_load_ps(m[2]), _mm_load_ps(m[3]));
+}
+
+Mat4 operator*(const Mat4 &a, const Mat4 &b)
+{
+	Mat4 result;
+	MultiplyRow(result[0], a._data[0], b);
+	MultiplyRow(result[1], a._data[1], b);
+	MultiplyRow(result[2], a._data[2], b);
+	MultiplyRow(result[3], a._data[3], b);
+	return result;
+}
+
+Mat3 Inverse(const Mat3 &matrix)
 {
 	float r[3][3] =
 	{

@@ -1,23 +1,20 @@
 #pragma once
 #include "Box.h"
 #include "BufferIterator.h"
-
-enum class ConnectorDirection
-{
-	NORTH = 0,
-	EAST = 1,
-	SOUTH = 2,
-	WEST = 3
-};
+#include "Direction2D.h"
 
 class Connector : public Box
 {
 public:
-	Connector() : direction(ConnectorDirection::NORTH) {}
+	Connector() : direction(Direction2D::NORTH) {}
 	virtual ~Connector() {}
 
-	ConnectorDirection direction;
+	Direction2D direction;
+
+	virtual void Render() const;
 
 	void SaveToFile(BufferIterator<byte>&) const;
 	void LoadFromFile(BufferIterator<byte>&);
+
+	bool IsCompatibleWith(const Connector &other) const;
 };

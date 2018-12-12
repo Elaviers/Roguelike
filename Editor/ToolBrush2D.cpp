@@ -18,6 +18,11 @@ void ToolBrush2D::Activate(PropertyWindow &properties, PropertyWindow &toolPrope
 	toolProperties.SetProperties(_properties);
 }
 
+void ToolBrush2D::Cancel()
+{
+	_placing = false;
+}
+
 void ToolBrush2D::MouseMove(const MouseData &mouseData)
 {
 	if (mouseData.forwardElement == 1)
@@ -51,7 +56,7 @@ void ToolBrush2D::MouseUp(const MouseData &mouseData)
 		_placing = false;
 
 		GameObject *brush = new Brush2D(_object);
-
+ 
 		_owner.LevelRef().ObjectCollection().InsertObject(brush);
 	}
 }

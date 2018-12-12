@@ -1,26 +1,27 @@
 #pragma once
 #include "Utilities.h"
 
-class Callback
+template <typename ...Args>
+class FPTR
 {
 	class BaseCallback
 	{
 	public:
 		virtual ~BaseCallback() {}
 
-		virtual void Call() = 0;
+		virtual void Call(Args...) = 0;
 		virtual size_t SizeOf() const = 0;
 	};
 
 	class StaticCallback : public BaseCallback
 	{
-		void(*_function)();
+		void(*_function)(Args...);
 
 	public:
-		StaticCallback(void(*function)()) {}
+		StaticCallback(void(*function)(Args...)) {}
 		virtual ~StaticCallback() {}
 
-		virtual void Call() override { if (_function) _function(); }
+		virtual void Call(Args ...args) override { if (_function) _function(args...); }
 		virtual size_t SizeOf() const override { return sizeof(*this); }
 	};
 
@@ -28,13 +29,13 @@ class Callback
 	class MemberCallback : public BaseCallback
 	{
 		T *_object;
-		void(T::*_function)();
+		void(T::*_function)(Args...);
 
 	public:
-		MemberCallback(T *object, void (T::*function)()) : _object(object), _function(function) {}
+		MemberCallback(T *object, void (T::*function)(Args...)) : _object(object), _function(function) {}
 		virtual ~MemberCallback() {}
 
-		virtual void Call() override { (_object->*_function)(); }
+		virtual void Call(Args... args) override { (_object->*_function)(args...); }
 		virtual size_t SizeOf() const override { return sizeof(*this); }
 	};
 
@@ -43,18 +44,18 @@ class Callback
 	BaseCallback *_cb;
 
 public:
-	Callback(void(*function)() = nullptr) : _cb(new StaticCallback(function)) {}
+	FPTR(void(*function)(Args...) = nullptr) : _cb(new StaticCallback(function)) {}
 
 	template<typename T>
-	Callback(T *object, void (T::*function)()) : _cb(new MemberCallback<T>(object, function)) {}
+	FPTR(T *object, void (T::*function)(Args...)) : _cb(new MemberCallback<T>(object, function)) {}
 
-	Callback(const Callback &other) { operator=(other); }
+	FPTR(const FPTR &other) { operator=(other); }
 
-	Callback(Callback &&other) { _cb = other._cb; other._cb = nullptr; }
+	FPTR(FPTR &&other) { _cb = other._cb; other._cb = nullptr; }
 
-	~Callback() { delete[] _cb; }
+	~FPTR() { delete[] _cb; }
 
-	inline Callback& operator=(const Callback &other)
+	inline FPTR& operator=(const FPTR &other)
 	{
 		uint32 size = (uint32)other._cb->SizeOf();
 		_cb = (BaseCallback*)new byte[size];
@@ -63,5 +64,8 @@ public:
 		return *this;
 	}
 
-	inline void operator()() { _cb->Call(); }
+	inline void operator()(Args ...args) { _cb->Call(args...); }
 };
+
+typedef FPTR<> Callback;
+typedef FPTR<const Buffer<String>&> Command;

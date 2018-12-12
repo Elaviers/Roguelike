@@ -8,9 +8,9 @@
 #include <Engine/ModelManager.h>
 #include <Engine/TextureManager.h>
 #include <Engine/Timer.h>
+#include <Engine/UIContainer.h>
 #include <Engine/Window.h>
 #include <Windows.h>
-#include "MainMenu.h"
 
 class Game
 {
@@ -30,7 +30,7 @@ private:
 	ModelManager _modelManager;
 	TextureManager _textureManager;
 
-	MainMenu _mainMenu;
+	UIContainer _ui;
 	Camera _uiCamera;
 
 	static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
@@ -46,11 +46,12 @@ public:
 	void Frame();
 	void Render();
 
+	void StartLevel(const String &level);
+
 	void Resize(uint16 w, uint16 h);
 
 	void MouseMove(unsigned short x, unsigned short y);
 	void MouseDown();
 
-	void ButtonStart();
 	void ButtonQuit();
 };

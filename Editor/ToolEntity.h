@@ -15,7 +15,7 @@ public:
 	ToolEntity(Editor &level) : Tool(level) {}
 	virtual ~ToolEntity() {}
 
-	virtual void Initialise();
+	virtual void Initialise() override;
 	virtual void Activate(PropertyWindow &properties, PropertyWindow &toolProperties) override;
-	virtual void MouseDown(const MouseData&);
+	virtual void MouseDown(const MouseData&) override;
 };

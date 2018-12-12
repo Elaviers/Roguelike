@@ -18,6 +18,8 @@ public:
 
 	virtual void Activate(PropertyWindow &properties, PropertyWindow &toolProperties) override;
 
+	virtual void Cancel() override;
+
 	virtual void MouseMove(const MouseData&) override;
 	virtual void MouseDown(const MouseData&) override;
 	virtual void KeySubmit() override;

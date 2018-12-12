@@ -10,5 +10,5 @@ void UIButton::OnMouseMove(float mouseX, float mouseY)
 void UIButton::OnClick()
 {
 	if (_active)
-		_callback();
+		_callback(*this);
 }

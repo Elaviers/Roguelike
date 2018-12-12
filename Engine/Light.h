@@ -23,4 +23,6 @@ public:
 	void Render() const override;
 
 	virtual void GetProperties(ObjectProperties&) override;
+
+	GAMEOBJ_STD_OVERRIDES;
 };

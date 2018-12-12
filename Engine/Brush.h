@@ -41,4 +41,6 @@ public:
 	virtual bool Overlaps(const Collider &collider, const Transform &transform) const override { return _collider.Overlaps(collider, transform); }
 
 	virtual Bounds GetBounds() const override { return Bounds(_collider.min, _collider.max); }
+
+	GAMEOBJ_STD_OVERRIDES;
 };

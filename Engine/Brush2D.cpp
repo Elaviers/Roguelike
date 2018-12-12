@@ -26,7 +26,7 @@ void Brush2D::Render() const
 	if (Engine::modelManager && _material)
 	{
 		_material->Apply();
-		this->ApplyTransformToShader();
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
 		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(transform.Scale()[0], transform.Scale()[1]));
 		Engine::modelManager->Plane().Render();
 		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));

@@ -27,7 +27,8 @@ namespace PropertyFlags
 		READONLY = 0x01,
 		MODEL = 0x02,
 		MATERIAL = 0x04,
-		CLASSNAME = 0x08
+		CLASSNAME = 0x08,
+		DIRECTION = 0x10
 	};
 }
 

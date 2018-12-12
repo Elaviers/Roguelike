@@ -5,6 +5,8 @@ class UIElement
 protected:
 	UIElement *_parent;
 
+	bool _markedForDelete;
+
 	//Absoulte bounds
 	float _x, _y, _w, _h;
 	
@@ -45,7 +47,9 @@ public:
 
 		_parent = parent;
 		UpdateAbsoluteBounds();
-		_parent->_OnParented(this);
+
+		if (_parent)
+			_parent->_OnParented(this);
 	}
 
 	inline void SetBounds(float x, float y, float w, float h, float xOffset = 0.f, float yOffset = 0.f)
@@ -61,7 +65,12 @@ public:
 
 	inline void SetZ(float z) { _z = z; UpdateAbsoluteBounds(); }
 
+	inline void MarkForDelete() { _markedForDelete = true; }
+	inline bool ShouldDelete() const { return _markedForDelete; }
+
 	virtual void Render() const {}
+	virtual void Update() {}
+
 	virtual void OnBoundsChanged() {}
 	virtual void OnMouseMove(float mouseX, float mouseY) {}
 	virtual void OnClick() {}

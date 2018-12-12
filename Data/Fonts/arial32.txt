@@ -1,4 +1,6 @@
 texture=fonts/arial32.png
+setmag nearest
+
 y_offset=6
 divs_x=8
 divs_y=8
@@ -67,3 +69,4 @@ w 26
 x 17
 y 18
 z 17
+. 6

@@ -110,4 +110,5 @@ namespace DrawUtils
 		DrawLine(modelManager, Vector3(p2[0], p1[1], p1[2]), Vector3(p2[0], p2[1], p1[2]));
 		DrawLine(modelManager, Vector3(p1[0], p1[1], p2[2]), Vector3(p1[0], p2[1], p2[2]));
 	}
+
 }

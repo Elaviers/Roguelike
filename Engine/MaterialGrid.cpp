@@ -14,22 +14,26 @@ void MaterialGrid::FromString(const String &string)
 	{
 		Buffer<String> tokens = lines[i].Split("=");
 
-		if (tokens[0] == "texture")
-			_texture = Engine::textureManager->GetTexture(tokens[1]);
-		else if (tokens[0] == "rows")
+		if (tokens.GetSize() > 1)
 		{
-			Buffer<String> rows = tokens[1].Split(",");
+			if (tokens[0] == "texture")
+				_texture = Engine::textureManager->GetTexture(tokens[1]);
+			else if (tokens[0] == "rows")
+			{
+				Buffer<String> rows = tokens[1].Split(",");
 
-			for (uint32 i = 0; i < rows.GetSize(); ++i)
-				row_heights.Add(rows[i].ToInt());
-		}
-		else if (tokens[0] == "columns")
-		{
-			Buffer<String> columns = tokens[1].Split(",");
+				for (uint32 i = 0; i < rows.GetSize(); ++i)
+					row_heights.Add(rows[i].ToInt());
+			}
+			else if (tokens[0] == "columns")
+			{
+				Buffer<String> columns = tokens[1].Split(",");
 
-			for (uint32 i = 0; i < columns.GetSize(); ++i)
-				column_widths.Add(columns[i].ToInt());
+				for (uint32 i = 0; i < columns.GetSize(); ++i)
+					column_widths.Add(columns[i].ToInt());
+			}
 		}
+		else Engine::materialManager->HandleCommand(lines[i]);
 	}
 
 	int rows = row_heights.GetSize();
@@ -70,8 +74,7 @@ void MaterialGrid::Apply(const RenderParam *param) const
 
 	const UVRect &uv = GetElement(r, c);
 
-	if (_texture)
-		_texture->Bind(0);
+	BindTextures();
 
 	GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, uv.pos);
 	GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, uv.size);

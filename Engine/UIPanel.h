@@ -13,12 +13,16 @@ class UIPanel : public UIElement
 	Transform _transforms[9];
 
 public:
-	UIPanel(UIElement *parent = nullptr) : UIElement(parent) {}
+	UIPanel(UIElement *parent = nullptr) : UIElement(parent), _colour(1.f, 1.f, 1.f, 1.f) {}
 	virtual ~UIPanel() {}
 
 	virtual void Render() const override;
 
 	virtual void OnBoundsChanged() override;
+
+	inline float GetBorderSize() const { return _borderSize; }
+	inline const Material* GetMaterial() const { return _material;}
+	inline const Vector4& GetColour() const { return _colour; }
 
 	inline void SetBorderSize(float size) { _borderSize = size; OnBoundsChanged(); }
 	inline void SetColour(const Vector4 &colour) { _colour = colour; }

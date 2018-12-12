@@ -59,6 +59,8 @@ public:
 		auto regNode = _registry.Find(className);
 		if (regNode)
 			return (*regNode)->Object();
+
+		return nullptr;
 	}
 
 	inline Buffer<Pair<const String*, RegistryNodeBase* const *>> GetRegisteredTypes() const { return _registry.ToBuffer(); }

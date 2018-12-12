@@ -19,6 +19,7 @@ public:
 	virtual void Deactivate() {}
 
 	//Input
+	virtual void Cancel() {}
 	virtual void MouseMove(const MouseData&) {}
 	virtual void MouseDown(const MouseData&) {}
 	virtual void MouseUp(const MouseData&) {}

@@ -46,3 +46,26 @@ const Material* MaterialManager::GetMaterial(const String &nameIn)
 
 	return nullptr;
 }
+
+void MaterialManager::HandleCommand(const String &string)
+{
+	Buffer<String> args = string.Split(" ");	
+
+	Command *command = _commands.Find(args[0]);
+	if (command)
+		(*command)(args);
+}
+
+void MaterialManager::Command_SetMag(const Buffer<String> &args)
+{
+	if (args.GetSize() >= 2)
+	{
+		GLsizei filter = GL_LINEAR;
+
+		if (args[1] == "nearest")
+			filter = GL_NEAREST;
+
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+	}
+}

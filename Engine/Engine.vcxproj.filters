@@ -273,6 +273,12 @@
     <ClInclude Include="UIPanel.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Direction2D.h">
+      <Filter>Header Files\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector4.h">
+      <Filter>Header Files\Classes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLProgram.cpp">
@@ -430,6 +436,9 @@
     </ClCompile>
     <ClCompile Include="UIPanel.cpp">
       <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Direction2D.cpp">
+      <Filter>Source Files\Classes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

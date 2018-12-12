@@ -16,6 +16,11 @@ void ToolBrush3D::Activate(PropertyWindow &properties, PropertyWindow &toolPrope
 	toolProperties.SetProperties(_properties);
 }
 
+void ToolBrush3D::Cancel()
+{
+	_placing = false;
+}
+
 void ToolBrush3D::MouseMove(const MouseData &mouseData)
 {
 	if (_owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::ORTHOGRAPHIC)

@@ -1,7 +1,10 @@
 #include "Game.h"
 #include <Engine/Engine.h>
 #include <Engine/GL.h>
+#include <Engine/IO.h>
 #include <windowsx.h>
+#include "LevelGeneration.h"
+#include "MenuMain.h"
 
 LRESULT CALLBACK Game::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -108,11 +111,6 @@ void Game::_Init()
 	Engine::modelManager = &_modelManager;
 	Engine::textureManager = &_textureManager;
 
-
-	_mainMenu.Initialise();
-	_mainMenu.SetOnStart(Callback(this, &Game::ButtonStart));
-	_mainMenu.SetOnQuit(Callback(this, &Game::ButtonQuit));
-
 	_uiCamera.SetProectionType(ProjectionType::ORTHOGRAPHIC);
 	_uiCamera.SetScale(1.f);
 	_uiCamera.SetZBounds(-10.f, 10.f);
@@ -123,6 +121,11 @@ void Game::Run()
 	_InitWindow();
 	_InitGL();
 	_Init();
+
+	MenuMain *menu = new MenuMain();
+	menu->SetBounds(0.5f, 0.5f, 400, 400, -200, -200);
+	menu->Initialise(FPTR<const String&>(this, &Game::StartLevel), Callback(this, &Game::ButtonQuit));
+	menu->SetParent(&_ui);
 
 	_window.Show();
 
@@ -140,9 +143,20 @@ void Game::Run()
 	}
 }
 
+void Game::StartLevel(const String &level)
+{
+	_running = false;
+
+	String fileString = IO::ReadFileString(level.GetData());
+	LevelGeneration::GenerateLevel(fileString);
+
+}
+
 void Game::Frame()
 {
 	_timer.Start();
+
+	_ui.Update();
 
 	Render();
 	_deltaTime = _timer.SecondsSinceStart();
@@ -158,14 +172,14 @@ void Game::Render()
 	_shader.SetMat4(DefaultUniformVars::mat4Projection, _uiCamera.GetProjectionMatrix());
 	_shader.SetMat4(DefaultUniformVars::mat4View, _uiCamera.transform.GetInverseTransformationMatrix());
 
-	_mainMenu.Render();
+	_ui.Render();
 
 	_window.SwapBuffers();
 }
 
 void Game::Resize(uint16 w, uint16 h)
 {
-	_mainMenu.SetBounds(w / 2 - 200, h / 2 - 200, 400, 400);
+	_ui.SetBounds(0, 0, w, h);
 	_uiCamera.SetViewport(w, h);
 	_uiCamera.transform.SetPosition(Vector3(w / 2.f, h / 2.f, 0.f));
 	glViewport(0, 0, w, h);
@@ -173,17 +187,12 @@ void Game::Resize(uint16 w, uint16 h)
 
 void Game::MouseMove(unsigned short x, unsigned short y)
 {
-	_mainMenu.OnMouseMove((float)x, _uiCamera.GetViewport()[1] - y);
+	_ui.OnMouseMove((float)x, _uiCamera.GetViewport()[1] - y);
 }
 
 void Game::MouseDown()
 {
-	_mainMenu.OnClick();
-}
-
-void Game::ButtonStart()
-{
-	::MessageBoxA(NULL, "Ha, you wish!", "Maybe Later", MB_OK);
+	_ui.OnClick();
 }
 
 void Game::ButtonQuit()

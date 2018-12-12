@@ -3,6 +3,13 @@
 #include "EditorUtil.h"
 #include <Engine/DrawUtils.h>
 
+void ToolSelect::Cancel()
+{
+	_placing = false;
+	_selectedObjects.SetSize(0);
+	_focusedObject = nullptr;
+}
+
 void ToolSelect::MouseMove(const MouseData &mouseData)
 {
 	if (_owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
@@ -14,10 +21,16 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 				Vector2 p1, p2;
 				EditorUtil::CalculatePointsFromMouseData(mouseData, p1, p2);
 
-				_box.point1[mouseData.rightElement] = p1[0];
-				_box.point1[mouseData.upElement] = p1[1];
-				_box.point2[mouseData.rightElement] = p2[0];
-				_box.point2[mouseData.upElement] = p2[1];
+				Vector3 v;
+				v[mouseData.rightElement] = p1[0];
+				v[mouseData.upElement] = p1[1];
+				v[mouseData.forwardElement] = _box.GetPoint1()[mouseData.forwardElement];
+				_box.SetPoint1(v);
+
+				v[mouseData.rightElement] = p2[0];
+				v[mouseData.upElement] = p2[1];
+				v[mouseData.forwardElement] = _box.GetPoint2()[mouseData.forwardElement];
+				_box.SetPoint2(v);
 			}
 			else if (_focusedObject)
 			{
@@ -31,12 +44,17 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 		}
 		else if (!_placing)
 		{
-			_box.point1[mouseData.rightElement] = mouseData.unitX_rounded;
-			_box.point1[mouseData.upElement] = mouseData.unitY_rounded;
-			_box.point1[mouseData.forwardElement] = -100;
-			_box.point2[mouseData.rightElement] = mouseData.unitX_rounded + 1;
-			_box.point2[mouseData.upElement] = mouseData.unitY_rounded + 1;
-			_box.point2[mouseData.forwardElement] = 100;
+			Vector3 v;
+
+			v[mouseData.rightElement] = mouseData.unitX_rounded;
+			v[mouseData.upElement] = mouseData.unitY_rounded;
+			v[mouseData.forwardElement] = -100;
+			_box.SetPoint1(v);
+
+			v[mouseData.rightElement] = mouseData.unitX_rounded + 1;
+			v[mouseData.upElement] = mouseData.unitY_rounded + 1;
+			v[mouseData.forwardElement] = 100;
+			_box.SetPoint2(v);
 
 			GameObject *prevObj = _focusedObject;
 			_focusedObject = nullptr;
@@ -101,15 +119,8 @@ void ToolSelect::KeySubmit()
 	_placing = false;
 
 	ColliderAABB aabb;
-	aabb.min = Vector3(
-		Utilities::Min(_box.point1[0], _box.point2[0]),
-		Utilities::Min(_box.point1[1], _box.point2[1]),
-		Utilities::Min(_box.point1[2], _box.point2[2]));
-
-	aabb.max = Vector3(
-		Utilities::Max(_box.point1[0], _box.point2[0]),
-		Utilities::Max(_box.point1[1], _box.point2[1]),
-		Utilities::Max(_box.point1[2], _box.point2[2]));
+	aabb.min = _box.GetMin();
+	aabb.max = _box.GetMax();
 
 	_selectedObjects = _owner.LevelRef().ObjectCollection().FindOverlaps(aabb);
 }

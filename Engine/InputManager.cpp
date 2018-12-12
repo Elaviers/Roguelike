@@ -17,6 +17,7 @@ const struct KeyName { Keycode key; String name; } keyNames[] =
 	//KEYNAME(LCTRL, lctrl), KEYNAME(LSHIFT, lshift), KEYNAME(LALT, lalt),
 	//KEYNAME(RCTRL, rctrl), KEYNAME(RSHIFT, rshift), KEYNAME(RALT, ralt),
 	KEYNAME(ENTER, enter),
+	KEYNAME(ESCAPE, escape),
 	KEYNAME(CAPSLOCK, caps),
 	KEYNAME(TAB, tab),
 	KEYNAME(BACKSPACE, backspace),

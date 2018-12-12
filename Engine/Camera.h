@@ -46,4 +46,6 @@ public:
 	Vector2 GetZPlaneDimensions() const;
 
 	virtual void GetProperties(ObjectProperties&) override;
+
+	GAMEOBJ_STD_OVERRIDES;
 };

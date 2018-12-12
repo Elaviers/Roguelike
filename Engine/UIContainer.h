@@ -14,7 +14,8 @@ public:
 	UIContainer(UIElement *parent = nullptr) : UIElement(parent) {}
 	virtual ~UIContainer() {}
 
-	virtual void Render();
+	virtual void Render() const override;
+	virtual void Update() override;
 	
 	virtual void OnBoundsChanged();
 	virtual void OnMouseMove(float mouseX, float mouseY);

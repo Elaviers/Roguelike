@@ -42,4 +42,6 @@ namespace Maths
 
 		return x;
 	}
+
+	float Random();
 }

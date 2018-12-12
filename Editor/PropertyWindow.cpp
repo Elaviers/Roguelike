@@ -190,6 +190,26 @@ void PropertyWindow::_CreateHWNDs(bool readOnly)
 					::SendMessage(box, CB_SETCURSEL, i, 0);
 			}
 		}
+		else if ((*properties[i].second)->GetFlags() & PropertyFlags::DIRECTION)
+		{
+			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_COMBOBOXA, (*properties[i].second)->GetAsString().GetData(), WS_CHILD | WS_VISIBLE | CBS_HASSTRINGS | CBS_DROPDOWNLIST, w, y, w, boxH, _hwnd, (HMENU)i, instance, NULL);
+
+			::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)"north");
+			::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)"east");
+			::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)"south");
+			::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)"west");
+
+			String value = (*properties[i].second)->GetAsString();
+
+			if (value == "north")
+				::SendMessage(box, CB_SETCURSEL, 0, 0);
+			else if (value == "east")
+				::SendMessage(box, CB_SETCURSEL, 1, 0);
+			else if (value == "south")
+				::SendMessage(box, CB_SETCURSEL, 2, 0);
+			else if (value == "west")
+				::SendMessage(box, CB_SETCURSEL, 3, 0);
+		}
 		else
 		{
 			if (!readOnly && (*properties[i].second)->GetFlags() & (PropertyFlags::MODEL | PropertyFlags::MATERIAL))

@@ -9,7 +9,7 @@ class UIButton : public UIElement
 protected:
 	bool _active;
 
-	Callback _callback;
+	FPTR<UIButton&> _callback;
 
 	Vector4 _colourInactive;
 	Vector4 _colourActive;
@@ -22,9 +22,16 @@ public:
 
 	virtual ~UIButton() {}
 
+	inline float GetBorderSize() const { return _panel.GetBorderSize(); }
+	inline const Vector4 &GetColourInactive() const { return _colourInactive; }
+	inline const Vector4 &GetColourActive() const { return _colourActive; }
+	inline const Font* GetFont() const { return _label.GetFont(); }
+	inline const Material* GetMaterial() const { return _panel.GetMaterial(); }
+	inline const String& GetString() const { return _label.GetString(); }
+
 	inline void SetBorderSize(float borderSize) { _panel.SetBorderSize(borderSize); }
-	inline void SetCallback(const Callback &callback) { _callback = callback; }
-	inline void SetColourInctive(const Vector4 &colour) 
+	inline void SetCallback(const FPTR<UIButton&> &callback) { _callback = callback; }
+	inline void SetColourInactive(const Vector4 &colour) 
 	{ 
 		_colourInactive = colour; 
 		if (!_active) 
@@ -36,9 +43,9 @@ public:
 		if (_active) 
 			_panel.SetColour(colour); 
 	}
+	inline void SetFont(const Font *font) { _label.SetFont(font); }
 	inline void SetMaterial(const Material *material) { _panel.SetMaterial(material); }
 	inline void SetString(const String &string) { _label.SetString(string); }
-	inline void SetFont(const Font *font) { _label.SetFont(font); }
 
 	virtual void OnMouseMove(float mouseX, float mouseY) override;
 	virtual void OnClick() override;

@@ -20,6 +20,8 @@ public:
 	ToolSelect(Editor &level) : Tool(level) {}
 	virtual ~ToolSelect() {}
 
+	virtual void Cancel() override;
+
 	virtual void MouseMove(const MouseData&) override;
 	virtual void MouseDown(const MouseData&) override;
 	virtual void KeySubmit() override;

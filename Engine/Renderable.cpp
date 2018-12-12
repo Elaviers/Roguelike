@@ -1,4 +1,5 @@
 #include "Renderable.h"
+#include "GLProgram.h"
 #include "ObjectProperties.h"
 
 void Renderable::GetProperties(ObjectProperties &properties)
@@ -15,7 +16,7 @@ void Renderable::Render() const
 		if (_material)
 			_material->Apply();
 
-		GameObject::ApplyTransformToShader();
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
 		_model->model.Render();
 	}
 }

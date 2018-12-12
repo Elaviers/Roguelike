@@ -346,7 +346,7 @@ void Frame()
 		//
 		program_Unlit.Use();
 		program_Unlit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
-		program_Unlit.SetMat4(DefaultUniformVars::mat4View, camera.MakeInverseTransformationMatrix());
+		program_Unlit.SetMat4(DefaultUniformVars::mat4View, camera.GetInverseTransformationMatrix());
 
 		light1.Render();
 		light2.Render();
@@ -357,7 +357,7 @@ void Frame()
 		//
 		program_Lit.Use();
 		program_Lit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
-		program_Lit.SetMat4(DefaultUniformVars::mat4View, camera.MakeInverseTransformationMatrix());
+		program_Lit.SetMat4(DefaultUniformVars::mat4View, camera.GetInverseTransformationMatrix());
 		program_Lit.SetInt(DefaultUniformVars::intCubemap, UNIT_CUBEMAP);
 		program_Lit.SetInt(DefaultUniformVars::intTextureDiffuse, UNIT_DIFFUSE);
 		program_Lit.SetInt(DefaultUniformVars::intTextureNormal, UNIT_NORMAL);
@@ -387,7 +387,7 @@ void Frame()
 		if (camera.GetProjectionType() == ProjectionType::PERSPECTIVE)
 		{
 			program_Sky.Use();
-			Mat4 skyView = camera.MakeInverseTransformationMatrix();
+			Mat4 skyView = camera.GetInverseTransformationMatrix();
 			skyView[3][0] = skyView[3][1] = skyView[3][2] = 0;
 
 			program_Sky.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
@@ -406,18 +406,18 @@ void Frame()
 
 			program_UI.Use();
 			program_UI.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
-			program_UI.SetMat4(DefaultUniformVars::mat4View, camera.MakeInverseTransformationMatrix());
+			program_UI.SetMat4(DefaultUniformVars::mat4View, camera.GetInverseTransformationMatrix());
 
 			glDisable(GL_CULL_FACE);
 			
 			program_UI.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 0.f, 0.f, 1.f));
-			DrawUtils::DrawGrid(modelManager, camera, Direction::RIGHT, w, 1.f, vpScale);
+			DrawUtils::DrawGrid(modelManager, camera, Direction::FORWARD, w, 1.f, vpScale);
 
 			program_UI.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
 			DrawUtils::DrawGrid(modelManager, camera, Direction::UP, w, 1.f, vpScale);
 
 			program_UI.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 0.f, 1.f, 1.f));
-			DrawUtils::DrawGrid(modelManager, camera, Direction::FORWARD, w, 1.f, vpScale);
+			DrawUtils::DrawGrid(modelManager, camera, Direction::RIGHT, w, 1.f, vpScale);
 
 			glEnable(GL_CULL_FACE);
 		}
