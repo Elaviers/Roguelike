@@ -163,6 +163,10 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Connector.h" />
     <ClInclude Include="ColliderAABB.h" />
+    <ClInclude Include="DebugFrustum.h" />
+    <ClInclude Include="DebugManager.h" />
+    <ClInclude Include="DebugObject.h" />
+    <ClInclude Include="DebugString.h" />
     <ClInclude Include="Direction2D.h" />
     <ClInclude Include="DrawUtils.h" />
     <ClInclude Include="Engine.h" />
@@ -222,6 +226,7 @@
     <ClInclude Include="Collection.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bounds.cpp" />
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="Brush2D.cpp" />
     <ClCompile Include="Brush3D.cpp" />
@@ -230,6 +235,10 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Connector.cpp" />
     <ClCompile Include="ColliderAABB.cpp" />
+    <ClCompile Include="DebugFrustum.cpp" />
+    <ClCompile Include="DebugManager.cpp" />
+    <ClCompile Include="DebugObject.cpp" />
+    <ClCompile Include="DebugString.cpp" />
     <ClCompile Include="Direction2D.cpp" />
     <ClCompile Include="DrawUtils.cpp" />
     <ClCompile Include="Engine.cpp" />

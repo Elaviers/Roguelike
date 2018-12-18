@@ -91,8 +91,8 @@ Vector4 operator*(const Vector4&, const Mat4&);
 
 inline Vector3 operator*(const Vector3 &v, const Mat4 &m)
 {
-	Vector4 v4 = Vector4(v[0], v[1], v[2]) * m;
-	return Vector3(v4.x, v4.y, v4.z);
+	Vector4 v4 = Vector4(v[0], v[1], v[2], 1.f) * m;
+	return Vector3(v4[0], v4[1], v4[2]);
 }
 
 Vector4 operator*(const Vector4&, const Mat4&);

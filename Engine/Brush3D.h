@@ -6,8 +6,6 @@
 class Brush3D : public Brush<3>
 {
 protected:
-	virtual void _OnTransformChanged() override;
-
 	virtual void _UpdateTransform() override;
 
 public:

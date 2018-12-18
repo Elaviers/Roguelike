@@ -32,7 +32,7 @@ Mat4 GameObject::GetInverseTransformationMatrix() const
 bool GameObject::Raycast(const Ray &ray, RaycastResult &result) const
 {
 	if (this->GetCollider())
-		return this->GetCollider()->IntersectsRay(ray, result, transform);
+		return this->GetCollider()->IntersectsRay(ray, result, GetWorldTransform());
 
 	return false;
 }
@@ -40,7 +40,7 @@ bool GameObject::Raycast(const Ray &ray, RaycastResult &result) const
 bool GameObject::Overlaps(const Collider &other, const Transform &otherTransform) const
 {
 	if (this->GetCollider())
-		return this->GetCollider()->Overlaps(other, otherTransform, transform);
+		return this->GetCollider()->Overlaps(other, otherTransform, GetWorldTransform());
 
 	return false;
 }

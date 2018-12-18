@@ -1,4 +1,5 @@
 #include "Collection.h"
+#include "Collision.h"
 #include "GameObject.h"
 #include "Utilities.h"
 
@@ -40,11 +41,20 @@ void Collection::Clear()
 	_nextSlot = -1;
 }
 
-void Collection::Render() const
+#include "GLProgram.h"
+#include "Engine.h"
+
+void Collection::Render(const Camera &camera) const
 {
 	for (uint32 i = 0; i < _objects.GetSize(); ++i)
 		if (_objects[i])
-			_objects[i]->Render();
+		{
+			Bounds b = _objects[i]->GetWorldBounds();
+
+			if (camera.IsInView(b))
+				_objects[i]->Render();
+		}
+	
 }
 
 Buffer<RaycastResult> Collection::Raycast(const Ray &ray)

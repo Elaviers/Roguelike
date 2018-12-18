@@ -11,6 +11,34 @@ Font::~Font()
 {
 }
 
+void Font::_HandleCommand(const String &string)
+{
+	Buffer<String> tokens = string.Split(" ");
+
+	if (tokens[0] == "region")
+	{
+		if (tokens.GetSize() >= 7)
+		{
+			if (tokens[1] == "SPACE")
+			{
+				Glyph &glyph = _charMap[' '];
+				glyph.uvOffset[0] = tokens[2].ToInt();
+				glyph.uvOffset[1] = tokens[3].ToInt();
+				glyph.uvSize[0] = tokens[4].ToInt();
+				glyph.uvSize[1] = tokens[5].ToInt();
+				glyph.advance = tokens[6].ToInt();
+
+				glyph.width = glyph.uvSize[0] * _texture->GetWidth();
+				if (glyph.width == 0)
+					glyph.width = glyph.advance;
+			}
+		}
+	}
+	else
+		Engine::materialManager->HandleCommand(string);
+
+}
+
 void Font::FromString(const String &string)
 {
 	Buffer<String> lines = string.Split("\r\n");
@@ -32,7 +60,7 @@ void Font::FromString(const String &string)
 				else if (tokens[0] == "divs_y")
 					_divsY = tokens[1].ToInt();
 			}
-			else Engine::materialManager->HandleCommand(lines[i]);
+			else _HandleCommand(lines[i]);
 		}
 		else
 		{
@@ -97,7 +125,10 @@ void Font::RenderString(const char *string, const Transform &transform) const
 			GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, charTransform.MakeTransformationMatrix());
 			Engine::modelManager->Plane().Render();
 
-			charTransform.Move(advanceDirection * (float)glyph->advance / (float)glyph->width * transform.Scale()[0]);
+			if (glyph->width)
+				charTransform.Move(advanceDirection * (float)glyph->advance / (float)glyph->width * transform.Scale()[0]);
+			else
+				charTransform.Move(advanceDirection * (float)glyph->advance * transform.Scale()[0]);
 		}
 	}
 }

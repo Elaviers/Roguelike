@@ -401,7 +401,7 @@ void Frame()
 
 		//
 		{
-			float vpScale = camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC ? 1.f : 1.f;
+			float vpScale = camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC ? 1.f : 10.f;
 			float w = 2.f;
 
 			program_UI.Use();

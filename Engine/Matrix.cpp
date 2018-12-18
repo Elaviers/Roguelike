@@ -2,7 +2,7 @@
 #include "Maths.h"
 
 #define RETURNMAT4(A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P) \
-	float data[4][4] = {A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P}; return Mat4(data)
+	{float data[4][4] = {A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P}; return Mat4(data);}
 
 using namespace Maths;
 
@@ -125,17 +125,6 @@ namespace Matrix
 		);
 	}
 }
-
-/*
-Vector3 operator*(const Vector3 &v, const Mat4 &m)
-{
-	return Vector3(
-		v[0] * m[0][0] + v[1] * m[1][0] + v[2] * m[2][0] + m[3][0],
-		v[0] * m[0][1] + v[1] * m[1][1] + v[2] * m[2][1] + m[3][1],
-		v[0] * m[0][2] + v[1] * m[1][2] + v[2] * m[2][2] + m[3][2]
-	);
-}
-*/
 
 #define SHUFFLE_PARAM(X, Y, Z, W) (X) | (Y << 2) | (Z << 4) | (W << 6)
 #define MM_SHUFFLE_X(v) _mm_shuffle_ps(v, v, SHUFFLE_PARAM(0, 0, 0, 0))

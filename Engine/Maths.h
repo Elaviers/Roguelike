@@ -31,17 +31,5 @@ namespace Maths
 		return 90.f;
 	}
 
-	template <typename T>
-	inline T Clamp(T min, T max, T x)
-	{
-		if (x < min)
-			return min;
-
-		if (x > max)
-			return max;
-
-		return x;
-	}
-
 	float Random();
 }

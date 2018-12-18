@@ -186,5 +186,6 @@ ModelData IO::ReadOBJFile(const char *filename)
 		}
 	}
 
+	data.bounds.RecalculateSphereBounds();
 	return data;
 }

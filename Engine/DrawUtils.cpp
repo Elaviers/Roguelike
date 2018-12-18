@@ -2,63 +2,172 @@
 #include "GL.h"
 #include "GLProgram.h"
 #include "Matrix.h"
+#include "Ray.h"
+
+#include "Engine.h"
 
 #define X 0
 #define Y 1
 #define Z 2
 
+using namespace Maths;
+using namespace Utilities;
+
 namespace DrawUtils
 {
-
-	void DrawGrid(const ModelManager &modelManager, const Camera &camera, Direction dir, float width, float gap, float boundsScale, float offset)
+	inline bool FindZOverlap(Vector3 &out, const Ray &r, int axisX, int axisY, int axisZ, int limit)
 	{
-		float vpW = camera.GetViewport()[0] * boundsScale / camera.GetScale();
-		float vpH = camera.GetViewport()[1] * boundsScale / camera.GetScale();
+		if (r.direction[axisZ] == 0.f)
+			return false;
 
-		Mat4 transformX = Matrix::Scale(Vector3(1.f, vpH, 1.f));
-		Mat4 transformY = Matrix::Scale(Vector3(1.f, vpW, 1.f));
+		float t = -r.origin[axisZ] / r.direction[axisZ];
+
+		if (t < 0.f)
+			return false;
+
+		out[axisX] = r.origin[axisX] + Clamp(r.direction[axisX] * t, -1.f * limit, (float)limit);
+		out[axisY] = r.origin[axisY] + Clamp(r.direction[axisY] * t, -1.f * limit, (float)limit);
+		return true;
+	}
+
+	inline void FindLimitOverlap(Vector3 &out, const Ray &r, int axisX, int axisY, int axisFWD, int limit)
+	{
+		float t = limit / Abs(r.direction[axisFWD]);
+
+		out[axisX] = r.origin[axisX] + Clamp(r.direction[axisX] * t, -1.f * limit, (float)limit);
+		out[axisY] = r.origin[axisY] + Clamp(r.direction[axisY] * t, -1.f * limit, (float)limit);
+	}
+
+	void DrawGrid(const ModelManager &modelManager, const Camera &camera, Direction dir, float width, float gap, float limit, float offset)
+	{
+		Mat4 transformX;
+		Mat4 transformY;
 
 		int axisX;
 		int axisY;
+		int axisZ;
 
 		switch (dir)
 		{
 		case Direction::RIGHT:
 			axisX = Z;
 			axisY = Y;
-			transformX *= Matrix::RotationY(90.f);
-			transformY *= Matrix::RotationX(90.f);
+			axisZ = X;
+			transformX = Matrix::RotationY(90.f);
+			transformY = Matrix::RotationX(90.f);
 			break;
 		case Direction::UP:
 			axisX = X;
 			axisY = Z;
-			transformX *= Matrix::RotationX(90.f);
-			transformY *= Matrix::RotationZ(90.f);
+			axisZ = Y;
+			transformX = Matrix::RotationX(90.f);
+			transformY = Matrix::RotationZ(90.f);
 			break;
 		case Direction::FORWARD:
 			axisX = X;
 			axisY = Y;
-			transformY *= Matrix::RotationZ(90.f);
+			axisZ = Z;
+			transformY = Matrix::RotationZ(90.f);
 			break;
 		}
 
-		transformX[3][axisY] = camera.transform.Position()[axisY];
-		transformY[3][axisX] = camera.transform.Position()[axisX];
+		bool results[4];
+		Vector3 points[4];
+		const Ray rays[4] = {
+			camera.ScreenCoordsToRay(Vector2(-.5f, -.5f)),
+			camera.ScreenCoordsToRay(Vector2(0.5f, -.5f)),
+			camera.ScreenCoordsToRay(Vector2(-.5f, 0.5f)), 
+			camera.ScreenCoordsToRay(Vector2(0.5f, 0.5f)) };
 
-		float halfScreenUnitsX = vpW / 2.f;
-		float halfScreenUnitsY = vpH / 2.f;
+		for (int i = 0; i < 4; ++i)
+		{
+			points[i][axisX] = camera.transform.Position()[axisX];
+			points[i][axisY] = camera.transform.Position()[axisY];
+		}
 
-		float startX = (int)((camera.transform.Position()[axisX] - halfScreenUnitsX) / gap) * gap + offset;
-		float startY = (int)((camera.transform.Position()[axisY] - halfScreenUnitsY) / gap) * gap + offset;
+		results[0] = FindZOverlap(points[0], rays[0], axisX, axisY, axisZ, limit);
+		results[1] = FindZOverlap(points[1], rays[1], axisX, axisY, axisZ, limit);
+		results[2] = FindZOverlap(points[2], rays[2], axisX, axisY, axisZ, limit);
+		results[3] = FindZOverlap(points[3], rays[3], axisX, axisY, axisZ, limit);
 
-		if (camera.transform.Position()[axisX] - halfScreenUnitsX > 0)
-			startX += gap;
+		float startX;
+		float startY;
+		float maxX;
+		float maxY;
 
-		if (camera.transform.Position()[axisY] - halfScreenUnitsY > 0)
-			startY += gap;
+		if (results[0] != results[1] || results[1] != results[2] || results[2] != results[3])
+		{
+			Vector3 fv = camera.transform.GetForwardVector();
+			int axisFwd = Abs(fv[axisX]) > Abs(fv[axisY]) ? axisX : axisY;
 
-		float maxX = (camera.transform.Position()[axisX] + halfScreenUnitsX);
-		float maxY = (camera.transform.Position()[axisY] + halfScreenUnitsY);
+			Vector3 morePoints[4];
+
+			for (int i = 0; i < 4; ++i)
+			{
+				morePoints[i][axisX] = camera.transform.Position()[axisX];
+				morePoints[i][axisY] = camera.transform.Position()[axisY];
+			}
+
+			FindLimitOverlap(morePoints[0], rays[0], axisX, axisY, axisFwd, limit);
+			FindLimitOverlap(morePoints[1], rays[1], axisX, axisY, axisFwd, limit);
+			FindLimitOverlap(morePoints[2], rays[2], axisX, axisY, axisFwd, limit);
+			FindLimitOverlap(morePoints[3], rays[3], axisX, axisY, axisFwd, limit);
+
+			startX =	Min(
+						Min(points[0][axisX],
+						Min(points[1][axisX],
+						Min(points[2][axisX],
+							points[3][axisX]))),
+						Min(morePoints[0][axisX],
+						Min(morePoints[1][axisX],
+						Min(morePoints[2][axisX],
+							morePoints[3][axisX]))));
+
+			startY =	Min(
+						Min(points[0][axisY],
+						Min(points[1][axisY],
+						Min(points[2][axisY],
+							points[3][axisY]))),
+						Min(morePoints[0][axisY],
+						Min(morePoints[1][axisY],
+						Min(morePoints[2][axisY],
+							morePoints[3][axisY]))));
+
+			maxX =		Max(
+						Max(points[0][axisX],
+						Max(points[1][axisX],
+						Max(points[2][axisX],
+							points[3][axisX]))),
+						Max(morePoints[0][axisX],
+						Max(morePoints[1][axisX],
+						Max(morePoints[2][axisX],
+							morePoints[3][axisX]))));
+
+			maxY =		Max(
+						Max(points[0][axisY],
+						Max(points[1][axisY],
+						Max(points[2][axisY],
+							points[3][axisY]))),
+						Max(morePoints[0][axisY],
+						Max(morePoints[1][axisY],
+						Max(morePoints[2][axisY],
+							morePoints[3][axisY]))));
+		}
+		else
+		{
+			startX = Min(points[0][axisX], Min(points[1][axisX], Min(points[2][axisX], points[3][axisX])));
+			startY = Min(points[0][axisY], Min(points[1][axisY], Min(points[2][axisY], points[3][axisY])));
+			maxX = Max(points[0][axisX], Max(points[1][axisX], Max(points[2][axisX], points[3][axisX])));
+			maxY = Max(points[0][axisY], Max(points[1][axisY], Max(points[2][axisY], points[3][axisY])));
+		}
+
+		transformX = Matrix::Scale(Vector3(1.f, maxY - startY, 1.f)) * transformX;
+		transformY = Matrix::Scale(Vector3(1.f, maxX - startX, 1.f)) * transformY;
+		transformX[3][axisY] = (startY + maxY) / 2.f;
+		transformY[3][axisX] = (startX + maxX) / 2.f;
+
+		startX = (int)(startX / gap) * gap + offset + (startX > 0 ? gap : 0);
+		startY = (int)(startY / gap) * gap + offset + (startY > 0 ? gap : 0);
 
 		for (float pos = startX; pos < maxX; pos += gap)
 		{

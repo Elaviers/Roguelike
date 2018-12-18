@@ -14,11 +14,25 @@ namespace Collision
 	bool SphereOverlapsAABB(const Transform &t1, float r1, const Vector3 &min2, const Vector3 &max2)
 	{
 		Vector3 closestPoint = Vector3(
-			Maths::Clamp(min2[0], max2[0], t1.Position()[0]),
-			Maths::Clamp(min2[1], max2[1], t1.Position()[1]),
-			Maths::Clamp(min2[2], max2[2], t1.Position()[2]));
+			Utilities::Clamp(t1.Position()[0], min2[0], max2[0]),
+			Utilities::Clamp(t1.Position()[1], min2[1], max2[1]),
+			Utilities::Clamp(t1.Position()[2], min2[2], max2[2]));
 
 		float dist = (t1.Position() - closestPoint).LengthSquared();
+		if (dist <= r1 * r1)
+			return true;
+
+		return false;
+	}
+
+	bool SphereOverlapsAABB(const Vector3 &v, float r1, const Vector3 &min2, const Vector3 &max2)
+	{
+		Vector3 closestPoint = Vector3(
+			Utilities::Clamp(v[0], min2[0], max2[0]),
+			Utilities::Clamp(v[1], min2[1], max2[1]),
+			Utilities::Clamp(v[2], min2[2], max2[2]));
+
+		float dist = (v - closestPoint).LengthSquared();
 		if (dist <= r1 * r1)
 			return true;
 

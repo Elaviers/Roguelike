@@ -61,7 +61,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 
 			for (uint32 i = 0; i < _selectedObjects.GetSize(); ++i)
 			{
-				auto bounds = _selectedObjects[i]->GetBounds();
+				auto bounds = _selectedObjects[i]->GetWorldBounds();
 
 				if (mouseData.unitX >= bounds.min[mouseData.rightElement] && mouseData.unitX <= bounds.max[mouseData.rightElement] && mouseData.unitY >= bounds.min[mouseData.upElement] && mouseData.unitY <= bounds.max[mouseData.upElement])
 				{
@@ -86,7 +86,10 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 		Camera &camera = _owner.CameraRef(mouseData.viewport);
 		RECT windowDims;
 		::GetClientRect(_owner.ViewportRef(mouseData.viewport).GetHwnd(), &windowDims);
-		Ray r(camera.transform.Position(), camera.ScreenCoordsToDirection(Vector2((float)mouseData.x / (float)windowDims.right, (float)mouseData.y / (float)windowDims.bottom)), RayChannel::CAMERA);
+		
+		Ray r = camera.ScreenCoordsToRay(Vector2((float)mouseData.x / (float)windowDims.right, (float)mouseData.y / (float)windowDims.bottom));
+		r.channel = RayChannel::CAMERA;
+
 		Buffer<RaycastResult> results = _owner.LevelRef().ObjectCollection().Raycast(r);
 
 		if (results.GetSize() > 0)
@@ -152,7 +155,7 @@ void ToolSelect::Render() const
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 0.f, 1.f));
 	for (uint32 i = 0; i < _selectedObjects.GetSize(); ++i)
 	{
-		Bounds bounds = _selectedObjects[i]->GetBounds();
+		Bounds bounds = _selectedObjects[i]->GetWorldBounds();
 
 		DrawUtils::DrawBox(*Engine::modelManager, bounds.min, bounds.max);
 	}

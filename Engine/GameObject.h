@@ -4,7 +4,7 @@
 #include "Map.h"
 #include "Transform.h"
 
-#define GAMEOBJ_STD_OVERRIDES virtual size_t SizeOf() const override { return sizeof(this); }
+#define GAMEOBJ_STD_OVERRIDES virtual size_t SizeOf() const override { return sizeof(*this); }
 
 class Collider;
 class ObjectProperties;
@@ -73,6 +73,7 @@ public:
 
 	//Collision
 	virtual const Collider* GetCollider() const { return nullptr; }
+
 	virtual bool Raycast(const Ray&, RaycastResult&) const;
 	virtual bool Overlaps(const Collider&, const Transform&) const;
 

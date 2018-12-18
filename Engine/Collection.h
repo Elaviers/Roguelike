@@ -1,5 +1,6 @@
 #pragma once
 #include "Buffer.h"
+#include "Camera.h"
 #include "Collider.h"
 #include "RaycastResult.h"
 
@@ -29,7 +30,7 @@ public:
 
 	void RemoveObject(GameObject*);
 
-	void Render() const;
+	void Render(const Camera &camera) const;
 
 	inline Buffer<GameObject*>& Objects() { return _objects; }
 	inline const Buffer<GameObject*>& Objects() const { return _objects; }

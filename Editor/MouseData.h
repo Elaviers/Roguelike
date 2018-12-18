@@ -16,6 +16,7 @@ struct MouseData
 	byte upElement;
 
 	bool isLeftDown;
+	bool isRightDown;
 	int heldUnitX_rounded;
 	int heldUnitY_rounded;
 };

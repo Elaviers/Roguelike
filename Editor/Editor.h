@@ -1,4 +1,6 @@
 #pragma once
+#include <Engine/DebugManager.h>
+#include <Engine/FontManager.h>
 #include <Engine/GLContext.h>
 #include <Engine/GLProgram.h>
 #include <Engine/InputManager.h>
@@ -34,10 +36,12 @@ private:
 	Timer _timer;
 
 	//Managers
+	DebugManager _debugManager;
 	InputManager _inputManager;
 	MaterialManager _materialManager;
 	ModelManager _modelManager;
 	TextureManager _textureManager;
+	FontManager _fontManager;
 
 	//Window stuff
 	Window _window;
@@ -48,6 +52,8 @@ private:
 	HBRUSH _windowBrush;
 	HWND _toolbar;
 	HIMAGELIST _tbImages;
+
+	Camera _uiCam;
 
 	Viewport _viewports[VIEWPORTCOUNT];
 
@@ -60,6 +66,8 @@ private:
 	Level _level;
 
 	Tool *_currentTool;
+
+	int _activeVP;
 
 	struct _EditorTools
 	{
@@ -77,6 +85,7 @@ private:
 
 	float _axisMoveX;
 	float _axisMoveY;
+	float _axisMoveZ;
 	float _axisLookX;
 	float _axisLookY;
 
@@ -100,6 +109,8 @@ public:
 	void UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y);
 	void LeftMouseDown();
 	void LeftMouseUp();
+	void RightMouseDown();
+	void RightMouseUp();
 
 	void KeySubmit();
 	void KeyCancel();

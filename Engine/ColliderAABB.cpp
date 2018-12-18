@@ -40,8 +40,8 @@ inline void FindT(const float &originComponent, const float &directionComponent,
 
 bool ColliderAABB::IntersectsRay(const Ray &ray, RaycastResult &result, const Transform &transform) const
 {
-	Vector3 worldMin = transform.Position() + min;
-	Vector3 worldMax = transform.Position() + max;
+	Vector3 worldMin = min * transform.GetTransformationMatrix();
+	Vector3 worldMax = max * transform.GetTransformationMatrix();
 
 	float minT, maxT;
 	float minT_y, maxT_y;

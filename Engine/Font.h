@@ -14,6 +14,7 @@ class Font
 	int _yOffset;
 	int _divsX, _divsY;
 
+	void _HandleCommand(const String &command);
 public:
 	Font();
 	~Font();

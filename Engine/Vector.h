@@ -9,9 +9,9 @@ protected:
 
 public:
 	Vector() : _data() {}
-	Vector(T x, T y)					{ static_assert(SIZE == 2, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; }
-	Vector(T x, T y, T z)			{ static_assert(SIZE == 3, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; }
-	Vector(T x, T y, T z, T w)	{ static_assert(SIZE == 4, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; _data[3] = w; }
+	Vector(T x, T y) { static_assert(SIZE == 2, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; }
+	Vector(T x, T y, T z) { static_assert(SIZE == 3, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; }
+	Vector(T x, T y, T z, T w) { static_assert(SIZE == 4, "Vector size differs from argument count"); _data[0] = x; _data[1] = y; _data[2] = z; _data[3] = w; }
 
 	T LengthSquared() const
 	{
@@ -26,11 +26,11 @@ public:
 	inline Vector Normal() { return *this / Length(); }
 	inline Vector& Normalise() { *this /= Length(); return *this; }
 
-	inline T&		operator[](int index)		{ return _data[index]; }
+	inline T&		operator[](int index) { return _data[index]; }
 	inline const T& operator[](int index) const { return _data[index]; }
 
 	template <typename CAST>
-	operator Vector<CAST, SIZE>() 
+	operator Vector<CAST, SIZE>()
 	{
 		Vector<CAST, SIZE> result;
 		for (int i = 0; i < SIZE; ++i)
@@ -95,20 +95,21 @@ public:
 		return *this;
 	}
 
-	Vector operator*(T other) const				{ Vector v(*this); v *= other; return v; }
-	Vector operator/(T other) const				{ Vector v(*this); v /= other; return v; }
+	Vector operator*(T other) const { Vector v(*this); v *= other; return v; }
+	Vector operator/(T other) const { Vector v(*this); v /= other; return v; }
 	Vector operator*(const Vector& other) const { Vector v(*this); v *= other; return v; }
 	Vector operator/(const Vector& other) const { Vector v(*this); v /= other; return v; }
 	Vector operator+(const Vector& other) const { Vector v(*this); v += other; return v; }
 	Vector operator-(const Vector& other) const { Vector v(*this); v -= other; return v; }
 
-	bool operator==(const Vector &other) const 
+	bool operator==(const Vector &other) const
 	{
-		for (int i = 0; i < SIZE; ++i) 
-			if (_data[i] != other._data[i]) 
-				return false; 
-		
-		return true; }
+		for (int i = 0; i < SIZE; ++i)
+			if (_data[i] != other._data[i])
+				return false;
+
+		return true;
+	}
 
 	static T Dot(const Vector &a, const Vector &b)
 	{
@@ -117,6 +118,15 @@ public:
 			result += a[i] * b[i];
 
 		return result;
+	}
+
+	inline Vector Abs() const
+	{
+		Vector v;
+		for (int i = 0; i < SIZE; ++i)
+			v[i] = Maths::Abs(_data[i]);
+
+		return v;
 	}
 };
 

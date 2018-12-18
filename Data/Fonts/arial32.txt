@@ -5,6 +5,8 @@ y_offset=6
 divs_x=8
 divs_y=8
 
+region SPACE 0 0 0 0 12
+
 //character_id advance
 GLYPHS
 0 19
@@ -70,3 +72,4 @@ x 17
 y 18
 z 17
 . 6
+- 10

@@ -1,4 +1,5 @@
 #pragma once
+#include "String.h"
 #include "Types.h"
 
 namespace Utilities
@@ -17,10 +18,29 @@ namespace Utilities
 	template <typename T>
 	inline T Max(const T &a, const T &b) { return a > b ? a : b; }
 
+	template <typename T>
+	inline T Clamp(const T &x, const T &lower, const T &upper)
+	{
+		if (x < lower)
+			return lower;
+		if (x > upper)
+			return upper;
+
+		return x;
+	}
+
 	inline void CopyBytes(const void *src, void *dest, uint32 length)
 	{
 		for (uint32 i = 0; i < length; ++i)
 			reinterpret_cast<byte*>(dest)[i] = reinterpret_cast<const byte*>(src)[i];
+	}
+
+	template<typename T>
+	inline T* CopyOf(const T &src, size_t size)
+	{
+		T* ptr = reinterpret_cast<T*>(new byte[size]);
+		CopyBytes(&src, ptr, size);
+		return ptr;
 	}
 
 	inline void StripExtension(String &string)

@@ -1,4 +1,5 @@
 #include "Editor.h"
+#include <Engine/DebugFrustum.h>
 #include <Engine/DrawUtils.h>
 #include <Engine/IO.h>
 #include <Engine/Ray.h>
@@ -68,6 +69,10 @@ void Editor::_Init()
 
 	_InitGL();
 
+	_uiCam.SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	_uiCam.SetZBounds(-10, 10);
+	_uiCam.SetScale(1.f);
+
 	CameraRef(0).SetProectionType(ProjectionType::PERSPECTIVE);
 	CameraRef(0).transform.SetPosition(Vector3(-5.f, 5.f, -5.f));
 	CameraRef(0).transform.SetRotation(Vector3(-45.f, 45.f, 0.f));
@@ -92,6 +97,8 @@ void Editor::_Init()
 	_inputManager.BindKeyAxis(Keycode::S, &_axisMoveY, -1.f);
 	_inputManager.BindKeyAxis(Keycode::D, &_axisMoveX, 1.f);
 	_inputManager.BindKeyAxis(Keycode::A, &_axisMoveX, -1.f);
+	_inputManager.BindKeyAxis(Keycode::SPACE, &_axisMoveZ, 1.f);
+	_inputManager.BindKeyAxis(Keycode::CTRL, &_axisMoveZ, -1.f);
 
 	_inputManager.BindKeyAxis(Keycode::UP, &_axisLookY, 1.f);
 	_inputManager.BindKeyAxis(Keycode::DOWN, &_axisLookY, -1.f);
@@ -110,13 +117,15 @@ void Editor::_Init()
 
 	_materialManager.SetRootPath("Data/Materials/");
 
+	_fontManager.SetRootPath("Data/Fonts/");
+
 	//oof
 	Engine::registry.RegisterEngineObjects();
 	Engine::inputManager = &_inputManager;
 	Engine::materialManager = &_materialManager;
 	Engine::modelManager = &_modelManager;
 	Engine::textureManager = &_textureManager;
-
+	Engine::fontManager = &_fontManager;
 
 	//Tool data init
 	_tools.brush2D.Initialise();
@@ -205,12 +214,16 @@ void Editor::Frame()
 
 	_timer.Start();
 
-	Camera &perspCam = CameraRef(0);
+	Camera &perspCam = CameraRef(_activeVP);
 	perspCam.transform.Move(
 		perspCam.transform.GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed
-		+ perspCam.transform.GetRightVector() * _deltaTime * _axisMoveX * moveSpeed);
+		+ perspCam.transform.GetRightVector() * _deltaTime * _axisMoveX * moveSpeed
+		+ perspCam.transform.GetUpVector() * _deltaTime * _axisMoveZ * moveSpeed);
 
 	perspCam.transform.Rotate(Vector3(_deltaTime * _axisLookY * rotSpeed, _deltaTime * _axisLookX * rotSpeed, 0.f));
+
+	_debugManager.Update(_deltaTime);
+	_debugManager.AddToWorld(DebugFrustum::FromCamera(CameraRef(0)));
 
 	Render();
 
@@ -226,23 +239,29 @@ void Editor::Render()
 	RenderViewport(1, Direction::UP);
 	RenderViewport(2, Direction::FORWARD);
 	RenderViewport(3, Direction::RIGHT);
+
+	_shaderUnlit.Use();
+	_shaderUnlit.SetMat4(DefaultUniformVars::mat4Projection, _uiCam.GetProjectionMatrix());
+	_shaderUnlit.SetMat4(DefaultUniformVars::mat4View, _uiCam.GetInverseTransformationMatrix());
+	_debugManager.RenderScreen();
 }
 
 void Editor::RenderViewport(int index, Direction dir)
 {
 	auto camera = CameraRef(index);
 	bool persp = camera.GetProjectionType() == ProjectionType::PERSPECTIVE;
-	float boundsScale = persp ? 10.f : 1.f;
+	float gridLimit = persp ? 100.f : -1.f;
+	gridLimit = 100;
 
 	_glContext.Use(_viewports[index]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LEQUAL);
 
 	_shaderUnlit.Use();
 	_shaderUnlit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
 	_shaderUnlit.SetMat4(DefaultUniformVars::mat4View, camera.GetInverseTransformationMatrix());
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
-	_level.ObjectCollection().Render();
+	_level.ObjectCollection().Render(CameraRef(0));
 
 	if (!persp) glDepthFunc(GL_ALWAYS);
 	
@@ -250,12 +269,11 @@ void Editor::RenderViewport(int index, Direction dir)
 
 	_textureManager.White().Bind(0);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.75f, .75f, .75f, 1.f));
-	DrawUtils::DrawGrid(_modelManager, camera, dir, 1.f, 1.f, boundsScale);
+	DrawUtils::DrawGrid(_modelManager, camera, dir, 1.f, 1.f, gridLimit);
 
 	if (persp) glDepthFunc(GL_LEQUAL);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.5f, .5f, 1.f, 1.f));
-	DrawUtils::DrawGrid(_modelManager, camera, dir, 1.f, 10.f, boundsScale);
-	if (persp) glDepthFunc(GL_LESS);
+	DrawUtils::DrawGrid(_modelManager, camera, dir, 1.f, 10.f, gridLimit);
 
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
 
@@ -266,6 +284,8 @@ void Editor::RenderViewport(int index, Direction dir)
 
 	if (_currentTool) _currentTool->Render();
 
+	_debugManager.RenderWorld();
+
 	_viewports[index].SwapBuffers();
 }
 
@@ -274,6 +294,8 @@ void Editor::ResizeViews(uint16 w, uint16 h)
 	const uint16 border = 4;
 	uint16 vpW = (w - border) / 2;
 	uint16 vpH = (h - border) / 2;
+
+	_uiCam.SetViewport(w, h);
 
 	_viewports[0].SetSizeAndPos(0, 0, vpW, vpH);
 	_viewports[1].SetSizeAndPos(vpW + border, 0, vpW, vpH);
@@ -326,11 +348,35 @@ void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y
 		_mouseData.forwardElement = (_mouseData.rightElement != 0 && _mouseData.upElement != 0) ? 0 : (_mouseData.rightElement != 1 && _mouseData.upElement != 1) ? 1 : 2;
 	}
 
+	float prevUnitX = _mouseData.unitX;
+	float prevUnitY = _mouseData.unitY;
+	int prevViewport = _mouseData.viewport;
+
 	_mouseData.viewport = vpIndex;
 	_mouseData.x = x - (camera.GetViewport()[0] / 2);
 	_mouseData.y = -(y - (camera.GetViewport()[1] / 2));
 	_mouseData.unitX = camera.transform.Position()[_mouseData.rightElement] + (float)_mouseData.x / camera.GetScale();
 	_mouseData.unitY = camera.transform.Position()[_mouseData.upElement] + (float)_mouseData.y / camera.GetScale();
+
+	if (_mouseData.isRightDown && _mouseData.viewport == prevViewport)
+	{
+		if (camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
+		{
+			Vector3 v;
+			v[_mouseData.rightElement] = prevUnitX - _mouseData.unitX;
+			v[_mouseData.upElement] = prevUnitY - _mouseData.unitY;
+			camera.transform.Move(v);
+
+			_mouseData.unitX = camera.transform.Position()[_mouseData.rightElement] + (float)_mouseData.x / camera.GetScale();
+			_mouseData.unitY = camera.transform.Position()[_mouseData.upElement] + (float)_mouseData.y / camera.GetScale();
+		}
+		else
+		{
+			camera.transform.Rotate(Vector3((prevUnitY - _mouseData.unitY) / -2.f, (prevUnitX - _mouseData.unitX) / -2.f, 0.f));
+		}
+	}
+
+
 	_mouseData.unitX_rounded = _mouseData.unitX < 0.f ? (int)(_mouseData.unitX - 1.f) : (int)_mouseData.unitX;
 	_mouseData.unitY_rounded = _mouseData.unitY < 0.f ? (int)(_mouseData.unitY - 1.f) : (int)_mouseData.unitY;
 
@@ -363,6 +409,19 @@ void Editor::LeftMouseUp()
 
 	if (_currentTool)
 		_currentTool->MouseUp(_mouseData);
+}
+
+void Editor::RightMouseDown()
+{
+	_mouseData.isRightDown = true;
+
+	if (CameraRef(_mouseData.viewport).GetProjectionType() == ProjectionType::PERSPECTIVE)
+		_activeVP = _mouseData.viewport;
+}
+
+void Editor::RightMouseUp()
+{
+	_mouseData.isRightDown = false;
 }
 
 void Editor::KeySubmit()

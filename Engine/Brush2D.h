@@ -4,8 +4,6 @@
 class Brush2D : public Brush<2>
 {
 protected:
-	virtual void _OnTransformChanged() override;
-
 	virtual void _UpdateTransform() override;
 
 public:

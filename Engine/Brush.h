@@ -3,12 +3,15 @@
 #include "ColliderAABB.h"
 #include "Engine.h"
 #include "ObjectProperties.h"
+#include "Vector.h"
 
 template <int SIZE>
 class Brush : public GameObject
 {
 protected:
-	ColliderAABB _collider;
+	//todo: add dimensions
+	ColliderAABB _collider = ColliderAABB(Vector3(-.5f, -.5f, -.5f), Vector3(.5f, .5f, .5f));
+	Bounds _bounds = Bounds(Vector3(-.5f, -.5f, -.5f), Vector3(.5f, .5f, .5f));
 
 	Vector<float, SIZE> _point1;
 	Vector<float, SIZE> _point2;
@@ -35,12 +38,8 @@ public:
 		return "Unknown";
 	}
 
-	//Collision
 	virtual const Collider* GetCollider() const override { return &_collider; }
-	virtual bool Raycast(const Ray &ray, RaycastResult &result) const override { return _collider.IntersectsRay(ray, result); }
-	virtual bool Overlaps(const Collider &collider, const Transform &transform) const override { return _collider.Overlaps(collider, transform); }
-
-	virtual Bounds GetBounds() const override { return Bounds(_collider.min, _collider.max); }
+	virtual Bounds GetBounds() const override { return _bounds; }
 
 	GAMEOBJ_STD_OVERRIDES;
 };
