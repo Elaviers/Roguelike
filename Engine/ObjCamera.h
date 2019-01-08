@@ -9,7 +9,7 @@ enum class ProjectionType
 	ORTHOGRAPHIC
 };
 
-class Camera : public GameObject
+class ObjCamera : public GameObject
 {
 protected:
 	virtual void _OnTransformChanged() override { UpdateWorldToClip(); }
@@ -29,8 +29,10 @@ private:
 	void UpdateProjectionMatrix();
 	inline void UpdateWorldToClip() {_worldToClip = GetInverseTransformationMatrix() * _projection;}
 public:
-	Camera() : _type(ProjectionType::PERSPECTIVE), _fov(90.f), _scale(1.f), _near(.001f), _far(100.f) { }
-	~Camera() {}
+	GAMEOBJECT_FUNCS(ObjCamera)
+
+	ObjCamera() : _type(ProjectionType::PERSPECTIVE), _fov(90.f), _scale(1.f), _near(.001f), _far(100.f) { }
+	~ObjCamera() {}
 
 	inline void SetProectionType(ProjectionType type)	{ _type = type; UpdateProjectionMatrix(); }
 	inline void SetFOV(float fieldOfView)				{ _fov = fieldOfView; UpdateProjectionMatrix(); }
@@ -49,14 +51,12 @@ public:
 	inline Mat4 GetProjectionMatrix() const				{ return _projection; }
 	inline Mat4 GetWorldToClipping() const				{ return _worldToClip; }
 
-	bool IsInView(const Bounds &b) const;
+	bool FrustumOverlaps(const Bounds &b) const;
 
 	//coords are between -.5f(top-left) and .5f(bottom-right)
 	Ray ScreenCoordsToRay(const Vector2 &coords) const;
 
 	Vector2 GetZPlaneDimensions() const;
 
-	virtual void GetProperties(ObjectProperties&) override;
-
-	GAMEOBJ_STD_OVERRIDES;
+	virtual void GetCvars(CvarMap&) override;
 };

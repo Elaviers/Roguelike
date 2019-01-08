@@ -1,53 +1,55 @@
 #include "ToolEntity.h"
 #include "Editor.h"
-#include <Engine/Brush.h>
-#include <Engine/Renderable.h>
+#include <Engine/ObjBrush.h>
+#include <Engine/ObjRenderable.h>
+#include <Engine/RaycastResult.h>
 
-void ToolEntity::_SetClassName(const String &className)
+void ToolEntity::_SetClassID(const byte &id)
 {
-	_className = className;
+	_classID = id;
 
-	_owner.PropertyWindowRef().SetObject(Engine::registry.GetObjectInstanceFromClassName(_className));
+	_owner.PropertyWindowRef().SetObject(Engine::registry.GetNode(_classID)->Object());
 }
 
 void ToolEntity::Initialise()
 {
-	_className = "Renderable";
-	_properties.SetBase(*this);
-	_properties.Add<ToolEntity, String>("Class", this, &ToolEntity::_GetClassName, &ToolEntity::_SetClassName, PropertyFlags::CLASSNAME);
+	_classID = 1;
+	_cvars.Add("Class", Getter<byte>(this, &ToolEntity::_GetClassID), Setter<byte>(this, &ToolEntity::_SetClassID), PropertyFlags::CLASSID);
 
 	//Defaults
-	reinterpret_cast<Brush<2>*>(Engine::registry.GetObjectInstanceFromClassName("Brush2D"))->SetMaterial("bricks");
-	reinterpret_cast<Brush<3>*>(Engine::registry.GetObjectInstanceFromClassName("Brush3D"))->SetMaterial("bricks");
-	reinterpret_cast<Renderable*>(Engine::registry.GetObjectInstanceFromClassName("Renderable"))->SetModel("sphere");
+	Engine::registry.GetFirstNodeOfType<ObjBrush2D>()->object.SetMaterial("bricks");
+	Engine::registry.GetFirstNodeOfType<ObjBrush3D>()->object.SetMaterial("bricks");
+	Engine::registry.GetFirstNodeOfType<ObjRenderable>()->object.SetModel("sphere");
 }
 
 void ToolEntity::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
 {
 	properties.Clear();
-	toolProperties.SetProperties(_properties);
+	toolProperties.SetCvars(_cvars);
 
-	_owner.PropertyWindowRef().SetObject(Engine::registry.GetObjectInstanceFromClassName(_className));
+	_owner.PropertyWindowRef().SetObject(Engine::registry.GetNode(_classID)->Object());
 }
 
 void ToolEntity::MouseDown(const MouseData &mouseData)
 {
 	if (_owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::PERSPECTIVE)
 	{
-		Camera &camera = _owner.CameraRef(mouseData.viewport);
+		ObjCamera &camera = _owner.CameraRef(mouseData.viewport);
 		RECT windowDims;
 		::GetClientRect(_owner.ViewportRef(mouseData.viewport).GetHwnd(), &windowDims);
 		Ray r = camera.ScreenCoordsToRay(Vector2((float)mouseData.x / (float)windowDims.right, (float)mouseData.y / (float)windowDims.bottom));
-		Buffer<RaycastResult> results = _owner.LevelRef().ObjectCollection().Raycast(r);
+		Buffer<RaycastResult> results = _owner.LevelRef().Raycast(r);
 
 		if (results.GetSize() > 0)
 		{
-			GameObject *newObj = Engine::registry.NewObjectFromClassName(_className);
-			_owner.LevelRef().ObjectCollection().InsertObject(newObj);
+			GameObject *newObj = Engine::registry.GetNode(_classID)->New();
+			newObj->SetParent(&_owner.LevelRef());
+
+			CvarMap newObjCvars;
+			newObj->GetCvars(newObjCvars);
+			_owner.PropertyWindowRef().GetCvars().TransferValuesTo(newObjCvars);
 
 			Vector3 pos = r.origin + r.direction * results[0].entryTime;
-			
-			_owner.PropertyWindowRef().GetProperties().Apply(newObj);
 			pos[1] -= newObj->GetBounds().min[1];
 			newObj->transform.SetPosition(pos);
 		}

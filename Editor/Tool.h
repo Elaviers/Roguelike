@@ -19,13 +19,13 @@ public:
 	virtual void Deactivate() {}
 
 	//Input
-	virtual void Cancel() {}
-	virtual void MouseMove(const MouseData&) {}
-	virtual void MouseDown(const MouseData&) {}
-	virtual void MouseUp(const MouseData&) {}
-	virtual void KeySubmit() {}
-	virtual void KeyDelete() {}
+	virtual void Cancel()						{}
+	virtual void MouseMove(const MouseData&)	{}
+	virtual void MouseDown(const MouseData&)	{}
+	virtual void MouseUp(const MouseData&)		{}
+	virtual void KeySubmit()					{}
+	virtual void KeyDelete()					{}
 
-	virtual void Render() const {}
+	virtual void Render() const					{}
 };
 

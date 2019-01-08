@@ -1,14 +1,18 @@
 #include "GameObject.h"
 #include "Collider.h"
+#include "CvarMap.h"
+#include "Engine.h"
 #include "GL.h"
 #include "GLProgram.h"
-#include "ObjectProperties.h"
+#include "ObjCamera.h"
+#include "RaycastResult.h"
 
-void GameObject::_AddBaseProperties(ObjectProperties &properties)
+void GameObject::_AddBaseCvars(CvarMap &cvars)
 {
-	properties.Add<Transform, Vector3>("Position", &transform, &Transform::GetPosition, &Transform::SetPosition);
-	properties.Add<Transform, Vector3>("Rotation", &transform, &Transform::GetRotation, &Transform::SetRotation);
-	properties.Add<Transform, Vector3>("Scale",	   &transform, &Transform::GetScale, &Transform::SetScale);
+	cvars.Add("UID", const_cast<uint32&>(_uid), PropertyFlags::READONLY);
+	cvars.Add("Position",	Getter<Vector3>(&transform, &Transform::GetPosition), Setter<Vector3>(&transform, &Transform::SetPosition));
+	cvars.Add("Rotation",	Getter<Vector3>(&transform, &Transform::GetRotation), Setter<Vector3>(&transform, &Transform::SetRotation));
+	cvars.Add("Scale",		Getter<Vector3>(&transform, &Transform::GetScale), Setter<Vector3>(&transform, &Transform::SetScale));
 }
 
 //Public
@@ -29,7 +33,36 @@ Mat4 GameObject::GetInverseTransformationMatrix() const
 	return transform.GetInverseTransformationMatrix();
 }
 
-bool GameObject::Raycast(const Ray &ray, RaycastResult &result) const
+void GameObject::Render(const ObjCamera &camera) const
+{
+	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags && FLAG_DBG_ALWAYS_DRAW)
+		Render();
+
+	for (uint32 i = 0; i < _children.GetSize(); ++i)
+		_children[i]->Render(camera);
+}
+
+//File IO
+
+void GameObject::WriteAllToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
+{
+	if (_flags & FLAG_SAVEABLE)
+	{
+		byte id = Engine::registry.GetFirstCompatibleID(this);
+		if (id != 0)
+		{
+			buffer.Write_byte(id);
+			WriteToFile(buffer, strings);
+		}
+	}
+
+	for (uint32 i = 0; i < _children.GetSize(); ++i)
+		_children[i]->WriteAllToFile(buffer, strings);
+}
+
+//Collision
+
+bool GameObject::OverlapsRay(const Ray &ray, RaycastResult &result) const
 {
 	if (this->GetCollider())
 		return this->GetCollider()->IntersectsRay(ray, result, GetWorldTransform());
@@ -37,10 +70,43 @@ bool GameObject::Raycast(const Ray &ray, RaycastResult &result) const
 	return false;
 }
 
-bool GameObject::Overlaps(const Collider &other, const Transform &otherTransform) const
+bool GameObject::OverlapsCollider(const Collider &other, const Transform &otherTransform) const
 {
 	if (this->GetCollider())
 		return this->GetCollider()->Overlaps(other, otherTransform, GetWorldTransform());
 
 	return false;
+}
+
+Buffer<RaycastResult> GameObject::Raycast(const Ray &ray)
+{
+	RaycastResult result;
+	Buffer<RaycastResult> results;
+
+	for (uint32 i = 0; i < _children.GetSize(); ++i)
+		if (_children[i]->OverlapsRay(ray, result))
+		{
+			result.object = _children[i];
+
+			uint32 index = 0;
+			while (index < results.GetSize())
+				if (results[index].entryTime > result.entryTime)
+					break;
+				else index++;
+
+			results.Insert(result, index);
+		}
+
+	return results;
+}
+
+Buffer<GameObject*> GameObject::FindOverlaps(const Collider &collider, const Transform &transform)
+{
+	Buffer<GameObject*> results;
+
+	for (uint32 i = 0; i < _children.GetSize(); ++i)
+		if (_children[i]->OverlapsCollider(collider, transform))
+			results.Add(_children[i]);
+
+	return results;
 }

@@ -1,5 +1,5 @@
 #include "Skybox.h"
-#include "Error.h"
+#include "Debug.h"
 #include "IO.h"
 #include <utility> //move
 
@@ -30,7 +30,7 @@ void Skybox::Load(const char *faces[6])
 		}
 		else if (td.width != faceWidth || td.height != faceHeight)
 		{
-			Error("Skybox faces must have the same dimensions");
+			Debug::Error("Skybox faces must have the same dimensions");
 			return;
 		}
 

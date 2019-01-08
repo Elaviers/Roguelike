@@ -1,4 +1,5 @@
 #include "String.h"
+#include "Buffer.h"
 #include "Types.h"
 
 String::~String()

@@ -1,6 +1,6 @@
 #pragma once
 #include "ResourceManager.h"
-#include "Callback.h"
+#include "FunctionPointer.h"
 #include "Material.h"
 
 class MaterialManager : public ResourceManager<Material*>

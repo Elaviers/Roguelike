@@ -12,7 +12,7 @@ private:
 
 public:
 	MaterialSurface(const GLTexture *diffuse = nullptr, const GLTexture *normal = nullptr, const GLTexture *specular = nullptr, const GLTexture *reflection = nullptr)
-		: _diffuse(diffuse), _normal(normal), _specular(specular), _reflection(reflection) {}
+		: Material(ShaderChannel::SURFACE), _diffuse(diffuse), _normal(normal), _specular(specular), _reflection(reflection) {}
 	
 	virtual ~MaterialSurface() {}
 

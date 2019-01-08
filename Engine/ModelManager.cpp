@@ -1,7 +1,7 @@
 #include "ModelManager.h"
 #include "ColliderAABB.h"
 #include "ColliderSphere.h"
-#include "Error.h"
+#include "Debug.h"
 #include "IO.h"
 #include "Utilities.h"
 #include "Vector.h"
@@ -144,7 +144,7 @@ const Model* ModelManager::GetModel(const String &nameIn)
 							delete collision;
 							collision = new ColliderSphere(args[1].ToFloat());
 						}
-						else Error(CSTR(path + ": Insufficient sphere arguments"));
+						else Debug::Error(CSTR(path + ": Insufficient sphere arguments"));
 					}
 					else if (args[0] == "aabb")
 					{
@@ -153,7 +153,7 @@ const Model* ModelManager::GetModel(const String &nameIn)
 							delete collision;
 							collision = new ColliderAABB(data.bounds.min, data.bounds.max);
 						}
-						else Error(CSTR(path + ": AABB collision cannot be used without model data"));
+						else Debug::Error(CSTR(path + ": AABB collision cannot be used without model data"));
 					}
 				}
 		}

@@ -11,7 +11,7 @@ class Material;
 class MenuStartLevel : protected UIContainer
 {
 protected:
-	FPTR<const String&> _onLevelChosen;
+	FunctionPointer<void, const String&> _onLevelChosen;
 
 	float _buttonBorderSize;
 	Vector4 _buttonColourInactive;
@@ -27,7 +27,7 @@ public:
 	MenuStartLevel(UIElement *parent = nullptr) : UIContainer(parent) {}
 	virtual ~MenuStartLevel();
 
-	void Initialise(const FPTR<const String&> &onLevelChosen);
+	void Initialise(const FunctionPointer<void, const String&> &onLevelChosen);
 
 	inline void SetBounds(float x, float y, float w, float h, float xOffset = 0.f, float yOffset = 0.f) { UIContainer::SetBounds(x, y, w, h, xOffset, yOffset); }
 	inline void SetButtonBorderSize(float size) { _buttonBorderSize = size; }

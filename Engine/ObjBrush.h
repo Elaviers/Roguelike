@@ -1,12 +1,12 @@
 #pragma once
+#include "CvarMap.h"
 #include "GameObject.h"
 #include "ColliderAABB.h"
 #include "Engine.h"
-#include "ObjectProperties.h"
 #include "Vector.h"
 
 template <int SIZE>
-class Brush : public GameObject
+class ObjBrush : public GameObject
 {
 protected:
 	//todo: add dimensions
@@ -20,10 +20,10 @@ protected:
 
 	virtual void _UpdateTransform() = 0;
 
-public:
-	Brush() : _material(nullptr) { }
-	virtual ~Brush() {}
+	ObjBrush() : GameObject(FLAG_SAVEABLE), _material(nullptr) { }
+	virtual ~ObjBrush() {}
 
+public:
 	inline void SetPoint1(const Vector<float, SIZE> &position) { _point1 = position; _UpdateTransform(); }
 	inline void SetPoint2(const Vector<float, SIZE> &position) { _point2 = position; _UpdateTransform(); }
 	inline void SetMaterial(const Material *material) { _material = material; }
@@ -40,6 +40,4 @@ public:
 
 	virtual const Collider* GetCollider() const override { return &_collider; }
 	virtual Bounds GetBounds() const override { return _bounds; }
-
-	GAMEOBJ_STD_OVERRIDES;
 };

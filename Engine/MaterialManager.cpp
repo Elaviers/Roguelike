@@ -1,5 +1,5 @@
 #include "MaterialManager.h"
-#include "Error.h"
+#include "Debug.h"
 #include "IO.h"
 #include "MaterialGrid.h"
 #include "MaterialSurface.h"
@@ -32,7 +32,7 @@ const Material* MaterialManager::GetMaterial(const String &nameIn)
 				newMaterial = new MaterialGrid();
 			else
 			{
-				Error(CSTR("Unknown material type for material \"" + name + '\"'));
+				Debug::Error(CSTR("Unknown material type for material \"" + name + '\"'));
 				return nullptr;
 			}
 

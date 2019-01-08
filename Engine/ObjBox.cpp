@@ -1,16 +1,18 @@
-#include "Box.h"
+#include "ObjBox.h"
 #include "DrawUtils.h"
 #include "Engine.h"
+#include "GLProgram.h"
+#include "ShaderChannel.h"
 
-void Box::Render() const
+void ObjBox::Render() const
 {
-	if (Engine::modelManager)
+	if (Engine::modelManager && GLProgram::Current().GetChannels() == ShaderChannel::UNLIT)
 	{
 		DrawUtils::DrawBox(*Engine::modelManager, _min, _max);
 	}
 }
 
-void Box::_UpdateMinMax()
+void ObjBox::_UpdateMinMax()
 {
 	if (_p1[0] < _p2[0])
 	{

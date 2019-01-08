@@ -1,8 +1,8 @@
-#include "Brush2D.h"
+#include "ObjBrush2D.h"
 #include "GLProgram.h"
 #include "Utilities.h"
 
-void Brush2D::_UpdateTransform()
+void ObjBrush2D::_UpdateTransform()
 {
 	float x = (_point1[0] + _point2[0]) / 2.f;
 	float z = (_point1[1] + _point2[1]) / 2.f;
@@ -13,9 +13,9 @@ void Brush2D::_UpdateTransform()
 	transform.SetScale(Vector3(w, h, 0));
 }
 
-void Brush2D::Render() const
+void ObjBrush2D::Render() const
 {
-	if (Engine::modelManager && _material)
+	if (Engine::modelManager && _material && GLProgram::Current().GetChannels() & _material->GetShaderChannels())
 	{
 		_material->Apply();
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
@@ -26,15 +26,12 @@ void Brush2D::Render() const
 }
 
 
-void Brush2D::SaveToFile(BufferIterator<byte> &buffer, const Map<String, uint16> &strings) const
+void ObjBrush2D::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
 {
-	buffer.Write_byte(Engine::ObjectIDs::BRUSH2D);
-
 	if (Engine::materialManager && _material)
 	{																		//TODO: const cast removal
-		const uint16 *id = strings.Find(Engine::materialManager->FindNameOf(const_cast<Material*>(_material)));
-		if (id) buffer.Write_uint16(*id);
-		else buffer.Write_uint16(0);
+		uint16 id = strings.Add(Engine::materialManager->FindNameOf(const_cast<Material*>(_material)));
+		buffer.Write_uint16(id);
 	}
 	else buffer.Write_uint16(0);
 
@@ -44,7 +41,7 @@ void Brush2D::SaveToFile(BufferIterator<byte> &buffer, const Map<String, uint16>
 	buffer.Write_float(transform.Scale()[1]);
 }
 
-void Brush2D::LoadFromFile(BufferIterator<byte> &buffer, const Map<uint16, String> &strings)
+void ObjBrush2D::ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet<String> &strings)
 {
 	const String *materialName = strings.Find(buffer.Read_uint16());
 	if (materialName)
@@ -64,12 +61,12 @@ void Brush2D::LoadFromFile(BufferIterator<byte> &buffer, const Map<uint16, Strin
 	_point2[1] = transform.Position()[2] + transform.Scale()[1] / 2.f;
 }
 
-void Brush2D::GetProperties(ObjectProperties &properties)
+void ObjBrush2D::GetCvars(CvarMap &cvars)
 {
-	_AddBaseProperties(properties);
-
-	properties.Add<Brush2D, String>("Material", this, &Brush2D::GetMaterialName, &Brush2D::SetMaterial, PropertyFlags::MATERIAL);
-	properties.Add<Vector2>("Point 1", _point1);
-	properties.Add<Vector2>("Point 2", _point2);
-	properties.Add<float>("Level", level);
+	_AddBaseCvars(cvars);
+	
+	cvars.Add("Material", Getter<String>((ObjBrush<2>*)this, &ObjBrush<2>::GetMaterialName), Setter<String>((ObjBrush<2>*)this, &ObjBrush<2>::SetMaterial), PropertyFlags::MATERIAL);
+	cvars.Add("Point 1", _point1);
+	cvars.Add("Point 2", _point2);
+	cvars.Add("Level", level);
 }

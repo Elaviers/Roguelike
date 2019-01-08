@@ -2,14 +2,14 @@
 #include "UIElement.h"
 #include "UILabel.h"
 #include "UIPanel.h"
-#include "Callback.h"
+#include "FunctionPointer.h"
 
 class UIButton : public UIElement
 {
 protected:
 	bool _active;
 
-	FPTR<UIButton&> _callback;
+	FunctionPointer<void, UIButton&> _callback;
 
 	Vector4 _colourInactive;
 	Vector4 _colourActive;
@@ -30,7 +30,7 @@ public:
 	inline const String& GetString() const { return _label.GetString(); }
 
 	inline void SetBorderSize(float borderSize) { _panel.SetBorderSize(borderSize); }
-	inline void SetCallback(const FPTR<UIButton&> &callback) { _callback = callback; }
+	inline void SetCallback(const FunctionPointer<void, UIButton&> &callback) { _callback = callback; }
 	inline void SetColourInactive(const Vector4 &colour) 
 	{ 
 		_colourInactive = colour; 

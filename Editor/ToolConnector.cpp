@@ -31,13 +31,12 @@ void ToolConnector::SetConnectorDirection(const String &dir)
 
 void ToolConnector::Initialise()
 {
-	_properties.SetBase(*this);
-	_properties.Add<ToolConnector, String>("Direction", this, &ToolConnector::GetConnectorDirection, &ToolConnector::SetConnectorDirection, PropertyFlags::DIRECTION);
+	_cvars.Add("Direction", Getter<String>(this, &ToolConnector::GetConnectorDirection), Setter<String>(this, &ToolConnector::SetConnectorDirection), PropertyFlags::DIRECTION);
 }
 
 void ToolConnector::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
 {
-	toolProperties.SetProperties(_properties);
+	toolProperties.SetCvars(_cvars);
 
 }
 
@@ -77,7 +76,7 @@ void ToolConnector::MouseMove(const MouseData &mouseData)
 			_connector.SetPoint1(v);
 
 			v[mouseData.rightElement] = mouseData.unitX_rounded + 1;
-			v[mouseData.upElement] = mouseData.unitY_rounded + 1;
+   			v[mouseData.upElement] = mouseData.unitY_rounded + 1;
 			v[mouseData.forwardElement] = 100;
 			_connector.SetPoint2(v);
 		}
@@ -93,8 +92,7 @@ void ToolConnector::KeySubmit()
 {
 	_placing = false;
 
-	_owner.LevelRef().Connectors().Add(_connector);
-
+	_connector.Clone()->SetParent(&_owner.LevelRef());
 	_connector.SetMin(Vector3());
 	_connector.SetMax(Vector3());
 }

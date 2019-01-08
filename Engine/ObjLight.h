@@ -4,14 +4,16 @@
 
 class ModelManager;
 
-class Light : public GameObject
+class ObjLight : public GameObject
 {
 	Vector3 _colour;
 	float _radius;
 
 public:
-	Light() : _radius(-1.f), _colour(1.f, 1.f, 1.f) { transform.SetScale(Vector3(.1f, .1f, .1f)); }
-	~Light() {};
+	GAMEOBJECT_FUNCS(ObjLight)
+
+	ObjLight() : GameObject(FLAG_SAVEABLE), _radius(-1.f), _colour(1.f, 1.f, 1.f) { transform.SetScale(Vector3(.1f, .1f, .1f)); }
+	~ObjLight() {};
 
 	static bool drawLightSources;
 
@@ -22,7 +24,5 @@ public:
 
 	void Render() const override;
 
-	virtual void GetProperties(ObjectProperties&) override;
-
-	GAMEOBJ_STD_OVERRIDES;
+	virtual void GetCvars(CvarMap&) override;
 };

@@ -4,7 +4,7 @@
 #include <Engine/GLContext.h>
 #include <Engine/GLProgram.h>
 #include <Engine/InputManager.h>
-#include <Engine/Level.h>
+#include <Engine/LevelIO.h>
 #include <Engine/MaterialManager.h>
 #include <Engine/ModelManager.h>
 #include <Engine/Registry.h>
@@ -53,7 +53,7 @@ private:
 	HWND _toolbar;
 	HIMAGELIST _tbImages;
 
-	Camera _uiCam;
+	ObjCamera _uiCam;
 
 	Viewport _viewports[VIEWPORTCOUNT];
 
@@ -63,7 +63,7 @@ private:
 	GLProgram _shaderUnlit;
 
 	//Editor
-	Level _level;
+	GameObject _level;
 
 	Tool *_currentTool;
 
@@ -122,8 +122,8 @@ public:
 	String SelectModelDialog();
 
 	//For Tools
-	inline Level& LevelRef() { return _level; }
+	inline GameObject& LevelRef() { return _level; }
 	inline Viewport& ViewportRef(int id) { return _viewports[id]; }
-	inline Camera& CameraRef(int id) { return _viewports[id].CameraRef(); }
+	inline ObjCamera& CameraRef(int id) { return _viewports[id].CameraRef(); }
 	inline PropertyWindow& PropertyWindowRef() { return _propertyWindow; }
 };

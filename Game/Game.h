@@ -1,11 +1,11 @@
 #pragma once
-#include <Engine/Camera.h>
 #include <Engine/GLContext.h>
 #include <Engine/GLProgram.h>
 #include <Engine/FontManager.h>
 #include <Engine/InputManager.h>
 #include <Engine/MaterialManager.h>
 #include <Engine/ModelManager.h>
+#include <Engine/ObjCamera.h>
 #include <Engine/TextureManager.h>
 #include <Engine/Timer.h>
 #include <Engine/UIContainer.h>
@@ -31,7 +31,7 @@ private:
 	TextureManager _textureManager;
 
 	UIContainer _ui;
-	Camera _uiCamera;
+	ObjCamera _uiCamera;
 
 	static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
 

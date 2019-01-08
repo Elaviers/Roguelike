@@ -56,7 +56,7 @@ LRESULT PropertyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 			char string[32];
 			::GetWindowText((HWND)lparam, string, 32);
 
-			pw->_child_hwnds[LOWORD(wparam)].property->SetByString(String(string));
+			pw->_child_hwnds[LOWORD(wparam)].cvar->SetByString(String(string));
 		}
 			break;
 
@@ -66,28 +66,36 @@ LRESULT PropertyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 			String string;
 
-			if (pw->_child_hwnds[id].property->GetFlags() & PropertyFlags::MATERIAL)
+			if (pw->_child_hwnds[id].cvar->GetFlags() & PropertyFlags::MATERIAL)
 				string = pw->_owner->SelectMaterialDialog();
-			else if (pw->_child_hwnds[id].property->GetFlags() & PropertyFlags::MODEL)
+			else if (pw->_child_hwnds[id].cvar->GetFlags() & PropertyFlags::MODEL)
 				string = pw->_owner->SelectModelDialog();
 			else break;
 
 			if (string.GetLength() > 0)
 			{
 				::SetWindowTextA(pw->_child_hwnds[id].box, string.GetData());
-				pw->_child_hwnds[id].property->SetByString(string);
+				pw->_child_hwnds[id].cvar->SetByString(string);
 			}
 		}
 			break;
 
 		case CBN_SELCHANGE:
 		{
-			int cbIndex = ::SendMessage((HWND)lparam, CB_GETCURSEL, 0, 0);
+			LRESULT cbIndex = ::SendMessage((HWND)lparam, CB_GETCURSEL, 0, 0);
 
-			char selectedString[256];
-			::SendMessage((HWND)lparam, CB_GETLBTEXT, (WPARAM)cbIndex, (LPARAM)selectedString);
+			if (pw->_child_hwnds[LOWORD(wparam)].cvar->GetFlags() & PropertyFlags::CLASSID)
+			{
+				auto regTypes = Engine::registry.GetRegisteredTypes();
+				reinterpret_cast<TypedCvar<byte>*>(pw->_child_hwnds[LOWORD(wparam)].cvar)->Set(*regTypes[cbIndex].first);
+			}
+			else
+			{
+				char selectedString[256];
+				::SendMessage((HWND)lparam, CB_GETLBTEXT, (WPARAM)cbIndex, (LPARAM)selectedString);
 
-			pw->_child_hwnds[LOWORD(wparam)].property->SetByString(String(selectedString));
+				pw->_child_hwnds[LOWORD(wparam)].cvar->SetByString(selectedString);
+			}
 		}
 			break;
 		}
@@ -117,7 +125,7 @@ LRESULT PropertyWindow::_EditProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpa
 			char string[32];
 			::GetWindowText(hwnd, string, 32);
 
-			pw->_child_hwnds[(int)::GetMenu(hwnd)].property->SetByString(String(string));
+			pw->_child_hwnds[(int)::GetMenu(hwnd)].cvar->SetByString(String(string));
 		}
 		else return ::CallWindowProc(_defaultEditProc, hwnd, msg, wparam, lparam);
 
@@ -156,7 +164,7 @@ PropertyWindow::~PropertyWindow()
 
 void PropertyWindow::_CreateHWNDs(bool readOnly)
 {
-	auto properties = _objProperties.GetAll();
+	auto properties = _cvars.GetAll();
 
 	RECT rect;
 	::GetClientRect(_hwnd, &rect);
@@ -174,19 +182,18 @@ void PropertyWindow::_CreateHWNDs(bool readOnly)
 
 		HWND box, button = 0;
 
-		if ((*properties[i].second)->GetFlags() & PropertyFlags::CLASSNAME)
+		if ((*properties[i].second)->GetFlags() & PropertyFlags::CLASSID && (*properties[i].second)->GetType() == CvarType::BYTE)
 		{
 			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_COMBOBOXA, (*properties[i].second)->GetAsString().GetData(), WS_CHILD | WS_VISIBLE | CBS_HASSTRINGS | CBS_DROPDOWNLIST, w, y, w, boxH, _hwnd, (HMENU)i, instance, NULL);
 
+			byte current = reinterpret_cast<TypedCvar<byte>*>((*properties[i].second))->Get();
+
 			auto listItems = Engine::registry.GetRegisteredTypes();
-
-			String value = (*properties[i].second)->GetAsString();
-
 			for (uint32 i = 0; i < listItems.GetSize(); ++i)
 			{
-				::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)listItems[i].first->GetData());
-			
-				if (*listItems[i].first == value)
+				::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)Engine::registry.GetNode(*listItems[i].first)->name.GetData());
+
+				if (*listItems[i].first == current)
 					::SendMessage(box, CB_SETCURSEL, i, 0);
 			}
 		}
@@ -226,17 +233,17 @@ void PropertyWindow::_CreateHWNDs(bool readOnly)
 			::SetWindowLongPtr(box, GWLP_WNDPROC, (LONG_PTR)_EditProc);
 		}
 
-		_child_hwnds.Add(PropertyHWND{ label, box, button, *_objProperties.FindRaw(name) });
+		_child_hwnds.Add(PropertyHWND{ label, box, button, _cvars.FindRaw(name) });
 
 		y += boxH;
 	}
 }
 
-void PropertyWindow::SetProperties(const ObjectProperties &properties, bool readOnly)
+void PropertyWindow::SetCvars(const CvarMap &cvars, bool readOnly)
 {
 	Clear();
 
-	_objProperties = properties;
+	_cvars = cvars;
 	_CreateHWNDs(readOnly);
 }
 
@@ -244,25 +251,18 @@ void PropertyWindow::SetObject(GameObject *object, bool readOnly)
 {
 	Clear();
 
-	_objProperties.SetBase(*object);
-	object->GetProperties(_objProperties);
+	object->GetCvars(_cvars);
 	_CreateHWNDs(readOnly);
-}
-
-void PropertyWindow::ChangeBase(GameObject *object)
-{
-	_objProperties.SetBase(object);
-	Refresh();
 }
 
 void PropertyWindow::Refresh()
 {
 	for (uint32 i = 0; i < _child_hwnds.GetSize(); ++i)
-		::SetWindowTextA(_child_hwnds[i].box, _child_hwnds[i].property->GetAsString().GetData());}
+		::SetWindowTextA(_child_hwnds[i].box, _child_hwnds[i].cvar->GetAsString().GetData());}
 
 void PropertyWindow::Clear()
 {
-	_objProperties.Clear(); 
+	_cvars.Clear(); 
 	
 	for (uint32 i = 0; i < _child_hwnds.GetSize(); ++i)
 	{

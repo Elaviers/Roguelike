@@ -1,15 +1,15 @@
 #include "ResourceSelect.h"
 #include <CommCtrl.h>
-#include <Engine/Camera.h>
-#include <Engine/Error.h>
+#include <Engine/Debug.h>
 #include <Engine/GL.h>
 #include <Engine/GLContext.h>
 #include <Engine/GLProgram.h>
 #include <Engine/IO.h>
-#include <Engine/Light.h>
 #include <Engine/MaterialManager.h>
 #include <Engine/ModelManager.h>
-#include <Engine/Renderable.h>
+#include <Engine/ObjCamera.h>
+#include <Engine/ObjLight.h>
+#include <Engine/ObjRenderable.h>
 #include <Engine/Utilities.h>
 #include <Engine/Window.h>
 #include "resource.h"
@@ -35,9 +35,9 @@ private:
 	MaterialManager* const materialManager;
 	ModelManager* const modelManager;
 
-	Camera _camera;
-	Renderable _object;
-	Light _light;
+	ObjCamera _camera;
+	ObjRenderable _object;
+	ObjLight _light;
 public:
 	Buffer<String> paths;
 	int selection;
@@ -139,7 +139,7 @@ INT_PTR DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		::DeleteObject(bmp);
 
 		if (::ImageList_GetImageCount(rs->imageList) < imageCount)
-			Error("Oh dear. Somehow the tree view's imagelist could not be created properly.");
+			Debug::Error("Oh dear. Somehow the tree view's imagelist could not be created properly.");
 
 		::SendDlgItemMessage(hwnd, IDC_TREE, TVM_SETIMAGELIST, (WPARAM)TVSIL_NORMAL, (LPARAM)rs->imageList);
 

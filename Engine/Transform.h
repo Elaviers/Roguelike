@@ -1,6 +1,6 @@
 #pragma once
 #include "BufferIterator.h"
-#include "Callback.h"
+#include "FunctionPointer.h"
 #include "Vector.h"
 #include "Matrix.h"
 
@@ -14,7 +14,8 @@ class Transform
 	inline void _Update()
 	{
 		_matrixStatus = MAT_EMPTY;
-		_onChanged();
+		if (_onChanged.IsCallable())
+			_onChanged();
 	}
 
 	Mat4 _matrix;

@@ -1,15 +1,15 @@
 #pragma once
 #include "Tool.h"
-#include <Engine/ObjectProperties.h>
+#include <Engine/CvarMap.h>
 
 class ToolEntity : public Tool
 {
-	String _className;
+	byte _classID;
 
-	ObjectProperties _properties;
+	CvarMap _cvars;
 
-	void _SetClassName(const String &className);
-	String _GetClassName() const { return _className; }
+	void _SetClassID(const byte &id);
+	byte _GetClassID() const { return _classID; }
 
 public:
 	ToolEntity(Editor &level) : Tool(level) {}

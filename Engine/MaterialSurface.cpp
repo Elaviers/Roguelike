@@ -1,6 +1,6 @@
 #include "MaterialSurface.h"
 #include "Engine.h"
-#include "Error.h"
+#include "Debug.h"
 #include "Utilities.h"
 
 void MaterialSurface::FromString(const String &stringIn)
@@ -27,7 +27,7 @@ void MaterialSurface::FromString(const String &stringIn)
 			}
 			else Engine::materialManager->HandleCommand(lines[i]);
 		}
-		else Error("Texture manager not set!");
+		else Debug::Error("Texture manager not set!");
 	}
 }
 

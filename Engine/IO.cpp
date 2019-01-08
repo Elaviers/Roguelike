@@ -1,5 +1,5 @@
 #include "IO.h"
-#include "Error.h"
+#include "Debug.h"
 #include "lodepng.h"
 #include "Utilities.h"
 #include <Windows.h>
@@ -18,7 +18,7 @@ Buffer<byte> IO::ReadFile(const char *filename) {
 		::CloseHandle(file);
 	}
 	else
-		Error(CSTR("Could not read file \"" + filename + '\"'));
+		Debug::Error(CSTR("Could not read file \"" + filename + '\"'));
 
 	return buffer;
 }
@@ -58,13 +58,15 @@ TextureData IO::ReadPNGFile(const char *filename)
 		unsigned int width, height;
 
 		lodepng_decode_memory(&buffer, &width, &height, fileBuffer.Data(), fileBuffer.GetSize(), LCT_RGBA, 8);
-		uint32 bufferSize = width * height * (4 * 8);
+		uint32 bufferSize = width * height * 4;
 
 		out.width = width;
 		out.height = height;
-		out.data._SetRaw(buffer, bufferSize);
+		out.data.FromCBuffer(buffer, bufferSize);
+
+		free(buffer);
 	}
-	else Error(CSTR("Could not open file \"" + filename + '\"'));
+	else Debug::Error(CSTR("Could not open file \"" + filename + '\"'));
 
 	return out;
 }

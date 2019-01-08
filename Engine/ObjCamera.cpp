@@ -1,12 +1,12 @@
-#include "Camera.h"
+#include "ObjCamera.h"
 #include "Ray.h"
 
-void Camera::GetProperties(ObjectProperties &properties)
+void ObjCamera::GetCvars(CvarMap &properties)
 {
-	_AddBaseProperties(properties);
+	_AddBaseCvars(properties);
 }
 
-void Camera::UpdateProjectionMatrix()
+void ObjCamera::UpdateProjectionMatrix()
 {
 	switch (_type)
 	{
@@ -21,7 +21,7 @@ void Camera::UpdateProjectionMatrix()
 	UpdateWorldToClip();
 }
 
-Vector2 Camera::GetZPlaneDimensions() const
+Vector2 ObjCamera::GetZPlaneDimensions() const
 {
 	float planeHeightAtZ = 2.f / Maths::TangentDegrees(90.f - _fov / 2.f);
 
@@ -29,7 +29,7 @@ Vector2 Camera::GetZPlaneDimensions() const
 }
 
 
-Ray Camera::ScreenCoordsToRay(const Vector2 &coords) const
+Ray ObjCamera::ScreenCoordsToRay(const Vector2 &coords) const
 {
 	if (_type == ProjectionType::PERSPECTIVE)
 	{
@@ -48,7 +48,7 @@ Ray Camera::ScreenCoordsToRay(const Vector2 &coords) const
 	}
 }
 
-bool Camera::IsInView(const Bounds &b) const
+bool ObjCamera::FrustumOverlaps(const Bounds &b) const
 {
 	Vector4 viewCentre = Vector4(b.centre) * _worldToClip;
 	float viewRadius = b.radius / Maths::TangentDegrees(_fov / 2.f);

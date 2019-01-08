@@ -1,6 +1,6 @@
 #include "GL.h"
 #include "String.h"
-#include "Error.h"
+#include "Debug.h"
 
 //Windows
 PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB;
@@ -103,7 +103,7 @@ namespace GL
 	void AssertExtension(const char *extension_str, const char *extension)
 	{
 		if (!StringContains(extension_str, extension))
-			FatalError(CSTR("OpenGL extension \"" + extension + "\" not supported!"));
+			Debug::FatalError(CSTR("OpenGL extension \"" + extension + "\" not supported!"));
 	}
 
 	void LoadExtensions(HDC hdc) {

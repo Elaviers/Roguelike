@@ -1,14 +1,14 @@
 #pragma once
 #include "Tool.h"
-#include <Engine/Connector.h>
-#include <Engine/ObjectProperties.h>
+#include <Engine/CvarMap.h>
+#include <Engine/ObjConnector.h>
 
 class ToolConnector : public Tool
 {
 	bool _placing;
 
-	Connector _connector;
-	ObjectProperties _properties;
+	ObjConnector _connector;
+	CvarMap _cvars;
 
 public:
 	ToolConnector(Editor &level) : Tool(level) {}

@@ -1,5 +1,5 @@
 #include "TextureManager.h"
-#include "Error.h"
+#include "Debug.h"
 #include "GL.h"
 #include "IO.h"
 #include <vector>

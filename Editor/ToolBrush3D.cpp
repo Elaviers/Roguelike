@@ -6,14 +6,13 @@ void ToolBrush3D::Initialise()
 {
 	_object.transform.SetScale(Vector3());
 	_object.SetMaterial("alt");
-	_properties.SetBase(_object);
-	_properties.Add<Brush3D, String>("Material", &_object, &Brush3D::GetMaterialName, &Brush3D::SetMaterial, PropertyFlags::MATERIAL);
+	_cvars.Add("Material", Getter<String>((ObjBrush<3>*)&_object, &ObjBrush<3>::GetMaterialName), Setter<String>((ObjBrush<3>*)&_object, &ObjBrush<3>::SetMaterial), PropertyFlags::MATERIAL);
 }
 
 void ToolBrush3D::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
 {
 	properties.SetObject(&_object, true);
-	toolProperties.SetProperties(_properties);
+	toolProperties.SetCvars(_cvars);
 }
 
 void ToolBrush3D::Cancel()
@@ -68,9 +67,7 @@ void ToolBrush3D::KeySubmit()
 {
 	_placing = false;
 
-	GameObject *brush = new Brush3D(_object);
-
-	_owner.LevelRef().ObjectCollection().InsertObject(brush);
+	_object.Clone()->SetParent(&_owner.LevelRef());
 }
 
 void ToolBrush3D::Render() const

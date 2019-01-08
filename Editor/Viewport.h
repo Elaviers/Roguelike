@@ -1,7 +1,7 @@
 #pragma once
 #include <Engine/Window.h>
-#include <Engine/Camera.h>
 #include <Engine/ModelManager.h>
+#include <Engine/ObjCamera.h>
 #include <Engine/TextureManager.h>
 #include <Windows.h>
 
@@ -17,7 +17,7 @@ private:
 	Editor *_editor;
 	int _index;
 
-	Camera _camera;
+	ObjCamera _camera;
 
 public:
 	Viewport();
@@ -34,5 +34,5 @@ public:
 
 	inline void SetSizeAndPos(uint16 x, uint16 y, uint16 width, uint16 height) { WindowFunctions::SetHWNDSizeAndPos(_hwnd, x, y, width, height); _camera.SetViewport(width, height); }
 
-	inline Camera& CameraRef() { return _camera; }
+	inline ObjCamera& CameraRef() { return _camera; }
 };

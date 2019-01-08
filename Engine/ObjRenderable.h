@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "Engine.h"
 
-class Renderable : public GameObject
+class ObjRenderable : public GameObject
 {
 private:
 	const Model *_model;
@@ -11,8 +11,10 @@ private:
 	bool _materialIsDefault;
 
 public:
-	Renderable() : _model(nullptr), _material(nullptr) {}
-	virtual ~Renderable() {}
+	GAMEOBJECT_FUNCS(ObjRenderable)
+	
+	ObjRenderable() : GameObject(FLAG_SAVEABLE), _model(nullptr), _material(nullptr) {}
+	virtual ~ObjRenderable() {}
 
 	inline void SetModel(const String &name) { if (Engine::modelManager) SetModel(Engine::modelManager->GetModel(name)); }
 	inline void SetModel(const Model *model) 
@@ -32,15 +34,15 @@ public:
 
 	virtual void Render() const override;
 
-	virtual void GetProperties(ObjectProperties&) override;
+	virtual void GetCvars(CvarMap&) override;
 
 	//These are for properties really
 	String GetModelName() const;
 	String GetMaterialName() const;
 
 	//File IO
-	virtual void SaveToFile(BufferIterator<byte>&, const Map<String, uint16> &strings) const override;
-	virtual void LoadFromFile(BufferIterator<byte>&, const Map<uint16, String> &strings) override;
+	virtual void WriteToFile(BufferIterator<byte>&, NumberedSet<String> &strings) const override;
+	virtual void ReadFromFile(BufferIterator<byte>&, const NumberedSet<String> &strings) override;
 
 	//Collision
 	virtual const Collider* GetCollider() const override;
@@ -48,9 +50,7 @@ public:
 	//Other
 	virtual Bounds GetBounds() const override 
 	{
-		if (_model) return Bounds(transform.Position() + _model->bounds.min, transform.Position() + _model->bounds.max);
-		else return Bounds(transform.Position(), transform.Position());
+		if (_model) return _model->bounds;
+		return Bounds();
 	}
-
-	GAMEOBJ_STD_OVERRIDES;
 };

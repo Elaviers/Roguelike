@@ -1,6 +1,6 @@
 #pragma once
 #include "Tool.h"
-#include <Engine/Box.h>
+#include <Engine/ObjBox.h>
 #include <Engine/Buffer.h>
 #include <Engine/GameObject.h>
 
@@ -8,7 +8,7 @@ class ToolSelect : public Tool
 {
 	bool _placing;
 
-	Box _box;
+	ObjBox _box;
 
 	Buffer<GameObject*> _selectedObjects;
 

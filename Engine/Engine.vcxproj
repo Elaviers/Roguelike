@@ -151,17 +151,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Bounds.h" />
-    <ClInclude Include="Box.h" />
-    <ClInclude Include="Brush.h" />
-    <ClInclude Include="Brush2D.h" />
-    <ClInclude Include="Brush3D.h" />
+    <ClInclude Include="Cvar.h" />
+    <ClInclude Include="ObjBox.h" />
+    <ClInclude Include="ObjBrush.h" />
+    <ClInclude Include="ObjBrush2D.h" />
+    <ClInclude Include="ObjBrush3D.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="BufferIterator.h" />
-    <ClInclude Include="Callback.h" />
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="FunctionPointer.h" />
+    <ClInclude Include="ObjCamera.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Collision.h" />
-    <ClInclude Include="Connector.h" />
+    <ClInclude Include="ObjConnector.h" />
     <ClInclude Include="ColliderAABB.h" />
     <ClInclude Include="DebugFrustum.h" />
     <ClInclude Include="DebugManager.h" />
@@ -170,7 +171,7 @@
     <ClInclude Include="Direction2D.h" />
     <ClInclude Include="DrawUtils.h" />
     <ClInclude Include="Engine.h" />
-    <ClInclude Include="Error.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FontManager.h" />
     <ClInclude Include="GameObject.h" />
@@ -180,13 +181,13 @@
     <ClInclude Include="GLDepthMap.h" />
     <ClInclude Include="Glyph.h" />
     <ClInclude Include="InputManager.h" />
-    <ClInclude Include="Level.h" />
+    <ClInclude Include="LevelIO.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="GLModel.h" />
     <ClInclude Include="GLProgram.h" />
     <ClInclude Include="GLTexture.h" />
     <ClInclude Include="IO.h" />
-    <ClInclude Include="Light.h" />
+    <ClInclude Include="ObjLight.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialGrid.h" />
@@ -196,14 +197,16 @@
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelManager.h" />
-    <ClInclude Include="ObjectProperties.h" />
+    <ClInclude Include="CvarMap.h" />
     <ClInclude Include="Pair.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RaycastResult.h" />
     <ClInclude Include="Registry.h" />
-    <ClInclude Include="Renderable.h" />
+    <ClInclude Include="ObjRenderable.h" />
     <ClInclude Include="RenderParam.h" />
     <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="NumberedSet.h" />
+    <ClInclude Include="ShaderChannel.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="ColliderSphere.h" />
     <ClInclude Include="String.h" />
@@ -223,17 +226,17 @@
     <ClInclude Include="Vector4.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
-    <ClInclude Include="Collection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bounds.cpp" />
-    <ClCompile Include="Box.cpp" />
-    <ClCompile Include="Brush2D.cpp" />
-    <ClCompile Include="Brush3D.cpp" />
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Cvar.cpp" />
+    <ClCompile Include="ObjBox.cpp" />
+    <ClCompile Include="ObjBrush2D.cpp" />
+    <ClCompile Include="ObjBrush3D.cpp" />
+    <ClCompile Include="ObjCamera.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="Connector.cpp" />
+    <ClCompile Include="ObjConnector.cpp" />
     <ClCompile Include="ColliderAABB.cpp" />
     <ClCompile Include="DebugFrustum.cpp" />
     <ClCompile Include="DebugManager.cpp" />
@@ -250,23 +253,22 @@
     <ClCompile Include="GLCubemap.cpp" />
     <ClCompile Include="GLDepthMap.cpp" />
     <ClCompile Include="InputManager.cpp" />
-    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="LevelIO.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="GLModel.cpp" />
     <ClCompile Include="GLProgram.cpp" />
     <ClCompile Include="GLTexture.cpp" />
     <ClCompile Include="IO.cpp" />
-    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="ObjLight.cpp" />
     <ClCompile Include="MaterialGrid.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="MaterialSurface.cpp" />
     <ClCompile Include="Maths.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="ModelManager.cpp" />
-    <ClCompile Include="ObjectProperties.cpp" />
     <ClCompile Include="ObjReader.cpp" />
     <ClCompile Include="Registry.cpp" />
-    <ClCompile Include="Renderable.cpp" />
+    <ClCompile Include="ObjRenderable.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="ColliderSphere.cpp" />
     <ClCompile Include="String.cpp" />
@@ -282,10 +284,9 @@
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="Window.cpp" />
-    <ClCompile Include="Collection.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Error.cpp" />
+    <ClCompile Include="Debug.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,14 +9,14 @@ class MenuMain : public UIContainer
 	UIButton _buttonStart;
 	UIButton _buttonQuit;
 
-	FPTR<const String&> _onLevelChosen;
+	FunctionPointer<void, const String&> _onLevelChosen;
 	Callback _onQuit;
 
 public:
 	MenuMain() {}
 	virtual ~MenuMain() {}
 
-	void Initialise(const FPTR<const String&> &onLevelChosen, const Callback &onQuit);
+	void Initialise(const FunctionPointer<void, const String&> &onLevelChosen, const Callback &onQuit);
 
 	void ButtonStart(UIButton&);
 	void ButtonQuit(UIButton&);

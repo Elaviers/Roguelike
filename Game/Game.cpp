@@ -90,7 +90,7 @@ void Game::_InitGL()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
-	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
+	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag", ShaderChannel::ALL);
 }
 
 void Game::_Init()
@@ -124,7 +124,7 @@ void Game::Run()
 
 	MenuMain *menu = new MenuMain();
 	menu->SetBounds(0.5f, 0.5f, 400, 400, -200, -200);
-	menu->Initialise(FPTR<const String&>(this, &Game::StartLevel), Callback(this, &Game::ButtonQuit));
+	menu->Initialise(FunctionPointer<void, const String&>(this, &Game::StartLevel), Callback(this, &Game::ButtonQuit));
 	menu->SetParent(&_ui);
 
 	_window.Show();
@@ -146,7 +146,7 @@ void Game::Run()
 void Game::StartLevel(const String &level)
 {
 	_running = false;
-
+	
 	String fileString = IO::ReadFileString(level.GetData());
 	LevelGeneration::GenerateLevel(fileString);
 

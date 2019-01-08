@@ -1,8 +1,8 @@
-#include "Brush3D.h"
+#include "ObjBrush3D.h"
 #include "GLProgram.h"
 #include "Utilities.h"
 
-void Brush3D::_UpdateTransform()
+void ObjBrush3D::_UpdateTransform()
 {
 	float x = (_point1[0] + _point2[0]) / 2.f;
 	float y = (_point1[1] + _point2[1]) / 2.f;
@@ -17,11 +17,13 @@ void Brush3D::_UpdateTransform()
 
 #include "DrawUtils.h"
 
-void Brush3D::Render() const
+void ObjBrush3D::Render() const
 {
-	if (Engine::modelManager && _material)
+	if (Engine::modelManager && _material && GLProgram::Current().GetChannels() & _material->GetShaderChannels())
 	{
 		_material->Apply();
+
+		Mat4 pt = _parent ? _parent->GetTransformationMatrix() : Mat4();
 
 		Transform t;
 
@@ -29,13 +31,13 @@ void Brush3D::Render() const
 		//Front
 		t.SetScale(Vector3(transform.Scale()[0], transform.Scale()[1], 0.f));
 		t.SetPosition(transform.GetPosition() + Vector3(0.f, 0.f, -transform.Scale()[2] / 2.f));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		Engine::modelManager->Plane().Render();
 
 		//Back
 		t.SetRotation(Vector3(0.f, 180.f, 0.f));
 		t.Move(Vector3(0.f, 0.f, transform.Scale()[2]));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		Engine::modelManager->Plane().Render();
 
 		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(transform.Scale()[2], transform.Scale()[1]));
@@ -43,13 +45,13 @@ void Brush3D::Render() const
 		t.SetScale(Vector3(transform.Scale()[2], transform.Scale()[1], 0.f));
 		t.SetRotation(Vector3(0.f, 90.f, 0.f));
 		t.SetPosition(Vector3(transform.GetPosition() - Vector3(transform.Scale()[0] / 2.f, 0.f, 0.f)));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		Engine::modelManager->Plane().Render();
 
 		//Right
 		t.SetRotation(Vector3(0.f, -90.f, 0.f));
 		t.Move(Vector3(transform.Scale()[0], 0.f, 0.f));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		Engine::modelManager->Plane().Render();
 
 
@@ -58,13 +60,13 @@ void Brush3D::Render() const
 		t.SetScale(Vector3(transform.Scale()[0], transform.Scale()[2], 0.f));
 		t.SetRotation(Vector3(90.f, 0.f, 0.f));
 		t.SetPosition(transform.GetPosition() - Vector3(0.f, transform.Scale()[1] / 2.f, 0.f));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		Engine::modelManager->Plane().Render();
 
 		//Top
 		t.SetRotation(Vector3(-90.f, 0.f, 0.f));
 		t.Move(Vector3(0.f, transform.Scale()[1], 0.f));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		Engine::modelManager->Plane().Render();
 
 		//Done
@@ -72,15 +74,12 @@ void Brush3D::Render() const
 	}
 }
 
-void Brush3D::SaveToFile(BufferIterator<byte> &buffer, const Map<String, uint16> &strings) const
+void ObjBrush3D::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
 {
-	buffer.Write_byte(Engine::ObjectIDs::BRUSH3D);
-
 	if (Engine::materialManager && _material)
 	{																	//todo: const cast removal
-		const uint16 *id = strings.Find(Engine::materialManager->FindNameOf(const_cast<Material*>(_material)));
-		if (id) buffer.Write_uint16(*id);
-		else buffer.Write_uint16(0);
+		uint16 id = strings.Add(Engine::materialManager->FindNameOf(const_cast<Material*>(_material)));
+		buffer.Write_uint16(id);
 	}
 	else buffer.Write_uint16(0);
 
@@ -88,7 +87,7 @@ void Brush3D::SaveToFile(BufferIterator<byte> &buffer, const Map<String, uint16>
 	buffer.Write_vector3(transform.Scale());
 }
 
-void Brush3D::LoadFromFile(BufferIterator<byte> &buffer, const Map<uint16, String> &strings)
+void ObjBrush3D::ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet<String> &strings)
 {
 	const String *materialName = strings.Find(buffer.Read_uint16());
 	if (materialName)
@@ -105,11 +104,11 @@ void Brush3D::LoadFromFile(BufferIterator<byte> &buffer, const Map<uint16, Strin
 	_point2[2] = transform.Position()[2] + transform.Scale()[2] / 2.f;
 }
 
-void Brush3D::GetProperties(ObjectProperties &properties)
+void ObjBrush3D::GetCvars(CvarMap &cvar)
 {
-	_AddBaseProperties(properties);
+	_AddBaseCvars(cvar);
 
-	properties.Add<Brush3D, String>("Material", this, &Brush3D::GetMaterialName, &Brush3D::SetMaterial, PropertyFlags::MATERIAL);
-	properties.Add<Vector3>("Point 1", _point1);
-	properties.Add<Vector3>("Point 2", _point2);
+	cvar.Add("Material", Getter<String>((ObjBrush<3>*)this, &ObjBrush<3>::GetMaterialName), Setter<String>((ObjBrush<3>*)this, &ObjBrush<3>::SetMaterial), PropertyFlags::MATERIAL);
+	cvar.Add("Point 1", _point1);
+	cvar.Add("Point 2", _point2);
 }

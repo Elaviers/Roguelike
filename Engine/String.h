@@ -1,6 +1,9 @@
 #pragma once
-#include "Buffer.h"
+#include "Types.h"
 #include "Vector.h"
+
+template<typename T>
+class Buffer;
 
 bool StringsEqual(const char *a, const char *b);
 bool StringsInequal(const char *a, const char *b);

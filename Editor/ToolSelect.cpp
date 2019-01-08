@@ -2,6 +2,7 @@
 #include "Editor.h"
 #include "EditorUtil.h"
 #include <Engine/DrawUtils.h>
+#include <Engine/RaycastResult.h>
 
 void ToolSelect::Cancel()
 {
@@ -83,14 +84,14 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 	{
 		_placing = false;
 
-		Camera &camera = _owner.CameraRef(mouseData.viewport);
+		ObjCamera &camera = _owner.CameraRef(mouseData.viewport);
 		RECT windowDims;
 		::GetClientRect(_owner.ViewportRef(mouseData.viewport).GetHwnd(), &windowDims);
 		
 		Ray r = camera.ScreenCoordsToRay(Vector2((float)mouseData.x / (float)windowDims.right, (float)mouseData.y / (float)windowDims.bottom));
 		r.channel = RayChannel::CAMERA;
 
-		Buffer<RaycastResult> results = _owner.LevelRef().ObjectCollection().Raycast(r);
+		Buffer<RaycastResult> results = _owner.LevelRef().Raycast(r);
 
 		if (results.GetSize() > 0)
 		{
@@ -125,16 +126,13 @@ void ToolSelect::KeySubmit()
 	aabb.min = _box.GetMin();
 	aabb.max = _box.GetMax();
 
-	_selectedObjects = _owner.LevelRef().ObjectCollection().FindOverlaps(aabb);
+	_selectedObjects = _owner.LevelRef().FindOverlaps(aabb);
 }
 
 void ToolSelect::KeyDelete()
 {
 	for (uint32 i = 0; i < _selectedObjects.GetSize(); ++i)
-	{
-		_owner.LevelRef().ObjectCollection().RemoveObject(_selectedObjects[i]);
 		delete _selectedObjects[i];
-	}
 
 	_owner.PropertyWindowRef().Clear();
 	_selectedObjects.SetSize(0);

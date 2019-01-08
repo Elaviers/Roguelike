@@ -1,5 +1,5 @@
 #include "GLProgram.h"
-#include "Error.h"
+#include "Debug.h"
 #include "String.h"
 #include "IO.h"
 
@@ -18,13 +18,13 @@ void CompileShader(GLuint shader, const char *src)
 		
 		String error((unsigned int)value);
 		glGetShaderInfoLog(shader, value, &value, &error[0]);
-		Error(error.GetData());
+		Debug::Error(error.GetData());
 
 		glDeleteShader(shader);
 	}
 }
 
-void GLProgram::Create(const char *vertSrc, const char *fragSrc)
+void GLProgram::Create(const char *vertSrc, const char *fragSrc, byte channels)
 {
 	GLuint vert = glCreateShader(GL_VERTEX_SHADER);
 	GLuint frag = glCreateShader(GL_FRAGMENT_SHADER);
@@ -48,7 +48,7 @@ void GLProgram::Create(const char *vertSrc, const char *fragSrc)
 
 		String error((unsigned int)value);
 		glGetProgramInfoLog(_id, value, &value,  &error[0]);
-		Error(error.GetData());
+		Debug::Error(error.GetData());
 
 		glDeleteShader(frag);
 		glDeleteShader(vert);
@@ -56,16 +56,18 @@ void GLProgram::Create(const char *vertSrc, const char *fragSrc)
 		return;
 	}
 
+	_channels = channels;
+
 	glDeleteShader(frag);
 	glDeleteShader(vert);
 }
 
-void GLProgram::Load(const char *vertFile, const char *fragFile)
+void GLProgram::Load(const char *vertFile, const char *fragFile, byte channels)
 {
 	String vertSrc = IO::ReadFileString(vertFile);
 	String fragSrc = IO::ReadFileString(fragFile);
 
-	Create(vertSrc.GetData(), fragSrc.GetData());
+	Create(vertSrc.GetData(), fragSrc.GetData(), channels);
 }
 
 GLint GLProgram::GetUniformLocation(const char *name) const

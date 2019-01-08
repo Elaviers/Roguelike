@@ -36,7 +36,7 @@ void MaterialGrid::FromString(const String &string)
 		else Engine::materialManager->HandleCommand(lines[i]);
 	}
 
-	int rows = row_heights.GetSize();
+	uint32 rows = row_heights.GetSize();
 	_columns = column_widths.GetSize();
 	_elements.SetSize(rows * _columns);
 	

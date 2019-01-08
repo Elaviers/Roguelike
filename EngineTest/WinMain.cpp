@@ -1,13 +1,13 @@
 #include <Windowsx.h>
-#include <Engine\Camera.h>
 #include <Engine\DrawUtils.h>
 #include <Engine\GL.h>
 #include <Engine\GLContext.h>
 #include <Engine\GLProgram.h>
 #include <Engine\InputManager.h>
-#include <Engine\Light.h>
+#include <Engine\ObjCamera.h>
+#include <Engine\ObjLight.h>
+#include <Engine\ObjRenderable.h>
 #include <Engine\ModelManager.h>
-#include <Engine\Renderable.h>
 #include <Engine\Skybox.h>
 #include <Engine\String.h>
 #include <Engine\TextureManager.h>
@@ -39,14 +39,14 @@ GameObject lightParent3;
 Vector3 rotationOffset3(33, -2, 0.f);
 GameObject lightParent4;
 Vector3 rotationOffset4(15, 12.88f, 0);
-Light light1;
-Light light2;
-Light light3;
-Light light4;
+ObjLight light1;
+ObjLight light2;
+ObjLight light3;
+ObjLight light4;
 
-Renderable renderable;
-Camera camera;
-Renderable cube;
+ObjRenderable renderable;
+ObjCamera camera;
+ObjRenderable cube;
 GameObject cubeParent;
 Vector3 cubeParentRotationOffset(2.f, 11.7f, 0.f);
 Vector3 cubeRotationOffset(9.f, 23.f, 0.f);
@@ -194,10 +194,10 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	//Compile & link shaders
 	window.SetTitle("Compiling Shaders...");
 	//
-	program_Lit.Load("Data/Shader.vert", "Data/Phong.frag");
-	program_Unlit.Load("Data/Shader.vert", "Data/Unlit.frag");
-	program_Sky.Load("Data/Sky.vert", "Data/Sky.frag");
-	program_UI.Load("Data/Basic.vert", "Data/Basic.frag");
+	program_Lit.Load("Data/Shader.vert", "Data/Phong.frag", ShaderChannel::ALL);
+	program_Unlit.Load("Data/Shader.vert", "Data/Unlit.frag", ShaderChannel::ALL);
+	program_Sky.Load("Data/Sky.vert", "Data/Sky.frag", ShaderChannel::ALL);
+	program_UI.Load("Data/Basic.vert", "Data/Basic.frag", ShaderChannel::ALL);
 
 	//
 	//Initialise managers

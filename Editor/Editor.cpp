@@ -2,8 +2,8 @@
 #include <Engine/DebugFrustum.h>
 #include <Engine/DrawUtils.h>
 #include <Engine/IO.h>
+#include <Engine/ObjRenderable.h>
 #include <Engine/Ray.h>
-#include <Engine/Renderable.h>
 #include "EditorIO.h"
 #include "resource.h"
 #include "ResourceSelect.h"
@@ -11,7 +11,6 @@
 constexpr int tbImageSize = 32;
 
 constexpr GLfloat lineW = 1;
-constexpr GLfloat lineW_Connector = 2;
 
 const Buffer<Pair<const wchar_t*>> fdFilter({ Pair<const wchar_t*>(L"Level File", L"*.lvl"), Pair<const wchar_t*>(L"All Files", L"*.*") });
 
@@ -150,8 +149,8 @@ void Editor::_InitGL()
 
 	glLineWidth(lineW);
 
-	_shaderLit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Phong.frag");
-	_shaderUnlit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
+	_shaderLit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Phong.frag", ShaderChannel::ALL);
+	_shaderUnlit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag", ShaderChannel::ALL);
 }
 
 #pragma endregion
@@ -214,7 +213,7 @@ void Editor::Frame()
 
 	_timer.Start();
 
-	Camera &perspCam = CameraRef(_activeVP);
+	ObjCamera &perspCam = CameraRef(_activeVP);
 	perspCam.transform.Move(
 		perspCam.transform.GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed
 		+ perspCam.transform.GetRightVector() * _deltaTime * _axisMoveX * moveSpeed
@@ -248,20 +247,19 @@ void Editor::Render()
 
 void Editor::RenderViewport(int index, Direction dir)
 {
-	auto camera = CameraRef(index);
+	auto& camera = CameraRef(index);
 	bool persp = camera.GetProjectionType() == ProjectionType::PERSPECTIVE;
-	float gridLimit = persp ? 100.f : -1.f;
-	gridLimit = 100;
+	float gridLimit = persp ? 100.f : 0.f;
 
 	_glContext.Use(_viewports[index]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDepthFunc(GL_LEQUAL);
-
+	
 	_shaderUnlit.Use();
 	_shaderUnlit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
 	_shaderUnlit.SetMat4(DefaultUniformVars::mat4View, camera.GetInverseTransformationMatrix());
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
-	_level.ObjectCollection().Render(CameraRef(0));
+	_level.Render(camera);
 
 	if (!persp) glDepthFunc(GL_ALWAYS);
 	
@@ -275,16 +273,9 @@ void Editor::RenderViewport(int index, Direction dir)
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.5f, .5f, 1.f, 1.f));
 	DrawUtils::DrawGrid(_modelManager, camera, dir, 1.f, 10.f, gridLimit);
 
-	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
-
-	glLineWidth(lineW_Connector);
-	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
-	for (uint32 i = 0; i < _level.Connectors().GetSize(); ++i)
-		_level.Connectors()[i].Render();
+	_debugManager.RenderWorld();
 
 	if (_currentTool) _currentTool->Render();
-
-	_debugManager.RenderWorld();
 
 	_viewports[index].SwapBuffers();
 }
@@ -335,7 +326,7 @@ String Editor::SelectModelDialog()
 
 void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y)
 {
-	Camera& camera = CameraRef(vpIndex);
+	ObjCamera& camera = CameraRef(vpIndex);
 	Vector3 right = camera.transform.GetRightVector();
 	Vector3 up = camera.transform.GetUpVector();
 
@@ -444,7 +435,7 @@ void Editor::KeyDelete()
 
 void Editor::Zoom(float amount)
 {
-	Camera& camera = CameraRef(_mouseData.viewport);
+	ObjCamera& camera = CameraRef(_mouseData.viewport);
 
 	if (camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
 	{
@@ -553,8 +544,8 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 				::GetCurrentDirectoryA(MAX_PATH, cd);
 				String filename = EditorIO::OpenFileDialog(L"\\Data\\Levels", fdFilter);
 				editor->KeyCancel();
-				editor->_level.Clear();
-				editor->_level.ReadFromFile(filename.GetData());
+				editor->_level.DeleteChildren();
+				LevelIO::Read(editor->_level, filename.GetData());
 			}
 			break;
 
@@ -563,13 +554,13 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 				char cd[MAX_PATH];
 				::GetCurrentDirectoryA(MAX_PATH, cd);
 				String filename = EditorIO::SaveFileDialog(L"\\Data\\Levels", fdFilter);
-				editor->_level.WriteToFile(filename.GetData());
+				LevelIO::Write(editor->_level, filename.GetData());
 			}
 			break;
 
 			case ID_FILE_CLEAR:
 				editor->KeyCancel();
-				editor->_level.Clear();
+				editor->_level.DeleteChildren();
 				break;
 
 			case ID_VIEW_MATERIALS:

@@ -1,6 +1,6 @@
 #pragma once
 #include "DebugObject.h"
-#include "Camera.h"
+#include "ObjCamera.h"
 
 class DebugFrustum : public DebugObject
 {
@@ -14,7 +14,7 @@ public:
 
 	virtual void Render() const override;
 
-	static DebugFrustum FromCamera(const Camera&);
+	static DebugFrustum FromCamera(const ObjCamera&);
 
 	SIZEOF_DEF;
 };

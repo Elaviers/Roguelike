@@ -22,13 +22,13 @@ void Font::_HandleCommand(const String &string)
 			if (tokens[1] == "SPACE")
 			{
 				Glyph &glyph = _charMap[' '];
-				glyph.uvOffset[0] = tokens[2].ToInt();
-				glyph.uvOffset[1] = tokens[3].ToInt();
-				glyph.uvSize[0] = tokens[4].ToInt();
-				glyph.uvSize[1] = tokens[5].ToInt();
+				glyph.uvOffset[0] = (float)tokens[2].ToInt();
+				glyph.uvOffset[1] = (float)tokens[3].ToInt();
+				glyph.uvSize[0] = (float)tokens[4].ToInt();
+				glyph.uvSize[1] = (float)tokens[5].ToInt();
 				glyph.advance = tokens[6].ToInt();
 
-				glyph.width = glyph.uvSize[0] * _texture->GetWidth();
+				glyph.width = (int)(glyph.uvSize[0] * _texture->GetWidth());
 				if (glyph.width == 0)
 					glyph.width = glyph.advance;
 			}
@@ -77,7 +77,7 @@ void Font::FromString(const String &string)
 				if (tokens.GetSize() > 1)
 				{
 					Glyph &glyph = _charMap[tokens[0][0]];
-					glyph.width = glyphUVW * _texture->GetWidth();
+					glyph.width = (int)(glyphUVW * _texture->GetWidth());
 					glyph.advance = tokens[1].ToInt();
 
 					glyph.uvOffset[0] = (slot % _divsX) / (float)_divsX;

@@ -1,21 +1,22 @@
-#include "Light.h"
+#include "ObjLight.h"
+#include "CvarMap.h"
 #include "Engine.h"
 #include "GL.h"
 #include "GLProgram.h"
-#include "ObjectProperties.h"
 #include "String.h"
+#include "ShaderChannel.h"
 
-bool Light::drawLightSources = true;
+bool ObjLight::drawLightSources = true;
 
-void Light::GetProperties(ObjectProperties &properties)
+void ObjLight::GetCvars(CvarMap &cvars)
 {
-	_AddBaseProperties(properties);
+	_AddBaseCvars(cvars);
 
-	properties.Add<Vector3>("Colour", _colour);
-	properties.Add<float>("Attenuation Radius", _radius);
+	cvars.Add("Colour", _colour);
+	cvars.Add("Attenuation Radius", _radius);
 }
 
-void Light::ToShader(int glArrayIndex)
+void ObjLight::ToShader(int glArrayIndex)
 {
 	Mat4 worldTransform = GetTransformationMatrix();
 
@@ -25,13 +26,11 @@ void Light::ToShader(int glArrayIndex)
 	glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName + ".Radius")),		1, &_radius);
 }
 
-#include "ModelManager.h"
-
-void Light::Render() const
+void ObjLight::Render() const
 {
 	const float colour[4] = {_colour[0], _colour[1], _colour[2], 1.f};
 
-	if (drawLightSources)
+	if (drawLightSources && GLProgram::Current().GetChannels() & ShaderChannel::UNLIT)
 	{
 		glUniform4fv(GLProgram::Current().GetUniformLocation("Colour"), 1, colour);
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());

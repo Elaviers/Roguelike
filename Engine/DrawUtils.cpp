@@ -15,7 +15,7 @@ using namespace Utilities;
 
 namespace DrawUtils
 {
-	inline bool FindZOverlap(Vector3 &out, const Ray &r, int axisX, int axisY, int axisZ, int limit)
+	inline bool FindZOverlap(Vector3 &out, const Ray &r, int axisX, int axisY, int axisZ, float limit, const Vector3 &camPos)
 	{
 		if (r.direction[axisZ] == 0.f)
 			return false;
@@ -25,20 +25,36 @@ namespace DrawUtils
 		if (t < 0.f)
 			return false;
 
-		out[axisX] = r.origin[axisX] + Clamp(r.direction[axisX] * t, -1.f * limit, (float)limit);
-		out[axisY] = r.origin[axisY] + Clamp(r.direction[axisY] * t, -1.f * limit, (float)limit);
+		if (limit > 0.f)
+		{
+			out[axisX] = Clamp(r.origin[axisX] + r.direction[axisX] * t, camPos[axisX] - limit, camPos[axisX] + limit);
+			out[axisY] = Clamp(r.origin[axisY] + r.direction[axisY] * t, camPos[axisY] - limit, camPos[axisY] + limit);
+		}
+		else
+		{
+			out[axisX] = r.origin[axisX] + r.direction[axisX] * t;
+			out[axisY] = r.origin[axisY] + r.direction[axisY] * t;
+		}
 		return true;
 	}
 
-	inline void FindLimitOverlap(Vector3 &out, const Ray &r, int axisX, int axisY, int axisFWD, int limit)
+	inline void FindLimitOverlap(Vector3 &out, const Ray &r, int axisX, int axisY, int axisFWD, float limit, const Vector3 &camPos)
 	{
 		float t = limit / Abs(r.direction[axisFWD]);
 
-		out[axisX] = r.origin[axisX] + Clamp(r.direction[axisX] * t, -1.f * limit, (float)limit);
-		out[axisY] = r.origin[axisY] + Clamp(r.direction[axisY] * t, -1.f * limit, (float)limit);
+		if (limit > 0.f)
+		{
+			out[axisX] = Clamp(r.origin[axisX] + r.direction[axisX] * t, camPos[axisX] - limit, camPos[axisX] + limit);
+			out[axisY] = Clamp(r.origin[axisY] + r.direction[axisY] * t, camPos[axisY] - limit, camPos[axisY] + limit);
+		}
+		else
+		{
+			out[axisX] = r.origin[axisX] + r.direction[axisX] * t;
+			out[axisY] = r.origin[axisY] + r.direction[axisY] * t;
+		}
 	}
 
-	void DrawGrid(const ModelManager &modelManager, const Camera &camera, Direction dir, float width, float gap, float limit, float offset)
+	void DrawGrid(const ModelManager &modelManager, const ObjCamera &camera, Direction dir, float width, float gap, float limit, float offset)
 	{
 		Mat4 transformX;
 		Mat4 transformY;
@@ -85,10 +101,10 @@ namespace DrawUtils
 			points[i][axisY] = camera.transform.Position()[axisY];
 		}
 
-		results[0] = FindZOverlap(points[0], rays[0], axisX, axisY, axisZ, limit);
-		results[1] = FindZOverlap(points[1], rays[1], axisX, axisY, axisZ, limit);
-		results[2] = FindZOverlap(points[2], rays[2], axisX, axisY, axisZ, limit);
-		results[3] = FindZOverlap(points[3], rays[3], axisX, axisY, axisZ, limit);
+		results[0] = FindZOverlap(points[0], rays[0], axisX, axisY, axisZ, limit, camera.transform.Position());
+		results[1] = FindZOverlap(points[1], rays[1], axisX, axisY, axisZ, limit, camera.transform.Position());
+		results[2] = FindZOverlap(points[2], rays[2], axisX, axisY, axisZ, limit, camera.transform.Position());
+		results[3] = FindZOverlap(points[3], rays[3], axisX, axisY, axisZ, limit, camera.transform.Position());
 
 		float startX;
 		float startY;
@@ -108,10 +124,10 @@ namespace DrawUtils
 				morePoints[i][axisY] = camera.transform.Position()[axisY];
 			}
 
-			FindLimitOverlap(morePoints[0], rays[0], axisX, axisY, axisFwd, limit);
-			FindLimitOverlap(morePoints[1], rays[1], axisX, axisY, axisFwd, limit);
-			FindLimitOverlap(morePoints[2], rays[2], axisX, axisY, axisFwd, limit);
-			FindLimitOverlap(morePoints[3], rays[3], axisX, axisY, axisFwd, limit);
+			FindLimitOverlap(morePoints[0], rays[0], axisX, axisY, axisFwd, limit, camera.transform.Position());
+			FindLimitOverlap(morePoints[1], rays[1], axisX, axisY, axisFwd, limit, camera.transform.Position());
+			FindLimitOverlap(morePoints[2], rays[2], axisX, axisY, axisFwd, limit, camera.transform.Position());
+			FindLimitOverlap(morePoints[3], rays[3], axisX, axisY, axisFwd, limit, camera.transform.Position());
 
 			startX =	Min(
 						Min(points[0][axisX],

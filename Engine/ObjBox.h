@@ -1,21 +1,27 @@
 #pragma once
+#include "GameObject.h"
 #include "Types.h"
 #include "Vector.h"
 
-class Box
+class ObjBox : public GameObject
 {
 	Vector3 _p1, _p2;
 
 	void _UpdateMinMax();
+	void _UpdateTransform();
 
 protected:
 	Vector3 _min, _max;
 
 public:
-	Box() {}
-	virtual ~Box() {}
+	GAMEOBJECT_FUNCS(ObjBox)
 
-	virtual void Render() const;
+	ObjBox(byte flags = 0) : GameObject(flags) {}
+	virtual ~ObjBox() {}
+
+	virtual void Render() const override;
+
+	virtual Bounds GetBounds() const override { return Bounds(_min, _max); }
 
 	inline void SetPoint1(const Vector3 &point1) 
 	{

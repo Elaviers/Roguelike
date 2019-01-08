@@ -1,14 +1,19 @@
-#include "Connector.h"
+#include "ObjConnector.h"
 #include "DrawUtils.h"
 #include "Engine.h"
 #include "GLProgram.h"
+#include "ShaderChannel.h"
 
-void Connector::Render() const {
-	if (Engine::modelManager)
+void ObjConnector::Render() const {
+	if (Engine::modelManager && GLProgram::Current().GetChannels() & ShaderChannel::UNLIT)
 	{
+		Engine::textureManager->White().Bind(0);
+
 		Vector3 c = (_min + _max) / 2.f;
 		Vector3 size = _max - _min;
 
+		glLineWidth(3);
+		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
 		DrawUtils::DrawBox(*Engine::modelManager, _min, _max);
 
 		Transform t;
@@ -46,14 +51,14 @@ void Connector::Render() const {
 	}
 }
 
-void Connector::SaveToFile(BufferIterator<byte> &buffer) const
+void ObjConnector::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
 {
 	buffer.Write_byte((byte)direction);
 	buffer.Write_vector3(_min);
 	buffer.Write_vector3(_max);
 }
 
-void Connector::LoadFromFile(BufferIterator<byte> &buffer)
+void ObjConnector::ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet<String> &strings)
 {
 	direction = (Direction2D)buffer.Read_byte();
 	_min = buffer.Read_vector3();

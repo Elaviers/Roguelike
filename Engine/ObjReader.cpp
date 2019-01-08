@@ -1,6 +1,6 @@
 #include "IO.h"
 #include "Buffer.h"
-#include "Error.h"
+#include "Debug.h"
 #include "Utilities.h"
 #include <stdlib.h>
 

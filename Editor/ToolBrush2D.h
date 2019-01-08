@@ -1,14 +1,14 @@
 #pragma once
 #include "Tool.h"
-#include <Engine/Brush2D.h>
-#include <Engine/ObjectProperties.h>
+#include <Engine/CvarMap.h>
+#include <Engine/ObjBrush2D.h>
 
 class ToolBrush2D : public Tool
 {
 	bool _placing;
 
-	Brush2D _object;
-	ObjectProperties _properties;
+	ObjBrush2D _object;
+	CvarMap _cvars;
 
 public:
 	ToolBrush2D(Editor &owner) : Tool(owner) {}

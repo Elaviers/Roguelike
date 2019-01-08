@@ -26,6 +26,7 @@ class GLProgram
 {
 private:
 	GLuint _id;
+	byte _channels;
 
 	static const GLProgram* _currentProgram;
 
@@ -37,9 +38,10 @@ public:
 	inline static const GLProgram& Current() { return *_currentProgram; }
 
 	inline GLuint GetID() const { return _id; }
+	inline byte GetChannels() const { return _channels; }
 
-	void Create(const char *vertSource, const char *fragSource);
-	void Load(const char *vertFile, const char *fragFile);
+	void Create(const char *vertSource, const char *fragSource, byte channels);
+	void Load(const char *vertFile, const char *fragFile, byte channels);
 
 	inline void Use() const { glUseProgram(_id); _currentProgram = this; }
 	GLint GetUniformLocation(const char *name) const;

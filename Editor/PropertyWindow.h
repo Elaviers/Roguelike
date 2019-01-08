@@ -1,7 +1,7 @@
 #pragma once
 #include <Engine/Window.h>
 #include <Engine/Buffer.h>
-#include <Engine/ObjectProperties.h>
+#include <Engine/CvarMap.h>
 
 class Editor;
 class GameObject;
@@ -12,7 +12,7 @@ struct PropertyHWND
 	HWND box;
 	HWND button;
 	
-	Property *property;
+	Cvar *cvar;
 };
 
 class PropertyWindow : public Window
@@ -23,7 +23,7 @@ class PropertyWindow : public Window
 	static LRESULT _EditProc(HWND, UINT, WPARAM, LPARAM);
 	static WNDPROC _defaultEditProc;
 
-	ObjectProperties _objProperties;
+	CvarMap _cvars;
 
 	Buffer<PropertyHWND> _child_hwnds;
 
@@ -43,11 +43,10 @@ public:
 		Window::SetSize(256, 512);
 	}
 
-	inline ObjectProperties& GetProperties() { return _objProperties; }
-	void SetProperties(const ObjectProperties&, bool readOnly = false);
+	inline CvarMap& GetCvars() { return _cvars; }
+	void SetCvars(const CvarMap&, bool readOnly = false);
 
 	void SetObject(GameObject*, bool readOnly = false);
-	void ChangeBase(GameObject*);
 
 	void Refresh();
 

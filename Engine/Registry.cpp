@@ -1,18 +1,19 @@
 #include "Registry.h"
-#include "Brush2D.h"
-#include "Brush3D.h"
-#include "Camera.h"
-#include "Light.h"
-#include "Renderable.h"
-
-#define QUICKREGISTER(TYPE) this->RegisterObjectClass<TYPE>(#TYPE)
+#include "ObjBox.h"
+#include "ObjBrush2D.h"
+#include "ObjBrush3D.h"
+#include "ObjConnector.h"
+#include "ObjCamera.h"
+#include "ObjLight.h"
+#include "ObjRenderable.h"
 
 void Registry::RegisterEngineObjects()
 {
-	QUICKREGISTER(Camera);
-	QUICKREGISTER(Renderable);
-	QUICKREGISTER(Brush2D);
-	QUICKREGISTER(Brush3D);
-	QUICKREGISTER(Light);
-
+	RegisterObjectClass<ObjBox>			(101,	"Box");
+	RegisterObjectClass<ObjBrush2D>		(3,		"Plane");
+	RegisterObjectClass<ObjBrush3D>		(2,		"Brush");
+	RegisterObjectClass<ObjConnector>	(100,	"Level Connector");
+	RegisterObjectClass<ObjCamera>		(102,	"Camera");
+	RegisterObjectClass<ObjLight>		(4,		"Light");
+	RegisterObjectClass<ObjRenderable>	(1,		"Renderable");
 }

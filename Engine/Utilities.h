@@ -7,9 +7,9 @@ namespace Utilities
 	template <typename T>
 	inline void Swap(T &a, T &b)
 	{
-		T temp = a;
-		a = b;
-		b = temp;
+		T temp = std::move(a);
+		a = std::move(b);
+		b = std::move(temp);
 	}
 
 	template <typename T>
@@ -29,7 +29,7 @@ namespace Utilities
 		return x;
 	}
 
-	inline void CopyBytes(const void *src, void *dest, uint32 length)
+	inline void CopyBytes(const void *src, void *dest, size_t length)
 	{
 		for (uint32 i = 0; i < length; ++i)
 			reinterpret_cast<byte*>(dest)[i] = reinterpret_cast<const byte*>(src)[i];

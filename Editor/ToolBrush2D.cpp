@@ -1,21 +1,20 @@
 #include "ToolBrush2D.h"
 #include "Editor.h"
 #include "EditorUtil.h"
-#include <Engine/ObjectProperties.h>
 
 void ToolBrush2D::Initialise()
 {
 	_object.transform.SetScale(Vector3());
 	_object.SetMaterial("bricks");
-	_properties.SetBase(_object);
-	_properties.Add<Brush2D, String>("Material", &_object, &Brush2D::GetMaterialName, &Brush2D::SetMaterial, PropertyFlags::MATERIAL);
-	_properties.Add<float>("Level", _object.level);
+
+	_cvars.Add("Material", Getter<String>((ObjBrush<2>*)&_object, &ObjBrush<2>::GetMaterialName), Setter<String>((ObjBrush<2>*)&_object, &ObjBrush<2>::SetMaterial), PropertyFlags::MATERIAL);
+	_cvars.Add("Level", _object.level);
 }
 
 void ToolBrush2D::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
 {
 	properties.SetObject(&_object, true);
-	toolProperties.SetProperties(_properties);
+	toolProperties.SetCvars(_cvars);
 }
 
 void ToolBrush2D::Cancel()
@@ -55,9 +54,7 @@ void ToolBrush2D::MouseUp(const MouseData &mouseData)
 	{
 		_placing = false;
 
-		GameObject *brush = new Brush2D(_object);
- 
-		_owner.LevelRef().ObjectCollection().InsertObject(brush);
+		_object.Clone()->SetParent(&_owner.LevelRef());
 	}
 }
 

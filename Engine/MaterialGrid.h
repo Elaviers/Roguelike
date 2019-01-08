@@ -8,12 +8,12 @@ class MaterialGrid : public Material
 {
 	const GLTexture *_texture;
 
-	int _columns;
+	uint32 _columns;
 
 	Buffer<UVRect> _elements;
 
 public:
-	MaterialGrid() {}
+	MaterialGrid() : Material(ShaderChannel::ALL) {}
 	virtual ~MaterialGrid() {}
 
 	virtual void FromString(const String &string) override;
