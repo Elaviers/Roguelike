@@ -1,12 +1,13 @@
 #include "UIPanel.h"
 #include "Engine.h"
 #include "GLProgram.h"
+#include "ModelManager.h"
 #include "RenderParam.h"
 
 inline void RenderPlaneWithTransform(const Transform &t) 
 { 
 	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.GetTransformationMatrix()); 
-	Engine::modelManager->Plane().Render();
+	Engine::Instance().pModelManager->Plane().Render();
 }
 
 void UIPanel::Render() const

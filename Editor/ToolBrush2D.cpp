@@ -4,7 +4,7 @@
 
 void ToolBrush2D::Initialise()
 {
-	_object.transform.SetScale(Vector3());
+	_object.SetRelativeScale(Vector3());
 	_object.SetMaterial("bricks");
 
 	_cvars.Add("Material", Getter<String>((ObjBrush<2>*)&_object, &ObjBrush<2>::GetMaterialName), Setter<String>((ObjBrush<2>*)&_object, &ObjBrush<2>::SetMaterial), PropertyFlags::MATERIAL);

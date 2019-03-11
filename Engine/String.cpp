@@ -26,7 +26,7 @@ String::String(const String &other) : _length(other._length)
 
 //Move constructor
 
-String::String(String &&string) : _data(string._data), _length(string._length)
+String::String(String &&string) noexcept : _data(string._data), _length(string._length)
 {
 	string._data = nullptr;
 }
@@ -54,7 +54,7 @@ String::String(char character) : _length(1)
 
 ////
 
-String::String(unsigned int length)
+String::String(size_t length)
 {
 	_length = length;
 	_data = new char[_length + 1]();
@@ -62,7 +62,7 @@ String::String(unsigned int length)
 
 ////
 
-inline bool IsPartOfToken(char c, const char *delimiters, unsigned int delimiterCount)
+inline bool IsPartOfToken(char c, const char *delimiters, size_t delimiterCount)
 {
 	if (c == '\0')
 		return false;
@@ -76,13 +76,13 @@ inline bool IsPartOfToken(char c, const char *delimiters, unsigned int delimiter
 
 Buffer<String> String::Split(const char *delimiters) const
 {
-	unsigned int delimiterCount = StringLength(delimiters);
+	size_t delimiterCount = StringLength(delimiters);
 
 	Buffer<String> result;
 
-	uint32 tokenCount = 0;
+	size_t tokenCount = 0;
 
-	for (unsigned int i = 0; i < _length;)
+	for (size_t i = 0; i < _length;)
 	{
 		if (IsPartOfToken(_data[i], delimiters, delimiterCount))
 		{
@@ -96,16 +96,16 @@ Buffer<String> String::Split(const char *delimiters) const
 	{
 		result.SetSize(tokenCount);
 
-		unsigned int token = 0;
-		for (unsigned int i = 0; i < _length;) {
+		size_t token = 0;
+		for (size_t i = 0; i < _length;) {
 			if (IsPartOfToken(_data[i], delimiters, delimiterCount)) {
-				unsigned int length = 0;
-				for (unsigned int j = i; IsPartOfToken(_data[j], delimiters, delimiterCount); ++j)
+				size_t length = 0;
+				for (size_t j = i; IsPartOfToken(_data[j], delimiters, delimiterCount); ++j)
 					++length;
 
 				result[token].SetLength(length);
 
-				for (unsigned int j = 0; j < length; ++j)
+				for (size_t j = 0; j < length; ++j)
 					result[token][j] = _data[i + j];
 
 				token++;
@@ -118,7 +118,7 @@ Buffer<String> String::Split(const char *delimiters) const
 	return result;
 }
 
-String String::SubString(unsigned int start, unsigned int end) const
+String String::SubString(size_t start, size_t end) const
 {
 	if (start > _length)
 		return "";
@@ -127,7 +127,7 @@ String String::SubString(unsigned int start, unsigned int end) const
 		end = _length;
 
 	String string(end - start);
-	for (unsigned int i = start; i < end; ++i)
+	for (size_t i = start; i < end; ++i)
 		string._data[i - start] = _data[i];
 
 	return string;
@@ -135,7 +135,7 @@ String String::SubString(unsigned int start, unsigned int end) const
 
 int String::IndexOf(char c) const
 {
-	for (int i = 0; i < _length; ++i)
+	for (unsigned int i = 0; i < _length; ++i)
 		if (_data[i] == c)
 			return i;
 
@@ -144,9 +144,9 @@ int String::IndexOf(char c) const
 
 ////
 
-void String::SetLength(unsigned int length)
+void String::SetLength(size_t length)
 {
-	unsigned int minLength = length < _length ? length : _length;
+	size_t minLength = length < _length ? length : _length;
 
 	char *new_data = new char[length + 1]();
 
@@ -174,7 +174,7 @@ String& String::operator=(const String &other)
 	return *this;
 }
 
-String& String::operator=(String &&other)
+String& String::operator=(String &&other) noexcept
 {
 	delete[] _data;
 
@@ -219,7 +219,7 @@ String& String::operator+=(const String &other)
 
 String& String::operator+=(const char *string)
 {
-	unsigned int length = StringLength(string);
+	size_t length = StringLength(string);
 	char *new_data = new char[_length + length + 1];
 
 	for (unsigned int i = 0; i < _length; ++i)
@@ -343,7 +343,7 @@ Vector3 String::ToVector3() const
 
 String String::FromInt(__int64 number, unsigned int minimum, byte base)
 {
-	unsigned int digit_count = 1;
+	size_t digit_count = 1;
 
 	for (int64 n = number / 10; n; n /= 10)
 		++digit_count;
@@ -391,7 +391,7 @@ String String::FromFloat(double number, unsigned int minimum, unsigned int maxDe
 	else
 		whole_string = FromInt(whole_number, minimum, base);
 
-	unsigned int fraction_digit_count = 0;
+	size_t fraction_digit_count = 0;
 	for (double d = fraction; d != 0.f && fraction_digit_count < maxDecimal;) {
 		d *= base;
 		d -= (int)d;
@@ -431,7 +431,7 @@ String String::FromVector3(const Vector3 &vector, unsigned int minimum, unsigned
 
 String String::FromWideString(const wchar_t *string)
 {
-	unsigned int i = 0;
+	size_t i = 0;
 
 	while (string[++i] != 0x0000);
 	String result(i);
@@ -440,7 +440,7 @@ String String::FromWideString(const wchar_t *string)
 	do
 	{
 		if (string[i] <= 0xFF)
-			result[i] = string[i];
+			result[i] = (char)string[i];
 		else
 			result[i] = '?';
 

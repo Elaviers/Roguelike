@@ -1,4 +1,5 @@
 #include "ObjRenderable.h"
+#include "Collider.h"
 #include "CvarMap.h"
 #include "GLProgram.h"
 
@@ -22,6 +23,7 @@ void ObjRenderable::Render() const
 		}
 
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
+		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
 		_model->model.Render();
 	}
 }
@@ -29,40 +31,44 @@ void ObjRenderable::Render() const
 const Collider* ObjRenderable::GetCollider() const
 {
 	if (_model)
+	{
+		Collider* c = _model->collider;
+		
 		return _model->collider;
+	}
 
 	return nullptr;
 }
 
 String ObjRenderable::GetModelName() const
 {
-	if (Engine::modelManager && _model) return Engine::modelManager->FindNameOf(*_model);
+	if (Engine::Instance().pModelManager && _model) return Engine::Instance().pModelManager->FindNameOf(*_model);
 	return "Unknown";
 }
 
 String ObjRenderable::GetMaterialName() const
 {																						//todo: remove Smelly const cast
-	if (Engine::materialManager && _material) return Engine::materialManager->FindNameOf(const_cast<Material*>(_material));
+	if (Engine::Instance().pMaterialManager && _material) return Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material));
 	return "Unknown";
 }
 
 void ObjRenderable::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
 {
-	if (Engine::modelManager && _model)
+	if (Engine::Instance().pModelManager && _model)
 	{
-		uint16 id = strings.Add(Engine::modelManager->FindNameOf(*_model));
+		uint16 id = strings.Add(Engine::Instance().pModelManager->FindNameOf(*_model));
 		buffer.Write_uint16(id);
 	}
 	else buffer.Write_uint16(0);
 
-	if (!_materialIsDefault && Engine::materialManager && _material)
+	if (!_materialIsDefault && Engine::Instance().pMaterialManager && _material)
 	{																	//todo: const cast removal
-		uint16 id = strings.Add(Engine::materialManager->FindNameOf(const_cast<Material*>(_material)));
+		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material)));
 		buffer.Write_uint16(id);
 	}
 	else buffer.Write_uint16(0);
 
-	transform.WriteToBuffer(buffer);
+	RelativeTransform().WriteToBuffer(buffer);
 }
 
 void ObjRenderable::ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet<String> &strings)
@@ -75,5 +81,5 @@ void ObjRenderable::ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet
 	if (string = strings.Find(buffer.Read_uint16()))
 		SetMaterial(*string);
 
-	transform.ReadFromBuffer(buffer);
+	RelativeTransform().ReadFromBuffer(buffer);
 }

@@ -10,5 +10,6 @@ enum class Direction2D
 
 namespace Direction2DFuncs
 {
+	//Gets the angle in degrees represented by a direction (0° == east)
 	int GetAngleOf(Direction2D dir);
 }

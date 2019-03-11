@@ -1,16 +1,5 @@
 #include "GLModel.h"
 
-
-
-GLModel::GLModel() : _vao(0), _vbo(0), _ebo(0), _drawMode(GL_TRIANGLES)
-{
-}
-
-
-GLModel::~GLModel()
-{
-}
-
 inline void SetGLAttribs()
 {
 	glEnableVertexAttribArray(0);	//Position
@@ -42,7 +31,7 @@ void GLModel::_CreateNewObjects()
 	glGenBuffers(1, &_vbo);
 }
 
-void GLModel::Create(const Vertex17F *data, uint32 vertexCount)
+void GLModel::Create(const Vertex17F *data, GLsizei vertexCount)
 {
 	_CreateNewObjects();
 	_ebo = 0;
@@ -58,7 +47,7 @@ void GLModel::Create(const Vertex17F *data, uint32 vertexCount)
 	SetGLAttribs();
 }
 
-void GLModel::Create(const Vertex17F *data, uint32 vertexCount, const uint32 *elements, uint32 elementCount)
+void GLModel::Create(const Vertex17F *data, GLsizei vertexCount, const uint32 *elements, GLsizei elementCount)
 {
 	_CreateNewObjects();
 	glGenBuffers(1, &_ebo);
@@ -77,7 +66,7 @@ void GLModel::Create(const Vertex17F *data, uint32 vertexCount, const uint32 *el
 	SetGLAttribs();
 }
 
-void GLModel::Create(const Vector3 *basicData, uint32 vertexCount, const uint32 *elements, uint32 elementCount)
+void GLModel::Create(const Vector3 *basicData, GLsizei vertexCount, const uint32 *elements, GLsizei elementCount)
 {
 	_CreateNewObjects();
 	glGenBuffers(1, &_ebo);

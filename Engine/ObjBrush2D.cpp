@@ -1,5 +1,7 @@
 #include "ObjBrush2D.h"
 #include "GLProgram.h"
+#include "MaterialManager.h"
+#include "ModelManager.h"
 #include "Utilities.h"
 
 void ObjBrush2D::_UpdateTransform()
@@ -9,18 +11,18 @@ void ObjBrush2D::_UpdateTransform()
 	float w = Maths::Abs(_point1[0] - _point2[0]);
 	float h = Maths::Abs(_point1[1] - _point2[1]);
 
-	transform.SetPosition(Vector3(x, level, z));
-	transform.SetScale(Vector3(w, h, 0));
+	SetRelativePosition(Vector3(x, level, z));
+	SetRelativeScale(Vector3(w, h, 0));
 }
 
 void ObjBrush2D::Render() const
 {
-	if (Engine::modelManager && _material && GLProgram::Current().GetChannels() & _material->GetShaderChannels())
+	if (Engine::Instance().pModelManager && _material && GLProgram::Current().GetChannels() & _material->GetShaderChannels())
 	{
 		_material->Apply();
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(transform.Scale()[0], transform.Scale()[1]));
-		Engine::modelManager->Plane().Render();
+		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale()[0], GetRelativeScale()[1]));
+		Engine::Instance().pModelManager->Plane().Render();
 		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
 	}
 }
@@ -28,17 +30,17 @@ void ObjBrush2D::Render() const
 
 void ObjBrush2D::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
 {
-	if (Engine::materialManager && _material)
+	if (Engine::Instance().pMaterialManager && _material)
 	{																		//TODO: const cast removal
-		uint16 id = strings.Add(Engine::materialManager->FindNameOf(const_cast<Material*>(_material)));
+		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material)));
 		buffer.Write_uint16(id);
 	}
 	else buffer.Write_uint16(0);
 
-	buffer.Write_vector3(transform.Position());
+	buffer.Write_vector3(GetRelativePosition());
 
-	buffer.Write_float(transform.Scale()[0]);
-	buffer.Write_float(transform.Scale()[1]);
+	buffer.Write_float(GetRelativeScale()[0]);
+	buffer.Write_float(GetRelativeScale()[1]);
 }
 
 void ObjBrush2D::ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet<String> &strings)
@@ -47,18 +49,18 @@ void ObjBrush2D::ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet<St
 	if (materialName)
 		SetMaterial(*materialName);
 
-	transform.SetPosition(buffer.Read_vector3());
+	SetRelativePosition(buffer.Read_vector3());
 
 	float scaleX = buffer.Read_float();
 	float scaleY = buffer.Read_float();
 
-	transform.SetScale(Vector3(scaleX, scaleY, 0.f));
+	SetRelativeScale(Vector3(scaleX, scaleY, 0.f));
 
-	level = transform.Position()[1];
-	_point1[0] = transform.Position()[0] - transform.Scale()[0] / 2.f;
-	_point1[1] = transform.Position()[2] - transform.Scale()[1] / 2.f;
-	_point2[0] = transform.Position()[0] + transform.Scale()[0] / 2.f;
-	_point2[1] = transform.Position()[2] + transform.Scale()[1] / 2.f;
+	level = GetRelativePosition()[1];
+	_point1[0] = GetRelativePosition()[0] - GetRelativeScale()[0] / 2.f;
+	_point1[1] = GetRelativePosition()[2] - GetRelativeScale()[1] / 2.f;
+	_point2[0] = GetRelativePosition()[0] + GetRelativeScale()[0] / 2.f;
+	_point2[1] = GetRelativePosition()[2] + GetRelativeScale()[1] / 2.f;
 }
 
 void ObjBrush2D::GetCvars(CvarMap &cvars)

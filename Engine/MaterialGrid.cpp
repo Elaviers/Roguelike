@@ -2,62 +2,65 @@
 #include "GLProgram.h"
 #include "Engine.h"
 #include "RenderParam.h"
+#include "TextureManager.h"
 
-void MaterialGrid::FromString(const String &string)
+void MaterialGrid::_CMD_texture(const Buffer<String> &args)
 {
-	Buffer<String> lines = string.Split("\r\n");
-
-	Buffer<int> row_heights;
-	Buffer<int> column_widths;
-
-	for (uint32 i = 0; i < lines.GetSize(); ++i)
+	if (args.GetSize() > 0)
 	{
-		Buffer<String> tokens = lines[i].Split("=");
-
-		if (tokens.GetSize() > 1)
-		{
-			if (tokens[0] == "texture")
-				_texture = Engine::textureManager->GetTexture(tokens[1]);
-			else if (tokens[0] == "rows")
-			{
-				Buffer<String> rows = tokens[1].Split(",");
-
-				for (uint32 i = 0; i < rows.GetSize(); ++i)
-					row_heights.Add(rows[i].ToInt());
-			}
-			else if (tokens[0] == "columns")
-			{
-				Buffer<String> columns = tokens[1].Split(",");
-
-				for (uint32 i = 0; i < columns.GetSize(); ++i)
-					column_widths.Add(columns[i].ToInt());
-			}
-		}
-		else Engine::materialManager->HandleCommand(lines[i]);
+		_texture = Engine::Instance().pTextureManager->Get(args[0]);
+		_TryCalculateElements();
 	}
+}
 
-	uint32 rows = row_heights.GetSize();
-	_columns = column_widths.GetSize();
-	_elements.SetSize(rows * _columns);
-	
-	float y = 0;
-	for (uint32 r = 0; r < rows; ++r)
+void MaterialGrid::_CMD_rows(const Buffer<String> &args)
+{
+	_rowHeights.Clear();
+
+	for (size_t i = 0; i < args.GetSize(); ++i)
+		_rowHeights.Add(args[i].ToInt());
+
+	_TryCalculateElements();
+}
+
+void MaterialGrid::_CMD_columns(const Buffer<String> &args)
+{
+	_columnWidths.Clear();
+
+	for (size_t i = 0; i < args.GetSize(); ++i)
+		_columnWidths.Add(args[i].ToInt());
+
+	_TryCalculateElements();
+}
+
+void MaterialGrid::_TryCalculateElements()
+{
+	size_t rows = _rowHeights.GetSize();
+	size_t columns = _columnWidths.GetSize();
+
+	if (rows && columns && _texture->IsValid())
 	{
-		float h = (float)row_heights[r] / (float)_texture->GetHeight();
+		_elements.SetSize(rows * columns);
 
-		float x = 0;
-		for (uint32 c = 0; c < _columns; ++c)
+		float y = 0;
+		for (size_t r = 0; r < rows; ++r)
 		{
-			int index = r * _columns + c;
-			float w = (float)column_widths[c] / (float)_texture->GetWidth();
+			float h = (float)_rowHeights[r] / (float)_texture->GetHeight();
 
-			_elements[index].pos = Vector2(x, y);
-			_elements[index].size = Vector2(w, h);
+			float x = 0;
+			for (size_t c = 0; c < columns; ++c)
+			{
+				size_t index = r * columns + c;
+				float w = (float)_columnWidths[c] / (float)_texture->GetWidth();
 
-			x += w;
+				_elements[index].pos = Vector2(x, y);
+				_elements[index].size = Vector2(w, h);
+
+				x += w;
+			}
+
+			y += h;
 		}
-
-		y += h;
 	}
 }
 

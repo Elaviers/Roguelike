@@ -1,4 +1,5 @@
 #pragma once
+#include "Sound.h"
 #include "Bounds.h"
 #include "Buffer.h"
 #include "String.h"
@@ -27,6 +28,8 @@ namespace IO {
 	bool WriteFile(const char *filename, const byte *data, uint32 dataLength);
 
 	String ReadFileString(const char *filename);
+
+	WaveSound ReadWaveFile(const char* filename);
 
 	TextureData ReadPNGFile(const char *filename);
 	ModelData ReadOBJFile(const char *filename);

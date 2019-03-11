@@ -1,5 +1,7 @@
 #include "MenuMain.h"
 #include <Engine/Engine.h>
+#include <Engine/FontManager.h>
+#include <Engine/MaterialManager.h>
 #include "MenuStartLevel.h"
 
 const Vector4 inactiveBtnColour(.8f, .8f, .2f, 1.f);
@@ -10,8 +12,8 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	_onLevelChosen = onLevelChosen;
 	_onQuit = onQuit;
 
-	const Material *material = Engine::materialManager->GetMaterial("panel");
-	const Font *arial = Engine::fontManager->GetFont("arial32");
+	const Material *material = *Engine::Instance().pMaterialManager->Get("panel");
+	const Font *arial = Engine::Instance().pFontManager->Get("arial32");
 
 	_panel.SetParent(this);
 	_panel.SetMaterial(material);

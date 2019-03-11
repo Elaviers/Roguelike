@@ -1,75 +1,76 @@
-texture=fonts/arial32.png
-setmag nearest
+mag nearest
+mips 0
+texture fonts/arial32.png
 
-y_offset=6
-divs_x=8
-divs_y=8
+size 32
+row_h 32
+y_offset 6
 
 region SPACE 0 0 0 0 12
 
-//character_id advance
+//character_id width advance
 GLYPHS
-0 19
-1 12
-2 18
-3 19
-4 19
-5 19
-6 19
-7 18
-8 19
-9 19
-A 24
-B 20
-C 24
-D 20
-E 19
-F 19
-G 25
-H 20
-I 6
-J 15
-K 22
-L 17
-M 24
-N 20
-O 26
-P 20
-Q 26
-R 21
-S 21
-T 22
-U 20
-V 24
-W 34
-X 24
-Y 24
-Z 22
-a 18
-b 17
-c 17
-d 17
-e 18
-f 12
-g 17
-h 17
-i 6
-j 9
-k 17
-l 6
-m 26
-n 17
-o 18
-p 17
-q 17
-r 12
-s 17
-t 11
-u 17
-v 18
-w 26
-x 17
-y 18
-z 17
-. 6
-- 10
+0 17 2
+1 10 2
+2 16 2
+3 17 2
+4 17 2
+5 17 2
+6 17 2
+7 16 2
+8 17 2
+9 17 2
+A 22 2
+B 18 2
+C 22 2
+D 20 2
+E 17 2
+F 17 2
+G 23 2
+H 18 2
+I 4 2
+J 13 2
+K 20 2
+L 15 2
+M 22 2
+N 18 2
+O 24 2
+P 18 2
+Q 24 2
+R 19 2
+S 19 2
+T 20 2
+U 18 2
+V 22 2
+W 32 2
+X 22 2
+Y 22 2
+Z 20 2
+a 16 2
+b 15 2
+c 15 2
+d 15 2
+e 16 2
+f 10 2
+g 15 2
+h 15 2
+i 4 2
+j 7 2
+k 15 2
+l 4 2
+m 24 2
+n 15 2
+o 16 2
+p 15 2
+q 15 2
+r 10 2
+s 15 2
+t 9 2
+u 15 2
+v 16 2
+w 24 2
+x 15 2
+y 16 2
+z 15 2
+. 3 2
+- 8 2

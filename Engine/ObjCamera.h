@@ -11,12 +11,8 @@ enum class ProjectionType
 
 class ObjCamera : public GameObject
 {
-protected:
-	virtual void _OnTransformChanged() override { UpdateWorldToClip(); }
-
 private:
 	Mat4 _projection;
-	Mat4 _worldToClip;
 
 	ProjectionType _type;
 
@@ -27,7 +23,6 @@ private:
 	Vector<uint16, 2> _viewport;
 
 	void UpdateProjectionMatrix();
-	inline void UpdateWorldToClip() {_worldToClip = GetInverseTransformationMatrix() * _projection;}
 public:
 	GAMEOBJECT_FUNCS(ObjCamera)
 
@@ -49,7 +44,6 @@ public:
 	inline float GetFar() const							{ return _far; }
 
 	inline Mat4 GetProjectionMatrix() const				{ return _projection; }
-	inline Mat4 GetWorldToClipping() const				{ return _worldToClip; }
 
 	bool FrustumOverlaps(const Bounds &b) const;
 

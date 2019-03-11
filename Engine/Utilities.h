@@ -45,7 +45,7 @@ namespace Utilities
 
 	inline void StripExtension(String &string)
 	{
-		for (unsigned int i = string.GetLength() - 1; i > 0; --i)
+		for (size_t i = string.GetLength() - 1; i > 0; --i)
 			if (string[i] == '.')
 			{
 				string.SetLength(i);

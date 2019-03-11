@@ -50,7 +50,7 @@ OBJVertexDef ParseOBJVertex(const String &term)
 }
 
 template<typename T>
-inline const uint32 OBJIndexToCIndex(const Buffer<T> &buf, int32 objIndex)
+inline const uint32 OBJIndexToCIndex(const Buffer<T> &buf, size_t objIndex)
 {
 	if (objIndex == 0)
 		return 0;
@@ -150,7 +150,7 @@ ModelData IO::ReadOBJFile(const char *filename)
 				{
 					if (data.vertices.GetSize() == 0)
 					{
-						uint32 maxSizeSoFar = Utilities::Max(Utilities::Max(positions.GetSize(), normals.GetSize()), uvs.GetSize());
+						size_t maxSizeSoFar = Utilities::Max(Utilities::Max(positions.GetSize(), normals.GetSize()), uvs.GetSize());
 						data.vertices.SetSize(maxSizeSoFar);
 					}
 
@@ -160,7 +160,7 @@ ModelData IO::ReadOBJFile(const char *filename)
 						uint32 v2 = GetVertexIndex(data.vertices, vertexCount, positions, normals, uvs, tokens[2].GetData());
 						uint32 v3 = GetVertexIndex(data.vertices, vertexCount, positions, normals, uvs, tokens[3].GetData());
 
-						uint32 last = data.elements.GetSize();
+						size_t last = data.elements.GetSize();
 						data.elements.Append(3);
 
 						data.elements[last] = v1;
@@ -172,7 +172,7 @@ ModelData IO::ReadOBJFile(const char *filename)
 						{
 							uint32 v4 = GetVertexIndex(data.vertices, vertexCount, positions, normals, uvs, tokens[4].GetData());
 
-							uint32 last = data.elements.GetSize();
+							size_t last = data.elements.GetSize();
 							data.elements.Append(3);
 
 							data.elements[last] = v1;

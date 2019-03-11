@@ -43,7 +43,7 @@ GameObject* CreateConnectedSegment(const ObjConnector &connector, const LevelBag
 	Vector3 centre = levelMax - levelMin;
 
 	GameObject *newSegment = GameObject::Create();
-	newSegment->transform.SetPosition(centre);
+	newSegment->SetRelativePosition(centre);
 	newSegment->CloneChildrenFrom(level);
 	return newSegment;
 }

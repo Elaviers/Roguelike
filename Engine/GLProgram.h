@@ -31,7 +31,7 @@ private:
 	static const GLProgram* _currentProgram;
 
 public:
-	GLProgram() : _id(0) {}
+	GLProgram() : _channels(0), _id(0) {}
 	~GLProgram() {}
 	GLProgram(const GLProgram &) = delete;
 

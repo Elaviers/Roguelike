@@ -6,6 +6,8 @@
 
 enum class CvarType
 {
+	FUNCTION,
+
 	UINT16, UINT32, UINT64,
 	INT16, INT32, INT64,
 	BYTE,
@@ -31,6 +33,7 @@ namespace PropertyFlags
 }
 
 template <typename T> inline CvarType TypenameToEnum() { return CvarType::NONE; }
+template<> inline CvarType TypenameToEnum<CommandPtr>() { return CvarType::FUNCTION; }
 template<> inline CvarType TypenameToEnum<float>() { return CvarType::FLOAT; }
 template<> inline CvarType TypenameToEnum<byte>() { return CvarType::BYTE; }
 template<> inline CvarType TypenameToEnum<uint16>() { return CvarType::UINT16; }
@@ -77,6 +80,18 @@ public:
 	virtual void Set(const T&) = 0;
 };
 
+template <>
+class TypedCvar<CommandPtr> : public Cvar
+{
+public:
+	TypedCvar(byte flags) : Cvar(TypenameToEnum<CommandPtr>(), flags) {}
+	virtual ~TypedCvar() {}
+
+	virtual CommandPtr Get() const = 0;
+	virtual void Set(const CommandPtr&) = 0;
+
+	inline void Call(const Buffer<String>& args) const { Get()(args); }
+};
 
 template <typename T>
 class TypedCallbackCvar : public TypedCvar<T>
@@ -90,11 +105,11 @@ class TypedCallbackCvar : public TypedCvar<T>
 	Setter<T> _set;
 
 public:
-	//TypedCallbackCvar(const FunctionPointer<const T&>& getter, const FunctionPointer<void, const T&>& setter, byte flags = 0) : TypedCvar(flags), _isReferenceGetter(true) {}
-	TypedCallbackCvar(const Getter<T>& getter, const Setter<T>& setter, byte flags = 0) : TypedCvar<T>(flags), _isReferenceGetter(false), _getByObject(getter), _set(setter) {}
+	TypedCallbackCvar(const Getter<T> &getter, const Setter<T> &setter, byte flags = 0) : TypedCvar<T>(flags), _isReferenceGetter(false), _getByObject(getter), _set(setter) {}
+	TypedCallbackCvar(const Getter<const T&>& getter, const Setter<T>& setter, byte flags = 0) : TypedCvar<T>(flags), _isReferenceGetter(true), _getByReference(getter), _set(setter) {}
 	virtual ~TypedCallbackCvar() {}
 
-	virtual T Get() const override { return _getByObject(); }
+	virtual T Get() const override { return _isReferenceGetter ? _getByReference() : _getByObject(); }
 	virtual void Set(const T &value) override { _set(value); }
 
 	virtual size_t SizeOf() { return sizeof(*this); }
@@ -111,6 +126,21 @@ public:
 
 	virtual T Get() const override { return _value; }
 	virtual void Set(const T &value) override { _value = value; }
+
+	virtual size_t SizeOf() { return sizeof(*this); }
+};
+
+template <typename T>
+class TypedValueCvar : public TypedCvar<T>
+{
+	T _value;
+
+public:
+	TypedValueCvar(const T& value, byte flags = 0) : TypedCvar<T>(flags), _value(value) {}
+	virtual ~TypedValueCvar() {}
+
+	virtual T Get() const override { return _value; }
+	virtual void Set(const T& value) override { _value = value; }
 
 	virtual size_t SizeOf() { return sizeof(*this); }
 };

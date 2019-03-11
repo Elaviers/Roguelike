@@ -118,7 +118,7 @@ private:
 	Map<AxisType, float*> _axisBinds;
 
 public:
-	InputManager() {}
+	InputManager() : _keyStates() {}
 	~InputManager();
 
 	inline void BindAxis(AxisType axis, float *axisPtr) { _axisBinds.Set(axis, axisPtr); }

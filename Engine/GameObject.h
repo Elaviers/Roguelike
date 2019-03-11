@@ -10,6 +10,7 @@
 public:																						\
 	virtual size_t SizeOf() const { return sizeof(*this); }									\
 	virtual GameObject* Clone() const { return GameObject::_CreateCopy<CLASSNAME>(*this); } \
+	inline CLASSNAME* TypedClone() const { return (CLASSNAME*)Clone(); }					\
 	static CLASSNAME* Create() { CLASSNAME* obj = new CLASSNAME(); const_cast<bool&>(obj->_dynamic) = true; return obj; }
 
 class Collider;
@@ -20,6 +21,8 @@ struct RaycastResult;
 
 class GameObject
 {
+	Transform _transform;
+
 protected:
 	static void* operator new(size_t size) { return ::operator new(size); }
 	
@@ -44,18 +47,15 @@ public:
 
 	GAMEOBJECT_FUNCS(GameObject)
 
-	Transform transform;
-	//Note: transform is relative to parent!
+	GameObject(byte flags = 0) : _uid(GetNextUID()), _flags(flags), _dynamic(false), _parent(nullptr), _transform(Callback(this, &GameObject::_OnTransformChanged)) {}
 
-	GameObject(byte flags = 0) : _uid(GetNextUID()), _flags(flags), _dynamic(false), _parent(nullptr), transform(Callback(this, &GameObject::_OnTransformChanged)) {}
-
-	GameObject(const GameObject &other) : _uid(GetNextUID()), _flags(other._flags), _dynamic(false), _parent(other._parent), transform(other.transform)
+	GameObject(const GameObject &other) : _uid(GetNextUID()), _flags(other._flags), _dynamic(false), _parent(other._parent), _transform(other._transform)
 	{
-		transform.SetCallback(Callback(this, &GameObject::_OnTransformChanged));
+		_transform.SetCallback(Callback(this, &GameObject::_OnTransformChanged));
 		CloneChildrenFrom(other);
 	}
 
-	GameObject(GameObject &&other) : _uid(other._uid), _flags(other._flags), _dynamic(false) 
+	GameObject(GameObject &&other) noexcept : _parent(nullptr), _uid(other._uid), _flags(other._flags), _dynamic(false) 
 	{ 
 		operator=(std::move(other)); 
 		
@@ -71,6 +71,66 @@ public:
 			_parent->_children.Remove(this);
 	}
 	
+	//Transform
+	inline Transform& RelativeTransform()							{ return _transform; }
+	inline const Transform& RelativeTransform() const				{ return _transform; }
+	inline const Vector3& GetRelativePosition() const				{ return RelativeTransform().GetPosition(); }
+	inline const Vector3& GetRelativeRotation() const				{ return RelativeTransform().GetRotation(); }
+	inline const Vector3& GetRelativeScale() const					{ return RelativeTransform().GetScale(); }
+
+	inline void SetRelativeTransform(const Transform& transform)	{ _transform = transform; }
+	inline void SetRelativePosition(const Vector3 &v)				{ _transform.SetPosition(v); }
+	inline void SetRelativeRotation(const Vector3 &v)				{ _transform.SetRotation(v); }
+	inline void SetRelativeScale(const Vector3 &v)					{ _transform.SetScale(v); }
+
+	inline void RelativeMove(const Vector3& v)						{ _transform.Move(v); }
+	inline void RelativeRotate(const Vector3& v)					{ _transform.Rotate(v); }
+
+	inline Transform GetWorldTransform() const
+	{
+		if (_parent)
+			return _transform * _parent->GetWorldTransform();
+
+		return _transform;
+	}
+
+	inline Vector3 GetWorldPosition() const { return GetWorldTransform().GetPosition(); }
+	inline Vector3 GetWorldRotation() const { return GetWorldTransform().GetRotation(); }
+	inline Vector3 GetWorldScale() const { return GetWorldTransform().GetScale(); }
+
+	inline void SetWorldTransform(const Transform &t)
+	{
+		if (_parent)
+			SetRelativeTransform(t * _parent->GetWorldTransform().Inverse());
+		else
+			SetRelativeTransform(t);
+	}
+
+	inline void SetWorldPosition(const Vector3 &v) 
+	{ 
+		if (_parent)
+			SetRelativePosition(v * _parent->GetInverseTransformationMatrix());
+		else
+			SetRelativePosition(v);
+	}
+
+	inline void SetWorldRotation(const Vector3 &v) {
+		if (_parent)
+			SetRelativeRotation(v - _parent->GetWorldTransform().GetRotation());
+		else
+			SetRelativeRotation(v);
+	}
+
+	inline void SetWorldScale(const Vector3& v)
+	{
+		if (_parent)
+			SetRelativeScale(v / _parent->GetWorldTransform().GetScale());
+		else
+			SetRelativeScale(v);
+	}
+
+	Mat4 GetTransformationMatrix() const;
+	Mat4 GetInverseTransformationMatrix() const;
 
 	//Hierachy
 	inline GameObject* GetParent() const { return _parent; }
@@ -102,18 +162,6 @@ public:
 			src._children[i]->Clone()->SetParent(this);
 	}
 
-	//Transform
-	Mat4 GetTransformationMatrix() const;
-	Mat4 GetInverseTransformationMatrix() const;
-
-	inline Transform GetWorldTransform() const
-	{
-		if (_parent)
-			return transform * _parent->transform;
-
-		return transform;
-	}
-
 	//General
 	inline byte GetFlags() const { return _flags; }
 
@@ -140,7 +188,7 @@ public:
 	//Operators
 	GameObject& operator=(const GameObject&) = delete;
 
-	inline GameObject& operator=(GameObject &&other)
+	inline GameObject& operator=(GameObject &&other) noexcept
 	{
 		SetParent(other._parent);
 		other.SetParent(nullptr);
@@ -148,8 +196,8 @@ public:
 		for (uint32 i = 0; i < other._children.GetSize(); ++i)
 			other._children[i]->SetParent(this);
 
-		transform = other.transform;
-		transform.SetCallback(Callback(this, &GameObject::_OnTransformChanged));
+		_transform = other._transform;
+		_transform.SetCallback(Callback(this, &GameObject::_OnTransformChanged));
 
 		return *this;
 	}

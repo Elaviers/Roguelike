@@ -51,7 +51,7 @@ String KeyToString(Keycode key)
 
 Keycode StringToKey(const char *string)
 {
-	unsigned int length = StringLength(string);
+	size_t length = StringLength(string);
 
 	for (uint16 i = 0; i < keyCount; ++i)
 		if (StringsEqual(string, keyNames[i].name.GetData()))

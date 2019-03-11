@@ -19,7 +19,7 @@ private:
 	}
 
 public:
-	SquareMatrix() 
+	SquareMatrix() : _data{}
 	{
 		for (unsigned int r = 0; r < SIZE; ++r)
 			for (unsigned int c = 0; c < SIZE; ++c)

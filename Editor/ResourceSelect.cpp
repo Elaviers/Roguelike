@@ -20,11 +20,11 @@ class RSDialog;
 
 struct VPInfo
 {
-	Transform *transform;
-	bool moving;
-	bool sizing;
+	Transform *transform = nullptr;
+	bool moving = false;
+	bool sizing = false;
 
-	RSDialog *parent;
+	RSDialog *parent = nullptr;
 };
 
 class RSDialog
@@ -40,17 +40,17 @@ private:
 	ObjLight _light;
 public:
 	Buffer<String> paths;
-	int selection;
+	int selection = 0;
 
-	bool isModelSelect;
+	bool isModelSelect = false;
 
 	HDC viewportDC;
 	VPInfo viewportInfo;
 
-	HIMAGELIST imageList;
+	HIMAGELIST imageList = NULL;
 
 	RSDialog(const GLContext &context, const GLProgram &program, MaterialManager& materialManager, ModelManager &modelManager) : 
-		glContext(&context), glProgram(&program), materialManager(&materialManager), modelManager(&modelManager), viewportDC(0) {}
+		glContext(&context), glProgram(&program), materialManager(&materialManager), modelManager(&modelManager), viewportDC(NULL) {}
 
 	inline const String &GetRootPath() { return isModelSelect ? modelManager->GetRootPath() : materialManager->GetRootPath(); }
 
@@ -65,16 +65,16 @@ public:
 
 		_camera.SetProectionType(ProjectionType::PERSPECTIVE);
 		_camera.SetFOV(90.f);
-		_camera.transform.SetPosition(Vector3(-.7f, .7f, -.7f));
-		_camera.transform.SetRotation(Vector3(-45.f, 45.f, 0.f));
+		_camera.SetRelativePosition(Vector3(-.7f, .7f, -.7f));
+		_camera.SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
 
-		_light.transform.SetPosition(Vector3(-1.f, .5f, -2.f));
+		_light.SetRelativeRotation(Vector3(-1.f, .5f, -2.f));
 
 		if (!isModelSelect)
 			_object.SetModel(&modelManager->Cube());
 
 		viewportInfo.parent = this;
-		viewportInfo.transform = &_object.transform;
+		viewportInfo.transform = &_object.RelativeTransform();
 		viewportInfo.moving = false;
 		viewportInfo.sizing = false;
 	}
@@ -82,9 +82,9 @@ public:
 	void Update()
 	{
 		if (isModelSelect)
-			_object.SetModel(modelManager->GetModel(paths[selection]));
+			_object.SetModel(modelManager->Get(paths[selection]));
 		else
-			_object.SetMaterial(materialManager->GetMaterial(paths[selection]));
+			_object.SetMaterial(*materialManager->Get(paths[selection]));
 	}
 
 	void Draw()
@@ -93,7 +93,7 @@ public:
 
 		glProgram->Use();
 		glProgram->SetMat4(DefaultUniformVars::mat4Projection, _camera.GetProjectionMatrix());
-		glProgram->SetMat4(DefaultUniformVars::mat4View, _camera.transform.MakeInverseTransformationMatrix());
+		glProgram->SetMat4(DefaultUniformVars::mat4View, _camera.GetInverseTransformationMatrix());
 		glProgram->SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
 
 		glProgram->SetInt(DefaultUniformVars::intTextureDiffuse, 0);
@@ -154,7 +154,7 @@ INT_PTR DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		{
 			insertStruct.item.lParam = (LPARAM)i;
 			insertStruct.item.pszText = &rs->paths[i][0];
-			insertStruct.item.cchTextMax = rs->paths[i].GetLength();
+			insertStruct.item.cchTextMax = (int)rs->paths[i].GetLength();
 			::SendDlgItemMessage(hwnd, IDC_TREE, TVM_INSERTITEM, 0, (LPARAM)&insertStruct);
 		}
 
@@ -255,7 +255,7 @@ LPARAM viewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			else
 			{
 				float scaling = deltaY / -50.f;
-				const Vector3& currentScale = vpInfo->transform->Scale();
+				const Vector3& currentScale = vpInfo->transform->GetScale();
 				vpInfo->transform->SetScale(Vector3(currentScale[0] + scaling, currentScale[1] + scaling, currentScale[2] + scaling));
 			}
 

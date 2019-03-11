@@ -1,12 +1,8 @@
 #pragma once
 #include <Engine/GLContext.h>
 #include <Engine/GLProgram.h>
-#include <Engine/FontManager.h>
-#include <Engine/InputManager.h>
-#include <Engine/MaterialManager.h>
-#include <Engine/ModelManager.h>
 #include <Engine/ObjCamera.h>
-#include <Engine/TextureManager.h>
+#include <Engine/InputManager.h> //For keycode
 #include <Engine/Timer.h>
 #include <Engine/UIContainer.h>
 #include <Engine/Window.h>
@@ -24,11 +20,7 @@ private:
 	GLContext _glContext;
 	GLProgram _shader;
 
-	FontManager _fontManager;
-	InputManager _inputManager;
-	MaterialManager _materialManager;
-	ModelManager _modelManager;
-	TextureManager _textureManager;
+	bool _consoleIsActive;
 
 	UIContainer _ui;
 	ObjCamera _uiCamera;
@@ -39,8 +31,8 @@ private:
 	void _InitGL();
 	void _Init();
 public:
-	Game();
-	~Game();
+	Game() : _running(false), _deltaTime(0.f) {}
+	~Game() {}
 
 	void Run();
 	void Frame();
@@ -52,6 +44,9 @@ public:
 
 	void MouseMove(unsigned short x, unsigned short y);
 	void MouseDown();
+
+	void KeyDown(Keycode key);
+	void InputChar(char character);
 
 	void ButtonQuit();
 };

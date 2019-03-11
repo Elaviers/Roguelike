@@ -2,32 +2,21 @@
 #include "Engine.h"
 #include "Debug.h"
 #include "Utilities.h"
+#include "TextureManager.h"
 
-void MaterialSurface::FromString(const String &stringIn)
+void MaterialSurface::_CMD_tex(const Buffer<String>& args)
 {
-	String string = stringIn.ToLower();
-	Buffer<String> lines = string.Split("\r\n");
-
-	for (unsigned int i = 0; i < lines.GetSize(); ++i)
+	if (args.GetSize() >= 2)
 	{
-		Buffer<String> tokens = lines[i].Split("=");
+		if (args[0] == "diffuse")
+			_diffuse = Engine::Instance().pTextureManager->Get(args[1]);
+		else if (args[0] == "normal")
+			_normal = Engine::Instance().pTextureManager->Get(args[1]);
+		else if (args[0] == "specular")
+			_specular = Engine::Instance().pTextureManager->Get(args[1]);
+		else if (args[0] == "reflection")
+			_reflection = Engine::Instance().pTextureManager->Get(args[1]);
 
-		if (Engine::textureManager)
-		{
-			if (tokens.GetSize() > 1)
-			{
-				if (tokens[0] == "diffuse")
-					_diffuse = Engine::textureManager->GetTexture(tokens[1]);
-				else if (tokens[0] == "normal")
-					_normal = Engine::textureManager->GetTexture(tokens[1]);
-				else if (tokens[0] == "specular")
-					_specular = Engine::textureManager->GetTexture(tokens[1]);
-				else if (tokens[0] == "reflection")
-					_reflection = Engine::textureManager->GetTexture(tokens[1]);
-			}
-			else Engine::materialManager->HandleCommand(lines[i]);
-		}
-		else Debug::Error("Texture manager not set!");
 	}
 }
 

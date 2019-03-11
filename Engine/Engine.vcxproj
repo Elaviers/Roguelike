@@ -28,26 +28,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -98,7 +98,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>opengl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib; ole32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,7 +110,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>opengl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib; ole32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -128,7 +128,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib; ole32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,12 +146,16 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib; ole32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Console.h" />
+    <ClInclude Include="Sound.h" />
+    <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Bounds.h" />
     <ClInclude Include="Cvar.h" />
+    <ClInclude Include="List.h" />
     <ClInclude Include="ObjBox.h" />
     <ClInclude Include="ObjBrush.h" />
     <ClInclude Include="ObjBrush2D.h" />
@@ -206,6 +210,7 @@
     <ClInclude Include="RenderParam.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="NumberedSet.h" />
+    <ClInclude Include="Sampler.h" />
     <ClInclude Include="ShaderChannel.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="ColliderSphere.h" />
@@ -228,6 +233,13 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Console.cpp" />
+    <ClCompile Include="CvarMap.cpp" />
+    <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Bounds.cpp" />
     <ClCompile Include="Cvar.cpp" />
     <ClCompile Include="ObjBox.cpp" />
@@ -244,7 +256,6 @@
     <ClCompile Include="DebugString.cpp" />
     <ClCompile Include="Direction2D.cpp" />
     <ClCompile Include="DrawUtils.cpp" />
-    <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -269,6 +280,7 @@
     <ClCompile Include="ObjReader.cpp" />
     <ClCompile Include="Registry.cpp" />
     <ClCompile Include="ObjRenderable.cpp" />
+    <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="ColliderSphere.cpp" />
     <ClCompile Include="String.cpp" />
@@ -283,6 +295,7 @@
     <ClCompile Include="UIRect.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="WavReader.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>

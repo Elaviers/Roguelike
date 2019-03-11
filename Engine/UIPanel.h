@@ -13,7 +13,7 @@ class UIPanel : public UIElement
 	Transform _transforms[9];
 
 public:
-	UIPanel(UIElement *parent = nullptr) : UIElement(parent), _colour(1.f, 1.f, 1.f, 1.f) {}
+	UIPanel(UIElement *parent = nullptr) : UIElement(parent), _material(nullptr), _colour(1.f, 1.f, 1.f, 1.f), _borderSize(0.f) {}
 	virtual ~UIPanel() {}
 
 	virtual void Render() const override;

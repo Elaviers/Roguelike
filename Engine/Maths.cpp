@@ -4,7 +4,7 @@
 
 namespace Maths
 {
-	float Round(float x)
+	float RoundOff(float x)
 	{
 		if (x <= 0.0001f && x >= -0.0001f)
 			x = 0.f;
@@ -19,32 +19,32 @@ namespace Maths
 
 	float Sine(float radians)
 	{
-		return Round(sinf(radians));
+		return RoundOff(sinf(radians));
 	}
 
 	float Cosine(float radians)
 	{
-		return Round(cosf(radians));
+		return RoundOff(cosf(radians));
 	}
 
 	float Tangent(float radians)
 	{
-		return Round(tanf(radians));
+		return RoundOff(tanf(radians));
 	}
 
 	float ArcSine(float x)
 	{
-		return Round(asinf(x));
+		return RoundOff(asinf(x));
 	}
 
 	float ArcCosine(float x)
 	{
-		return Round(asinf(x));
+		return RoundOff(asinf(x));
 	}
 
 	float ArcTangent(float x)
 	{
-		return Round(atanf(x));
+		return RoundOff(atanf(x));
 	}
 
 	float Random()

@@ -114,14 +114,13 @@ namespace Matrix
 
 	Mat4 Perspective(float fieldOfView, float near, float far, float aspectRatio)
 	{
-		float scaleY = 1.f / TangentDegrees(fieldOfView / 2.f);
-		float zDepth = (far - near);
-
+		float tan = TangentDegrees(fieldOfView / 2.f);
+		
 		RETURNMAT4(
-			scaleY / aspectRatio,	0.f,		0.f,					0.f,
-			0.f,					scaleY,		0.f,					0.f,
-			0.f,					0.f,		far / zDepth,			1.f,
-			0.f,					0.f,		(-far * near) / zDepth,	0.f
+			1.f / aspectRatio * tan,	0.f,		0.f,							0.f,
+			0.f,						1.f / tan,	0.f,							0.f,
+			0.f,						0.f,		far / (far - near),				1.f,
+			0.f,						0.f,		-(far * near) / (far - near),	0.f
 		);
 	}
 }

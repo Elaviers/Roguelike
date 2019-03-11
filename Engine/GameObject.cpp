@@ -10,9 +10,9 @@
 void GameObject::_AddBaseCvars(CvarMap &cvars)
 {
 	cvars.Add("UID", const_cast<uint32&>(_uid), PropertyFlags::READONLY);
-	cvars.Add("Position",	Getter<Vector3>(&transform, &Transform::GetPosition), Setter<Vector3>(&transform, &Transform::SetPosition));
-	cvars.Add("Rotation",	Getter<Vector3>(&transform, &Transform::GetRotation), Setter<Vector3>(&transform, &Transform::SetRotation));
-	cvars.Add("Scale",		Getter<Vector3>(&transform, &Transform::GetScale), Setter<Vector3>(&transform, &Transform::SetScale));
+	cvars.Add("Position",	Getter<const Vector3&>(&_transform, &Transform::GetPosition), Setter<Vector3>(&_transform, &Transform::SetPosition));
+	cvars.Add("Rotation",	Getter<const Vector3&>(&_transform, &Transform::GetRotation), Setter<Vector3>(&_transform, &Transform::SetRotation));
+	cvars.Add("Scale",		Getter<const Vector3&>(&_transform, &Transform::GetScale), Setter<Vector3>(&_transform, &Transform::SetScale));
 }
 
 //Public
@@ -20,22 +20,22 @@ void GameObject::_AddBaseCvars(CvarMap &cvars)
 Mat4 GameObject::GetTransformationMatrix() const
 {
 	if (_parent)
-		return Mat4(transform.GetTransformationMatrix()) * _parent->GetTransformationMatrix();
+		return Mat4(_transform.GetTransformationMatrix()) * _parent->GetTransformationMatrix();
 
-	return Mat4(transform.GetTransformationMatrix());
+	return Mat4(_transform.GetTransformationMatrix());
 }
 
 Mat4 GameObject::GetInverseTransformationMatrix() const
 {
 	if (_parent)
-		return transform.GetInverseTransformationMatrix() * _parent->GetInverseTransformationMatrix();
+		return _transform.GetInverseTransformationMatrix() * _parent->GetInverseTransformationMatrix();
 
-	return transform.GetInverseTransformationMatrix();
+	return _transform.GetInverseTransformationMatrix();
 }
 
 void GameObject::Render(const ObjCamera &camera) const
 {
-	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags && FLAG_DBG_ALWAYS_DRAW)
+	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags & FLAG_DBG_ALWAYS_DRAW)
 		Render();
 
 	for (uint32 i = 0; i < _children.GetSize(); ++i)
@@ -48,7 +48,7 @@ void GameObject::WriteAllToFile(BufferIterator<byte> &buffer, NumberedSet<String
 {
 	if (_flags & FLAG_SAVEABLE)
 	{
-		byte id = Engine::registry.GetFirstCompatibleID(this);
+		byte id = Engine::Instance().registry.GetFirstCompatibleID(this);
 		if (id != 0)
 		{
 			buffer.Write_byte(id);
@@ -100,12 +100,12 @@ Buffer<RaycastResult> GameObject::Raycast(const Ray &ray)
 	return results;
 }
 
-Buffer<GameObject*> GameObject::FindOverlaps(const Collider &collider, const Transform &transform)
+Buffer<GameObject*> GameObject::FindOverlaps(const Collider &collider, const Transform &_transform)
 {
 	Buffer<GameObject*> results;
 
 	for (uint32 i = 0; i < _children.GetSize(); ++i)
-		if (_children[i]->OverlapsCollider(collider, transform))
+		if (_children[i]->OverlapsCollider(collider, _transform))
 			results.Add(_children[i]);
 
 	return results;

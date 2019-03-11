@@ -11,7 +11,7 @@ class ToolBrush2D : public Tool
 	CvarMap _cvars;
 
 public:
-	ToolBrush2D(Editor &owner) : Tool(owner) {}
+	ToolBrush2D(Editor &owner) : Tool(owner), _placing(false) {}
 	virtual ~ToolBrush2D() {}
 
 	virtual void Initialise();

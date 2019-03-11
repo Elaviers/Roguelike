@@ -1,5 +1,5 @@
-SURFACE
-diffuse=Normal.png
-normal=Normal.png
-specular=Diffuse.png
-reflection=Reflectivity.png
+surface
+tex diffuse Normal.png
+tex normal Normal.png
+tex specular Diffuse.png
+tex reflection Reflectivity.png

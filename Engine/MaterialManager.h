@@ -6,20 +6,10 @@
 class MaterialManager : public ResourceManager<Material*>
 {
 private:
-	Map<String, Command> _commands;
-
-	void Command_SetMag(const Buffer<String> &args);
+	virtual bool _CreateResource(Material *&, const String&, const String&) override;
 
 public:
-	MaterialManager() 
-	{
-		_commands["setmag"] = Command(this, &MaterialManager::Command_SetMag);
-	}
-
-	void HandleCommand(const String &command);
-
+	MaterialManager() {}
 	virtual ~MaterialManager() {}
-
-	const Material* GetMaterial(const String &name);
 };
  

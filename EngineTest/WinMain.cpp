@@ -248,19 +248,19 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 		camera.SetProectionType(ProjectionType::ORTHOGRAPHIC);
 		camera.SetZBounds(-100000.f, 100000.f);
 		camera.SetScale(128.f);
-		camera.transform.SetRotation(Vector3(-90.f, 0.f, 0.f));
+		camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
 	}
 	else
 	{
 		camera.SetProectionType(ProjectionType::PERSPECTIVE);
 		camera.SetZBounds(0.001f, 100000.f);
-		camera.transform.SetPosition(Vector3(0.f, 0.f, -5.f));
+		camera.SetRelativePosition(Vector3(0.f, 0.f, -5.f));
 	}
 
-	light1.transform.SetPosition(Vector3(0.f, 0.f, -4.f));
-	light2.transform.SetPosition(Vector3(0.f, 0.f, -3.5f));
-	light3.transform.SetPosition(Vector3(0.f, 0.f, -3.f));
-	light4.transform.SetPosition(Vector3(0.f, 0.f, -2.f));
+	light1.SetRelativePosition(Vector3(0.f, 0.f, -4.f));
+	light2.SetRelativePosition(Vector3(0.f, 0.f, -3.5f));
+	light3.SetRelativePosition(Vector3(0.f, 0.f, -3.f));
+	light4.SetRelativePosition(Vector3(0.f, 0.f, -2.f));
 
 	light1.SetColour(Vector3(1.f, 0.f, 0.f));
 	light2.SetColour(Vector3(0.f, 1.f, 0.f));
@@ -277,7 +277,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	light4.SetParent(&lightParent4);
 	lightParent4.SetParent(&cube);
 
-	cube.transform.SetPosition(Vector3(2.f, 0.f, 0.f));
+	cube.SetRelativePosition(Vector3(2.f, 0.f, 0.f));
 	cube.SetParent(&cubeParent);
 	cube.SetModel(&modelManager.Cube());
 
@@ -326,19 +326,19 @@ void Frame()
 	float moveAmount = MOVERATE * dt;
 	float turnAmount = TURNRATE * dt;
 
-	camera.transform.Move(camera.transform.GetForwardVector() * axisZ * moveAmount +
-		camera.transform.GetRightVector() * axisX * moveAmount +
-		camera.transform.GetUpVector() * axisY * moveAmount);
+	camera.RelativeMove(camera.RelativeTransform().GetForwardVector() * axisZ * moveAmount +
+		camera.RelativeTransform().GetRightVector() * axisX * moveAmount +
+		camera.RelativeTransform().GetUpVector() * axisY * moveAmount);
 
-	camera.transform.Rotate(Vector3(lookX * turnAmount, lookY * turnAmount, lookZ * turnAmount));
+	camera.RelativeRotate(Vector3(lookX * turnAmount, lookY * turnAmount, lookZ * turnAmount));
 
-	lightParent1.transform.Rotate(rotationOffset1 * dt);
-	lightParent2.transform.Rotate(rotationOffset2 * dt);
-	lightParent3.transform.Rotate(rotationOffset3 * dt);
-	lightParent4.transform.Rotate(rotationOffset4 * dt);
+	lightParent1.RelativeRotate(rotationOffset1 * dt);
+	lightParent2.RelativeRotate(rotationOffset2 * dt);
+	lightParent3.RelativeRotate(rotationOffset3 * dt);
+	lightParent4.RelativeRotate(rotationOffset4 * dt);
 
-	cubeParent.transform.Rotate(cubeParentRotationOffset * dt);
-	cube.transform.Rotate(cubeRotationOffset * dt);
+	cubeParent.RelativeRotate(cubeParentRotationOffset * dt);
+	cube.RelativeRotate(cubeRotationOffset * dt);
 
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -12,7 +12,7 @@ class ToolEntity : public Tool
 	byte _GetClassID() const { return _classID; }
 
 public:
-	ToolEntity(Editor &level) : Tool(level) {}
+	ToolEntity(Editor &level) : Tool(level), _classID(0) {}
 	virtual ~ToolEntity() {}
 
 	virtual void Initialise() override;

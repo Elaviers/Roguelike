@@ -2,6 +2,7 @@
 #include "Editor.h"
 #include "EditorUtil.h"
 #include <Engine/DrawUtils.h>
+#include <Engine/InputManager.h>
 #include <Engine/RaycastResult.h>
 
 void ToolSelect::Cancel()
@@ -36,25 +37,25 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 			else if (_focusedObject)
 			{
 				Vector3 newPos;
-				newPos[mouseData.forwardElement] = _focusedObject->transform.Position()[mouseData.forwardElement];
+				newPos[mouseData.forwardElement] = _focusedObject->GetWorldPosition()[mouseData.forwardElement];
 				newPos[mouseData.rightElement] = mouseData.unitX + _dragOffsetX;
 				newPos[mouseData.upElement] = mouseData.unitY + _dragOffsetY;
 
-				_focusedObject->transform.SetPosition(newPos);
+				_focusedObject->SetWorldPosition(newPos);
 			}
 		}
 		else if (!_placing)
 		{
 			Vector3 v;
 
-			v[mouseData.rightElement] = mouseData.unitX_rounded;
-			v[mouseData.upElement] = mouseData.unitY_rounded;
-			v[mouseData.forwardElement] = -100;
+			v[mouseData.rightElement] = (float)mouseData.unitX_rounded;
+			v[mouseData.upElement] = (float)mouseData.unitY_rounded;
+			v[mouseData.forwardElement] = -100.f;
 			_box.SetPoint1(v);
 
-			v[mouseData.rightElement] = mouseData.unitX_rounded + 1;
-			v[mouseData.upElement] = mouseData.unitY_rounded + 1;
-			v[mouseData.forwardElement] = 100;
+			v[mouseData.rightElement] = (float)mouseData.unitX_rounded + 1.f;
+			v[mouseData.upElement] = (float)mouseData.unitY_rounded + 1.f;
+			v[mouseData.forwardElement] = 100.f;
 			_box.SetPoint2(v);
 
 			GameObject *prevObj = _focusedObject;
@@ -95,7 +96,7 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 
 		if (results.GetSize() > 0)
 		{
-			if (Engine::inputManager->IsKeyDown(Keycode::CTRL))
+			if (Engine::Instance().pInputManager->IsKeyDown(Keycode::CTRL))
 				_selectedObjects.Add(results[0].object);
 			else
 			{
@@ -104,7 +105,7 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 				_owner.PropertyWindowRef().SetObject(_selectedObjects[0]);
 			}
 		}
-		else if (!Engine::inputManager->IsKeyDown(Keycode::CTRL))
+		else if (!Engine::Instance().pInputManager->IsKeyDown(Keycode::CTRL))
 		{
 			_selectedObjects.SetSize(0);
 			_owner.PropertyWindowRef().Clear();
@@ -112,8 +113,10 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 	}
 	else if (_focusedObject) 
 	{
-		_dragOffsetX = _focusedObject->transform.Position()[mouseData.rightElement] - mouseData.unitX;
-		_dragOffsetY = _focusedObject->transform.Position()[mouseData.upElement] - mouseData.unitY;
+		Vector3 objPos = _focusedObject->GetWorldPosition();
+
+		_dragOffsetX = objPos[mouseData.rightElement] - mouseData.unitX;
+		_dragOffsetY = objPos[mouseData.upElement] - mouseData.unitY;
 	}
 	else _placing = true;
 }
@@ -155,7 +158,7 @@ void ToolSelect::Render() const
 	{
 		Bounds bounds = _selectedObjects[i]->GetWorldBounds();
 
-		DrawUtils::DrawBox(*Engine::modelManager, bounds.min, bounds.max);
+		DrawUtils::DrawBox(*Engine::Instance().pModelManager, bounds.min, bounds.max);
 	}
 
 	glDepthFunc(GL_LESS);

@@ -3,20 +3,20 @@
 
 struct MouseData
 {
-	int viewport;
-	int x;
-	int y;
-	float unitX;
-	float unitY;
-	int unitX_rounded;
-	int unitY_rounded;
+	int viewport = 0;
+	int x = 0;
+	int y = 0;
+	float unitX = 0.f;
+	float unitY = 0.f;
+	int unitX_rounded = 0;
+	int unitY_rounded = 0;
 
-	byte forwardElement;
-	byte rightElement;
-	byte upElement;
+	byte forwardElement = 0;
+	byte rightElement = 0;
+	byte upElement = 0;
 
-	bool isLeftDown;
-	bool isRightDown;
-	int heldUnitX_rounded;
-	int heldUnitY_rounded;
+	bool isLeftDown = false;
+	bool isRightDown = false;
+	int heldUnitX_rounded = 0;
+	int heldUnitY_rounded = 0;
 };

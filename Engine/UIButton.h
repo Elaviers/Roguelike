@@ -18,7 +18,7 @@ protected:
 	UILabel _label;
 
 public:
-	UIButton(UIElement *parent = nullptr) : UIElement(parent), _panel(this), _label(this) { }
+	UIButton(UIElement *parent = nullptr) : UIElement(parent), _active(false), _panel(this), _label(this) { }
 
 	virtual ~UIButton() {}
 

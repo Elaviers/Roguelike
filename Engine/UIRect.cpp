@@ -1,6 +1,8 @@
 #include "UIRect.h"
 #include "Engine.h"
 #include "GLProgram.h"
+#include "ModelManager.h"
+#include "TextureManager.h"
 
 void UIRect::OnBoundsChanged()
 {
@@ -14,9 +16,9 @@ void UIRect::Render() const
 	if (_texture)
 		_texture->Bind(0);
 	else
-		Engine::textureManager->White().Bind(0);
+		Engine::Instance().pTextureManager->White().Bind(0);
 
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
 	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, _transform.GetTransformationMatrix());
-	Engine::modelManager->Plane().model.Render();
+	Engine::Instance().pModelManager->Plane().model.Render();
 }

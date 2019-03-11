@@ -11,7 +11,7 @@ public:
 
 	float level;
 
-	ObjBrush2D() : level(0.f) { transform.SetRotation(Vector3(-90.f, 0.f, 0.f)); }
+	ObjBrush2D() : level(0.f) { SetRelativeRotation(Vector3(-90.f, 0.f, 0.f)); }
 	virtual ~ObjBrush2D() {}
 	
 	virtual void Render() const override;

@@ -31,15 +31,14 @@ class Transform
 
 public:
 	Transform(const Callback &callback = Callback(nullptr)) : _onChanged(callback), _scale(1.f, 1.f, 1.f), _matrixStatus(MAT_EMPTY) {}
+	Transform(const Vector3& position, const Vector3& rotation = Vector3(0, 0, 0), const Vector3& scale = Vector3(1, 1, 1), const Callback& callback = Callback(nullptr)) : 
+		_position(position), _rotation(rotation), _scale(scale), _onChanged(callback), _matrixStatus(MAT_EMPTY) {}
+	
 	~Transform() {}
 
-	inline const Vector3& Position() const	{ return _position; }
-	inline const Vector3& Rotation() const	{ return _rotation; }
-	inline const Vector3& Scale() const		{ return _scale; }
-
-	inline Vector3 GetPosition() const	{ return _position; }
-	inline Vector3 GetRotation() const	{ return _rotation; }
-	inline Vector3 GetScale() const		{ return _scale; }
+	inline const Vector3& GetPosition() const			{ return _position; }
+	inline const Vector3& GetRotation() const			{ return _rotation; }
+	inline const Vector3& GetScale() const				{ return _scale; }
 
 	inline void SetPosition(const Vector3 &position)	{ _position = position; _Update(); }
 	inline void SetRotation(const Vector3 &rotation)	{ _rotation = rotation; _Update(); }
@@ -65,6 +64,8 @@ public:
 		t *= other;
 		return t;
 	}
+
+	inline Transform Inverse() const { return Transform(_position * -1.f, _rotation * -1.f, 1.f / _scale); }
 
 	void WriteToBuffer(BufferIterator<byte> &buffer) const;
 	void ReadFromBuffer(BufferIterator<byte> &buffer);

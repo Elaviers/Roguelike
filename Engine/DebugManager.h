@@ -14,7 +14,7 @@ class DebugManager
 	const Font *_font;
 
 public:
-	DebugManager() {}
+	DebugManager() : _font(nullptr) {}
 	~DebugManager() {}
 
 	inline void SetFont(const Font &font) { _font = &font; }

@@ -32,8 +32,8 @@ class PropertyWindow : public Window
 	void _CreateHWNDs(bool readOnly);
 
 public:
-	PropertyWindow(Editor *owner);
-	virtual ~PropertyWindow();
+	PropertyWindow(Editor* owner) : _owner(owner) {}
+	virtual ~PropertyWindow() {}
 
 	static void Initialise(HBRUSH);
 

@@ -7,7 +7,7 @@ protected:
 
 	bool _markedForDelete;
 
-	//Absoulte bounds
+	//Absolute bounds
 	float _x, _y, _w, _h;
 	
 	//Relative bounds

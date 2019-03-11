@@ -45,7 +45,7 @@ bool LevelIO::Write(const GameObject &world, const char *filename)
 		WriteStringMessage(iterator1, *stringBuffer[i].second, *stringBuffer[i].first);
 
 	Buffer<byte> finalBuffer = buffer1 + buffer2;
-	return IO::WriteFile(filename, finalBuffer.Data(), finalBuffer.GetSize());
+	return IO::WriteFile(filename, finalBuffer.Data(), (uint32)finalBuffer.GetSize());
 }
 
 bool LevelIO::Read(GameObject &world, const char *filename)
@@ -87,7 +87,7 @@ bool LevelIO::Read(GameObject &world, const char *filename)
 			}
 			else
 			{
-				GameObject *obj = Engine::registry.GetNode(id)->New();
+				GameObject *obj = Engine::Instance().registry.GetNode(id)->New();
 				if (obj)
 				{
 					obj->SetParent(&world);

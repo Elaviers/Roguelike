@@ -11,7 +11,7 @@ class ToolConnector : public Tool
 	CvarMap _cvars;
 
 public:
-	ToolConnector(Editor &level) : Tool(level) {}
+	ToolConnector(Editor &level) : Tool(level), _placing(false) {}
 	virtual ~ToolConnector() {}
 
 	virtual void Initialise();

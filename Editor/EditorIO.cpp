@@ -27,7 +27,7 @@ String EditorIO::OpenFileDialog(const wchar_t *dir, const Buffer<Pair<const wcha
 	HRESULT result = ::CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog, (void**)&fileOpenDialog);
 	if (SUCCEEDED(result))
 	{
-		fileOpenDialog->SetFileTypes(_fileTypes.GetSize(), _fileTypes.Data());
+		fileOpenDialog->SetFileTypes((UINT)_fileTypes.GetSize(), _fileTypes.Data());
 
 		IShellItem *folder;
 
@@ -78,7 +78,7 @@ String EditorIO::SaveFileDialog(const wchar_t *dir, const Buffer<Pair<const wcha
 		SHCreateItemFromParsingName(fullPath, NULL, IID_PPV_ARGS(&folder));
 
 		fileSaveDialog->SetDefaultExtension(L"lvl");
-		fileSaveDialog->SetFileTypes(_fileTypes.GetSize(), _fileTypes.Data());
+		fileSaveDialog->SetFileTypes((UINT)_fileTypes.GetSize(), _fileTypes.Data());
 		fileSaveDialog->SetFolder(folder);
 
 		result = fileSaveDialog->Show(NULL);

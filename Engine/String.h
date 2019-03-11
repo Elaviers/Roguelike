@@ -11,32 +11,32 @@ bool StringsInequal(const char *a, const char *b);
 class String {
 private:
 	char *_data;
-	unsigned int _length;
+	size_t _length;
 
 public:
 	~String();
 	String();
 	String(const String &string);
-	String(String&& string);
+	String(String&& string) noexcept;
 
 	String(const char *string);
 	String(char character);
-	String(unsigned int length);
+	String(size_t length);
 
 	Buffer<String> Split(const char *delimiters) const;
-	String SubString(unsigned int start, unsigned int end) const;
-	inline String SubString(unsigned int start) const { return SubString(start, _length); }
+	String SubString(size_t start, size_t end) const;
+	inline String SubString(size_t start) const { return SubString(start, _length); }
 	int IndexOf(char) const;
 
-	void SetLength(unsigned int length);
+	void SetLength(size_t length);
 	inline void Clear() { SetLength(0); }
 
 	inline const char* const GetData() const { return _data; }
-	inline unsigned int GetLength() const { return _length; }
-	inline char& operator[](unsigned int position) const { return _data[position]; }
+	inline size_t GetLength() const { return _length; }
+	inline char& operator[](size_t position) const { return _data[position]; }
 
 	String& operator=(const String&);
-	String& operator=(String&&);
+	String& operator=(String&&) noexcept;
 	String& operator=(const char*);
 	String& operator+=(const String&);
 	String& operator+=(const char*);
@@ -61,7 +61,7 @@ public:
 	Vector3 ToVector3() const;
 
 	//
-	static String FromInt(__int64,	unsigned int minimunDigits = 0, byte base = 10);
+	static String FromInt(int64,	unsigned int minimunDigits = 0, byte base = 10);
 	static String FromFloat(double, unsigned int minimumDigits = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
 	static String FromVector2(const Vector2&, unsigned int minimum = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
 	static String FromVector3(const Vector3&, unsigned int minimum = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
@@ -70,8 +70,8 @@ public:
 
 #define CSTR(BODY) ((String)BODY).GetData()
 
-inline unsigned int StringLength(const char *string) {
-	unsigned int length = 0;
+inline size_t StringLength(const char *string) {
+	size_t length = 0;
 	while (string[length] != '\0') length++;
 	return length;
 }

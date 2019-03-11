@@ -19,11 +19,6 @@ LRESULT ToolWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 	}
 		break;
 
-
-	case WM_COMMAND:
-
-		break;
-
 	default:
 		return ::DefWindowProc(hwnd, msg, wparam, lparam);
 	}

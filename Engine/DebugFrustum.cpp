@@ -7,11 +7,11 @@ using namespace DrawUtils;
 
 void DebugFrustum::Render() const
 {
-	if (Engine::modelManager)
+	if (Engine::Instance().pModelManager)
 	{
 		_PreRender();
 
-		const ModelManager &mm = *Engine::modelManager;
+		const ModelManager &mm = *Engine::Instance().pModelManager;
 
 		for (int i = 0; i < 4; ++i) DrawLine(mm, _origin, _far[i]);
 
@@ -33,7 +33,7 @@ DebugFrustum DebugFrustum::FromCamera(const ObjCamera &camera)
 {
 	DebugFrustum frustum;
 
-	frustum._origin = camera.transform.GetPosition();
+	frustum._origin = camera.GetWorldPosition();
 		
 	Ray ray = camera.ScreenCoordsToRay(Vector2(-0.5f, -0.5f));
 	frustum._near[0] = ray.origin + ray.direction * camera.GetNear();

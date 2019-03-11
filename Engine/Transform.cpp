@@ -5,21 +5,16 @@ using namespace Maths;
 
 void Transform::_MakeTransformationMatrix(Mat4 &matrix) const
 {
-	/*
-	matrix =
-		Matrix::Scale(_scale) *
-		Matrix::RotationZ(_rotation[2]) * Matrix::RotationX(_rotation[0]) * Matrix::RotationY(_rotation[1]) *
-		Matrix::Translation(_position);
-	*/
-
 	matrix = Matrix::Transformation(_position, _rotation, _scale);
 }
 
 void Transform::_MakeInverseTransformationMatrix(Mat4 &matrix) const
 {
-	matrix =
-		Matrix::Translation(-1.f * _position) *
-		Matrix::RotationY(-_rotation[1]) * Matrix::RotationX(-_rotation[0]) * Matrix::RotationZ(-_rotation[2]) *
+	matrix = 
+		Matrix::Translation(-1.f * _position) * 
+		Matrix::RotationY(-_rotation[1]) * 
+		Matrix::RotationX(-_rotation[0]) * 
+		Matrix::RotationZ(-_rotation[2]) * 
 		Matrix::Scale(1.f / _scale);
 }
 

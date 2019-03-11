@@ -20,8 +20,13 @@ protected:
 	HDC		_hdc;		//Device context handle
 
 public:
-	Window();
-	virtual ~Window();
+	Window() : _hwnd(NULL), _hdc(NULL) { }
+
+	virtual ~Window()
+	{
+		if (_hwnd)
+			::DestroyWindow(_hwnd);
+	}
 
 	inline HWND GetHwnd() const { return _hwnd; }
 	inline HDC GetHDC() const { return _hdc; }

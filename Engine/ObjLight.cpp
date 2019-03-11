@@ -5,6 +5,7 @@
 #include "GLProgram.h"
 #include "String.h"
 #include "ShaderChannel.h"
+#include "ModelManager.h"
 
 bool ObjLight::drawLightSources = true;
 
@@ -34,6 +35,6 @@ void ObjLight::Render() const
 	{
 		glUniform4fv(GLProgram::Current().GetUniformLocation("Colour"), 1, colour);
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
-		Engine::modelManager->Cube().Render();
+		Engine::Instance().pModelManager->Cube().Render();
 	}
 }

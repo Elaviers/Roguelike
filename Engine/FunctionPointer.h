@@ -25,7 +25,7 @@ class FunctionPointer
 		RETURNTYPE (*_function)(Args...);
 
 	public:
-		StaticCallback(RETURNTYPE (*function)(Args...)) {}
+		StaticCallback(RETURNTYPE (*function)(Args...)) : _function(function) {}
 		virtual ~StaticCallback() {}
 
 		virtual RETURNTYPE Call(Args ...args) override 
@@ -90,7 +90,7 @@ public:
 	template<typename T>
 	FunctionPointer(T *object, RETURNTYPE(T::*function)(Args...) const) : _cb(nullptr)	{ if (object && function) _cb = new MemberCallback<T>(object, function); }
 
-	FunctionPointer(const FunctionPointer &other) { operator=(other); }
+	FunctionPointer(const FunctionPointer &other) : _cb(nullptr) { operator=(other); }
 
 	FunctionPointer(FunctionPointer &&other) { _cb = other._cb; other._cb = nullptr; }
 
@@ -112,7 +112,9 @@ public:
 };
 
 typedef FunctionPointer<void> Callback;
-typedef FunctionPointer<void, const Buffer<String>&> Command;
+
+typedef void (Command)(const Buffer<String>& args);
+typedef FunctionPointer<void, const Buffer<String>&> CommandPtr;
 
 template<typename T>
 using Getter = FunctionPointer<T>;

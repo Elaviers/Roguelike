@@ -95,16 +95,18 @@ namespace DrawUtils
 			camera.ScreenCoordsToRay(Vector2(-.5f, 0.5f)), 
 			camera.ScreenCoordsToRay(Vector2(0.5f, 0.5f)) };
 
+		Vector3 camPosition = camera.GetWorldPosition();
+
 		for (int i = 0; i < 4; ++i)
 		{
-			points[i][axisX] = camera.transform.Position()[axisX];
-			points[i][axisY] = camera.transform.Position()[axisY];
+			points[i][axisX] = camPosition[axisX];
+			points[i][axisY] = camPosition[axisY];
 		}
 
-		results[0] = FindZOverlap(points[0], rays[0], axisX, axisY, axisZ, limit, camera.transform.Position());
-		results[1] = FindZOverlap(points[1], rays[1], axisX, axisY, axisZ, limit, camera.transform.Position());
-		results[2] = FindZOverlap(points[2], rays[2], axisX, axisY, axisZ, limit, camera.transform.Position());
-		results[3] = FindZOverlap(points[3], rays[3], axisX, axisY, axisZ, limit, camera.transform.Position());
+		results[0] = FindZOverlap(points[0], rays[0], axisX, axisY, axisZ, limit, camPosition);
+		results[1] = FindZOverlap(points[1], rays[1], axisX, axisY, axisZ, limit, camPosition);
+		results[2] = FindZOverlap(points[2], rays[2], axisX, axisY, axisZ, limit, camPosition);
+		results[3] = FindZOverlap(points[3], rays[3], axisX, axisY, axisZ, limit, camPosition);
 
 		float startX;
 		float startY;
@@ -113,21 +115,21 @@ namespace DrawUtils
 
 		if (results[0] != results[1] || results[1] != results[2] || results[2] != results[3])
 		{
-			Vector3 fv = camera.transform.GetForwardVector();
+			Vector3 fv = camera.GetWorldTransform().GetForwardVector();
 			int axisFwd = Abs(fv[axisX]) > Abs(fv[axisY]) ? axisX : axisY;
 
 			Vector3 morePoints[4];
 
 			for (int i = 0; i < 4; ++i)
 			{
-				morePoints[i][axisX] = camera.transform.Position()[axisX];
-				morePoints[i][axisY] = camera.transform.Position()[axisY];
+				morePoints[i][axisX] = camPosition[axisX];
+				morePoints[i][axisY] = camPosition[axisY];
 			}
 
-			FindLimitOverlap(morePoints[0], rays[0], axisX, axisY, axisFwd, limit, camera.transform.Position());
-			FindLimitOverlap(morePoints[1], rays[1], axisX, axisY, axisFwd, limit, camera.transform.Position());
-			FindLimitOverlap(morePoints[2], rays[2], axisX, axisY, axisFwd, limit, camera.transform.Position());
-			FindLimitOverlap(morePoints[3], rays[3], axisX, axisY, axisFwd, limit, camera.transform.Position());
+			FindLimitOverlap(morePoints[0], rays[0], axisX, axisY, axisFwd, limit, camPosition);
+			FindLimitOverlap(morePoints[1], rays[1], axisX, axisY, axisFwd, limit, camPosition);
+			FindLimitOverlap(morePoints[2], rays[2], axisX, axisY, axisFwd, limit, camPosition);
+			FindLimitOverlap(morePoints[3], rays[3], axisX, axisY, axisFwd, limit, camPosition);
 
 			startX =	Min(
 						Min(points[0][axisX],

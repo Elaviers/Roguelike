@@ -11,7 +11,7 @@ class ToolBrush3D : public Tool
 	CvarMap _cvars;
 
 public:
-	ToolBrush3D(Editor &level) : Tool(level) {}
+	ToolBrush3D(Editor &level) : Tool(level), _placing(false) {}
 	virtual ~ToolBrush3D() {}
 
 	virtual void Initialise();

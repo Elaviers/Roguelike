@@ -31,6 +31,21 @@ public:
 		return nullptr;
 	}
 
+	/*
+		Creates a new variable and initialises with existing value
+	*/
+	template <typename Type>
+	void CreateVar(const String& name, const Type& value, byte flags = 0)
+	{
+		TypedValueCvar<Type>* cvar = new TypedValueCvar<Type>(value, flags);
+
+		cvar->index = _count++;
+		_cvars.Set(name, cvar);
+	}
+
+	/*
+		Creates a new variable that refers to an existing variable
+	*/
 	template <typename Type>
 	void Add(const String &name, Type& value, byte flags = 0)
 	{
@@ -40,10 +55,25 @@ public:
 		_cvars.Set(name, cvar);
 	}
 
+	/*
+		Creates a new variable that is accessed via function pointers
+	*/
 	template <typename T>
 	void Add(const String &name, const Getter<T> &getter, const Setter<T> &setter, byte flags = 0)
 	{
 		TypedCallbackCvar<T> *cvar = new TypedCallbackCvar<T>(getter, setter, flags);
+
+		cvar->index = _count++;
+		_cvars.Set(name, cvar);
+	}
+
+	/*
+		Creates a new variable that is accessed via function pointers
+	*/
+	template <typename T>
+	void Add(const String& name, const Getter<const T&>& getter, const Setter<T>& setter, byte flags = 0)
+	{
+		TypedCallbackCvar<T>* cvar = new TypedCallbackCvar<T>(getter, setter, flags);
 
 		cvar->index = _count++;
 		_cvars.Set(name, cvar);
@@ -97,4 +127,6 @@ public:
 			}
 		}
 	}
+
+	String HandleCommand(const String &command);
 };

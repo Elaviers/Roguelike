@@ -29,7 +29,7 @@ bool IO::WriteFile(const char *filename, const byte *data, uint32 length)
 	if (file == INVALID_HANDLE_VALUE)
 		return false;
 
-	BOOL success = ::WriteFile(file, data, length, NULL, NULL);
+	BOOL success = ::WriteFile(file, data, (DWORD)length, NULL, NULL);
 	::CloseHandle(file);
 
 	return success;

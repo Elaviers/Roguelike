@@ -1,14 +1,8 @@
 #pragma once
-#include <Engine/DebugManager.h>
-#include <Engine/FontManager.h>
 #include <Engine/GLContext.h>
 #include <Engine/GLProgram.h>
-#include <Engine/InputManager.h>
 #include <Engine/LevelIO.h>
-#include <Engine/MaterialManager.h>
-#include <Engine/ModelManager.h>
 #include <Engine/Registry.h>
-#include <Engine/TextureManager.h>
 #include <Engine/Timer.h>
 #include <Engine/Window.h>
 #include "MouseData.h"
@@ -28,20 +22,12 @@
 class Editor
 {
 private:
-	bool _running;
-	float _deltaTime;
+	bool _running = false;
+	float _deltaTime = 0.f;
 
 	//Engine
 	Registry _registry;
 	Timer _timer;
-
-	//Managers
-	DebugManager _debugManager;
-	InputManager _inputManager;
-	MaterialManager _materialManager;
-	ModelManager _modelManager;
-	TextureManager _textureManager;
-	FontManager _fontManager;
 
 	//Window stuff
 	Window _window;
@@ -49,9 +35,9 @@ private:
 	PropertyWindow _propertyWindow;
 	ToolWindow _toolWindow;
 
-	HBRUSH _windowBrush;
-	HWND _toolbar;
-	HIMAGELIST _tbImages;
+	HBRUSH _windowBrush = NULL;
+	HWND _toolbar = NULL;
+	HIMAGELIST _tbImages = NULL;
 
 	ObjCamera _uiCam;
 
@@ -65,9 +51,9 @@ private:
 	//Editor
 	GameObject _level;
 
-	Tool *_currentTool;
+	Tool *_currentTool = nullptr;
 
-	int _activeVP;
+	int _activeVP = 0;
 
 	struct _EditorTools
 	{
@@ -83,11 +69,11 @@ private:
 
 	MouseData _mouseData;
 
-	float _axisMoveX;
-	float _axisMoveY;
-	float _axisMoveZ;
-	float _axisLookX;
-	float _axisLookY;
+	float _axisMoveX = 0.f;
+	float _axisMoveY = 0.f;
+	float _axisMoveZ = 0.f;
+	float _axisLookX = 0.f;
+	float _axisLookY = 0.f;
 
 	static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
 	static LRESULT CALLBACK _vpAreaProc(HWND, UINT, WPARAM, LPARAM);

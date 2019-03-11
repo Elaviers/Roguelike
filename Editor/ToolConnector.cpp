@@ -32,6 +32,8 @@ void ToolConnector::SetConnectorDirection(const String &dir)
 void ToolConnector::Initialise()
 {
 	_cvars.Add("Direction", Getter<String>(this, &ToolConnector::GetConnectorDirection), Setter<String>(this, &ToolConnector::SetConnectorDirection), PropertyFlags::DIRECTION);
+
+	_connector.SetRenderColour(Vector4(0.f, 1.f, 0.f, .5f));
 }
 
 void ToolConnector::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
@@ -70,14 +72,14 @@ void ToolConnector::MouseMove(const MouseData &mouseData)
 		{
 			Vector3 v;
 
-			v[mouseData.rightElement] = mouseData.unitX_rounded;
-			v[mouseData.upElement] = mouseData.unitY_rounded;
-			v[mouseData.forwardElement] = -100;
+			v[mouseData.rightElement] = (float)mouseData.unitX_rounded;
+			v[mouseData.upElement] = (float)mouseData.unitY_rounded;
+			v[mouseData.forwardElement] = -100.f;
 			_connector.SetPoint1(v);
 
-			v[mouseData.rightElement] = mouseData.unitX_rounded + 1;
-   			v[mouseData.upElement] = mouseData.unitY_rounded + 1;
-			v[mouseData.forwardElement] = 100;
+			v[mouseData.rightElement] = (float)mouseData.unitX_rounded + 1.f;
+   			v[mouseData.upElement] = (float)mouseData.unitY_rounded + 1.f;
+			v[mouseData.forwardElement] = 100.f;
 			_connector.SetPoint2(v);
 		}
 	}
@@ -92,7 +94,10 @@ void ToolConnector::KeySubmit()
 {
 	_placing = false;
 
-	_connector.Clone()->SetParent(&_owner.LevelRef());
+	ObjConnector *clone = _connector.TypedClone();
+	clone->SetRenderColour(Vector4(0.f, 1.f, 0.f, 1.f));
+	clone->SetParent(&_owner.LevelRef());
+
 	_connector.SetMin(Vector3());
 	_connector.SetMax(Vector3());
 }
@@ -100,7 +105,5 @@ void ToolConnector::KeySubmit()
 void ToolConnector::Render() const
 {
 	glLineWidth(3);
-	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
 	_connector.Render();
 }
-

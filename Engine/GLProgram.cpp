@@ -16,7 +16,7 @@ void CompileShader(GLuint shader, const char *src)
 	{
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &value);
 		
-		String error((unsigned int)value);
+		String error((size_t)value);
 		glGetShaderInfoLog(shader, value, &value, &error[0]);
 		Debug::Error(error.GetData());
 
@@ -46,7 +46,7 @@ void GLProgram::Create(const char *vertSrc, const char *fragSrc, byte channels)
 
 		glGetProgramInfoLog(_id, value, &value, error_str);
 
-		String error((unsigned int)value);
+		String error((size_t)value);
 		glGetProgramInfoLog(_id, value, &value,  &error[0]);
 		Debug::Error(error.GetData());
 

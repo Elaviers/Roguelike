@@ -5,7 +5,7 @@ namespace Collision
 {
 	bool SphereOverlapsSphere(const Transform &t1, float r1, const Transform &t2, float r2)
 	{
-		float d = (t1.Position() - t2.Position()).LengthSquared();
+		float d = (t1.GetPosition() - t2.GetPosition()).LengthSquared();
 		float maxD = r1 * r1 + r2 * r2;
 
 		return d <= maxD;
@@ -14,11 +14,11 @@ namespace Collision
 	bool SphereOverlapsAABB(const Transform &t1, float r1, const Vector3 &min2, const Vector3 &max2)
 	{
 		Vector3 closestPoint = Vector3(
-			Utilities::Clamp(t1.Position()[0], min2[0], max2[0]),
-			Utilities::Clamp(t1.Position()[1], min2[1], max2[1]),
-			Utilities::Clamp(t1.Position()[2], min2[2], max2[2]));
+			Utilities::Clamp(t1.GetPosition()[0], min2[0], max2[0]),
+			Utilities::Clamp(t1.GetPosition()[1], min2[1], max2[1]),
+			Utilities::Clamp(t1.GetPosition()[2], min2[2], max2[2]));
 
-		float dist = (t1.Position() - closestPoint).LengthSquared();
+		float dist = (t1.GetPosition() - closestPoint).LengthSquared();
 		if (dist <= r1 * r1)
 			return true;
 

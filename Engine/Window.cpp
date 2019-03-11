@@ -17,37 +17,30 @@ void WindowFunctions::RepositionHWND(HWND hwnd, uint16 x, uint16 y)
 
 void WindowFunctions::SetDefaultPixelFormat(HDC hdc)
 {
-	PIXELFORMATDESCRIPTOR pfd = {
-		sizeof(PIXELFORMATDESCRIPTOR),
-		1,
-		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-		PFD_TYPE_RGBA,
-		24,							//cColorBits
-		0, 0, 0, 0, 0, 0, 0, 0,		//*
-		0, 0, 0, 0, 0,				//*
-		32,							//cDepthBits
-		0,							//*
-		0,							//*
-		0,							//Ignored
-		0,							//*
-		0,							//*	
-		0,							//*
-		0							//* - Not relevant for finding PFD
+	const int attribInts[] =
+	{
+		WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+		WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+		WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+		WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
+		WGL_COLOR_BITS_ARB, 32,
+		WGL_DEPTH_BITS_ARB, 24,
+		WGL_STENCIL_BITS_ARB, 8,
+		WGL_SAMPLE_BUFFERS_ARB, 1,
+		WGL_SAMPLES_ARB, 8,					//8x MSAA
+		0, // End
 	};
 
-	int pfd_id = ChoosePixelFormat(hdc, &pfd);
-	SetPixelFormat(hdc, pfd_id, &pfd);
-}
+	int pfdId;
+	UINT formatCount;
 
-Window::Window() : _hwnd(NULL)
-{
-}
+	wglChoosePixelFormatARB(hdc, attribInts, NULL, 1, &pfdId, &formatCount);
+	
+	PIXELFORMATDESCRIPTOR pfd = {0};
+	DescribePixelFormat(hdc, pfdId, sizeof(pfd), &pfd);
+	//Get a pfd so Windows doesn't cry
 
-
-Window::~Window()
-{
-	if (_hwnd)
-		::DestroyWindow(_hwnd);
+	SetPixelFormat(hdc, pfdId, &pfd);
 }
 
 void Window::Create(LPCTSTR className, LPCTSTR title, LPVOID param, DWORD flags, HWND parent)

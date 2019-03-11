@@ -12,7 +12,7 @@ class ObjLight : public GameObject
 public:
 	GAMEOBJECT_FUNCS(ObjLight)
 
-	ObjLight() : GameObject(FLAG_SAVEABLE), _radius(-1.f), _colour(1.f, 1.f, 1.f) { transform.SetScale(Vector3(.1f, .1f, .1f)); }
+	ObjLight() : GameObject(FLAG_SAVEABLE), _radius(-1.f), _colour(1.f, 1.f, 1.f) { SetRelativeScale(Vector3(.1f, .1f, .1f)); }
 	~ObjLight() {};
 
 	static bool drawLightSources;

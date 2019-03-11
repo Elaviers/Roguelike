@@ -1,5 +1,8 @@
 #include "Game.h"
+#include <Engine/AudioManager.h>
+#include <Engine/Console.h>
 #include <Engine/Engine.h>
+#include <Engine/FontManager.h>
 #include <Engine/GL.h>
 #include <Engine/IO.h>
 #include <windowsx.h>
@@ -41,30 +44,37 @@ LRESULT CALLBACK Game::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 		game->MouseDown();
 		break;
 
+	case WM_KEYDOWN:
+		if (lparam& (1 << 30))
+			break; //Key repeats ignored
+
+		game->KeyDown((Keycode)wparam);
+		break;
+
+	case WM_CHAR:
+		game->InputChar((char)wparam);
+		break;
+
 	default: return ::DefWindowProc(hwnd, msg, wparam, lparam);
 	}
 
 	return 0;
 }
 
-Game::Game()
-{
-}
-
-
-Game::~Game()
-{
-}
-
 void Game::_InitWindow()
 {
 	{
+		LPCTSTR dummyClassName = TEXT("DUMMY");
 		LPCTSTR className = TEXT("GAMEWINDOW");
 
 		WNDCLASSEX windowClass = {};
 		windowClass.cbSize = sizeof(WNDCLASSEX);
-		windowClass.lpfnWndProc = _WindowProc;
+		windowClass.lpfnWndProc = ::DefWindowProc;
 		windowClass.hInstance = ::GetModuleHandle(NULL);
+		windowClass.lpszClassName = dummyClassName;
+		::RegisterClassEx(&windowClass);
+
+		windowClass.lpfnWndProc = _WindowProc;
 		windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		windowClass.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
 		windowClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
@@ -72,7 +82,12 @@ void Game::_InitWindow()
 		windowClass.lpszClassName = className;
 		::RegisterClassEx(&windowClass);
 
+		GLContext dummy = GLContext::CreateDummyAndUse(dummyClassName);
+		GL::LoadDummyExtensions();
+
 		_window.Create(className, "Window", this);
+			
+		dummy.Delete();
 	}
 }
 
@@ -95,21 +110,9 @@ void Game::_InitGL()
 
 void Game::_Init()
 {
-	_fontManager.SetRootPath("Data/Fonts/");
+	Engine::Instance().DefaultInit();
 
-	_modelManager.Initialise();
-	_modelManager.SetRootPath("Data/Models/");
-
-	_textureManager.Initialise();
-	_textureManager.SetRootPath("Data/Textures/");
-
-	_materialManager.SetRootPath("Data/Materials/");
-
-	Engine::fontManager = &_fontManager;
-	Engine::inputManager = &_inputManager;
-	Engine::materialManager = &_materialManager;
-	Engine::modelManager = &_modelManager;
-	Engine::textureManager = &_textureManager;
+	_consoleIsActive = false;
 
 	_uiCamera.SetProectionType(ProjectionType::ORTHOGRAPHIC);
 	_uiCamera.SetScale(1.f);
@@ -148,13 +151,15 @@ void Game::StartLevel(const String &level)
 	_running = false;
 	
 	String fileString = IO::ReadFileString(level.GetData());
-	LevelGeneration::GenerateLevel(fileString);
+	GameObject world = LevelGeneration::GenerateLevel(fileString);
 
 }
 
 void Game::Frame()
 {
 	_timer.Start();
+
+	Engine::Instance().pAudioManager->FillBuffer();
 
 	_ui.Update();
 
@@ -170,9 +175,15 @@ void Game::Render()
 
 	_shader.Use();
 	_shader.SetMat4(DefaultUniformVars::mat4Projection, _uiCamera.GetProjectionMatrix());
-	_shader.SetMat4(DefaultUniformVars::mat4View, _uiCamera.transform.GetInverseTransformationMatrix());
+	_shader.SetMat4(DefaultUniformVars::mat4View, _uiCamera.GetInverseTransformationMatrix());
 
 	_ui.Render();
+
+	if (_consoleIsActive)
+	{
+		_shader.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+		Engine::Instance().pConsole->Render(*Engine::Instance().pFontManager->Get("arial32"), _deltaTime);
+	}
 
 	_window.SwapBuffers();
 }
@@ -181,18 +192,42 @@ void Game::Resize(uint16 w, uint16 h)
 {
 	_ui.SetBounds(0, 0, w, h);
 	_uiCamera.SetViewport(w, h);
-	_uiCamera.transform.SetPosition(Vector3(w / 2.f, h / 2.f, 0.f));
+	_uiCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
 	glViewport(0, 0, w, h);
 }
 
 void Game::MouseMove(unsigned short x, unsigned short y)
 {
-	_ui.OnMouseMove((float)x, _uiCamera.GetViewport()[1] - y);
+	_ui.OnMouseMove((float)x, (float)(_uiCamera.GetViewport()[1] - y));
 }
 
 void Game::MouseDown()
 {
 	_ui.OnClick();
+}
+
+void Game::KeyDown(Keycode key)
+{
+	if (key == Keycode::TILDE)
+	{
+		_consoleIsActive = !_consoleIsActive;
+		return;
+	}
+	
+	if (_consoleIsActive)
+		Engine::Instance().pInputManager->KeyDown(key);
+}
+
+void Game::InputChar(char character)
+{
+	if (_consoleIsActive)
+	{
+		if (character == '`')
+			return;
+
+		Engine::Instance().pConsole->InputChar(character);
+	}
+
 }
 
 void Game::ButtonQuit()

@@ -4,7 +4,7 @@
 
 void ToolBrush3D::Initialise()
 {
-	_object.transform.SetScale(Vector3());
+	_object.SetRelativeScale(Vector3());
 	_object.SetMaterial("alt");
 	_cvars.Add("Material", Getter<String>((ObjBrush<3>*)&_object, &ObjBrush<3>::GetMaterialName), Setter<String>((ObjBrush<3>*)&_object, &ObjBrush<3>::SetMaterial), PropertyFlags::MATERIAL);
 }

@@ -1,18 +1,35 @@
 #pragma once
-#include "FontManager.h"
-#include "InputManager.h"
-#include "MaterialManager.h"
-#include "ModelManager.h"
-#include "TextureManager.h"
 #include "Registry.h"
 
-namespace Engine
-{
-	extern Registry registry;
+class Console;
+class AudioManager;
+class DebugManager;
+class FontManager;
+class InputManager;
+class MaterialManager;
+class ModelManager;
+class TextureManager;
 
-	extern FontManager *fontManager;
-	extern InputManager *inputManager;
-	extern MaterialManager *materialManager;
-	extern ModelManager *modelManager;
-	extern TextureManager *textureManager;
-}
+class Engine
+{
+private:
+	Engine() {}
+	~Engine();
+
+public:
+	inline static Engine& Instance() { static Engine _instance;  return _instance; }
+
+	Registry registry;
+
+	Console			*pConsole = nullptr;
+	AudioManager	*pAudioManager = nullptr;
+	DebugManager	*pDebugManager = nullptr;
+	FontManager		*pFontManager = nullptr;
+	InputManager	*pInputManager = nullptr;
+	MaterialManager	*pMaterialManager = nullptr;
+	ModelManager	*pModelManager = nullptr;
+	TextureManager	*pTextureManager = nullptr;
+
+	//Allocates all managers with default setup
+	void DefaultInit();
+};

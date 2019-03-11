@@ -1,6 +1,8 @@
 #pragma once
 #include "GameObject.h"
 #include "Engine.h"
+#include "MaterialManager.h"
+#include "ModelManager.h"
 
 class ObjRenderable : public GameObject
 {
@@ -13,10 +15,10 @@ private:
 public:
 	GAMEOBJECT_FUNCS(ObjRenderable)
 	
-	ObjRenderable() : GameObject(FLAG_SAVEABLE), _model(nullptr), _material(nullptr) {}
+	ObjRenderable() : GameObject(FLAG_SAVEABLE), _model(nullptr), _material(nullptr), _materialIsDefault(false) {}
 	virtual ~ObjRenderable() {}
 
-	inline void SetModel(const String &name) { if (Engine::modelManager) SetModel(Engine::modelManager->GetModel(name)); }
+	inline void SetModel(const String &name) { if (Engine::Instance().pModelManager) SetModel(Engine::Instance().pModelManager->Get(name)); }
 	inline void SetModel(const Model *model) 
 	{ 
 		_model = model; 
@@ -27,7 +29,7 @@ public:
 		} 
 	}
 
-	inline void SetMaterial(const String &name) { if (Engine::materialManager) SetMaterial(Engine::materialManager->GetMaterial(name)); }
+	inline void SetMaterial(const String &name) { if (Engine::Instance().pMaterialManager) SetMaterial(*Engine::Instance().pMaterialManager->Get(name)); }
 	inline void SetMaterial(const Material *material) { _material = material; _materialIsDefault = false; }
 
 	inline bool MaterialIsDefault() const { return _materialIsDefault; }

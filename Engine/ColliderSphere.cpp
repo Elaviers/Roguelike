@@ -7,9 +7,14 @@ bool ColliderSphere::IntersectsRay(const Ray &ray, RaycastResult &result, const 
 {
 	//Assuming ray.direction is noramlised
 
-	Vector3 selfToRayOrigin = ray.origin - transform.Position();
+	if (transform.GetScale()[0] != transform.GetScale()[1] || transform.GetScale()[0] != transform.GetScale()[2])
+		Debug::PrintLine("WARNING: Sphere collision used with nonuniform scaling");
+
+	float r = _radius * transform.GetScale()[0];
+
+	Vector3 selfToRayOrigin = ray.origin - transform.GetPosition();
 	float dot = Vector3::Dot(selfToRayOrigin, ray.direction);
-	float distanceSq = selfToRayOrigin.LengthSquared() - _radius * _radius;	//The distance from the surface of the sphere to the ray's origin
+	float distanceSq = selfToRayOrigin.LengthSquared() - r * r;	//The distance from the surface of the sphere to the ray's origin
 
 	if (distanceSq > 0.f && dot > 0.f) //We are not inside the sphere and not facing it
 		return false;

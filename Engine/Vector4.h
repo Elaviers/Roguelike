@@ -9,7 +9,7 @@ class Vector4
 public:
 	Vector4(float x, float y, float z, float w = 1.f) : _data {x, y, z, w} {}
 	Vector4(float a = 0.f) : Vector4(a, a, a) {}
-	Vector4(const Vector3 &v3) : Vector4(v3[0], v3[1], v3[2]) {}
+	Vector4(const Vector3 &v3) : Vector4(v3[0], v3[1], v3[2], 1.f) {}
 
 	Vector4(__m128 simd) { _mm_store_ps(_data, simd); }
 	

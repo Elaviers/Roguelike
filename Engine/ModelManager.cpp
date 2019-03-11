@@ -6,26 +6,30 @@
 #include "Utilities.h"
 #include "Vector.h"
 
-constexpr const char *extension = ".txt";
-
 ModelManager::ModelManager()
 {
 }
 
 ModelManager::~ModelManager()
 {
-	_map.ForEach(
-		[](const String&, Model &model) 
-		{
-			model.model.Delete(); 
-			delete model.collider;
-		});
-
 	_line.model.Delete();
 	_plane.model.Delete();
 	_cube.model.Delete();
 	_invCube.model.Delete();
 }
+
+bool ModelManager::_CreateResource(Model& model, const String& name, const String& data)
+{
+	model.FromString(data);
+	return true;
+}
+
+void ModelManager::_DestroyResource(Model& model)
+{
+	model.model.Delete();
+	delete model.collider;
+}
+
 
 void ModelManager::Initialise()
 {
@@ -105,70 +109,4 @@ void ModelManager::Initialise()
 	_invCube.model.Create(cubeData, 36);
 
 	_line.defaultMaterial =  _plane.defaultMaterial = _cube.defaultMaterial = _invCube.defaultMaterial = "";
-}
-
-const Model* ModelManager::GetModel(const String &nameIn)
-{
-	String name = nameIn.ToLower();
-
-	Model *model = _map.Find(name);
-	if (model) return model;
-	else
-	{
-		String path = (_rootPath + name + extension).ToLower();
-		String fs = IO::ReadFileString(path.GetData());
-		Utilities::LowerString(fs);
-		Buffer<String> lines = fs.Split("\r\n");
-
-		ModelData data;
-		String materialName;
-		Collider *collision = nullptr;
-
-		for (uint32 i = 0; i < lines.GetSize(); ++i)
-		{
-			Buffer<String> tokens = lines[i].Split("=");
-
-			if (tokens[0] == "model")
-				data = IO::ReadOBJFile((_rootPath + tokens[1]).GetData());
-			else if (tokens[0] == "material")
-				materialName = tokens[1];
-			else if (tokens[0] == "collision")
-				if (tokens.GetSize() > 1)
-				{
-					Buffer<String> args = tokens[1].Split(" ");
-
-					if (args[0] == "sphere")
-					{
-						if (args.GetSize() >= 2)
-						{
-							delete collision;
-							collision = new ColliderSphere(args[1].ToFloat());
-						}
-						else Debug::Error(CSTR(path + ": Insufficient sphere arguments"));
-					}
-					else if (args[0] == "aabb")
-					{
-						if (data.IsValid())
-						{
-							delete collision;
-							collision = new ColliderAABB(data.bounds.min, data.bounds.max);
-						}
-						else Debug::Error(CSTR(path + ": AABB collision cannot be used without model data"));
-					}
-				}
-		}
-
-		if (data.IsValid())
-		{
-			Model &newModel = _map[name];
-			newModel.model.Create(data.vertices.Data(), data.vertices.GetSize(), data.elements.Data(), data.elements.GetSize());
-			newModel.bounds = data.bounds;
-			newModel.defaultMaterial = materialName;
-			newModel.collider = collision;
-			return &newModel;
-		}
-		else delete collision;
-	}
-	
-	return nullptr;
 }

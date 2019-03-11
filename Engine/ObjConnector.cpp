@@ -2,19 +2,21 @@
 #include "DrawUtils.h"
 #include "Engine.h"
 #include "GLProgram.h"
+#include "ModelManager.h"
 #include "ShaderChannel.h"
+#include "TextureManager.h"
 
 void ObjConnector::Render() const {
-	if (Engine::modelManager && GLProgram::Current().GetChannels() & ShaderChannel::UNLIT)
+	if (Engine::Instance().pModelManager && GLProgram::Current().GetChannels() & ShaderChannel::UNLIT)
 	{
-		Engine::textureManager->White().Bind(0);
+		Engine::Instance().pTextureManager->White().Bind(0);
 
 		Vector3 c = (_min + _max) / 2.f;
 		Vector3 size = _max - _min;
 
 		glLineWidth(3);
-		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
-		DrawUtils::DrawBox(*Engine::modelManager, _min, _max);
+		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
+		DrawUtils::DrawBox(*Engine::Instance().pModelManager, _min, _max);
 
 		Transform t;
 
@@ -46,7 +48,7 @@ void ObjConnector::Render() const {
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
 
 		glDisable(GL_CULL_FACE);
-		Engine::modelManager->Plane().Render();
+		Engine::Instance().pModelManager->Plane().Render();
 		glEnable(GL_CULL_FACE);
 	}
 }

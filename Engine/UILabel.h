@@ -12,7 +12,7 @@ class UILabel : public UIElement
 	Transform _transform;
 
 public:
-	UILabel(UIElement *parent) : UIElement(parent), _colour(1.f, 1.f, 1.f, 1.f) {}
+	UILabel(UIElement *parent) : UIElement(parent), _font(nullptr), _colour(1.f, 1.f, 1.f, 1.f) {}
 	virtual ~UILabel() {}
 
 	inline const Font* GetFont() const { return _font; }

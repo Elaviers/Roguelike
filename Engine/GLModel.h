@@ -11,20 +11,20 @@ private:
 	GLuint _vbo;
 	GLuint _ebo; //Element buffer
 
-	uint32 _count; //The amount of elements/verts to draw
+	GLsizei _count; //The amount of elements/verts to draw
 
 	GLenum _drawMode;
 
 	void _CreateNewObjects();
 
 public:
-	GLModel();
-	virtual ~GLModel();
+	GLModel() : _vao(0), _vbo(0), _ebo(0), _count(0), _drawMode(GL_TRIANGLES) {}
+	virtual ~GLModel() {}
 
-	void Create(const Vertex17F *data, uint32 vertexCount);
-	void Create(const Vertex17F *data, uint32 vertexCount, const uint32 *elements, uint32 elementCount);
+	void Create(const Vertex17F *data, GLsizei vertexCount);
+	void Create(const Vertex17F *data, GLsizei vertexCount, const uint32 *elements, GLsizei elementCount);
 
-	void Create(const Vector3 *basicData, uint32 vertexCount, const uint32 *elements, uint32 elementCount);
+	void Create(const Vector3 *basicData, GLsizei vertexCount, const uint32 *elements, GLsizei elementCount);
 
 	inline void SetDrawMode(GLenum drawMode) { _drawMode = drawMode; }
 

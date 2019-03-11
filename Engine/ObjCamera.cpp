@@ -17,8 +17,6 @@ void ObjCamera::UpdateProjectionMatrix()
 		_projection = Matrix::Ortho(_viewport[0], _viewport[1], _near, _far, _scale);
 		break;
 	}
-	
-	UpdateWorldToClip();
 }
 
 Vector2 ObjCamera::GetZPlaneDimensions() const
@@ -34,32 +32,49 @@ Ray ObjCamera::ScreenCoordsToRay(const Vector2 &coords) const
 	if (_type == ProjectionType::PERSPECTIVE)
 	{
 		Vector2 scale = GetZPlaneDimensions();
-		Vector3 pointOnPlane = VectorMaths::Rotate(Vector3(coords[0] * scale[0], coords[1] * scale[1], 1.f), transform.Rotation());
+		Vector3 pointOnPlane = VectorMaths::Rotate(Vector3(coords[0] * scale[0], coords[1] * scale[1], 1.f), GetWorldRotation());
 		pointOnPlane.Normalise();
-		return Ray(transform.Position(), pointOnPlane);
+		return Ray(GetWorldPosition(), pointOnPlane);
 	}
 	else
 	{
-		return Ray(transform.Position() + 
-			transform.GetRightVector() * ((_viewport[0] * coords[0]) / _scale) + 
-			transform.GetUpVector() * ((_viewport[1] * coords[1]) / _scale), 
-			
-			transform.GetForwardVector());
+		Transform wt = GetWorldTransform();
+
+		return Ray(GetWorldPosition() + 
+			wt.GetRightVector() * ((_viewport[0] * coords[0]) / _scale) + 
+			wt.GetUpVector() * ((_viewport[1] * coords[1]) / _scale), 
+			wt.GetForwardVector());
 	}
 }
 
 bool ObjCamera::FrustumOverlaps(const Bounds &b) const
 {
-	Vector4 viewCentre = Vector4(b.centre) * _worldToClip;
-	float viewRadius = b.radius / Maths::TangentDegrees(_fov / 2.f);
+	//World to View
+	Vector4 v = Vector4(b.centre) * GetInverseTransformationMatrix();
+	const Vector3& v3 = reinterpret_cast<Vector3&>(v);
 
-	const float w = viewCentre[3];
-	const float nw = -viewCentre[3];
-	return Collision::SphereOverlapsAABB(Vector3(viewCentre[0], viewCentre[1], viewCentre[2]), viewRadius, Vector3(nw, nw, nw), Vector3(w, w, w));
+	float clipRadius;
+
+	if (_type == ProjectionType::PERSPECTIVE)
+	{
+		//Yeah, just return true for now because the W and Z components of the clip space vector are stinky for some reason
+		//todo: not this please
+		return true;
+
+		clipRadius = b.radius / (v3.Length() * Maths::TangentDegrees(_fov / 2.f));
+	}
+	else
+		clipRadius = (b.radius * _scale) / (float)Utilities::Min(_viewport[0], _viewport[1]) * 2.f;
+
+	Debug::PrintLine(CSTR(String::FromVector3(v3) + ", " + String::FromFloat(v[3]) + " (" + String::FromFloat(clipRadius) + ")"));
+	
+	//View To Clip
+	v = v * _projection;
+
+	//Clip to NDC
+	v[0] /= v[3];
+	v[1] /= v[3];
+	v[2] /= v[3];
+
+	return Collision::SphereOverlapsAABB(v3, clipRadius, Vector3(-1, -1, -1), Vector3(1, 1, 1));
 }
-
-//
-//
-// frac{y}{x}=\left(\frac{180}{k}-1\right)
-// x=\frac{1}{\left(\frac{180}{k}-1\right)}
-//

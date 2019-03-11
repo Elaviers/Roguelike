@@ -4,10 +4,11 @@
 
 class FontManager : public ResourceManager<Font>
 {
+
+	virtual bool _CreateResource(Font&, const String&, const String&) override;
+
 public:
 	FontManager() {}
 	virtual ~FontManager() {}
-
-	const Font* GetFont(const String &name);
 };
 

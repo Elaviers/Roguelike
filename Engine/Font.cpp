@@ -1,42 +1,33 @@
 #include "Font.h"
 #include "Engine.h"
 #include "GLProgram.h"
+#include "TextureManager.h"
+#include "ModelManager.h"
 
-Font::Font()
+void Font::_CMD_texture(const Buffer<String>& args)
 {
+	if (args.GetSize() > 0)
+		_texture = Engine::Instance().pTextureManager->Get(args[0]);
 }
 
-
-Font::~Font()
+void Font::_CMD_region(const Buffer<String> &args)
 {
-}
-
-void Font::_HandleCommand(const String &string)
-{
-	Buffer<String> tokens = string.Split(" ");
-
-	if (tokens[0] == "region")
+	if (args.GetSize() >= 6)
 	{
-		if (tokens.GetSize() >= 7)
+		if (args[0] == "space")
 		{
-			if (tokens[1] == "SPACE")
-			{
-				Glyph &glyph = _charMap[' '];
-				glyph.uvOffset[0] = (float)tokens[2].ToInt();
-				glyph.uvOffset[1] = (float)tokens[3].ToInt();
-				glyph.uvSize[0] = (float)tokens[4].ToInt();
-				glyph.uvSize[1] = (float)tokens[5].ToInt();
-				glyph.advance = tokens[6].ToInt();
+			Glyph& glyph = _charMap[' '];
+			glyph.uvOffset[0] = (float)args[1].ToInt();
+			glyph.uvOffset[1] = (float)args[2].ToInt();
+			glyph.uvSize[0] = (float)args[3].ToInt();
+			glyph.uvSize[1] = (float)args[4].ToInt();
+			glyph.advance = args[5].ToInt();
 
-				glyph.width = (int)(glyph.uvSize[0] * _texture->GetWidth());
-				if (glyph.width == 0)
-					glyph.width = glyph.advance;
-			}
+			glyph.width = (int)(glyph.uvSize[0] * _texture->GetWidth());
+			if (glyph.width == 0)
+				glyph.width = glyph.advance;
 		}
 	}
-	else
-		Engine::materialManager->HandleCommand(string);
-
 }
 
 void Font::FromString(const String &string)
@@ -45,50 +36,47 @@ void Font::FromString(const String &string)
 	
 	for (uint32 i = 0; i < lines.GetSize(); ++i)
 	{
-		if (lines[i] != "GLYPHS")
-		{
-			Buffer<String> tokens = lines[i].Split("=");
+		String loweredLine = lines[i].ToLower();
 
-			if (tokens.GetSize() > 1)
-			{
-				if (tokens[0] == "texture")
-					_texture = Engine::textureManager->GetTexture(tokens[1]);
-				else if (tokens[0] == "y_offset")
-					_yOffset = tokens[1].ToInt();
-				else if (tokens[0] == "divs_x")
-					_divsX = tokens[1].ToInt();
-				else if (tokens[0] == "divs_y")
-					_divsY = tokens[1].ToInt();
-			}
-			else _HandleCommand(lines[i]);
-		}
-		else
+		if (loweredLine == "glyphs")
 		{
 			if (!_texture) return;
 
+			int cX = 0;
+			int cY = 0;
+
 			i++;
-			for (uint32 slot = 0; i + slot < lines.GetSize(); ++slot)
+			for (size_t slot = 0; i + slot < lines.GetSize(); ++slot)
 			{
 				Buffer<String> tokens = lines[i + slot].Split(" ");
 
-				float glyphUVW = 1.f / _divsX;
-				float glyphUVH = -1.f / _divsY;
+				float glyphUVH = -_rowH / (float)_texture->GetHeight();
 
 				if (tokens.GetSize() > 1)
 				{
 					Glyph &glyph = _charMap[tokens[0][0]];
-					glyph.width = (int)(glyphUVW * _texture->GetWidth());
-					glyph.advance = tokens[1].ToInt();
+					glyph.width = tokens[1].ToInt();
+					glyph.advance = tokens[2].ToInt();
 
-					glyph.uvOffset[0] = (slot % _divsX) / (float)_divsX;
-					glyph.uvOffset[1] = ((slot / _divsX) + 1) / (float)_divsY;
-					glyph.uvSize[0] = glyphUVW;
+					if (cX + glyph.width >= _texture->GetWidth())
+					{
+						cX = 0;
+						cY += _rowH;
+					}
+
+					glyph.uvOffset[0] = cX / (float)_texture->GetWidth();
+					glyph.uvOffset[1] = (cY + _rowH) / (float)_texture->GetHeight();
+					glyph.uvSize[0] = glyph.width / (float)_texture->GetWidth();
 					glyph.uvSize[1] = glyphUVH;
+
+					cX += glyph.width;
 				}
 			}
 
 			break;
 		}
+
+		_cvars.HandleCommand(loweredLine);
 	}
 }
 
@@ -100,35 +88,55 @@ float Font::CalculateStringWidth(const char *string, float scaleX) const
 	{
 		const Glyph *glyph = _charMap.Find(*c);
 		if (glyph)
-			width += (float)glyph->advance / (float)glyph->width * scaleX;
+			width += (glyph->width + glyph->advance) * (scaleX / (float)_size);
 	}
 
 	return width;
 }
 
-void Font::RenderString(const char *string, const Transform &transform) const
+void Font::RenderString(const char *string, const Transform &_transform, float lineHeight) const
 {
 	_texture->Bind(0);
 
-	Transform charTransform = transform;
+	Transform charTransform = _transform;
 	Vector3 advanceDirection = charTransform.GetRightVector();
+	Vector3 downDirection = -1.f * charTransform.GetUpVector();
 
-	charTransform.Move(Vector3(transform.Scale()[0] / 2.f, transform.Scale()[1] / 2.f, 0.f));
+	charTransform.Move(Vector3(0.f, Maths::Round(_transform.GetScale()[1] / 2.f), 0.f));
 
+	float scale = (_transform.GetScale()[0] / (float)_size);
+
+	float totalAdvance = 0.f;
+	
 	for (const char *c = string; *c != '\0'; ++c)
 	{
+		const Vector2 halfTexel(.5f / ((float)_texture->GetWidth() * scale), .5f / ((float)_texture->GetHeight() * scale));
+		const Vector2 texel(1.f / ((float)_texture->GetWidth() * scale), 1.f / ((float)_texture->GetHeight() * scale));
+
 		const Glyph *glyph = _charMap.Find(*c);
 		if (glyph)
 		{
-			GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, glyph->uvOffset);
-			GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, glyph->uvSize);
-			GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, charTransform.MakeTransformationMatrix());
-			Engine::modelManager->Plane().Render();
+			float halfCharW = (glyph->width * scale / 2.f);
+			charTransform.Move(advanceDirection * halfCharW);
+			charTransform.SetScale(Vector3(glyph->width * scale, (float)_transform.GetScale()[1], 1.f));
 
-			if (glyph->width)
-				charTransform.Move(advanceDirection * (float)glyph->advance / (float)glyph->width * transform.Scale()[0]);
-			else
-				charTransform.Move(advanceDirection * (float)glyph->advance * transform.Scale()[0]);
+			GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, glyph->uvOffset + halfTexel);
+			GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, glyph->uvSize - texel);
+			GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, charTransform.MakeTransformationMatrix());
+			Engine::Instance().pModelManager->Plane().Render();
+
+			float secondHalfWPlusAdvance = (((glyph->width / 2.f) + glyph->advance) * scale);
+			charTransform.Move(advanceDirection * secondHalfWPlusAdvance);
+
+			totalAdvance += halfCharW + secondHalfWPlusAdvance;
+		}
+
+		if (*c == '\n')
+		{
+			charTransform.Move(advanceDirection * -totalAdvance);
+			charTransform.Move(downDirection * lineHeight);
+
+			totalAdvance = 0;
 		}
 	}
 }

@@ -13,7 +13,7 @@ protected:
 	Transform _transform;
 
 public:
-	UIRect(UIElement *parent = nullptr) : UIElement(parent), _colour(1.f, 1.f, 1.f, 1.f) {}
+	UIRect(UIElement *parent = nullptr) : UIElement(parent), _texture(nullptr), _colour(1.f, 1.f, 1.f, 1.f) {}
 	virtual ~UIRect() {}
 
 	inline void SetTexture(const GLTexture *texture) { _texture = texture; }

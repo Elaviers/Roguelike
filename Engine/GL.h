@@ -5,6 +5,7 @@
 #include <gl\wglext.h>
 
 //Windows
+extern PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 extern PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB;
 extern PFNWGLSWAPINTERVALEXTPROC	wglSwapIntervalEXT;
 
@@ -47,6 +48,7 @@ extern PFNGLSHADERSOURCEPROC		glShaderSource;
 extern PFNGLCOMPILESHADERPROC		glCompileShader;
 
 //Textures
+extern PFNGLTEXSTORAGE2DPROC		glTexStorage2D;
 extern PFNGLACTIVETEXTUREPROC		glActiveTexture;
 extern PFNGLGENERATEMIPMAPPROC		glGenerateMipmap;
 
@@ -89,5 +91,6 @@ extern PFNGLUNIFORMMATRIX4X3FVPROC	glUniformMatrix4x3fv;
 
 namespace GL
 {
+	void LoadDummyExtensions();
 	void LoadExtensions(HDC deviceContext);
 }

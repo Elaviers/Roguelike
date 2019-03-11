@@ -13,10 +13,12 @@ class ObjBox : public GameObject
 protected:
 	Vector3 _min, _max;
 
+	Vector4 _colour;
+
 public:
 	GAMEOBJECT_FUNCS(ObjBox)
 
-	ObjBox(byte flags = 0) : GameObject(flags) {}
+	ObjBox(byte flags = 0) : GameObject(flags), _colour(1.f, 1.f, 1.f, 1.f) {}
 	virtual ~ObjBox() {}
 
 	virtual void Render() const override;
@@ -37,6 +39,8 @@ public:
 
 	inline void SetMin(const Vector3 &min) { _min = min; }
 	inline void SetMax(const Vector3 &max) { _max = max; }
+
+	inline void SetRenderColour(const Vector4 &colour) { _colour = colour; }
 
 	inline const Vector3& GetPoint1() const { return _p1; }
 	inline const Vector3& GetPoint2() const { return _p2; }

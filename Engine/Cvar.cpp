@@ -1,10 +1,15 @@
 #include "CVar.h"
+#include "Buffer.h"
 
 #define SETSTRINGCASE(ENUM, TYPE, VALUE) case ENUM: ((TypedCvar<TYPE>*)this)->Set(VALUE); break
 void Cvar::SetByString(const String &value)
 {
 	switch (_type)
 	{
+		case CvarType::FUNCTION: 
+			((TypedCvar<CommandPtr>*)this)->Call(value.Split(" ")); 
+			break;
+
 		SETSTRINGCASE(CvarType::STRING, String, value);
 		SETSTRINGCASE(CvarType::FLOAT, float, value.ToFloat());
 		SETSTRINGCASE(CvarType::VECTOR2, Vector2, value.ToVector2());
@@ -23,6 +28,7 @@ String Cvar::GetAsString() const
 {
 	switch (_type)
 	{
+	case CvarType::FUNCTION:return "(Command)";
 	case CvarType::STRING:	return GETASTYPE(String);
 	case CvarType::FLOAT:	return String::FromFloat(GETASTYPE(float));
 	case CvarType::VECTOR2: return String::FromVector2(GETASTYPE(Vector2));

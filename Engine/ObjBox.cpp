@@ -6,9 +6,10 @@
 
 void ObjBox::Render() const
 {
-	if (Engine::modelManager && GLProgram::Current().GetChannels() == ShaderChannel::UNLIT)
+	if (Engine::Instance().pModelManager && GLProgram::Current().GetChannels() == ShaderChannel::UNLIT)
 	{
-		DrawUtils::DrawBox(*Engine::modelManager, _min, _max);
+		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
+		DrawUtils::DrawBox(*Engine::Instance().pModelManager, _min, _max);
 	}
 }
 

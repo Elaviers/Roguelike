@@ -18,8 +18,8 @@ class LevelBag
 	Buffer<LevelPtrWithChance> _levels;
 
 public:
-	LevelBag();
-	~LevelBag();
+	LevelBag() : _totalSize(0) {}
+	~LevelBag() {}
 
 	void AddLevel(GameObject &level, int dominance = 1);
 

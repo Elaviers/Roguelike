@@ -3,6 +3,7 @@
 #include "Debug.h"
 
 //Windows
+PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB;
 PFNWGLSWAPINTERVALEXTPROC	wglSwapIntervalEXT;
 
@@ -45,6 +46,7 @@ PFNGLSHADERSOURCEPROC		glShaderSource;
 PFNGLCOMPILESHADERPROC		glCompileShader;
 
 //Textures
+PFNGLTEXSTORAGE2DPROC		glTexStorage2D;
 PFNGLACTIVETEXTUREPROC		glActiveTexture;
 PFNGLGENERATEMIPMAPPROC		glGenerateMipmap;
 
@@ -94,7 +96,8 @@ namespace GL
 		if (function == 0 || function == (void*)1 || function == (void*)2 || function == (void*)-1)
 		{
 			HMODULE module = LoadLibraryA("opengl32.dll");
-			function = (void *)GetProcAddress(module, functionName);
+			if (module)
+				function = (void *)GetProcAddress(module, functionName);
 		}
 
 		return function;
@@ -106,10 +109,19 @@ namespace GL
 			Debug::FatalError(CSTR("OpenGL extension \"" + extension + "\" not supported!"));
 	}
 
-	void LoadExtensions(HDC hdc) {
 #define LOAD_GL_FUNC(FUNC, TYPE) FUNC = (TYPE)Get(#FUNC)
 
+	void LoadDummyExtensions()
+	{
+		LOAD_GL_FUNC(wglChoosePixelFormatARB, PFNWGLCHOOSEPIXELFORMATARBPROC);
+	}
+
+	void LoadExtensions(HDC hdc)
+	{
+		LoadDummyExtensions();
+
 		//Windows extensions
+		LOAD_GL_FUNC(wglChoosePixelFormatARB, PFNWGLCHOOSEPIXELFORMATARBPROC);
 		LOAD_GL_FUNC(wglGetExtensionsStringARB, PFNWGLGETEXTENSIONSSTRINGARBPROC);
 
 		const char *extensions = (char*)glGetString(GL_EXTENSIONS);
@@ -156,6 +168,7 @@ namespace GL
 		LOAD_GL_FUNC(glShaderSource, PFNGLSHADERSOURCEPROC);
 		LOAD_GL_FUNC(glCompileShader, PFNGLCOMPILESHADERPROC);
 
+		LOAD_GL_FUNC(glTexStorage2D, PFNGLTEXSTORAGE2DPROC);
 		LOAD_GL_FUNC(glActiveTexture, PFNGLACTIVETEXTUREPROC);
 		LOAD_GL_FUNC(glGenerateMipmap, PFNGLGENERATEMIPMAPPROC);
 

@@ -86,7 +86,7 @@ LRESULT PropertyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 			if (pw->_child_hwnds[LOWORD(wparam)].cvar->GetFlags() & PropertyFlags::CLASSID)
 			{
-				auto regTypes = Engine::registry.GetRegisteredTypes();
+				auto regTypes = Engine::Instance().registry.GetRegisteredTypes();
 				reinterpret_cast<TypedCvar<byte>*>(pw->_child_hwnds[LOWORD(wparam)].cvar)->Set(*regTypes[cbIndex].first);
 			}
 			else
@@ -125,7 +125,7 @@ LRESULT PropertyWindow::_EditProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpa
 			char string[32];
 			::GetWindowText(hwnd, string, 32);
 
-			pw->_child_hwnds[(int)::GetMenu(hwnd)].cvar->SetByString(String(string));
+			pw->_child_hwnds[(size_t)::GetMenu(hwnd)].cvar->SetByString(String(string));
 		}
 		else return ::CallWindowProc(_defaultEditProc, hwnd, msg, wparam, lparam);
 
@@ -151,15 +151,6 @@ void PropertyWindow::Initialise(HBRUSH brush)
 	windowClass.hCursor = ::LoadCursor(NULL, IDC_ARROW);
 	windowClass.lpszClassName = _className;
 	::RegisterClassEx(&windowClass);
-}
-
-PropertyWindow::PropertyWindow(Editor* owner) : _owner(owner)
-{
-}
-
-
-PropertyWindow::~PropertyWindow()
-{
 }
 
 void PropertyWindow::_CreateHWNDs(bool readOnly)
@@ -188,10 +179,10 @@ void PropertyWindow::_CreateHWNDs(bool readOnly)
 
 			byte current = reinterpret_cast<TypedCvar<byte>*>((*properties[i].second))->Get();
 
-			auto listItems = Engine::registry.GetRegisteredTypes();
+			auto listItems = Engine::Instance().registry.GetRegisteredTypes();
 			for (uint32 i = 0; i < listItems.GetSize(); ++i)
 			{
-				::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)Engine::registry.GetNode(*listItems[i].first)->name.GetData());
+				::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)Engine::Instance().registry.GetNode(*listItems[i].first)->name.GetData());
 
 				if (*listItems[i].first == current)
 					::SendMessage(box, CB_SETCURSEL, i, 0);

@@ -1,4 +1,6 @@
 #pragma once
+#include "Types.h"
+
 namespace Maths
 {
 	constexpr double PI = 3.14159265358979323846;
@@ -7,6 +9,17 @@ namespace Maths
 
 	template <typename T>
 	inline T Abs(const T& value) { return value < 0 ? -value : value; }
+
+	template <typename T>
+	inline T Lerp(const T& from, const T& to, float alpha) { return (T)((from * (1.f - alpha)) + (to * alpha)); }
+
+	inline float Round(float x) 
+	{
+		uint32 asInt = (uint32)x;
+		float dec = x - asInt;
+
+		return (dec >= .5f) ? (float)asInt : ((float)asInt + 1.f);
+	}
 
 	float SquareRoot(float x);
 

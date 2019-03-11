@@ -24,7 +24,7 @@ public:
 
 	inline const ColliderType& GetType() const { return _type; }
 
-	virtual bool IntersectsRay(const Ray&, RaycastResult&, const Transform& transform) const = 0;
+	virtual bool IntersectsRay(const Ray&, RaycastResult&, const Transform& _transform) const = 0;
 
-	bool Overlaps(const Collider &other, const Transform &otherTransform, const Transform &transform) const;
+	bool Overlaps(const Collider &other, const Transform &otherTransform, const Transform &_transform) const;
 };

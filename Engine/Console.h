@@ -1,0 +1,71 @@
+#pragma once
+#include "Buffer.h"
+#include "CvarMap.h"
+#include "Font.h"
+#include <Windows.h>
+
+class Console
+{
+	CvarMap _cvars;
+
+	Buffer<char> _charBuffer;
+	String _prompt;
+
+	size_t _endOfString;
+
+	bool _showCursor = true;
+	float _blinkTimer = 0.f;
+
+	inline void _ResetBlink()
+	{
+		_showCursor = true;
+		_blinkTimer = 0.f;
+	}
+
+	void _CMD_echo(const Buffer<String>& tokens);
+
+	void _ExpandBuffer();
+
+public:
+	Console() : _endOfString(0) {}
+	~Console() {}
+
+	inline CvarMap& Cvars() { return _cvars; }
+
+	inline void Initialise() { _cvars.CreateVar("echo", CommandPtr(this, &Console::_CMD_echo)); }
+
+	void Print(const char* string);
+
+	inline void InputChar(char key) 
+	{
+		if (key == '\b')
+			Backspace();
+		else if (key == '\r')
+			SubmitPrompt();
+		else
+		{
+			_prompt += key;
+			_ResetBlink();
+		}
+	}
+
+
+	inline void Backspace()
+	{
+		if (_prompt.GetLength())
+		{
+			_prompt.SetLength(_prompt.GetLength() - 1);
+			_ResetBlink();
+		}
+	}
+
+	inline void SubmitPrompt() 
+	{ 
+		Print((_prompt + '\n').GetData());
+		Print(_cvars.HandleCommand(_prompt).GetData());
+		_prompt.Clear(); 
+		_ResetBlink();
+	}
+
+	void Render(const Font &font, float deltaTime);
+};

@@ -3,12 +3,13 @@
 #include <Engine/ObjBrush.h>
 #include <Engine/ObjRenderable.h>
 #include <Engine/RaycastResult.h>
+#include <Engine/Registry.h>
 
 void ToolEntity::_SetClassID(const byte &id)
 {
 	_classID = id;
 
-	_owner.PropertyWindowRef().SetObject(Engine::registry.GetNode(_classID)->Object());
+	_owner.PropertyWindowRef().SetObject(Engine::Instance().registry.GetNode(_classID)->Object());
 }
 
 void ToolEntity::Initialise()
@@ -17,9 +18,11 @@ void ToolEntity::Initialise()
 	_cvars.Add("Class", Getter<byte>(this, &ToolEntity::_GetClassID), Setter<byte>(this, &ToolEntity::_SetClassID), PropertyFlags::CLASSID);
 
 	//Defaults
-	Engine::registry.GetFirstNodeOfType<ObjBrush2D>()->object.SetMaterial("bricks");
-	Engine::registry.GetFirstNodeOfType<ObjBrush3D>()->object.SetMaterial("bricks");
-	Engine::registry.GetFirstNodeOfType<ObjRenderable>()->object.SetModel("sphere");
+	Registry &reg = Engine::Instance().registry;
+
+	reg.GetFirstNodeOfType<ObjBrush2D>()->object.SetMaterial("bricks");
+	reg.GetFirstNodeOfType<ObjBrush3D>()->object.SetMaterial("bricks");
+	reg.GetFirstNodeOfType<ObjRenderable>()->object.SetModel("sphere");
 }
 
 void ToolEntity::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
@@ -27,7 +30,7 @@ void ToolEntity::Activate(PropertyWindow &properties, PropertyWindow &toolProper
 	properties.Clear();
 	toolProperties.SetCvars(_cvars);
 
-	_owner.PropertyWindowRef().SetObject(Engine::registry.GetNode(_classID)->Object());
+	_owner.PropertyWindowRef().SetObject(Engine::Instance().registry.GetNode(_classID)->Object());
 }
 
 void ToolEntity::MouseDown(const MouseData &mouseData)
@@ -42,7 +45,7 @@ void ToolEntity::MouseDown(const MouseData &mouseData)
 
 		if (results.GetSize() > 0)
 		{
-			GameObject *newObj = Engine::registry.GetNode(_classID)->New();
+			GameObject *newObj = Engine::Instance().registry.GetNode(_classID)->New();
 			newObj->SetParent(&_owner.LevelRef());
 
 			CvarMap newObjCvars;
@@ -51,7 +54,7 @@ void ToolEntity::MouseDown(const MouseData &mouseData)
 
 			Vector3 pos = r.origin + r.direction * results[0].entryTime;
 			pos[1] -= newObj->GetBounds().min[1];
-			newObj->transform.SetPosition(pos);
+			newObj->SetRelativePosition(pos);
 		}
 	}
 }

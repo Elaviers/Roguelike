@@ -10,13 +10,15 @@ private:
 	Model _invCube;
 	Model _plane;
 
+	virtual bool _CreateResource(Model&, const String&, const String&) override;
+
+	virtual void _DestroyResource(Model&);
+
 public:
 	ModelManager();
 	virtual ~ModelManager();
 
 	void Initialise();
-
-	const Model* GetModel(const String &name);
 
 	inline const Model& Line() const			{ return _line; }
 	inline const Model& Plane() const			{ return _plane; }

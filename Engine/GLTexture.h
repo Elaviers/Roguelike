@@ -9,10 +9,10 @@ private:
 	GLsizei _w, _h;
 
 public:
-	GLTexture();
-	~GLTexture();
+	GLTexture() : _id(0), _w(0), _h(0) {}
+	~GLTexture() {}
 
-	void Create(GLsizei width, GLsizei height, const GLvoid *data, GLint filter = GL_LINEAR);
+	void Create(GLsizei width, GLsizei height, const GLvoid *data, GLint mipLevels, GLint magFilter);
 
 	inline void Bind(byte unit) const { glActiveTexture(GL_TEXTURE0 + unit); glBindTexture(GL_TEXTURE_2D, _id); }
 

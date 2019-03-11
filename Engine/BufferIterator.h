@@ -13,16 +13,16 @@ template <typename T>
 class BufferIterator
 {
 	Buffer<T> &_buffer;
-	uint32 _index;
+	size_t _index;
 	T *_pointer;
 
 public:
-	BufferIterator(Buffer<T> &buffer, uint32 index = 0) : _buffer(buffer), _pointer(nullptr) { if (!SetIndex(index)) _index = 0; }
+	BufferIterator(Buffer<T> &buffer, size_t index = 0) : _buffer(buffer), _pointer(nullptr) { if (!SetIndex(index)) _index = 0; }
 	BufferIterator() {}
 
 	inline bool Valid() const { return _index < _buffer.GetSize(); }
 
-	inline bool SetIndex(uint32 index)
+	inline bool SetIndex(size_t index)
 	{
 		if (index < _buffer.GetSize())
 		{
@@ -34,14 +34,14 @@ public:
 		return false;
 	}
 
-	bool StepForward(bool createNew, uint32 amount = 1)
+	bool StepForward(bool createNew, size_t amount = 1)
 	{
 		if (SetIndex(_index + amount))
 			return true;
 
 		if (createNew)
 		{
-			uint32 newSlotsNeeded;
+			size_t newSlotsNeeded;
 
 			if (_buffer.GetSize() == 0)
 				newSlotsNeeded = amount;
@@ -128,7 +128,7 @@ public:
 
 	void Write_string(const char *string)
 	{
-		unsigned int len = StringLength(string);
+		size_t len = StringLength(string);
 
 		StepForward(true, len + 1);
 
@@ -136,6 +136,20 @@ public:
 
 		for (unsigned int i = 1; i <= len; ++i)
 			_pointer[-(int)i] = string[len - i];
+	}
+
+	//returns bytes read
+	size_t ReadTo(T* dest, size_t amount)
+	{
+		for (size_t i = 0; i < amount; ++i)
+		{
+			dest[i] = *_pointer;
+
+			if (!StepForward(false, 1))
+				return i + 1;
+		}
+
+		return amount;
 	}
 
 	inline void Write_vector2(const Vector2 &v)
@@ -162,6 +176,20 @@ public:
 	{
 		uint16 value = (_pointer[0] << 8) + _pointer[1];
 		StepForward(false, 2);
+		return value;
+	}
+
+	uint16 Read_uint16_little()
+	{
+		uint16 value = _pointer[0] + (_pointer[1] << 8);
+		StepForward(false, 2);
+		return value;
+	}
+
+	uint32 Read_uint32_little()
+	{
+		uint32 value = _pointer[0] + (_pointer[1] << 8) + (_pointer[2] << 16) + (_pointer[3] << 24);
+		StepForward(false, 4);
 		return value;
 	}
 

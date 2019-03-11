@@ -17,7 +17,7 @@ class ToolSelect : public Tool
 	float _dragOffsetY;
 
 public:
-	ToolSelect(Editor &level) : Tool(level) {}
+	ToolSelect(Editor &level) : Tool(level), _placing(false), _focusedObject(nullptr), _dragOffsetX(0.f), _dragOffsetY(0.f) {}
 	virtual ~ToolSelect() {}
 
 	virtual void Cancel() override;
