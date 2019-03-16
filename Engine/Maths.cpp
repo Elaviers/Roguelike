@@ -19,32 +19,32 @@ namespace Maths
 
 	float Sine(float radians)
 	{
-		return RoundOff(sinf(radians));
+		return sinf(radians);
 	}
 
 	float Cosine(float radians)
 	{
-		return RoundOff(cosf(radians));
+		return cosf(radians);
 	}
 
 	float Tangent(float radians)
 	{
-		return RoundOff(tanf(radians));
+		return tanf(radians);
 	}
 
 	float ArcSine(float x)
 	{
-		return RoundOff(asinf(x));
+		return asinf(x);
 	}
 
 	float ArcCosine(float x)
 	{
-		return RoundOff(asinf(x));
+		return asinf(x);
 	}
 
 	float ArcTangent(float x)
 	{
-		return RoundOff(atanf(x));
+		return atanf(x);
 	}
 
 	float Random()

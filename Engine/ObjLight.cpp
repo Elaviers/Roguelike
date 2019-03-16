@@ -19,7 +19,7 @@ void ObjLight::GetCvars(CvarMap &cvars)
 
 void ObjLight::ToShader(int glArrayIndex)
 {
-	Mat4 worldTransform = GetTransformationMatrix();
+	Mat4 worldTransform = GetWorldTransform().GetTransformationMatrix();
 
 	String arrayElemName = String("Lights[") + String::FromInt(glArrayIndex) + ']';
 	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName + ".Position")),		1, worldTransform[3]);

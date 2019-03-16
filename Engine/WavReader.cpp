@@ -21,20 +21,23 @@ WaveSound IO::ReadWaveFile(const char* filename)
 
 	uint32 fmtChunkSize = iterator.Read_uint32_little();
 	aud.format = iterator.Read_uint16_little();
-	aud.channel_count = iterator.Read_uint16_little();
-	aud.sample_rate = iterator.Read_uint32_little();
-	aud.byte_rate = iterator.Read_uint32_little();
-	aud.block_align = iterator.Read_uint16_little();
-	aud.bits_per_sample = iterator.Read_uint16_little();
+	aud.channelCount = iterator.Read_uint16_little();
+	aud.sampleRate = iterator.Read_uint32_little();
+	aud.byteRate = iterator.Read_uint32_little();
+	aud.FrameSize = iterator.Read_uint16_little();
+	aud.bitsPerSample = iterator.Read_uint16_little();
 	aud.data = NULL;
 
 	if (!(iterator.Read_byte() == 'd' && iterator.Read_byte() == 'a' && iterator.Read_byte() == 't' && iterator.Read_byte() == 'a'))
 		return aud;
 
-	aud.data_size = iterator.Read_uint32_little();
-	aud.data = new byte[aud.data_size];
+	aud.dataSize = iterator.Read_uint32_little();
+	aud.data = new byte[aud.dataSize];
 
-	size_t bytesRead = iterator.ReadTo(aud.data, aud.data_size);
+	//ReadTo is kinda slow here..
+	//size_t bytesRead = iterator.ReadTo(aud.data, aud.dataSize);
+
+	Utilities::CopyBytes(iterator.Ptr(), aud.data, aud.dataSize);
 
 	return aud;
 }

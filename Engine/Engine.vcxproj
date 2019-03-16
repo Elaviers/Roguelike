@@ -150,6 +150,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AudioUtilities.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="AudioManager.h" />
@@ -233,6 +234,7 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AudioUtilities.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="CvarMap.cpp" />
     <ClCompile Include="Engine.cpp" />

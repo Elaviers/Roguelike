@@ -55,7 +55,10 @@ public:
 
 	inline Node* Last()
 	{
-		Node* node = nullptr;
+		if (_first == nullptr)
+			return nullptr;
+
+		Node* node = _first;
 
 		while (node->next)
 			node = node->next;

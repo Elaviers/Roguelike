@@ -20,6 +20,8 @@ public:
 	BufferIterator(Buffer<T> &buffer, size_t index = 0) : _buffer(buffer), _pointer(nullptr) { if (!SetIndex(index)) _index = 0; }
 	BufferIterator() {}
 
+	inline T* Ptr() { return _pointer; }
+
 	inline bool Valid() const { return _index < _buffer.GetSize(); }
 
 	inline bool SetIndex(size_t index)

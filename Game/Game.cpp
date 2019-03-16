@@ -63,6 +63,11 @@ LRESULT CALLBACK Game::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 
 void Game::_InitWindow()
 {
+	short lol = -3000;
+	short lol2 = 3000;
+
+	short lol3 = Maths::Lerp(lol, lol2, 0.25f);
+
 	{
 		LPCTSTR dummyClassName = TEXT("DUMMY");
 		LPCTSTR className = TEXT("GAMEWINDOW");

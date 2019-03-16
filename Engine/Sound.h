@@ -16,14 +16,14 @@ enum class SoundCategory
 struct WaveSound
 {
 	uint16 format;
-	uint16 channel_count;
-	uint32 sample_rate;
-	uint32 byte_rate;
-	uint16 block_align;			//bytes per sample
-	uint16 bits_per_sample;
+	uint16 channelCount;
+	uint32 sampleRate;
+	uint32 byteRate;
+	uint16 FrameSize;
+	uint16 bitsPerSample;
 
 	byte* data;
-	uint32 data_size;
+	uint32 dataSize;
 
 	float volume;
 	SoundCategory category;
@@ -32,5 +32,5 @@ struct WaveSound
 
 	void MakeStereo();
 
-	inline void Destroy() { delete data; }
+	inline void Destroy() { delete[] data; }
 };

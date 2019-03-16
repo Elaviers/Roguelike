@@ -1,2 +1,2 @@
-filename test.wav
+filename test41khz.wav
 category music

@@ -68,7 +68,7 @@ public:
 		_camera.SetRelativePosition(Vector3(-.7f, .7f, -.7f));
 		_camera.SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
 
-		_light.SetRelativeRotation(Vector3(-1.f, .5f, -2.f));
+		_light.SetRelativePosition(Vector3(-1.f, .5f, -2.f));
 
 		if (!isModelSelect)
 			_object.SetModel(&modelManager->Cube());

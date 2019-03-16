@@ -1,9 +1,8 @@
 #include "AudioManager.h"
+#include "AudioUtilities.h"
 #include "Debug.h"
 #include "IO.h"
 #include "Utilities.h"
-
-constexpr const char* extension = ".txt";
 
 #define TRYRELEASE(noob) if (noob != NULL) noob->Release();
 
@@ -43,6 +42,27 @@ bool AudioManager::_CreateResource(WaveSound& sound, const String& name, const S
 	sound = IO::ReadWaveFile((this->GetRootPath() + filename).GetData());
 	sound.volume = volume;
 	sound.category = category;
+
+	if (sound.sampleRate != _waveFormat.nSamplesPerSec)
+	{
+		byte* originalData = new byte[sound.dataSize];
+		Utilities::CopyBytes(sound.data, originalData, sound.dataSize);
+
+		uint32 cutoff = (uint32)(Utilities::Min<uint32>(sound.sampleRate, _waveFormat.nSamplesPerSec) / 2.f);
+
+		AudioUtilities::LowPassFilter(
+			(int16*)originalData,
+			(int16*)sound.data,
+			sound.channelCount,
+			sound.dataSize / sound.FrameSize,
+			sound.sampleRate,
+			cutoff);
+
+		delete[] originalData;
+
+		//sound.Resample(_waveFormat.nSamplesPerSec);
+	}
+
 	return true;
 }
 
@@ -53,7 +73,7 @@ void AudioManager::_DestroyResource(WaveSound& sound)
 
 #define CHECK(result) if (!SUCCEEDED(result)) goto Finished
 
-void AudioManager::Initialise()
+void AudioManager::Initialise(uint32 minimumBufferDurationMillis)
 {
 	WAVEFORMATEX* descriptor = NULL;
 
@@ -74,7 +94,6 @@ void AudioManager::Initialise()
 	CHECK(result);
 
 	{
-		const uint32 minimumBufferDurationMillis = 100;
 		const REFERENCE_TIME buffer_duration = Utilities::Max((REFERENCE_TIME)(minimumBufferDurationMillis * 10000), minimumDevicePeriod);
 
 		result = _audioClient->GetMixFormat(&descriptor);
@@ -112,6 +131,7 @@ void AudioManager::FillBuffer()
 {
 	UINT32 padding = 0;
 	HRESULT result = _audioClient->GetCurrentPadding(&padding);
+
 	uint32 availableFrames = _bufferFrameCount - padding;
 	uint32 destFramesWritten = 0;
 
@@ -131,7 +151,7 @@ void AudioManager::FillBuffer()
 		{
 			List<Sampler>::Node* next = node->next;
 
-			uint32 framesWritten = node->obj.ReadToSoundBuffer(buffer, availableFrames, _waveFormat.nSamplesPerSec, _waveFormat.nChannels, 1.f);
+			uint32 framesWritten = node->obj.ReadToSoundBuffer(buffer, availableFrames, _waveFormat.nSamplesPerSec, _waveFormat.nChannels, .5f);
 
 			destFramesWritten = Utilities::Max(destFramesWritten, framesWritten);
 

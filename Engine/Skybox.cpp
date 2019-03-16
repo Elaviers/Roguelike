@@ -1,6 +1,8 @@
 #include "Skybox.h"
 #include "Debug.h"
+#include "Engine.h"
 #include "IO.h"
+#include "TextureManager.h"
 #include <utility> //move
 
 Skybox::Skybox()
@@ -18,7 +20,7 @@ void Skybox::Load(const char *faces[6])
 	uint32 faceWidth, faceHeight;
 
 	for (int i = 0; i < 6; ++i) {
-		TextureData td = IO::ReadPNGFile(faces[i]);
+		TextureData td = IO::ReadPNGFile(CSTR(Engine::Instance().pTextureManager->GetRootPath() + faces[i]));
 
 		if (!td.IsValid())
 			return;

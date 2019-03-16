@@ -17,18 +17,14 @@
 
 #define ORTHO 0
 
-const char *modelName = "Data/Model";
-const char *texDiffuse = "Data/Diffuse.png";
-const char *texNormal = "Data/Normal.png";
-const char *texSpecular = "Data/Specular.png";
-const char *texReflection = "Data/Reflectivity.png";
-const char *skyFaces[6] = { "Data/SkyLeft.png", "Data/SkyRight.png", "Data/SkyUp.png", "Data/SkyDown.png", "Data/SkyFront.png", "Data/SkyBack.png" };
+const char *modelName = "Model";
+const char *texDiffuse = "Diffuse.png";
+const char *texNormal = "Normal.png";
+const char *texSpecular = "Specular.png";
+const char *texReflection = "Reflectivity.png";
+const char *skyFaces[6] = { "SkyLeft.png", "SkyRight.png", "SkyUp.png", "SkyDown.png", "SkyFront.png", "SkyBack.png" };
 
 bool running = false;
-
-InputManager inputManager;
-ModelManager modelManager;
-TextureManager textureManager;
 
 //
 GameObject lightParent1;
@@ -131,11 +127,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (lParam & (1 << 30))
 			break; //Key repeats ignored
 
-		inputManager.KeyDown((Keycode)wParam);
+		Engine::Instance().pInputManager->KeyDown((Keycode)wParam);
 		break;
 	case WM_KEYUP:
 
-		inputManager.KeyUp((Keycode)wParam);
+		Engine::Instance().pInputManager->KeyUp((Keycode)wParam);
 		break;
 
 	default:
@@ -168,7 +164,13 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	};
 	::RegisterClassEx(&windowClass);
 
+	GLContext dummy = GLContext::CreateDummyAndUse(className);
+	GL::LoadDummyExtensions();
+
 	window.Create(className, "Window", nullptr);
+
+	dummy.Delete();
+
 	glContext.Create(window);
 	glContext.Use(window);
 	window.Show();
@@ -203,8 +205,13 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	//Initialise managers
 	window.SetTitle("Manager Init");
 	//
-	textureManager.Initialise();
-	modelManager.Initialise();
+	Engine::Instance().DefaultInit();
+	ModelManager& modelManager = *Engine::Instance().pModelManager;
+	TextureManager& textureManager = *Engine::Instance().pTextureManager;
+	InputManager& inputManager = *Engine::Instance().pInputManager;
+
+	modelManager.SetRootPath("Data/");
+	textureManager.SetRootPath("Data/");
 
 	inputManager.BindKeyAxis(Keycode::A, &axisX, -1);
 	inputManager.BindKeyAxis(Keycode::D, &axisX, 1);
@@ -223,19 +230,18 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	inputManager.BindAxis(AxisType::MOUSE_X, &lookY);
 	inputManager.BindAxis(AxisType::MOUSE_Y, &lookX);
 
-	Engine::modelManager = &modelManager;
 
 	//
 	//Load resources
 	//
 	window.SetTitle("Loading Models...");
-	modelManager.GetModel(modelName);
+	modelManager.Get(modelName);
 
 	window.SetTitle("Loading Textures...");
-	textureManager.GetTexture(texDiffuse);
-	textureManager.GetTexture(texNormal);
-	textureManager.GetTexture(texSpecular);
-	textureManager.GetTexture(texReflection);
+	textureManager.Get(texDiffuse);
+	textureManager.Get(texNormal);
+	textureManager.Get(texSpecular);
+	textureManager.Get(texReflection);
 	sky.Load(skyFaces);
 
 	//
@@ -319,7 +325,7 @@ void Frame()
 	if (cursorLocked) {
 		POINT cursorPos;
 		::GetCursorPos(&cursorPos);
-		inputManager.MouseMove((short)(cursorPos.x - lockPos.x), (short)(cursorPos.y - lockPos.y));
+		Engine::Instance().pInputManager->MouseMove((short)(cursorPos.x - lockPos.x), (short)(cursorPos.y - lockPos.y));
 		::SetCursorPos(lockPos.x, lockPos.y);
 	}
 
@@ -369,11 +375,14 @@ void Frame()
 		light3.ToShader(2);
 		light4.ToShader(3);
 
+		ModelManager& modelManager = *Engine::Instance().pModelManager;
+		TextureManager& textureManager = *Engine::Instance().pTextureManager;
+
 		sky.Bind(UNIT_CUBEMAP);
-		textureManager.GetTexture(texDiffuse)->Bind(UNIT_DIFFUSE);
-		textureManager.GetTexture(texNormal)->Bind(UNIT_NORMAL);
-		textureManager.GetTexture(texSpecular)->Bind(UNIT_SPECULAR);
-		textureManager.GetTexture(texReflection)->Bind(UNIT_REFLECTION);
+		textureManager.Get(texDiffuse)->Bind(UNIT_DIFFUSE);
+		textureManager.Get(texNormal)->Bind(UNIT_NORMAL);
+		textureManager.Get(texSpecular)->Bind(UNIT_SPECULAR);
+		textureManager.Get(texReflection)->Bind(UNIT_REFLECTION);
 		
 		cube.Render();
 

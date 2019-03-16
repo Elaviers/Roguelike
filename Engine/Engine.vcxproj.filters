@@ -330,6 +330,9 @@
     <ClInclude Include="Console.h">
       <Filter>Header Files\Console</Filter>
     </ClInclude>
+    <ClInclude Include="AudioUtilities.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLProgram.cpp">
@@ -526,6 +529,9 @@
     </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Source Files\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioUtilities.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

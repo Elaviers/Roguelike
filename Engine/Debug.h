@@ -1,10 +1,5 @@
 #pragma once
 
-#ifndef _DEBUG
-	#define Debug::Assert(UNUSED)
-	#define Assert(UNUSED)
-#endif
-
 namespace Debug
 {
 	void Break();
@@ -23,5 +18,8 @@ namespace Debug
 			Error(message);
 		}
 	}
+#else
+	inline void Assert(bool condition, const char* message) {}
 #endif
+
 }
