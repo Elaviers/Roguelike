@@ -1,16 +1,15 @@
-#include "Font.h"
+#include "Font_Texture.h"
 #include "Engine.h"
 #include "GLProgram.h"
-#include "TextureManager.h"
 #include "ModelManager.h"
 
-void Font::_CMD_texture(const Buffer<String>& args)
+void FontTexture::_CMD_texture(const Buffer<String>& args)
 {
 	if (args.GetSize() > 0)
 		_texture = Engine::Instance().pTextureManager->Get(args[0]);
 }
 
-void Font::_CMD_region(const Buffer<String> &args)
+void FontTexture::_CMD_region(const Buffer<String>& args)
 {
 	if (args.GetSize() >= 6)
 	{
@@ -30,10 +29,10 @@ void Font::_CMD_region(const Buffer<String> &args)
 	}
 }
 
-void Font::FromString(const String &string)
+void FontTexture::FromString(const String & string)
 {
 	Buffer<String> lines = string.Split("\r\n");
-	
+
 	for (uint32 i = 0; i < lines.GetSize(); ++i)
 	{
 		String loweredLine = lines[i].ToLower();
@@ -54,7 +53,7 @@ void Font::FromString(const String &string)
 
 				if (tokens.GetSize() > 1)
 				{
-					Glyph &glyph = _charMap[tokens[0][0]];
+					Glyph& glyph = _charMap[tokens[0][0]];
 					glyph.width = tokens[1].ToInt();
 					glyph.advance = tokens[2].ToInt();
 
@@ -80,45 +79,47 @@ void Font::FromString(const String &string)
 	}
 }
 
-float Font::CalculateStringWidth(const char *string, float scaleX) const
+float FontTexture::CalculateStringWidth(const char* string, float scaleX) const
 {
 	float width = 0.f;
 
-	for (const char *c = string; *c != '\0'; ++c)
+	float scale = scaleX / (float)_size;
+
+	for (const char* c = string; *c != '\0'; ++c)
 	{
-		const Glyph *glyph = _charMap.Find(*c);
+		const Glyph* glyph = _charMap.Find(*c);
 		if (glyph)
-			width += (glyph->width + glyph->advance) * (scaleX / (float)_size);
+			width += (glyph->width + glyph->advance) * scale;
 	}
 
 	return width;
 }
 
-void Font::RenderString(const char *string, const Transform &_transform, float lineHeight) const
+void FontTexture::RenderString(const char* string, const Transform & transform, float lineHeight) const
 {
 	_texture->Bind(0);
 
-	Transform charTransform = _transform;
+	Transform charTransform = transform;
 	Vector3 advanceDirection = charTransform.GetRightVector();
 	Vector3 downDirection = -1.f * charTransform.GetUpVector();
 
-	charTransform.Move(Vector3(0.f, Maths::Round(_transform.GetScale()[1] / 2.f), 0.f));
+	charTransform.Move(Vector3(0.f, Maths::Round(transform.GetScale()[1] / 2.f), 0.f));
 
-	float scale = (_transform.GetScale()[0] / (float)_size);
+	float scale = (transform.GetScale()[0] / (float)_size);
 
-	float totalAdvance = 0.f;
-	
-	for (const char *c = string; *c != '\0'; ++c)
+	float line = 0.f;
+
+	for (const char* c = string; *c != '\0'; ++c)
 	{
 		const Vector2 halfTexel(.5f / ((float)_texture->GetWidth() * scale), .5f / ((float)_texture->GetHeight() * scale));
 		const Vector2 texel(1.f / ((float)_texture->GetWidth() * scale), 1.f / ((float)_texture->GetHeight() * scale));
 
-		const Glyph *glyph = _charMap.Find(*c);
+		const Glyph * glyph = _charMap.Find(*c);
 		if (glyph)
 		{
 			float halfCharW = (glyph->width * scale / 2.f);
 			charTransform.Move(advanceDirection * halfCharW);
-			charTransform.SetScale(Vector3(glyph->width * scale, (float)_transform.GetScale()[1], 1.f));
+			charTransform.SetScale(Vector3(glyph->width * scale, (float)transform.GetScale()[1], 1.f));
 
 			GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, glyph->uvOffset + halfTexel);
 			GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, glyph->uvSize - texel);
@@ -127,16 +128,15 @@ void Font::RenderString(const char *string, const Transform &_transform, float l
 
 			float secondHalfWPlusAdvance = (((glyph->width / 2.f) + glyph->advance) * scale);
 			charTransform.Move(advanceDirection * secondHalfWPlusAdvance);
-
-			totalAdvance += halfCharW + secondHalfWPlusAdvance;
 		}
 
-		if (*c == '\n')
+		if (*c == '\n' && lineHeight)
 		{
-			charTransform.Move(advanceDirection * -totalAdvance);
-			charTransform.Move(downDirection * lineHeight);
+			++line;
 
-			totalAdvance = 0;
+			charTransform = transform;
+			charTransform.Move(downDirection * lineHeight * line);
 		}
 	}
 }
+

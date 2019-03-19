@@ -16,7 +16,7 @@ uint32 Sampler::ReadToSoundBuffer(byte* dest, uint32 destFrameCount, uint32 dest
 	do
 	{
 		framesWritten = AudioUtilities::ResampleTo(
-			(int16*)(_sound->data + (_currentFrame * _sound->FrameSize)), _sound->sampleRate, _sound->channelCount, _sound->dataSize / _sound->FrameSize,
+			(int16*)(_sound->data + (_currentFrame * _sound->FrameSize)), _sound->sampleRate, _sound->channelCount, _sound->dataSize / _sound->FrameSize - _currentFrame,
 			(int16*)dest, destSampleRate, destChannelCount, destFrameCount, mix, 3);
 	} while (_loop && framesWritten < destFrameCount);
 

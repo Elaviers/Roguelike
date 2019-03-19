@@ -1,8 +1,8 @@
 #include "MaterialManager.h"
 #include "Debug.h"
 #include "IO.h"
-#include "MaterialGrid.h"
-#include "MaterialSurface.h"
+#include "Material_Grid.h"
+#include "Material_Surface.h"
 #include "TextureManager.h"
 #include "Utilities.h"
 
@@ -10,8 +10,7 @@ bool MaterialManager::_CreateResource(Material*& material, const String &name, c
 {
 	if (data.GetLength() != 0)
 	{
-		//todo: using min here is not an optimised way of finding the first char equal to one of two values
-		int splitIndex = Utilities::Min(data.IndexOf('\n'), data.IndexOf('\r'));
+		int splitIndex = data.IndexOfAny("\r\n");
 		String firstLine = data.SubString(0, splitIndex).ToLower();
 		Material* newMaterial;
 

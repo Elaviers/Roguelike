@@ -1,4 +1,6 @@
 #pragma once
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #include "Registry.h"
 
 class Console;
@@ -16,6 +18,8 @@ private:
 	Engine() {}
 	~Engine();
 
+	FT_Library _ftLib;
+
 public:
 	inline static Engine& Instance() { static Engine _instance;  return _instance; }
 
@@ -29,6 +33,10 @@ public:
 	MaterialManager	*pMaterialManager = nullptr;
 	ModelManager	*pModelManager = nullptr;
 	TextureManager	*pTextureManager = nullptr;
+
+	void InitFT();
+
+	inline FT_Library GetFTLibrary() { return _ftLib; }
 
 	//Allocates all managers with default setup
 	void DefaultInit();

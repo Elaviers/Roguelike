@@ -73,21 +73,25 @@
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
     <IncludePath>$(SolutionDir)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
     <IncludePath>$(SolutionDir)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
     <IncludePath>$(SolutionDir)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
     <IncludePath>$(SolutionDir)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -98,7 +102,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>opengl32.lib; ole32.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib; opengl32.lib; ole32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,7 +114,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>opengl32.lib; ole32.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib; opengl32.lib; ole32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -128,7 +132,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib; ole32.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib; opengl32.lib; ole32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,12 +150,14 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>opengl32.lib; ole32.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib; opengl32.lib; ole32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AudioUtilities.h" />
     <ClInclude Include="Console.h" />
+    <ClInclude Include="Font_TTF.h" />
+    <ClInclude Include="Font_Texture.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Bounds.h" />
@@ -195,8 +201,8 @@
     <ClInclude Include="ObjLight.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Material.h" />
-    <ClInclude Include="MaterialGrid.h" />
-    <ClInclude Include="MaterialSurface.h" />
+    <ClInclude Include="Material_Grid.h" />
+    <ClInclude Include="Material_Surface.h" />
     <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Matrix.h" />
@@ -238,6 +244,8 @@
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="CvarMap.cpp" />
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Font_TTF.cpp" />
+    <ClCompile Include="Font_Texture.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Sound.cpp" />
@@ -258,7 +266,6 @@
     <ClCompile Include="DebugString.cpp" />
     <ClCompile Include="Direction2D.cpp" />
     <ClCompile Include="DrawUtils.cpp" />
-    <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GL.cpp" />
@@ -273,9 +280,9 @@
     <ClCompile Include="GLTexture.cpp" />
     <ClCompile Include="IO.cpp" />
     <ClCompile Include="ObjLight.cpp" />
-    <ClCompile Include="MaterialGrid.cpp" />
+    <ClCompile Include="Material_Grid.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
-    <ClCompile Include="MaterialSurface.cpp" />
+    <ClCompile Include="Material_Surface.cpp" />
     <ClCompile Include="Maths.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="ModelManager.cpp" />

@@ -9,9 +9,11 @@ class Console
 	CvarMap _cvars;
 
 	Buffer<char> _charBuffer;
+
+	String _prePrompt;
 	String _prompt;
 
-	size_t _endOfString;
+	size_t _nextBufferIndex;
 
 	bool _showCursor = true;
 	float _blinkTimer = 0.f;
@@ -24,10 +26,12 @@ class Console
 
 	void _CMD_echo(const Buffer<String>& tokens);
 
+	void _SetNextChar(char c);
+
 	void _ExpandBuffer();
 
 public:
-	Console() : _endOfString(0) {}
+	Console() : _nextBufferIndex(0), _prePrompt('>') {}
 	~Console() {}
 
 	inline CvarMap& Cvars() { return _cvars; }
@@ -61,7 +65,7 @@ public:
 
 	inline void SubmitPrompt() 
 	{ 
-		Print((_prompt + '\n').GetData());
+		Print((_prePrompt + _prompt + '\n').GetData());
 		Print(_cvars.HandleCommand(_prompt).GetData());
 		_prompt.Clear(); 
 		_ResetBlink();

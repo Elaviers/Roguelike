@@ -13,7 +13,10 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	_onQuit = onQuit;
 
 	const Material *material = *Engine::Instance().pMaterialManager->Get("panel");
-	const Font *arial = Engine::Instance().pFontManager->Get("arial32");
+	const Font *arial = *Engine::Instance().pFontManager->Get("arial32");
+
+	_buttonStart.SetFont(arial);
+	_buttonQuit.SetFont(arial);
 
 	_panel.SetParent(this);
 	_panel.SetMaterial(material);
@@ -41,9 +44,6 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 
 	_buttonStart.SetString("Start");
 	_buttonQuit.SetString("Exit");
-
-	_buttonStart.SetFont(arial);
-	_buttonQuit.SetFont(arial);
 }
 
 void MenuMain::ButtonStart(UIButton&)

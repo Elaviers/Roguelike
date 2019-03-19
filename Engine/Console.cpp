@@ -1,10 +1,11 @@
 #include "Console.h"
+#include "GLProgram.h"
 #include "Transform.h"
 
 const int maxAllocSize = 2048;
 const int allocUnitSize = 128;
 
-const int linesToDraw = 5;
+const int linesToDraw = 15;
 
 void Console::_CMD_echo(const Buffer<String>& tokens)
 {
@@ -12,12 +13,20 @@ void Console::_CMD_echo(const Buffer<String>& tokens)
 		Print(CSTR(tokens[0] + '\n'));
 }
 
+void Console::_SetNextChar(char c)
+{
+	if (_nextBufferIndex >= _charBuffer.GetSize())
+		_ExpandBuffer();
+
+	_charBuffer[_nextBufferIndex] = c;
+}
+
 void Console::_ExpandBuffer()
 {
 	if (maxAllocSize && _charBuffer.GetSize() + allocUnitSize >= maxAllocSize)
 	{
 		Utilities::CopyBytes(&_charBuffer[allocUnitSize], &_charBuffer[0], _charBuffer.GetSize() - allocUnitSize);
-		_endOfString -= maxAllocSize;
+		_nextBufferIndex -= maxAllocSize;
 	}
 	else
 		_charBuffer.Append(allocUnitSize);
@@ -27,13 +36,12 @@ void Console::Print(const char *string)
 {
 	for (int i = 0; string[i] != '\0'; ++i)
 	{
-		++_endOfString;
+		_SetNextChar(string[i]);
 
-		if (_endOfString > _charBuffer.GetSize())
-			_ExpandBuffer();
-
-		_charBuffer[_endOfString] = string[i];
+		++_nextBufferIndex;
 	}
+
+	_SetNextChar('\0');
 }
 
 void Console::Render(const Font &font, float deltaTime)
@@ -50,8 +58,10 @@ void Console::Render(const Font &font, float deltaTime)
 
 	int linesNeeded = 0;
 
+	float yOffset = 10;
+
 	Transform transform;
-	transform.SetScale(Vector3(128, 128, 1));
+	transform.SetScale(Vector3(32, 32, 1));
 
 	if (_charBuffer.GetSize())
 	{
@@ -81,20 +91,21 @@ void Console::Render(const Font &font, float deltaTime)
 			linesNeeded = Utilities::Min((int)lc, linesToDraw);
 		}
 
-		transform.SetPosition(Vector3(0, linesNeeded * transform.GetScale()[1], 0));
+		transform.SetPosition(Vector3(0, yOffset + linesNeeded * transform.GetScale()[1], 0));
 
 		font.RenderString(&_charBuffer[startIndex], transform, transform.GetScale()[1]);
 	}
 
-	transform.SetPosition(Vector3(0, 0, 0));
+	transform.SetPosition(Vector3(0, yOffset, 0));
 
-	if (_prompt.GetLength())
-	{
-		font.RenderString(&_prompt[0], transform);
+	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, .2f, 0.f));
+	font.RenderString(&_prePrompt[0], transform);
+	transform.Move(Vector3(font.CalculateStringWidth(&_prePrompt[0], transform.GetScale()[0]), 0.f, 0.f));
 
-		transform.Move(Vector3(font.CalculateStringWidth(&_prompt[0], transform.GetScale()[0]), 0.f, 0.f));
-	}
+	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.2f, 1.f, 0.2f));
+	font.RenderString(&_prompt[0], transform);
+	transform.Move(Vector3(font.CalculateStringWidth(&_prompt[0], transform.GetScale()[0]), 0.f, 0.f));
 
 	if (_showCursor)
-		font.RenderString("l", transform);
+		font.RenderString("|", transform);
 }

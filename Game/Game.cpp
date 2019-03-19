@@ -63,11 +63,6 @@ LRESULT CALLBACK Game::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 
 void Game::_InitWindow()
 {
-	short lol = -3000;
-	short lol2 = 3000;
-
-	short lol3 = Maths::Lerp(lol, lol2, 0.25f);
-
 	{
 		LPCTSTR dummyClassName = TEXT("DUMMY");
 		LPCTSTR className = TEXT("GAMEWINDOW");
@@ -115,7 +110,18 @@ void Game::_InitGL()
 
 void Game::_Init()
 {
+	Engine::Instance().InitFT();
 	Engine::Instance().DefaultInit();
+
+	String fontDir;
+	fontDir.SetLength(MAX_PATH);
+
+	::GetWindowsDirectoryA(&fontDir[0], fontDir.GetLength());
+
+	fontDir.Trim();
+	fontDir += "\\FONTS\\";
+
+	Engine::Instance().pFontManager->AddPath(fontDir);
 
 	_consoleIsActive = false;
 
@@ -187,7 +193,7 @@ void Game::Render()
 	if (_consoleIsActive)
 	{
 		_shader.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
-		Engine::Instance().pConsole->Render(*Engine::Instance().pFontManager->Get("arial32"), _deltaTime);
+		Engine::Instance().pConsole->Render(**Engine::Instance().pFontManager->Get("consolas"), _deltaTime);
 	}
 
 	_window.SwapBuffers();

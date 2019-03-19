@@ -4,7 +4,17 @@
 #include "Utilities.h"
 #include <Windows.h>
 
-Buffer<byte> IO::ReadFile(const char *filename) {
+bool IO::FileExists(const char* filename)
+{
+	WIN32_FIND_DATAA fd;
+
+	HANDLE file = ::FindFirstFileA(filename, &fd);
+
+	return file != INVALID_HANDLE_VALUE;
+}
+
+Buffer<byte> IO::ReadFile(const char *filename)
+{
 	Buffer<byte> buffer;
 	
 	HANDLE file = ::CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);

@@ -1,4 +1,4 @@
-#include "MaterialGrid.h"
+#include "Material_Grid.h"
 #include "GLProgram.h"
 #include "Engine.h"
 #include "RenderParam.h"

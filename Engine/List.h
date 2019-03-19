@@ -85,9 +85,13 @@ public:
 	void Remove(Node* target)
 	{
 		for (Node* node = _first; node; node = node->next)
-			if (node->next == target)
+			if (node == target)
 			{
-				node->next = target->next;
+				if (node == _first)
+					_first = target->next;
+				else
+					node->next = target->next;
+				
 				delete target;
 				return;
 			}

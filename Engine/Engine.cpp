@@ -11,6 +11,15 @@
 Engine::~Engine()
 {
 	delete pConsole; delete pAudioManager; delete pDebugManager; delete pFontManager; delete pInputManager; delete pMaterialManager; delete pModelManager; delete pTextureManager;
+
+	FT_Done_FreeType(_ftLib);
+}
+
+void Engine::InitFT()
+{
+	FT_Error error = FT_Init_FreeType(&_ftLib);
+	if (error) { Debug::Error("Freetype init error"); }
+
 }
 
 void Engine::DefaultInit()

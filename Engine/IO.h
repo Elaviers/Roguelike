@@ -24,6 +24,8 @@ struct ModelData
 };
 
 namespace IO {
+	bool FileExists(const char* filename);
+
 	Buffer<byte> ReadFile(const char *filename);
 	bool WriteFile(const char *filename, const byte *data, uint32 dataLength);
 

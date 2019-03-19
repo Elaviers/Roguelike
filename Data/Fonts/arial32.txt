@@ -1,3 +1,4 @@
+bitmap
 mag nearest
 mips 0
 texture fonts/arial32.png

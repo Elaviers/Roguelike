@@ -135,9 +135,19 @@ String String::SubString(size_t start, size_t end) const
 
 int String::IndexOf(char c) const
 {
-	for (unsigned int i = 0; i < _length; ++i)
+	for (size_t i = 0; i < _length; ++i)
 		if (_data[i] == c)
 			return i;
+
+	return -1;
+}
+
+int String::IndexOfAny(const char* chars) const
+{
+	for (size_t i = 0; i < _length; ++i)
+		for (const char* c = chars; *c != '\0'; ++c)
+			if (_data[i] == *c)
+				return i;
 
 	return -1;
 }
@@ -150,12 +160,22 @@ void String::SetLength(size_t length)
 
 	char *new_data = new char[length + 1]();
 
-	for (unsigned int i = 0; i < minLength; ++i)
+	for (size_t i = 0; i < minLength; ++i)
 		new_data[i] = _data[i];
 
 	delete[] _data;
 	_length = length;
 	_data = new_data;
+}
+
+void String::Trim()
+{
+	size_t length = 0;
+
+	for (const char* c = _data; *c != '\0'; ++c)
+		++length;
+
+	SetLength(length);
 }
 
 ////

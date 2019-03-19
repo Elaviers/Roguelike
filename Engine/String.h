@@ -27,9 +27,12 @@ public:
 	String SubString(size_t start, size_t end) const;
 	inline String SubString(size_t start) const { return SubString(start, _length); }
 	int IndexOf(char) const;
+	int IndexOfAny(const char* possibleChars) const;
 
 	void SetLength(size_t length);
 	inline void Clear() { SetLength(0); }
+
+	void Trim();
 
 	inline const char* const GetData() const { return _data; }
 	inline size_t GetLength() const { return _length; }

@@ -1,14 +1,18 @@
 #pragma once
 #include "ResourceManager.h"
-#include "Font.h"
 
-class FontManager : public ResourceManager<Font>
+class Font;
+
+class FontManager : public ResourceManager<Font*>
 {
-
-	virtual bool _CreateResource(Font&, const String&, const String&) override;
+	virtual bool _CreateResource(Font*&, const String&, const String&) override;
+	
+	String _systemPath;
 
 public:
 	FontManager() {}
 	virtual ~FontManager() {}
+
+	inline void SetSystemPath(const String& path) { _systemPath = path; }
 };
 

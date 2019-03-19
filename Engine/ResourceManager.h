@@ -7,7 +7,7 @@ template<typename T, bool RAW = false>
 class ResourceManager
 {
 private:
-	String _rootPath;
+	Buffer<String> _paths;
 	Map<String, T> _map;
 	
 protected:
@@ -16,10 +16,11 @@ protected:
 
 	virtual void _DestroyResource(T& resource) {}
 
-	ResourceManager() {}
+	ResourceManager() { _paths.SetSize(1); }
 	virtual ~ResourceManager() {}
 
 public:
+
 	T* Get(const String& name)
 	{
 		String lowerName = name.ToLower();
@@ -29,12 +30,15 @@ public:
 
 		if (lowerName.GetLength() > 0)
 		{
-			T resource;
+			for (size_t i = 0; i < _paths.GetSize(); ++i)
+			{
+				T resource;
 
-			String data = RAW ? (_rootPath + name) : IO::ReadFileString((_rootPath + name + ".txt").GetData());
+				String data = RAW ? (_paths[i] + name) : IO::ReadFileString((_paths[i] + name + ".txt").GetData());
 
-			if (_CreateResource(resource, lowerName, data))
-				return &_map.Set(lowerName, std::move(resource));
+				if (_CreateResource(resource, lowerName, data))
+					return &_map.Set(lowerName, std::move(resource));
+			}
 		}
 
 		return nullptr;
@@ -53,6 +57,10 @@ public:
 		return string;
 	}
 
-	inline void SetRootPath(const char *root) { _rootPath = root; }
-	inline const String &GetRootPath() { return _rootPath; }
+	inline void SetRootPath(const String &root) { _paths[0] = root; }
+	inline const String &GetRootPath() { return _paths[0]; }
+
+	inline void AddPath(const String &root) { _paths.Add(root); }
+
+	inline const Buffer<String>& GetPaths() { return _paths; }
 };

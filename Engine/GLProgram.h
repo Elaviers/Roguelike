@@ -20,6 +20,8 @@ namespace DefaultUniformVars
 	constexpr const char *intTextureReflection = "T_Reflection";
 
 	constexpr const char *intCubemap = "Cubemap";
+
+	constexpr const char *boolIsFont = "IsFont";
 }
 
 class GLProgram
@@ -48,6 +50,7 @@ public:
 
 	//Setter inlines
 
+	inline void SetBool(const char* name, GLboolean x) const { glUniform1i(GetUniformLocation(name), x ? 1 : 0); }
 	inline void SetInt(const char *name, GLint x) const { glUniform1i(GetUniformLocation(name), x); }
 	inline void SetMat4(const char *name, const Mat4 &x) const { glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &x[0][0]); }
 	inline void SetVec2(const char *name, const Vector2 &x) const { glUniform2fv(GetUniformLocation(name), 1, &x[0]); }

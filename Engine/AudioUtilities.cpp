@@ -64,8 +64,9 @@ uint32 AudioUtilities::ResampleTo(int16 *src, uint32 srcSampleRate, uint16 srcCh
 							  int16 *dest, uint32 destSampleRate, uint16 destChannelCount, uint32 destFrameCount, float mix, unsigned int filterSize)
 {
 	const float srcFramesPerDestFrame = (float)srcSampleRate / (float)destSampleRate;
+	const float destFramesPerSrcFrame = (float)destSampleRate / (float)srcSampleRate;
 
-	uint32 framesToWrite = Utilities::Min(srcFrameCount, destFrameCount);
+	uint32 framesToWrite = Utilities::Min<uint32>(srcFrameCount * destFramesPerSrcFrame, destFrameCount);
 
 	for (int f = 0; f < framesToWrite; ++f)
 	{
