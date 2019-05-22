@@ -1,6 +1,6 @@
-#include "GL.h"
-#include "String.h"
-#include "Debug.h"
+#include "GL.hpp"
+#include "String.hpp"
+#include "Debug.hpp"
 
 //Windows
 PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;

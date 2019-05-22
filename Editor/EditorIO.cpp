@@ -1,5 +1,5 @@
-#include "EditorIO.h"
-#include <Engine/Utilities.h>
+#include "EditorIO.hpp"
+#include <Engine/Utilities.hpp>
 #include <Windows.h>
 #include <ShObjIdl.h>
 #include <string.h> //for wcscat

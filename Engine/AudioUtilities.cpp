@@ -1,6 +1,6 @@
-#include "AudioUtilities.h"
-#include "Maths.h"
-#include "Utilities.h"
+#include "AudioUtilities.hpp"
+#include "Maths.hpp"
+#include "Utilities.hpp"
 #include <limits>
 
 void AudioUtilities::LowPassFilter(const int16 *src, int16 *dest, int channelCount, size_t frameCount, uint32 sampleRate, uint32 cutoff)

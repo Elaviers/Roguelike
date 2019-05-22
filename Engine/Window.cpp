@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "Window.hpp"
 
 void WindowFunctions::ResizeHWND(HWND hwnd, uint16 w, uint16 h)
 {

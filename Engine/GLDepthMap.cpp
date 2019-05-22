@@ -1,4 +1,4 @@
-#include "GLDepthMap.h"
+#include "GLDepthMap.hpp"
 
 
 

@@ -1,5 +1,5 @@
-#include "Bounds.h"
-#include "Utilities.h"
+#include "Bounds.hpp"
+#include "Utilities.hpp"
 
 void Bounds::RecalculateSphereBounds()
 {

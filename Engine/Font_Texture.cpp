@@ -1,7 +1,7 @@
-#include "Font_Texture.h"
-#include "Engine.h"
-#include "GLProgram.h"
-#include "ModelManager.h"
+#include "Font_Texture.hpp"
+#include "Engine.hpp"
+#include "GLProgram.hpp"
+#include "ModelManager.hpp"
 
 void FontTexture::_CMD_texture(const Buffer<String>& args)
 {

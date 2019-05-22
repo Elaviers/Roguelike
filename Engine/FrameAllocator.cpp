@@ -1,5 +1,5 @@
-#include "FrameAllocator.h"
-#include "Utilities.h"
+#include "FrameAllocator.hpp"
+#include "Utilities.hpp"
 
 byte* FrameAllocator::Allocate(size_t size)
 {

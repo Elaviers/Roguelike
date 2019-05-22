@@ -1,13 +1,13 @@
-#include "Game.h"
-#include <Engine/AudioManager.h>
-#include <Engine/Console.h>
-#include <Engine/Engine.h>
-#include <Engine/FontManager.h>
-#include <Engine/GL.h>
-#include <Engine/IO.h>
+#include "Game.hpp"
+#include <Engine/AudioManager.hpp>
+#include <Engine/Console.hpp>
+#include <Engine/Engine.hpp>
+#include <Engine/FontManager.hpp>
+#include <Engine/GL.hpp>
+#include <Engine/IO.hpp>
 #include <windowsx.h>
-#include "LevelGeneration.h"
-#include "MenuMain.h"
+#include "LevelGeneration.hpp"
+#include "MenuMain.hpp"
 
 LRESULT CALLBACK Game::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {

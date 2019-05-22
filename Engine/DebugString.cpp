@@ -1,5 +1,5 @@
-#include "DebugString.h"
-#include "Font.h"
+#include "DebugString.hpp"
+#include "Font.hpp"
 
 void DebugString::Render() const
 {

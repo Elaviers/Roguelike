@@ -1,7 +1,7 @@
-#include "FontManager.h"
-#include "Font.h"
-#include "Font_Texture.h"
-#include "Font_TTF.h"
+#include "FontManager.hpp"
+#include "Font.hpp"
+#include "Font_Texture.hpp"
+#include "Font_TTF.hpp"
 
 bool FontManager::_CreateResource(Font*& font, const String& name, const String& data)
 {

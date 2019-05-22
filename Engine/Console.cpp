@@ -1,6 +1,6 @@
-#include "Console.h"
-#include "GLProgram.h"
-#include "Transform.h"
+#include "Console.hpp"
+#include "GLProgram.hpp"
+#include "Transform.hpp"
 
 const int maxAllocSize = 2048;
 const int allocUnitSize = 128;

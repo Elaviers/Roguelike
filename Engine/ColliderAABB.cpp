@@ -1,10 +1,10 @@
-#include "ColliderAABB.h"
-#include "ColliderSphere.h"
-#include "Collision.h"
-#include "GameObject.h"
-#include "Maths.h"
-#include "RaycastResult.h"
-#include "Utilities.h"
+#include "ColliderAABB.hpp"
+#include "ColliderSphere.hpp"
+#include "Collision.hpp"
+#include "GameObject.hpp"
+#include "Maths.hpp"
+#include "RaycastResult.hpp"
+#include "Utilities.hpp"
 
 #include <float.h>
 

@@ -1,6 +1,6 @@
-#include "ToolConnector.h"
-#include "Editor.h"
-#include "EditorUtil.h"
+#include "ToolConnector.hpp"
+#include "Editor.hpp"
+#include "EditorUtil.hpp"
 
 String ToolConnector::GetConnectorDirection() const
 {

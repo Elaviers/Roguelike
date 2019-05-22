@@ -1,5 +1,5 @@
-#include "Transform.h"
-#include "Maths.h"
+#include "Transform.hpp"
+#include "Maths.hpp"
 
 using namespace Maths;
 
@@ -16,7 +16,7 @@ void Transform::_MakeInverseTransformationMatrix(Mat4 &matrix) const
 		Matrix::Scale(1.f / _scale);
 }
 
-const Mat4& Transform::GetTransformationMatrix() const
+Mat4 Transform::GetTransformationMatrix() const
 {
 	//todo: hm.
 	Transform *disgusting = const_cast<Transform*>(this);
@@ -30,7 +30,7 @@ const Mat4& Transform::GetTransformationMatrix() const
 	return _matrix;
 }
 
-const Mat4& Transform::GetInverseTransformationMatrix() const
+Mat4 Transform::GetInverseTransformationMatrix() const
 {
 	Transform *disgusting = const_cast<Transform*>(this);
 
@@ -79,9 +79,8 @@ void Transform::ReadFromBuffer(BufferIterator<byte> &buffer)
 
 Transform& Transform::operator*=(const Transform &other)
 {
-	//_position = other._position + other._scale * (other.GetForwardVector() * _position[0] + other.GetUpVector() * _position[1] + other.GetRightVector() * _position[2]);
 	_position = _position * other.GetTransformationMatrix();
-	_rotation = other._rotation;
+	_rotation = other._rotation * _rotation;
 	_scale *= other._scale;
 
 	return *this;

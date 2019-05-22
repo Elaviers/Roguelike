@@ -1,8 +1,8 @@
-#include "ObjBrush2D.h"
-#include "GLProgram.h"
-#include "MaterialManager.h"
-#include "ModelManager.h"
-#include "Utilities.h"
+#include "ObjBrush2D.hpp"
+#include "GLProgram.hpp"
+#include "MaterialManager.hpp"
+#include "ModelManager.hpp"
+#include "Utilities.hpp"
 
 void ObjBrush2D::_UpdateTransform()
 {

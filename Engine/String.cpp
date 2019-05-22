@@ -1,6 +1,6 @@
-#include "String.h"
-#include "Buffer.h"
-#include "Types.h"
+#include "String.hpp"
+#include "Buffer.hpp"
+#include "Types.hpp"
 
 String::~String()
 {

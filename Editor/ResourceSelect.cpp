@@ -1,17 +1,17 @@
-#include "ResourceSelect.h"
+#include "ResourceSelect.hpp"
 #include <CommCtrl.h>
-#include <Engine/Debug.h>
-#include <Engine/GL.h>
-#include <Engine/GLContext.h>
-#include <Engine/GLProgram.h>
-#include <Engine/IO.h>
-#include <Engine/MaterialManager.h>
-#include <Engine/ModelManager.h>
-#include <Engine/ObjCamera.h>
-#include <Engine/ObjLight.h>
-#include <Engine/ObjRenderable.h>
-#include <Engine/Utilities.h>
-#include <Engine/Window.h>
+#include <Engine/Debug.hpp>
+#include <Engine/GL.hpp>
+#include <Engine/GLContext.hpp>
+#include <Engine/GLProgram.hpp>
+#include <Engine/IO.hpp>
+#include <Engine/MaterialManager.hpp>
+#include <Engine/ModelManager.hpp>
+#include <Engine/ObjCamera.hpp>
+#include <Engine/ObjLight.hpp>
+#include <Engine/ObjRenderable.hpp>
+#include <Engine/Utilities.hpp>
+#include <Engine/Window.hpp>
 #include "resource.h"
 
 constexpr LPCTSTR viewportClassName = TEXT("RESSELECTVPCLASS");

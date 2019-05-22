@@ -1,6 +1,6 @@
-#include "MenuStartLevel.h"
-#include "LevelGeneration.h"
-#include <Engine/IO.h>
+#include "MenuStartLevel.hpp"
+#include "LevelGeneration.hpp"
+#include <Engine/IO.hpp>
 
 MenuStartLevel::~MenuStartLevel()
 {

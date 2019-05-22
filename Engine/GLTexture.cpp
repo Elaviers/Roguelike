@@ -1,4 +1,4 @@
-#include "GLTexture.h"
+#include "GLTexture.hpp"
 
 void GLTexture::Create(GLsizei width, GLsizei height, const GLvoid *data, GLint mipLevels, GLint filter)
 {

@@ -1,10 +1,10 @@
-#include "ObjConnector.h"
-#include "DrawUtils.h"
-#include "Engine.h"
-#include "GLProgram.h"
-#include "ModelManager.h"
-#include "ShaderChannel.h"
-#include "TextureManager.h"
+#include "ObjConnector.hpp"
+#include "DrawUtils.hpp"
+#include "Engine.hpp"
+#include "GLProgram.hpp"
+#include "ModelManager.hpp"
+#include "ShaderChannel.hpp"
+#include "TextureManager.hpp"
 
 void ObjConnector::Render() const {
 	if (Engine::Instance().pModelManager && GLProgram::Current().GetChannels() & ShaderChannel::UNLIT)

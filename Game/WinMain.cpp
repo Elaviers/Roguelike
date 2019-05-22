@@ -1,5 +1,5 @@
 #include <Windows.h>
-#include "Game.h"
+#include "Game.hpp"
 
 int APIENTRY WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandString, int cmdShow)
 {

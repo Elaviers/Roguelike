@@ -1,5 +1,5 @@
-#include "Debug.h"
-#include "String.h"
+#include "Debug.hpp"
+#include "String.hpp"
 #include <Windows.h>
 
 namespace Debug

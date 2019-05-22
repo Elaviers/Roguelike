@@ -1,5 +1,5 @@
-#include "InputManager.h"
-#include "String.h"
+#include "InputManager.hpp"
+#include "String.hpp"
 #include <Windows.h>
 
 #define KEYNAME(KEY, NAME) {Keycode::KEY, #NAME}

@@ -1,5 +1,5 @@
-#include "Viewport.h"
-#include "Editor.h"
+#include "Viewport.hpp"
+#include "Editor.hpp"
 #include <Windows.h>
 #include <windowsx.h> //For X & Y LPARAM macros
 

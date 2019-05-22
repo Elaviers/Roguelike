@@ -1,8 +1,8 @@
-#include "Sampler.h"
-#include "AudioUtilities.h"
-#include "Debug.h"
-#include "Maths.h"
-#include "Utilities.h"
+#include "Sampler.hpp"
+#include "AudioUtilities.hpp"
+#include "Debug.hpp"
+#include "Maths.hpp"
+#include "Utilities.hpp"
 #include <limits>
 
 uint32 Sampler::ReadToSoundBuffer(byte* dest, uint32 destFrameCount, uint32 destSampleRate, uint16 destChannelCount, float mix)

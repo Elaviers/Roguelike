@@ -1,8 +1,8 @@
-#include "Font_TTF.h"
-#include "Engine.h"
-#include "GLProgram.h"
-#include "FontManager.h"
-#include "ModelManager.h"
+#include "Font_TTF.hpp"
+#include "Engine.hpp"
+#include "GLProgram.hpp"
+#include "FontManager.hpp"
+#include "ModelManager.hpp"
 
 void FontTTF::_CMD_LoadFont(const Buffer<String>& args)
 {

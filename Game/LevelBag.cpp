@@ -1,4 +1,4 @@
-#include "LevelBag.h"
+#include "LevelBag.hpp"
 
 void LevelBag::AddLevel(GameObject &level, int dominance)
 {

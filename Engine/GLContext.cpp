@@ -1,5 +1,5 @@
-#include "GLContext.h"
-#include "Window.h"
+#include "GLContext.hpp"
+#include "Window.hpp"
 
 GLContext GLContext::CreateDummyAndUse(LPCTSTR className)
 {

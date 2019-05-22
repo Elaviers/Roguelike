@@ -1,7 +1,7 @@
-#include "DebugFrustum.h"
-#include "DrawUtils.h"
-#include "Engine.h"
-#include "Ray.h"
+#include "DebugFrustum.hpp"
+#include "DrawUtils.hpp"
+#include "Engine.hpp"
+#include "Ray.hpp"
 
 using namespace DrawUtils;
 

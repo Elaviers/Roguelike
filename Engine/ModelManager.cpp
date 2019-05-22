@@ -1,10 +1,10 @@
-#include "ModelManager.h"
-#include "ColliderAABB.h"
-#include "ColliderSphere.h"
-#include "Debug.h"
-#include "IO.h"
-#include "Utilities.h"
-#include "Vector.h"
+#include "ModelManager.hpp"
+#include "ColliderAABB.hpp"
+#include "ColliderSphere.hpp"
+#include "Debug.hpp"
+#include "IO.hpp"
+#include "Utilities.hpp"
+#include "Vector.hpp"
 
 ModelManager::ModelManager()
 {

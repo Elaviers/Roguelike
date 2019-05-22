@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include <CommCtrl.h>
-#include "Editor.h"
+#include "Editor.hpp"
 
 //Visual styles
 #pragma comment(linker,"\"/manifestdependency:type='win32' \

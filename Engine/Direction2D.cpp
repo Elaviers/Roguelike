@@ -1,4 +1,4 @@
-#include "Direction2D.h"
+#include "Direction2D.hpp"
 
 namespace Direction2DFuncs
 {

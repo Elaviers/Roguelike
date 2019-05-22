@@ -1,6 +1,6 @@
-#include "ToolBrush3D.h"
-#include "Editor.h"
-#include "EditorUtil.h"
+#include "ToolBrush3D.hpp"
+#include "Editor.hpp"
+#include "EditorUtil.hpp"
 
 void ToolBrush3D::Initialise()
 {

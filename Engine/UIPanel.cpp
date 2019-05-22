@@ -1,8 +1,8 @@
-#include "UIPanel.h"
-#include "Engine.h"
-#include "GLProgram.h"
-#include "ModelManager.h"
-#include "RenderParam.h"
+#include "UIPanel.hpp"
+#include "Engine.hpp"
+#include "GLProgram.hpp"
+#include "ModelManager.hpp"
+#include "RenderParam.hpp"
 
 inline void RenderPlaneWithTransform(const Transform &t) 
 { 

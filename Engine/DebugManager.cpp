@@ -1,7 +1,7 @@
-#include "DebugManager.h"
-#include "DebugObject.h"
-#include "Font.h"
-#include "String.h"
+#include "DebugManager.hpp"
+#include "DebugObject.hpp"
+#include "Font.hpp"
+#include "String.hpp"
 
 void DebugManager::Update(float deltaTime)
 {
@@ -40,7 +40,7 @@ void DebugManager::RenderScreen() const
 		_screenObjects[i]->Render();
 }
 
-#include "DebugString.h"
+#include "DebugString.hpp"
 
 void DebugManager::AddString(const String &string)
 {

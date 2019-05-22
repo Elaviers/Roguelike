@@ -1,5 +1,5 @@
-#include "Sound.h"
-#include "Utilities.h"
+#include "Sound.hpp"
+#include "Utilities.hpp"
 
 void WaveSound::MakeStereo()
 {

@@ -1,8 +1,8 @@
-#include "MenuMain.h"
-#include <Engine/Engine.h>
-#include <Engine/FontManager.h>
-#include <Engine/MaterialManager.h>
-#include "MenuStartLevel.h"
+#include "MenuMain.hpp"
+#include <Engine/Engine.hpp>
+#include <Engine/FontManager.hpp>
+#include <Engine/MaterialManager.hpp>
+#include "MenuStartLevel.hpp"
 
 const Vector4 inactiveBtnColour(.8f, .8f, .2f, 1.f);
 const Vector4 activeBtnColour(.6f, .6f, .3f, 1.f);

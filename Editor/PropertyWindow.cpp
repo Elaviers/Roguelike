@@ -1,8 +1,8 @@
-#include "PropertyWindow.h"
+#include "PropertyWindow.hpp"
 #include <CommCtrl.h>
-#include <Engine/GameObject.h>
-#include <Engine/Registry.h>
-#include "Editor.h"
+#include <Engine/GameObject.hpp>
+#include <Engine/Registry.hpp>
+#include "Editor.hpp"
 
 constexpr int buttonW = 20;
 constexpr int boxH = 18;

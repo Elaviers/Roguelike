@@ -1,5 +1,5 @@
-#include "IO.h"
-#include "BufferIterator.h"
+#include "IO.hpp"
+#include "BufferIterator.hpp"
 
 WaveSound IO::ReadWaveFile(const char* filename)
 {

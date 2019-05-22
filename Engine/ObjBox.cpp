@@ -1,8 +1,8 @@
-#include "ObjBox.h"
-#include "DrawUtils.h"
-#include "Engine.h"
-#include "GLProgram.h"
-#include "ShaderChannel.h"
+#include "ObjBox.hpp"
+#include "DrawUtils.hpp"
+#include "Engine.hpp"
+#include "GLProgram.hpp"
+#include "ShaderChannel.hpp"
 
 void ObjBox::Render() const
 {

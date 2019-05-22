@@ -1,8 +1,8 @@
-#include "Material_Grid.h"
-#include "GLProgram.h"
-#include "Engine.h"
-#include "RenderParam.h"
-#include "TextureManager.h"
+#include "Material_Grid.hpp"
+#include "GLProgram.hpp"
+#include "Engine.hpp"
+#include "RenderParam.hpp"
+#include "TextureManager.hpp"
 
 void MaterialGrid::_CMD_texture(const Buffer<String> &args)
 {

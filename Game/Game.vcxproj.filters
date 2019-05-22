@@ -38,19 +38,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game.h">
+    <ClInclude Include="Game.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MenuStartLevel.h">
+    <ClInclude Include="MenuStartLevel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MenuMain.h">
+    <ClInclude Include="MenuMain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LevelGeneration.h">
+    <ClInclude Include="LevelGeneration.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LevelBag.h">
+    <ClInclude Include="LevelBag.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

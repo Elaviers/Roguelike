@@ -1,4 +1,4 @@
-#include "GLCubemap.h"
+#include "GLCubemap.hpp"
 
 
 

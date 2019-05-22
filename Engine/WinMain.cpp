@@ -1,5 +1,5 @@
-#include <Windows.h>
-#include "Window.h"
+#include <Windows.hpp>
+#include "Window.hpp"
 
 bool running = true;
 

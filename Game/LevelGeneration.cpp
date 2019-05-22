@@ -1,8 +1,8 @@
-#include "LevelGeneration.h"
-#include "LevelBag.h"
-#include <Engine/GameObject.h>
-#include <Engine/LevelIO.h>
-#include <Engine/String.h>
+#include "LevelGeneration.hpp"
+#include "LevelBag.hpp"
+#include <Engine/GameObject.hpp>
+#include <Engine/LevelIO.hpp>
+#include <Engine/String.hpp>
 
 ObjConnector* GetRandomConnector(const Buffer<GameObject*> &objects)
 {

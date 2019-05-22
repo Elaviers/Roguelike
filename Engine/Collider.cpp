@@ -1,7 +1,7 @@
-#include "Collider.h"
-#include "ColliderAABB.h"
-#include "ColliderSphere.h"
-#include "Collision.h"
+#include "Collider.hpp"
+#include "ColliderAABB.hpp"
+#include "ColliderSphere.hpp"
+#include "Collision.hpp"
 
 bool Collider::Overlaps(const Collider &other, const Transform &otherTransform, const Transform &_transform) const
 {

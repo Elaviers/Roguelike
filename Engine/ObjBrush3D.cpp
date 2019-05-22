@@ -1,6 +1,6 @@
-#include "ObjBrush3D.h"
-#include "GLProgram.h"
-#include "Utilities.h"
+#include "ObjBrush3D.hpp"
+#include "GLProgram.hpp"
+#include "Utilities.hpp"
 
 void ObjBrush3D::_UpdateTransform()
 {
@@ -15,7 +15,7 @@ void ObjBrush3D::_UpdateTransform()
 	SetRelativeScale(Vector3(w, h, d));
 }
 
-#include "DrawUtils.h"
+#include "DrawUtils.hpp"
 
 void ObjBrush3D::Render() const
 {

@@ -1,5 +1,5 @@
-#include "Material.h"
-#include "GL.h"
+#include "Material.hpp"
+#include "GL.hpp"
 
 void Material::FromString(const String &data)
 {

@@ -1,12 +1,12 @@
-#include "Engine.h"
-#include "Console.h"
-#include "AudioManager.h"
-#include "DebugManager.h"
-#include "FontManager.h"
-#include "InputManager.h"
-#include "MaterialManager.h"
-#include "ModelManager.h"
-#include "TextureManager.h"
+#include "Engine.hpp"
+#include "Console.hpp"
+#include "AudioManager.hpp"
+#include "DebugManager.hpp"
+#include "FontManager.hpp"
+#include "InputManager.hpp"
+#include "MaterialManager.hpp"
+#include "ModelManager.hpp"
+#include "TextureManager.hpp"
 
 Engine::~Engine()
 {

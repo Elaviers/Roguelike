@@ -1,7 +1,7 @@
-#include "TextureManager.h"
-#include "Debug.h"
-#include "GL.h"
-#include "IO.h"
+#include "TextureManager.hpp"
+#include "Debug.hpp"
+#include "GL.hpp"
+#include "IO.hpp"
 #include <vector>
 
 

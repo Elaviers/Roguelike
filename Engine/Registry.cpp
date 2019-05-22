@@ -1,11 +1,11 @@
-#include "Registry.h"
-#include "ObjBox.h"
-#include "ObjBrush2D.h"
-#include "ObjBrush3D.h"
-#include "ObjConnector.h"
-#include "ObjCamera.h"
-#include "ObjLight.h"
-#include "ObjRenderable.h"
+#include "Registry.hpp"
+#include "ObjBox.hpp"
+#include "ObjBrush2D.hpp"
+#include "ObjBrush3D.hpp"
+#include "ObjConnector.hpp"
+#include "ObjCamera.hpp"
+#include "ObjLight.hpp"
+#include "ObjRenderable.hpp"
 
 void Registry::RegisterEngineObjects()
 {

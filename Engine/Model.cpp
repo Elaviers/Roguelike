@@ -1,8 +1,8 @@
-#include "Model.h"
-#include "ColliderAABB.h"
-#include "ColliderSphere.h"
-#include "Engine.h"
-#include "ModelManager.h"
+#include "Model.hpp"
+#include "ColliderAABB.hpp"
+#include "ColliderSphere.hpp"
+#include "Engine.hpp"
+#include "ModelManager.hpp"
 
 void Model::_CMD_model(const Buffer<String> &args)
 {

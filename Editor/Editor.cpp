@@ -1,14 +1,14 @@
-#include "Editor.h"
-#include <Engine/DebugFrustum.h>
-#include <Engine/DebugManager.h>
-#include <Engine/DrawUtils.h>
-#include <Engine/InputManager.h>
-#include <Engine/IO.h>
-#include <Engine/ObjRenderable.h>
-#include <Engine/Ray.h>
-#include "EditorIO.h"
+#include "Editor.hpp"
+#include <Engine/DebugFrustum.hpp>
+#include <Engine/DebugManager.hpp>
+#include <Engine/DrawUtils.hpp>
+#include <Engine/InputManager.hpp>
+#include <Engine/IO.hpp>
+#include <Engine/ObjRenderable.hpp>
+#include <Engine/Ray.hpp>
+#include "EditorIO.hpp"
 #include "resource.h"
-#include "ResourceSelect.h"
+#include "ResourceSelect.hpp"
 
 constexpr int tbImageSize = 32;
 
@@ -100,8 +100,6 @@ void Editor::_Init()
 	CameraRef(0).SetProectionType(ProjectionType::PERSPECTIVE);
 	CameraRef(0).SetRelativePosition(Vector3(-5.f, 5.f, -5.f));
 	CameraRef(0).SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
-	CameraRef(0).SetRelativePosition(Vector3());
-	CameraRef(0).SetRelativeRotation(Vector3());
 
 	CameraRef(1).SetProectionType(ProjectionType::ORTHOGRAPHIC);
 	CameraRef(1).SetScale(32.f);
@@ -236,7 +234,7 @@ void Editor::Frame()
 		+ perspCam.RelativeTransform().GetRightVector() * _deltaTime * _axisMoveX * moveSpeed
 		+ perspCam.RelativeTransform().GetUpVector() * _deltaTime * _axisMoveZ * moveSpeed);
 
-	perspCam.AddRelativeRotation(Vector3(_deltaTime * _axisLookY * rotSpeed, -1.f * _deltaTime * _axisLookX * rotSpeed, 0.f));
+	perspCam.AddRelativeRotation(Vector3(_deltaTime * _axisLookY * rotSpeed, _deltaTime * _axisLookX * rotSpeed, 0.f));
 
 	Engine::Instance().pDebugManager->Update(_deltaTime);
 	Engine::Instance().pDebugManager->AddToWorld(DebugFrustum::FromCamera(CameraRef(0)));
@@ -380,7 +378,7 @@ void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y
 		}
 		else
 		{
-			camera.RelativeRotate(Vector3((prevUnitY - _mouseData.unitY) / -2.f, (prevUnitX - _mouseData.unitX) / -2.f, 0.f));
+			camera.AddRelativeRotation(Vector3((prevUnitY - _mouseData.unitY) / -2.f, (prevUnitX - _mouseData.unitX) / -2.f, 0.f));
 		}
 	}
 

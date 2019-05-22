@@ -1,10 +1,10 @@
-#include "DrawUtils.h"
-#include "GL.h"
-#include "GLProgram.h"
-#include "Matrix.h"
-#include "Ray.h"
+#include "DrawUtils.hpp"
+#include "GL.hpp"
+#include "GLProgram.hpp"
+#include "Matrix.hpp"
+#include "Ray.hpp"
 
-#include "Engine.h"
+#include "Engine.hpp"
 
 #define X 0
 #define Y 1
@@ -211,9 +211,9 @@ namespace DrawUtils
 		Vector3 dir = (b - a).Normalise();
 
 		if (dir[2] >= 0.f)
-			t.SetRotation(Vector3(90 + Maths::ArcSineDegrees(dir[1]), -Maths::ArcTangentDegrees2(dir[0], dir[2]), 0.f));
+			t.SetRotation(Vector3(90 + Maths::ArcSineDegrees(dir[1]), Maths::ArcTangentDegrees2(dir[0], dir[2]), 0.f));
 		else
-			t.SetRotation(Vector3(90 - Maths::ArcSineDegrees(dir[1]), -Maths::ArcTangentDegrees2(dir[0], dir[2]), 0.f));
+			t.SetRotation(Vector3(90 - Maths::ArcSineDegrees(dir[1]), Maths::ArcTangentDegrees2(dir[0], dir[2]), 0.f));
 
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
 		modelManager.Line().Render();

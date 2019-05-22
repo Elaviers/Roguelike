@@ -1,9 +1,9 @@
-#include "ToolEntity.h"
-#include "Editor.h"
-#include <Engine/ObjBrush.h>
-#include <Engine/ObjRenderable.h>
-#include <Engine/RaycastResult.h>
-#include <Engine/Registry.h>
+#include "ToolEntity.hpp"
+#include "Editor.hpp"
+#include <Engine/ObjBrush.hpp>
+#include <Engine/ObjRenderable.hpp>
+#include <Engine/RaycastResult.hpp>
+#include <Engine/Registry.hpp>
 
 void ToolEntity::_SetClassID(const byte &id)
 {

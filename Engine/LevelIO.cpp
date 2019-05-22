@@ -1,13 +1,13 @@
-#include "LevelIO.h"
-#include "Engine.h"
-#include "Debug.h"
-#include "IO.h"
-#include "Map.h"
-#include "Registry.h"
+#include "LevelIO.hpp"
+#include "Engine.hpp"
+#include "Debug.hpp"
+#include "IO.hpp"
+#include "Map.hpp"
+#include "Registry.hpp"
 
-#include "ObjBrush2D.h"
-#include "ObjBrush3D.h"
-#include "ObjRenderable.h"
+#include "ObjBrush2D.hpp"
+#include "ObjBrush3D.hpp"
+#include "ObjRenderable.hpp"
 
 constexpr const char *levelPrefix = "POO";
 constexpr const byte currentVersion = LevelVersions::VERSION_2;

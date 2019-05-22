@@ -1,4 +1,4 @@
-#include "GLModel.h"
+#include "GLModel.hpp"
 
 inline void SetGLAttribs()
 {

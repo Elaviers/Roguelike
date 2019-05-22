@@ -1,7 +1,7 @@
-#include "IO.h"
-#include "Debug.h"
+#include "IO.hpp"
+#include "Debug.hpp"
 #include "lodepng.h"
-#include "Utilities.h"
+#include "Utilities.hpp"
 #include <Windows.h>
 
 bool IO::FileExists(const char* filename)

@@ -1,11 +1,11 @@
-#include "ObjLight.h"
-#include "CvarMap.h"
-#include "Engine.h"
-#include "GL.h"
-#include "GLProgram.h"
-#include "String.h"
-#include "ShaderChannel.h"
-#include "ModelManager.h"
+#include "ObjLight.hpp"
+#include "CvarMap.hpp"
+#include "Engine.hpp"
+#include "GL.hpp"
+#include "GLProgram.hpp"
+#include "String.hpp"
+#include "ShaderChannel.hpp"
+#include "ModelManager.hpp"
 
 bool ObjLight::drawLightSources = true;
 

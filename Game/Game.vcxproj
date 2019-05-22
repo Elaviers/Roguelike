@@ -194,11 +194,11 @@ EXIT 0</Command>
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="LevelBag.h" />
-    <ClInclude Include="LevelGeneration.h" />
-    <ClInclude Include="MenuMain.h" />
-    <ClInclude Include="MenuStartLevel.h" />
+    <ClInclude Include="Game.hpp" />
+    <ClInclude Include="LevelBag.hpp" />
+    <ClInclude Include="LevelGeneration.hpp" />
+    <ClInclude Include="MenuMain.hpp" />
+    <ClInclude Include="MenuStartLevel.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Data\Shaders\Basic.frag">

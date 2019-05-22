@@ -1,5 +1,5 @@
 #pragma once
-#include "PropertyWindow.h"
+#include "PropertyWindow.hpp"
 
 class Editor;
 struct MouseData;

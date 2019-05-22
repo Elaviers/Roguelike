@@ -1,8 +1,8 @@
-#include "Skybox.h"
-#include "Debug.h"
-#include "Engine.h"
-#include "IO.h"
-#include "TextureManager.h"
+#include "Skybox.hpp"
+#include "Debug.hpp"
+#include "Engine.hpp"
+#include "IO.hpp"
+#include "TextureManager.hpp"
 #include <utility> //move
 
 Skybox::Skybox()

@@ -1,7 +1,7 @@
-#include "GLProgram.h"
-#include "Debug.h"
-#include "String.h"
-#include "IO.h"
+#include "GLProgram.hpp"
+#include "Debug.hpp"
+#include "String.hpp"
+#include "IO.hpp"
 
 const GLProgram* GLProgram::_currentProgram = nullptr;
 

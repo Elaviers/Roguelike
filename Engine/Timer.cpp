@@ -1,5 +1,5 @@
-#include "Timer.h"
-#include "Debug.h"
+#include "Timer.hpp"
+#include "Debug.hpp"
 #include <Windows.h>
 
 

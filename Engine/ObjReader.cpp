@@ -1,7 +1,7 @@
-#include "IO.h"
-#include "Buffer.h"
-#include "Debug.h"
-#include "Utilities.h"
+#include "IO.hpp"
+#include "Buffer.hpp"
+#include "Debug.hpp"
+#include "Utilities.hpp"
 #include <stdlib.h>
 
 struct OBJVertexDef

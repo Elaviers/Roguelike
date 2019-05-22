@@ -1,5 +1,5 @@
-#include "Vector.h"
-#include "Matrix.h"
+#include "Vector.hpp"
+#include "Matrix.hpp"
 
 using namespace Maths;
 

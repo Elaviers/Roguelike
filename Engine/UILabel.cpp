@@ -1,5 +1,5 @@
-#include "UILabel.h"
-#include "GLProgram.h"
+#include "UILabel.hpp"
+#include "GLProgram.hpp"
 
 void UILabel::Render() const
 {

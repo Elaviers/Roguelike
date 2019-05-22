@@ -1,11 +1,11 @@
-#include "GameObject.h"
-#include "Collider.h"
-#include "CvarMap.h"
-#include "Engine.h"
-#include "GL.h"
-#include "GLProgram.h"
-#include "ObjCamera.h"
-#include "RaycastResult.h"
+#include "GameObject.hpp"
+#include "Collider.hpp"
+#include "CvarMap.hpp"
+#include "Engine.hpp"
+#include "GL.hpp"
+#include "GLProgram.hpp"
+#include "ObjCamera.hpp"
+#include "RaycastResult.hpp"
 
 void GameObject::_AddBaseCvars(CvarMap &cvars)
 {

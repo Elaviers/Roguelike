@@ -1,6 +1,6 @@
-#include "ToolBrush2D.h"
-#include "Editor.h"
-#include "EditorUtil.h"
+#include "ToolBrush2D.hpp"
+#include "Editor.hpp"
+#include "EditorUtil.hpp"
 
 void ToolBrush2D::Initialise()
 {

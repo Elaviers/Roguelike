@@ -1,8 +1,8 @@
-#include "UIRect.h"
-#include "Engine.h"
-#include "GLProgram.h"
-#include "ModelManager.h"
-#include "TextureManager.h"
+#include "UIRect.hpp"
+#include "Engine.hpp"
+#include "GLProgram.hpp"
+#include "ModelManager.hpp"
+#include "TextureManager.hpp"
 
 void UIRect::OnBoundsChanged()
 {

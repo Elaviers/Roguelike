@@ -1,5 +1,5 @@
-#include "Collision.h"
-#include "Transform.h"
+#include "Collision.hpp"
+#include "Transform.hpp"
 
 namespace Collision
 {

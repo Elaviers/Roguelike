@@ -1,4 +1,4 @@
-#include "ToolWindow.h"
+#include "ToolWindow.hpp"
 #include <CommCtrl.h>
 
 LPCTSTR ToolWindow::_className = TEXT("TOOLPROPERTIESCLASS");

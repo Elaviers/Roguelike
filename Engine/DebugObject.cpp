@@ -1,5 +1,5 @@
-#include "DebugObject.h"
-#include "GLProgram.h"
+#include "DebugObject.hpp"
+#include "GLProgram.hpp"
 
 void DebugObject::_PreRender() const
 {

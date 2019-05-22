@@ -1,7 +1,7 @@
-#include "ObjRenderable.h"
-#include "Collider.h"
-#include "CvarMap.h"
-#include "GLProgram.h"
+#include "ObjRenderable.hpp"
+#include "Collider.hpp"
+#include "CvarMap.hpp"
+#include "GLProgram.hpp"
 
 void ObjRenderable::GetCvars(CvarMap &cvars)
 {

@@ -1,4 +1,4 @@
-#include "Vertex.h"
+#include "Vertex.hpp"
 
 void Vertex17F::CalculateTangents(Vertex17F &vertex1, Vertex17F &vertex2, Vertex17F &vertex3)
 {

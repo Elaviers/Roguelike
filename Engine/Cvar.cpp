@@ -1,5 +1,5 @@
-#include "CVar.h"
-#include "Buffer.h"
+#include "CVar.hpp"
+#include "Buffer.hpp"
 
 #define SETSTRINGCASE(ENUM, TYPE, VALUE) case ENUM: ((TypedCvar<TYPE>*)this)->Set(VALUE); break
 void Cvar::SetByString(const String &value)

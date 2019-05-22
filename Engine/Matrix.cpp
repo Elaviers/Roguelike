@@ -1,7 +1,7 @@
-#include "Matrix.h"
-#include "Maths.h"
-#include "Rotation.h"
-#include "Quaternion.h"
+#include "Matrix.hpp"
+#include "Maths.hpp"
+#include "Rotation.hpp"
+#include "Quaternion.hpp"
 
 using namespace Maths;
 

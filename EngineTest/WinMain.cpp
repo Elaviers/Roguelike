@@ -1,19 +1,19 @@
 #include <Windowsx.h>
-#include <Engine\DrawUtils.h>
-#include <Engine\GL.h>
-#include <Engine\GLContext.h>
-#include <Engine\GLProgram.h>
-#include <Engine\InputManager.h>
-#include <Engine\ObjCamera.h>
-#include <Engine\ObjLight.h>
-#include <Engine\ObjRenderable.h>
-#include <Engine\ModelManager.h>
-#include <Engine\Skybox.h>
-#include <Engine\String.h>
-#include <Engine\TextureManager.h>
-#include <Engine\Timer.h>
-#include <Engine\Utilities.h>
-#include <Engine\Window.h>
+#include <Engine\DrawUtils.hpp>
+#include <Engine\GL.hpp>
+#include <Engine\GLContext.hpp>
+#include <Engine\GLProgram.hpp>
+#include <Engine\InputManager.hpp>
+#include <Engine\ObjCamera.hpp>
+#include <Engine\ObjLight.hpp>
+#include <Engine\ObjRenderable.hpp>
+#include <Engine\ModelManager.hpp>
+#include <Engine\Skybox.hpp>
+#include <Engine\String.hpp>
+#include <Engine\TextureManager.hpp>
+#include <Engine\Timer.hpp>
+#include <Engine\Utilities.hpp>
+#include <Engine\Window.hpp>
 
 #define ORTHO 0
 
@@ -336,7 +336,7 @@ void Frame()
 		camera.RelativeTransform().GetRightVector() * axisX * moveAmount +
 		camera.RelativeTransform().GetUpVector() * axisY * moveAmount);
 
-	camera.AddRelativeRotation(Vector3(lookX * turnAmount, -1.f * lookY * turnAmount, lookZ * turnAmount));
+	camera.AddRelativeRotation(Vector3(lookX * turnAmount, lookY * turnAmount, lookZ * turnAmount));
 
 	lightParent1.RelativeRotate(rotationOffset1 * dt);
 	lightParent2.RelativeRotate(rotationOffset2 * dt);

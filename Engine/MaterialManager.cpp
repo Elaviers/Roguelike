@@ -1,10 +1,10 @@
-#include "MaterialManager.h"
-#include "Debug.h"
-#include "IO.h"
-#include "Material_Grid.h"
-#include "Material_Surface.h"
-#include "TextureManager.h"
-#include "Utilities.h"
+#include "MaterialManager.hpp"
+#include "Debug.hpp"
+#include "IO.hpp"
+#include "Material_Grid.hpp"
+#include "Material_Surface.hpp"
+#include "TextureManager.hpp"
+#include "Utilities.hpp"
 
 bool MaterialManager::_CreateResource(Material*& material, const String &name, const String &data)
 {

@@ -1,8 +1,8 @@
-#include "AudioManager.h"
-#include "AudioUtilities.h"
-#include "Debug.h"
-#include "IO.h"
-#include "Utilities.h"
+#include "AudioManager.hpp"
+#include "AudioUtilities.hpp"
+#include "Debug.hpp"
+#include "IO.hpp"
+#include "Utilities.hpp"
 
 #define TRYRELEASE(noob) if (noob != NULL) noob->Release();
 

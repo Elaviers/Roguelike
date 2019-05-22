@@ -1,8 +1,8 @@
-#include "Material_Surface.h"
-#include "Engine.h"
-#include "Debug.h"
-#include "Utilities.h"
-#include "TextureManager.h"
+#include "Material_Surface.hpp"
+#include "Engine.hpp"
+#include "Debug.hpp"
+#include "Utilities.hpp"
+#include "TextureManager.hpp"
 
 void MaterialSurface::_CMD_tex(const Buffer<String>& args)
 {

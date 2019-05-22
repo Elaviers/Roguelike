@@ -1,7 +1,7 @@
-#include "ColliderSphere.h"
-#include "ColliderAABB.h"
-#include "GameObject.h"
-#include "RaycastResult.h"
+#include "ColliderSphere.hpp"
+#include "ColliderAABB.hpp"
+#include "GameObject.hpp"
+#include "RaycastResult.hpp"
 
 bool ColliderSphere::IntersectsRay(const Ray &ray, RaycastResult &result, const Transform &transform) const
 {

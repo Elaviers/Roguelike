@@ -105,7 +105,8 @@
       <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+
 mklink /d $(ProjectDir)Data ..\Data
 EXIT 0</Command>
     </PostBuildEvent>
@@ -126,7 +127,8 @@ EXIT 0</Command>
       <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+
 mklink /d $(ProjectDir)Data ..\Data
 EXIT 0</Command>
     </PostBuildEvent>
@@ -151,7 +153,8 @@ EXIT 0</Command>
       <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+
 mklink /d $(ProjectDir)Data ..\Data
 EXIT 0</Command>
     </PostBuildEvent>
@@ -176,7 +179,8 @@ EXIT 0</Command>
       <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+      <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
+
 mklink /d $(ProjectDir)Data ..\Data
 EXIT 0</Command>
     </PostBuildEvent>
@@ -201,21 +205,21 @@ EXIT 0</Command>
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Editor.h" />
-    <ClInclude Include="EditorIO.h" />
-    <ClInclude Include="EditorUtil.h" />
+    <ClInclude Include="Editor.hpp" />
+    <ClInclude Include="EditorIO.hpp" />
+    <ClInclude Include="EditorUtil.hpp" />
     <ClInclude Include="MouseData.h" />
-    <ClInclude Include="PropertyWindow.h" />
+    <ClInclude Include="PropertyWindow.hpp" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="ResourceSelect.h" />
-    <ClInclude Include="Tool.h" />
-    <ClInclude Include="ToolBrush2D.h" />
-    <ClInclude Include="ToolBrush3D.h" />
-    <ClInclude Include="ToolConnector.h" />
-    <ClInclude Include="ToolEntity.h" />
-    <ClInclude Include="ToolSelect.h" />
-    <ClInclude Include="ToolWindow.h" />
-    <ClInclude Include="Viewport.h" />
+    <ClInclude Include="ResourceSelect.hpp" />
+    <ClInclude Include="Tool.hpp" />
+    <ClInclude Include="ToolBrush2D.hpp" />
+    <ClInclude Include="ToolBrush3D.hpp" />
+    <ClInclude Include="ToolConnector.hpp" />
+    <ClInclude Include="ToolEntity.hpp" />
+    <ClInclude Include="ToolSelect.hpp" />
+    <ClInclude Include="ToolWindow.hpp" />
+    <ClInclude Include="Viewport.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
