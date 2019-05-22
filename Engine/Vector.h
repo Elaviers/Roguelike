@@ -111,6 +111,13 @@ public:
 		return true;
 	}
 
+	static Vector Cross(const Vector& a, const Vector& b)
+	{
+		static_assert(SIZE == 3, "Cross product is only implemented for 3D vectors right now...");
+
+		return Vector(a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]);
+	}
+
 	static T Dot(const Vector &a, const Vector &b)
 	{
 		float result = 0.f;
@@ -151,6 +158,10 @@ typedef Vector<float, 3> Vector3;
 
 namespace VectorMaths
 {
+	extern const Vector3 V3X;
+	extern const Vector3 V3Y;
+	extern const Vector3 V3Z;
+
 	Vector3 GetForwardVector(const Vector3 &rotation);
 	Vector3 GetRightVector(const Vector3 &rotation);
 	Vector3 GetUpVector(const Vector3 &rotation);

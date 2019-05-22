@@ -17,6 +17,36 @@ namespace Maths
 		return sqrtf(x);
 	}
 
+	double SineD(double radians)
+	{
+		return sin(radians);
+	}
+
+	double CosineD(double radians)
+	{
+		return cos(radians);
+	}
+
+	double TangentD(double radians)
+	{
+		return tan(radians);
+	}
+
+	double ArcSineD(double x)
+	{
+		return asin(x);
+	}
+
+	double ArcCosineD(double x)
+	{
+		return asin(x);
+	}
+
+	double ArcTangentD(double x)
+	{
+		return atan(x);
+	}
+
 	float Sine(float radians)
 	{
 		return sinf(radians);

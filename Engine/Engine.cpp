@@ -15,14 +15,13 @@ Engine::~Engine()
 	FT_Done_FreeType(_ftLib);
 }
 
-void Engine::InitFT()
+void Engine::Init()
 {
 	FT_Error error = FT_Init_FreeType(&_ftLib);
 	if (error) { Debug::Error("Freetype init error"); }
-
 }
 
-void Engine::DefaultInit()
+void Engine::CreateAllManagers()
 {
 	this->registry.RegisterEngineObjects();
 

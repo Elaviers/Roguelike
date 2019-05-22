@@ -110,8 +110,8 @@ void Game::_InitGL()
 
 void Game::_Init()
 {
-	Engine::Instance().InitFT();
-	Engine::Instance().DefaultInit();
+	Engine::Instance().Init();
+	Engine::Instance().CreateAllManagers();
 
 	String fontDir;
 	fontDir.SetLength(MAX_PATH);

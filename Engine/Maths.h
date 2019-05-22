@@ -4,8 +4,8 @@
 namespace Maths
 {
 	constexpr double PI = 3.14159265358979323846;
-	const float DEGS_PER_RAD_F = 180.f / (float)PI;
-	const float RADS_PER_DEG_F = (float)PI / 180.f;
+	constexpr const double DEGS_PER_RAD = 180.0 / PI;
+	constexpr const double RADS_PER_DEG = PI / 180.0;
 
 	template <typename T>
 	inline T Abs(const T& value) { return value < 0 ? -value : value; }
@@ -30,18 +30,39 @@ namespace Maths
 	float ArcCosine(float x);
 	float ArcTangent(float x);
 
-	inline float SineDegrees(float degrees) { return Sine(RADS_PER_DEG_F * degrees); };
-	inline float CosineDegrees(float degrees) { return Cosine(RADS_PER_DEG_F * degrees); };
-	inline float TangentDegrees(float degrees) { return Tangent(RADS_PER_DEG_F * degrees); };
+	inline float SineDegrees(float degrees) { return Sine((float)RADS_PER_DEG * degrees); };
+	inline float CosineDegrees(float degrees) { return Cosine((float)RADS_PER_DEG * degrees); };
+	inline float TangentDegrees(float degrees) { return Tangent((float)RADS_PER_DEG * degrees); };
+	inline float ArcSineDegrees(float x) { return (float)DEGS_PER_RAD * ArcSine(x); }
+	inline float ArcCoineDegrees(float x) { return (float)DEGS_PER_RAD * ArcCosine(x); }
+	inline float ArcTangentDegrees(float x) { return (float)DEGS_PER_RAD * ArcTangent(x); }
 
-	inline float ArcSineDegrees(float x) { return DEGS_PER_RAD_F * ArcSine(x); }
-	inline float ArcCoineDegrees(float x) { return DEGS_PER_RAD_F * ArcCosine(x); }
-	inline float ArcTangentDegrees(float x) { return DEGS_PER_RAD_F * ArcTangent(x); }
-	inline float ArcTangentDegrees2(float x, float y)
+	inline float ArcTangentDegrees2(float y, float x)
 	{ 
 		if (x) return ArcTangentDegrees(y / x);
 		if (y < 0.f) return -90.f;
 		return 90.f;
+	}
+
+	double SineD(double radians);
+	double CosineD(double radians);
+	double TangentD(double radians);
+	double ArcSineD(double x);
+	double ArcCosineD(double x);
+	double ArcTangentD(double x);
+
+	inline double SineDegreesD(double degrees) { return SineD(RADS_PER_DEG * degrees); };
+	inline double CosineDegreesD(double degrees) { return CosineD(RADS_PER_DEG * degrees); };
+	inline double TangentDegreesD(double degrees) { return TangentD(RADS_PER_DEG * degrees); };
+	inline double ArcSineDegreesD(double x) { return DEGS_PER_RAD * ArcSineD(x); }
+	inline double ArcCoineDegreesD(double x) { return DEGS_PER_RAD * ArcCosineD(x); }
+	inline double ArcTangentDegreesD(double x) { return DEGS_PER_RAD * ArcTangentD(x); }
+
+	inline double ArcTangentDegrees2D(double y, double x)
+	{
+		if (x) return ArcTangentDegreesD(y / x);
+		if (y < 0.f) return -90.0;
+		return 90.0;
 	}
 
 	float Random();

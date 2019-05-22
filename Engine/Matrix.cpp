@@ -1,8 +1,7 @@
 #include "Matrix.h"
 #include "Maths.h"
-
-#define RETURNMAT4(A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P) \
-	{float data[4][4] = {A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P}; return Mat4(data);}
+#include "Rotation.h"
+#include "Quaternion.h"
 
 using namespace Maths;
 
@@ -77,7 +76,7 @@ namespace Matrix
 		);
 	}
 
-	Mat4 Transformation(Vector3 translation, Vector3 rotation, Vector3 scale)
+	Mat4 Transformation(const Vector3 &translation, const Vector3 &rotation, const Vector3 &scale)
 	{
 		float sinRX = SineDegrees(rotation[0]);
 		float nsinRX = -sinRX;
@@ -100,6 +99,11 @@ namespace Matrix
 			f5 * sinRY,									scale[2] * sinRX,	f5 * cosRY,											0.f,
 			translation[0],								translation[1],		translation[2],										1.f
 		);
+	}
+
+	Mat4 Transformation(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
+	{
+		return Scale(scale) * rotation.ToMatrix() * Translation(translation);
 	}
 
 	Mat4 Ortho(float width, float height, float near, float far, float scale)

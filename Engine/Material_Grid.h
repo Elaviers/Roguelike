@@ -20,7 +20,8 @@ class MaterialGrid : public Material
 	void _CMD_columns(const Buffer<String> &args);
 
 public:
-	MaterialGrid() : Material(ShaderChannel::ALL), _texture(nullptr)	{
+	MaterialGrid() : Material(ShaderChannel::ALL), _texture(nullptr)	
+	{
 		_cvars.CreateVar("texture", CommandPtr(this, &MaterialGrid::_CMD_texture));
 		_cvars.CreateVar("rows", CommandPtr(this, &MaterialGrid::_CMD_rows));
 		_cvars.CreateVar("columns", CommandPtr(this, &MaterialGrid::_CMD_columns));

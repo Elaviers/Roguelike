@@ -205,7 +205,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	//Initialise managers
 	window.SetTitle("Manager Init");
 	//
-	Engine::Instance().DefaultInit();
+	Engine::Instance().CreateAllManagers();
 	ModelManager& modelManager = *Engine::Instance().pModelManager;
 	TextureManager& textureManager = *Engine::Instance().pTextureManager;
 	InputManager& inputManager = *Engine::Instance().pInputManager;
@@ -336,7 +336,7 @@ void Frame()
 		camera.RelativeTransform().GetRightVector() * axisX * moveAmount +
 		camera.RelativeTransform().GetUpVector() * axisY * moveAmount);
 
-	camera.RelativeRotate(Vector3(lookX * turnAmount, lookY * turnAmount, lookZ * turnAmount));
+	camera.AddRelativeRotation(Vector3(lookX * turnAmount, -1.f * lookY * turnAmount, lookZ * turnAmount));
 
 	lightParent1.RelativeRotate(rotationOffset1 * dt);
 	lightParent2.RelativeRotate(rotationOffset2 * dt);

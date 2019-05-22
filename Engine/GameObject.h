@@ -75,16 +75,18 @@ public:
 	inline Transform& RelativeTransform()							{ return _transform; }
 	inline const Transform& RelativeTransform() const				{ return _transform; }
 	inline const Vector3& GetRelativePosition() const				{ return RelativeTransform().GetPosition(); }
-	inline const Vector3& GetRelativeRotation() const				{ return RelativeTransform().GetRotation(); }
+	inline const Rotation& GetRelativeRotation() const				{ return RelativeTransform().GetRotation(); }
 	inline const Vector3& GetRelativeScale() const					{ return RelativeTransform().GetScale(); }
+
+	inline void AddRelativeRotation(const Vector3& euler)			{ _transform.AddRotation(euler); }
 
 	inline void SetRelativeTransform(const Transform& transform)	{ _transform = transform; }
 	inline void SetRelativePosition(const Vector3 &v)				{ _transform.SetPosition(v); }
-	inline void SetRelativeRotation(const Vector3 &v)				{ _transform.SetRotation(v); }
+	inline void SetRelativeRotation(const Rotation &r)				{ _transform.SetRotation(r); }
 	inline void SetRelativeScale(const Vector3 &v)					{ _transform.SetScale(v); }
 
 	inline void RelativeMove(const Vector3& v)						{ _transform.Move(v); }
-	inline void RelativeRotate(const Vector3& v)					{ _transform.Rotate(v); }
+	inline void RelativeRotate(const Rotation& q)					{ _transform.Rotate(q); }
 
 	inline Transform GetWorldTransform() const
 	{
@@ -94,9 +96,9 @@ public:
 		return _transform;
 	}
 
-	inline Vector3 GetWorldPosition() const { return GetWorldTransform().GetPosition(); }
-	inline Vector3 GetWorldRotation() const { return GetWorldTransform().GetRotation(); }
-	inline Vector3 GetWorldScale() const { return GetWorldTransform().GetScale(); }
+	inline Vector3 GetWorldPosition() const							{ return GetWorldTransform().GetPosition(); }
+	inline Rotation GetWorldRotation() const						{ return GetWorldTransform().GetRotation(); }
+	inline Vector3 GetWorldScale() const							{ return GetWorldTransform().GetScale(); }
 
 	inline void SetWorldTransform(const Transform &t)
 	{
@@ -114,11 +116,11 @@ public:
 			SetRelativePosition(v);
 	}
 
-	inline void SetWorldRotation(const Vector3 &v) {
+	inline void SetWorldRotation(const Rotation &rotation) {
 		if (_parent)
-			SetRelativeRotation(v - _parent->GetWorldTransform().GetRotation());
+			SetRelativeRotation(rotation * _parent->GetWorldTransform().GetRotation().Inverse());
 		else
-			SetRelativeRotation(v);
+			SetRelativeRotation(rotation);
 	}
 
 	inline void SetWorldScale(const Vector3& v)

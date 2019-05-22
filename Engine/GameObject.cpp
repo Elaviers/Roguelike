@@ -11,7 +11,7 @@ void GameObject::_AddBaseCvars(CvarMap &cvars)
 {
 	cvars.Add("UID", const_cast<uint32&>(_uid), PropertyFlags::READONLY);
 	cvars.Add("Position",	Getter<const Vector3&>(&_transform, &Transform::GetPosition), Setter<Vector3>(&_transform, &Transform::SetPosition));
-	cvars.Add("Rotation",	Getter<const Vector3&>(&_transform, &Transform::GetRotation), Setter<Vector3>(&_transform, &Transform::SetRotation));
+	cvars.Add("Rotation",	Getter<const Vector3&>(&_transform, &Transform::GetRotationEuler), Setter<Vector3>(&_transform, &Transform::SetRotationEuler));
 	cvars.Add("Scale",		Getter<const Vector3&>(&_transform, &Transform::GetScale), Setter<Vector3>(&_transform, &Transform::SetScale));
 }
 

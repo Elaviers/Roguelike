@@ -46,4 +46,19 @@ public:
 	inline Vector4& operator/=(float f) { _data[0] /= f; _data[1] /= f; _data[2] /= f; _data[3] /= f; return *this; }
 	inline Vector4 operator*(float f) { Vector4 v(*this); return v *= f; }
 	inline Vector4 operator/(float f) { Vector4 v(*this); return v /= f; }
+
+	inline float LengthSquared() const
+	{
+		return _data[0] * _data[0] + _data[1] * _data[1] + _data[2] * _data[2] + _data[3] * _data[3];
+	}
+
+	inline float Length() const
+	{
+		return Maths::SquareRoot(LengthSquared());
+	}
+
+	inline void Normalise()
+	{
+		*this /= Length();
+	}
 };

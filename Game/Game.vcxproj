@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{85FAF26B-EF13-4D5A-ADC3-322FCD9CAC1E}</ProjectGuid>
     <RootNamespace>Game</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -71,25 +71,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
@@ -102,13 +102,17 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
 mklink /d $(ProjectDir)Data ..\Data
 EXIT 0</Command>
     </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -119,13 +123,17 @@ EXIT 0</Command>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
 mklink /d $(ProjectDir)Data ..\Data
 EXIT 0</Command>
     </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -140,13 +148,17 @@ EXIT 0</Command>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
 mklink /d $(ProjectDir)Data ..\Data
 EXIT 0</Command>
     </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -161,13 +173,17 @@ EXIT 0</Command>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib; user32.lib; gdi32.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
 mklink /d $(ProjectDir)Data ..\Data
 EXIT 0</Command>
     </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />

@@ -71,7 +71,7 @@ class FunctionPointer
 		MemberCallback(T *object, RETURNTYPE(T::*function)(Args...) const) : _object(object), _constFunction(function), _isConstFunction(true) {}
 
 		virtual ~MemberCallback() {}
-
+		
 		virtual RETURNTYPE Call(Args... args) override { return _isConstFunction ? (_object->*_constFunction)(args...) : (_object->*_function)(args...); }
 		virtual RETURNTYPE Call(Args... args) const override { return _isConstFunction ? (_object->*_constFunction)(args...) : (_object->*_function)(args...); }
 		virtual size_t SizeOf() const override { return sizeof(*this); }

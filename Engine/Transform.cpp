@@ -5,16 +5,14 @@ using namespace Maths;
 
 void Transform::_MakeTransformationMatrix(Mat4 &matrix) const
 {
-	matrix = Matrix::Transformation(_position, _rotation, _scale);
+	matrix = Matrix::Transformation(_position, _rotation.GetQuat(), _scale);
 }
 
 void Transform::_MakeInverseTransformationMatrix(Mat4 &matrix) const
 {
 	matrix = 
 		Matrix::Translation(-1.f * _position) * 
-		Matrix::RotationY(-_rotation[1]) * 
-		Matrix::RotationX(-_rotation[0]) * 
-		Matrix::RotationZ(-_rotation[2]) * 
+		_rotation.GetQuat().Inverse().ToMatrix() *
 		Matrix::Scale(1.f / _scale);
 }
 
@@ -68,14 +66,14 @@ Mat4 Transform::MakeInverseTransformationMatrix() const
 void Transform::WriteToBuffer(BufferIterator<byte> &buffer) const
 {
 	buffer.Write_vector3(_position);
-	buffer.Write_vector3(_rotation);
+	buffer.Write_vector3(_rotation.GetEuler());
 	buffer.Write_vector3(_scale);
 }
 
 void Transform::ReadFromBuffer(BufferIterator<byte> &buffer)
 {
 	_position = buffer.Read_vector3();
-	_rotation = buffer.Read_vector3();
+	_rotation = Quaternion(buffer.Read_vector3());
 	_scale = buffer.Read_vector3();
 }
 
@@ -83,7 +81,7 @@ Transform& Transform::operator*=(const Transform &other)
 {
 	//_position = other._position + other._scale * (other.GetForwardVector() * _position[0] + other.GetUpVector() * _position[1] + other.GetRightVector() * _position[2]);
 	_position = _position * other.GetTransformationMatrix();
-	_rotation += other._rotation;
+	_rotation = other._rotation;
 	_scale *= other._scale;
 
 	return *this;

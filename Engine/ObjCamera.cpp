@@ -32,7 +32,8 @@ Ray ObjCamera::ScreenCoordsToRay(const Vector2 &coords) const
 	if (_type == ProjectionType::PERSPECTIVE)
 	{
 		Vector2 scale = GetZPlaneDimensions();
-		Vector3 pointOnPlane = VectorMaths::Rotate(Vector3(coords[0] * scale[0], coords[1] * scale[1], 1.f), GetWorldRotation());
+		//Vector3 pointOnPlane = VectorMaths::Rotate(Vector3(coords[0] * scale[0], coords[1] * scale[1], 1.f), GetWorldRotation().GetQuat());
+		Vector3 pointOnPlane = GetWorldRotation().GetQuat().Transform(Vector3(coords[0] * scale[0], coords[1] * scale[1], 1.f));
 		pointOnPlane.Normalise();
 		return Ray(GetWorldPosition(), pointOnPlane);
 	}

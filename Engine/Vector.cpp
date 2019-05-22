@@ -5,6 +5,10 @@ using namespace Maths;
 
 namespace VectorMaths
 {
+	const Vector3 V3X(1, 0, 0);
+	const Vector3 V3Y(0, 1, 0);
+	const Vector3 V3Z(0, 0, 1);
+
 	Vector3 GetForwardVector(const Vector3 &rotation)
 	{
 		//cos pitch * sin yaw, sin pitch, cos pitch * cos yaw

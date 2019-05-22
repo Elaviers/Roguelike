@@ -15,6 +15,7 @@
 #include "ToolWindow.h"
 #include "Viewport.h"
 #include <CommCtrl.h>
+#include <fbxsdk.h>
 
 #define VIEWPORTCOUNT 4
 
@@ -28,6 +29,8 @@ private:
 	//Engine
 	Registry _registry;
 	Timer _timer;
+
+	FbxManager *_fbxManager;
 
 	//Window stuff
 	Window _window;
@@ -82,8 +85,8 @@ private:
 	void _InitGL();
 
 public:
-	Editor() : _propertyWindow(this), _toolWindow(this), _tools(*this) {}
-	~Editor() {}
+	Editor() : _fbxManager(nullptr), _propertyWindow(this), _toolWindow(this), _tools(*this) {}
+	~Editor();
 
 	void Run();
 	void Frame();

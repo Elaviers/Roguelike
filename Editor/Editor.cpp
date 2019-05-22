@@ -14,7 +14,10 @@ constexpr int tbImageSize = 32;
 
 constexpr GLfloat lineW = 1;
 
-const Buffer<Pair<const wchar_t*>> fdFilter({ Pair<const wchar_t*>(L"Level File", L"*.lvl"), Pair<const wchar_t*>(L"All Files", L"*.*") });
+const Buffer<Pair<const wchar_t*>> levelDialogFilter({ Pair<const wchar_t*>(L"Level File", L"*.lvl"), Pair<const wchar_t*>(L"All Files", L"*.*") });
+
+const Buffer<Pair<const wchar_t*>> openModelFilter({Pair<const wchar_t*>(L"FBX Scene", L"*.fbx"), Pair<const wchar_t*>(L"OBJ Model", L"*.obj")});
+const Buffer<Pair<const wchar_t*>> openTextureFilter({Pair<const wchar_t*>(L"PNG Image", L"*.png")});
 
 enum
 {
@@ -24,6 +27,12 @@ enum
 	TBITEM_ENTITY = 3,
 	TBITEM_CONNECTOR = 4
 };
+
+Editor::~Editor()
+{
+	if (_fbxManager)
+		_fbxManager->Destroy();
+}
 
 #pragma region Init
 
@@ -91,6 +100,8 @@ void Editor::_Init()
 	CameraRef(0).SetProectionType(ProjectionType::PERSPECTIVE);
 	CameraRef(0).SetRelativePosition(Vector3(-5.f, 5.f, -5.f));
 	CameraRef(0).SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
+	CameraRef(0).SetRelativePosition(Vector3());
+	CameraRef(0).SetRelativeRotation(Vector3());
 
 	CameraRef(1).SetProectionType(ProjectionType::ORTHOGRAPHIC);
 	CameraRef(1).SetScale(32.f);
@@ -107,8 +118,8 @@ void Editor::_Init()
 	CameraRef(3).SetZBounds(-10000.f, 10000.f);
 	CameraRef(3).SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
 
-
-	Engine::Instance().DefaultInit();
+	_fbxManager = FbxManager::Create();
+	Engine::Instance().CreateAllManagers();
 
 	InputManager* inputManager = Engine::Instance().pInputManager;
 
@@ -225,7 +236,7 @@ void Editor::Frame()
 		+ perspCam.RelativeTransform().GetRightVector() * _deltaTime * _axisMoveX * moveSpeed
 		+ perspCam.RelativeTransform().GetUpVector() * _deltaTime * _axisMoveZ * moveSpeed);
 
-	perspCam.RelativeRotate(Vector3(_deltaTime * _axisLookY * rotSpeed, _deltaTime * _axisLookX * rotSpeed, 0.f));
+	perspCam.AddRelativeRotation(Vector3(_deltaTime * _axisLookY * rotSpeed, -1.f * _deltaTime * _axisLookX * rotSpeed, 0.f));
 
 	Engine::Instance().pDebugManager->Update(_deltaTime);
 	Engine::Instance().pDebugManager->AddToWorld(DebugFrustum::FromCamera(CameraRef(0)));
@@ -480,6 +491,11 @@ LRESULT CALLBACK AboutProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	return 0;
 }
 
+inline String GetCurrentDir()
+{
+
+}
+
 LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	Editor *editor = (Editor*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
@@ -546,9 +562,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			{
 			case ID_FILE_OPEN:
 			{
-				char cd[MAX_PATH];
-				::GetCurrentDirectoryA(MAX_PATH, cd);
-				String filename = EditorIO::OpenFileDialog(L"\\Data\\Levels", fdFilter);
+				String filename = EditorIO::OpenFileDialog(L"\\Data\\Levels", levelDialogFilter);
 				editor->KeyCancel();
 				editor->_level.DeleteChildren();
 				LevelIO::Read(editor->_level, filename.GetData());
@@ -557,12 +571,24 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 			case ID_FILE_SAVEAS:
 			{
-				char cd[MAX_PATH];
-				::GetCurrentDirectoryA(MAX_PATH, cd);
-				String filename = EditorIO::SaveFileDialog(L"\\Data\\Levels", fdFilter);
+				String filename = EditorIO::SaveFileDialog(L"\\Data\\Levels", levelDialogFilter);
 				LevelIO::Write(editor->_level, filename.GetData());
 			}
 			break;
+
+			case ID_IMPORT_MODEL:
+			{
+				String filename = EditorIO::OpenFileDialog(L"\\Data\\Models", openModelFilter);
+
+			}
+			break;
+
+			case ID_IMPORT_TEXTURE:
+			{
+				String filename = EditorIO::OpenFileDialog(L"\\Data\\Textures", openTextureFilter);
+
+			}
+				break;
 
 			case ID_FILE_CLEAR:
 				editor->KeyCancel();

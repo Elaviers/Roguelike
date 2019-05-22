@@ -7,10 +7,12 @@
 void Model::_CMD_model(const Buffer<String> &args)
 {
 	if (args.GetSize() > 0)
+	{
 		_data = IO::ReadOBJFile((Engine::Instance().pModelManager->GetRootPath() + args[0]).GetData());
-
-	this->model.Create(_data.vertices.Data(), (GLsizei)_data.vertices.GetSize(), _data.elements.Data(), (GLsizei)_data.elements.GetSize());
-	this->bounds = _data.bounds;
+	
+		this->model.Create(_data.vertices.Data(), (GLsizei)_data.vertices.GetSize(), _data.elements.Data(), (GLsizei)_data.elements.GetSize());
+		this->bounds = _data.bounds;
+	}
 }
 
 void Model::_CMD_collision(const Buffer<String>& args)

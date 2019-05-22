@@ -34,10 +34,8 @@ public:
 	ModelManager	*pModelManager = nullptr;
 	TextureManager	*pTextureManager = nullptr;
 
-	void InitFT();
-
 	inline FT_Library GetFTLibrary() { return _ftLib; }
 
-	//Allocates all managers with default setup
-	void DefaultInit();
+	void Init();
+	void CreateAllManagers();
 };

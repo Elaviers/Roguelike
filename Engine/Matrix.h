@@ -2,6 +2,11 @@
 #include "Vector.h"
 #include "Vector4.h"
 
+class Quaternion;
+
+#define RETURNMAT4(A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P) \
+	{float data[4][4] = {A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P}; return Mat4(data);}
+
 template <typename T, int SIZE>
 class SquareMatrix
 {
@@ -109,7 +114,8 @@ namespace Matrix
 	Mat4 RotationZ(float angle);
 	Mat4 Scale(const Vector3 &scale);
 
-	Mat4 Transformation(Vector3 translation, Vector3 rotation, Vector3 scale);
+	Mat4 Transformation(const Vector3 &translation, const Vector3 &rotation, const Vector3 &scale);
+	Mat4 Transformation(const Vector3 &translation, const Quaternion &rotation, const Vector3 &scale);
 
 	Mat4 Ortho(float width, float height, float near, float far, float scale = 1.f);
 	Mat4 Perspective(float fieldOfView, float near, float far, float aspectRatio);

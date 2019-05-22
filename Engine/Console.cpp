@@ -68,7 +68,7 @@ void Console::Render(const Font &font, float deltaTime)
 		size_t startIndex = 0;
 
 		{
-			size_t i = _charBuffer.GetSize() - 1;
+			size_t i = _nextBufferIndex - 1;
 			size_t lc = 0;
 
 			while (true)
@@ -96,7 +96,7 @@ void Console::Render(const Font &font, float deltaTime)
 		font.RenderString(&_charBuffer[startIndex], transform, transform.GetScale()[1]);
 	}
 
-	transform.SetPosition(Vector3(0, yOffset, 0));
+	transform.SetPosition(Vector3(0, 0, 0));
 
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, .2f, 0.f));
 	font.RenderString(&_prePrompt[0], transform);

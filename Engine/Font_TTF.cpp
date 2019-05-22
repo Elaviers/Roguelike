@@ -97,6 +97,10 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 
 	float line = 0.f;
 
+	float yOffset = (_face->descender >> 6);
+
+	t.Move(downDirection * yOffset);
+
 	GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, Vector2(0.f, 0.f));
 	GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
 
@@ -109,7 +113,7 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 			++line;
 
 			t = transform;
-			t.Move(downDirection * lineHeight * line);
+			t.Move(downDirection * (yOffset + lineHeight * line));
 		}
 		else
 		{
@@ -123,7 +127,7 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 				Vector3 v = t.GetPosition() + (advanceDirection * (glyph->bearing[0] + glyph->size[0] / 2.f) * scale) + (downDirection * (glyph->size[1] / 2.f - glyph->bearing[1]) * scale);
 
 				GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model,
-					Matrix::Transformation(v, t.GetRotation(), t.GetScale()));
+					Matrix::Transformation(v, t.GetRotation().GetQuat(), t.GetScale()));
 
 				Engine::Instance().pModelManager->Plane().Render();
 

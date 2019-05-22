@@ -211,9 +211,9 @@ namespace DrawUtils
 		Vector3 dir = (b - a).Normalise();
 
 		if (dir[2] >= 0.f)
-			t.SetRotation(Vector3(90 + Maths::ArcSineDegrees(dir[1]), Maths::ArcTangentDegrees2(dir[2], dir[0]), 0.f));
+			t.SetRotation(Vector3(90 + Maths::ArcSineDegrees(dir[1]), -Maths::ArcTangentDegrees2(dir[0], dir[2]), 0.f));
 		else
-			t.SetRotation(Vector3(90 - Maths::ArcSineDegrees(dir[1]), Maths::ArcTangentDegrees2(dir[2], dir[0]), 0.f));
+			t.SetRotation(Vector3(90 - Maths::ArcSineDegrees(dir[1]), -Maths::ArcTangentDegrees2(dir[0], dir[2]), 0.f));
 
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
 		modelManager.Line().Render();
