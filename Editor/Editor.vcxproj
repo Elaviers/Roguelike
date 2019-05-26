@@ -193,6 +193,7 @@ EXIT 0</Command>
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EditorIO.cpp" />
     <ClCompile Include="EditorUtil.cpp" />
+    <ClCompile Include="FbxReader.cpp" />
     <ClCompile Include="PropertyWindow.cpp" />
     <ClCompile Include="ResourceSelect.cpp" />
     <ClCompile Include="ToolBrush2D.cpp" />

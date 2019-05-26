@@ -75,13 +75,15 @@ void Transform::ReadFromBuffer(BufferIterator<byte> &buffer)
 	_position = buffer.Read_vector3();
 	_rotation = Quaternion(buffer.Read_vector3());
 	_scale = buffer.Read_vector3();
+	_Update();
 }
 
 Transform& Transform::operator*=(const Transform &other)
 {
 	_position = _position * other.GetTransformationMatrix();
-	_rotation = other._rotation * _rotation;
+	_rotation = _rotation * other._rotation;
 	_scale *= other._scale;
+	_Update();
 
 	return *this;
 }

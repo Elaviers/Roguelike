@@ -93,25 +93,25 @@ void Editor::_Init()
 	dummy.Delete();
 	_InitGL();
 
-	_uiCam.SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	_uiCam.SetProjectionType(ProjectionType::ORTHOGRAPHIC);
 	_uiCam.SetZBounds(-10, 10);
 	_uiCam.SetScale(1.f);
 
-	CameraRef(0).SetProectionType(ProjectionType::PERSPECTIVE);
+	CameraRef(0).SetProjectionType(ProjectionType::PERSPECTIVE);
 	CameraRef(0).SetRelativePosition(Vector3(-5.f, 5.f, -5.f));
 	CameraRef(0).SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
 
-	CameraRef(1).SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	CameraRef(1).SetProjectionType(ProjectionType::ORTHOGRAPHIC);
 	CameraRef(1).SetScale(32.f);
 	CameraRef(1).SetZBounds(-10000.f, 10000.f);
 	CameraRef(1).SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
 
-	CameraRef(2).SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	CameraRef(2).SetProjectionType(ProjectionType::ORTHOGRAPHIC);
 	CameraRef(2).SetScale(32.f);
 	CameraRef(2).SetZBounds(-10000.f, 10000.f);
 	CameraRef(2).SetRelativeRotation(Vector3(0.f, 0.f, 0.f));
 
-	CameraRef(3).SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	CameraRef(3).SetProjectionType(ProjectionType::ORTHOGRAPHIC);
 	CameraRef(3).SetScale(32.f);
 	CameraRef(3).SetZBounds(-10000.f, 10000.f);
 	CameraRef(3).SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
@@ -316,7 +316,7 @@ void Editor::ResizeViews(uint16 w, uint16 h)
 String Editor::SelectMaterialDialog()
 {
 	String string = ResourceSelect::Dialog(*Engine::Instance().pMaterialManager, *Engine::Instance().pModelManager, "Data/Materials/*.txt", _propertyWindow.GetHwnd(),
-		ResourceType::MATERIAL, _glContext, _shaderLit);
+		ResourceType::MATERIAL, _glContext, _shaderLit, _shaderUnlit);
 
 	RECT rect;
 	::GetClientRect(_window.GetHwnd(), &rect);
@@ -328,7 +328,7 @@ String Editor::SelectMaterialDialog()
 String Editor::SelectModelDialog()
 {
 	String string = ResourceSelect::Dialog(*Engine::Instance().pMaterialManager, *Engine::Instance().pModelManager, "Data/Models/*.txt", _propertyWindow.GetHwnd(),
-		ResourceType::MODEL, _glContext, _shaderLit);
+		ResourceType::MODEL, _glContext, _shaderLit, _shaderUnlit);
 
 	RECT rect;
 	::GetClientRect(_window.GetHwnd(), &rect);
@@ -578,6 +578,21 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			{
 				String filename = EditorIO::OpenFileDialog(L"\\Data\\Models", openModelFilter);
 
+				String ext = Utilities::GetExtension(filename).ToLower();
+
+				ModelData model;
+
+				if (Utilities::GetExtension(filename) == ".fbx")
+				{
+					model = EditorIO::ReadFBXFile(editor->_fbxManager, filename.GetData());
+				}
+				else if (Utilities::GetExtension(filename) == ".obj")
+				{
+					model = IO::ReadOBJFile(filename.GetData());
+				}
+
+				if (model.IsValid())
+					IO::WriteModelData("Data/Models/debug.mesh", model);
 			}
 			break;
 

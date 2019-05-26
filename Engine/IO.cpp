@@ -33,7 +33,7 @@ Buffer<byte> IO::ReadFile(const char *filename)
 	return buffer;
 }
 
-bool IO::WriteFile(const char *filename, const byte *data, uint32 length)
+bool IO::WriteFile(const char *filename, const byte *data, size_t length)
 {
 	HANDLE file = ::CreateFile(filename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (file == INVALID_HANDLE_VALUE)

@@ -27,7 +27,10 @@ namespace IO {
 	bool FileExists(const char* filename);
 
 	Buffer<byte> ReadFile(const char *filename);
-	bool WriteFile(const char *filename, const byte *data, uint32 dataLength);
+	bool WriteFile(const char *filename, const byte *data, size_t dataLength);
+
+	bool WriteModelData(const char* filename, const ModelData& data);
+	ModelData ReadModelData(const char* filename);
 
 	String ReadFileString(const char *filename);
 

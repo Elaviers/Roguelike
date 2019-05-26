@@ -29,7 +29,7 @@ public:
 	ObjCamera() : _type(ProjectionType::PERSPECTIVE), _fov(90.f), _scale(1.f), _near(.001f), _far(100.f) { }
 	~ObjCamera() {}
 
-	inline void SetProectionType(ProjectionType type)	{ _type = type; UpdateProjectionMatrix(); }
+	inline void SetProjectionType(ProjectionType type)	{ _type = type; UpdateProjectionMatrix(); }
 	inline void SetFOV(float fieldOfView)				{ _fov = fieldOfView; UpdateProjectionMatrix(); }
 	inline void SetScale(float scale)					{ _scale = scale; UpdateProjectionMatrix(); }
 	inline void SetZBounds(float n, float f)			{ _near = n; _far = f; UpdateProjectionMatrix(); }

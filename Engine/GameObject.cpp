@@ -28,7 +28,7 @@ Mat4 GameObject::GetTransformationMatrix() const
 Mat4 GameObject::GetInverseTransformationMatrix() const
 {
 	if (_parent)
-		return _transform.GetInverseTransformationMatrix() * _parent->GetInverseTransformationMatrix();
+		return _parent->GetInverseTransformationMatrix() * _transform.GetInverseTransformationMatrix();
 
 	return _transform.GetInverseTransformationMatrix();
 }

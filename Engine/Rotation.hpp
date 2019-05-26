@@ -27,7 +27,7 @@ public:
 	Rotation(const Quaternion& q) : _quaternion(q) { _UpdateEulerFromQuat(); }
 	~Rotation() {}
 
-	inline Vector3 GetEuler() const
+	inline const Vector3& GetEuler() const
 	{
 		return _euler;
 	}
@@ -44,7 +44,7 @@ public:
 		_UpdateQuatFromEuler();
 	}
 
-	inline Quaternion GetQuat() const
+	inline const Quaternion& GetQuat() const
 	{
 		return _quaternion;
 	}

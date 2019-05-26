@@ -118,6 +118,9 @@ Buffer<String> String::Split(const char *delimiters) const
 	return result;
 }
 
+/*
+	Returns substring with all elements greater than or equal to the start and less than the end
+*/
 String String::SubString(size_t start, size_t end) const
 {
 	if (start > _length)

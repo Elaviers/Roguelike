@@ -276,12 +276,12 @@
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="CvarMap.cpp" />
     <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="FbxReader.cpp" />
     <ClCompile Include="Font_TTF.cpp" />
     <ClCompile Include="Font_Texture.cpp" />
     <ClCompile Include="FrameAllocator.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ModelDataIO.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="AudioManager.cpp" />

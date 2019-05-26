@@ -125,7 +125,7 @@ void Game::_Init()
 
 	_consoleIsActive = false;
 
-	_uiCamera.SetProectionType(ProjectionType::ORTHOGRAPHIC);
+	_uiCamera.SetProjectionType(ProjectionType::ORTHOGRAPHIC);
 	_uiCamera.SetScale(1.f);
 	_uiCamera.SetZBounds(-10.f, 10.f);
 }

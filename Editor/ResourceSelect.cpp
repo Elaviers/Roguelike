@@ -1,6 +1,7 @@
 #include "ResourceSelect.hpp"
 #include <CommCtrl.h>
 #include <Engine/Debug.hpp>
+#include <Engine/DrawUtils.hpp>
 #include <Engine/GL.hpp>
 #include <Engine/GLContext.hpp>
 #include <Engine/GLProgram.hpp>
@@ -16,28 +17,23 @@
 
 constexpr LPCTSTR viewportClassName = TEXT("RESSELECTVPCLASS");
 
-class RSDialog;
-
-struct VPInfo
-{
-	Transform *transform = nullptr;
-	bool moving = false;
-	bool sizing = false;
-
-	RSDialog *parent = nullptr;
-};
-
 class RSDialog
 {
 private:
 	const GLContext *glContext;
-	const GLProgram *glProgram;
+	const GLProgram *programLit;
+	const GLProgram *programUnlit;
 	MaterialManager* const materialManager;
 	ModelManager* const modelManager;
 
+	GameObject _cameraRoot;
 	ObjCamera _camera;
 	ObjRenderable _object;
 	ObjLight _light;
+
+	bool _moving;
+	bool _sizing;
+
 public:
 	Buffer<String> paths;
 	int selection = 0;
@@ -45,12 +41,11 @@ public:
 	bool isModelSelect = false;
 
 	HDC viewportDC;
-	VPInfo viewportInfo;
 
 	HIMAGELIST imageList = NULL;
 
-	RSDialog(const GLContext &context, const GLProgram &program, MaterialManager& materialManager, ModelManager &modelManager) : 
-		glContext(&context), glProgram(&program), materialManager(&materialManager), modelManager(&modelManager), viewportDC(NULL) {}
+	RSDialog(const GLContext &context, const GLProgram &programLit, const GLProgram &programUnlit, MaterialManager& materialManager, ModelManager &modelManager) : 
+		glContext(&context), programLit(&programLit), programUnlit(&programUnlit), materialManager(&materialManager), modelManager(&modelManager), viewportDC(NULL) {}
 
 	inline const String &GetRootPath() { return isModelSelect ? modelManager->GetRootPath() : materialManager->GetRootPath(); }
 
@@ -63,20 +58,21 @@ public:
 		glViewport(0, 0, vpW, vpH);
 		_camera.SetViewport(vpW, vpH);
 
-		_camera.SetProectionType(ProjectionType::PERSPECTIVE);
-		_camera.SetFOV(90.f);
-		_camera.SetRelativePosition(Vector3(-.7f, .7f, -.7f));
-		_camera.SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
+		_camera.SetParent(&_cameraRoot);
 
-		_light.SetRelativePosition(Vector3(-1.f, .5f, -2.f));
+		_camera.SetProjectionType(ProjectionType::PERSPECTIVE);
+		_camera.SetFOV(90.f);
+		_camera.SetRelativePosition(Vector3(0.f, 0.f, 1.f));
+		_camera.SetRelativeRotation(Vector3(0.f, 180.f, 0.f));
+
+		_light.SetParent(&_camera);
+		_light.SetRelativePosition(Vector3(0.5f, 0.5f, 0.f));
 
 		if (!isModelSelect)
 			_object.SetModel(&modelManager->Cube());
 
-		viewportInfo.parent = this;
-		viewportInfo.transform = &_object.RelativeTransform();
-		viewportInfo.moving = false;
-		viewportInfo.sizing = false;
+		_moving = false;
+		_sizing = false;
 	}
 
 	void Update()
@@ -91,28 +87,46 @@ public:
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glProgram->Use();
-		glProgram->SetMat4(DefaultUniformVars::mat4Projection, _camera.GetProjectionMatrix());
-		glProgram->SetMat4(DefaultUniformVars::mat4View, _camera.GetInverseTransformationMatrix());
-		glProgram->SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+		glDepthFunc(GL_LESS);
 
-		glProgram->SetInt(DefaultUniformVars::intTextureDiffuse, 0);
-		glProgram->SetInt(DefaultUniformVars::intTextureNormal, 1);
-		glProgram->SetInt(DefaultUniformVars::intTextureSpecular, 2);
-		glProgram->SetInt(DefaultUniformVars::intTextureReflection, 3);
+		programLit->Use();
+		programLit->SetMat4(DefaultUniformVars::mat4Projection, _camera.GetProjectionMatrix());
+		programLit->SetMat4(DefaultUniformVars::mat4View, _camera.GetInverseTransformationMatrix());
+		programLit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+
+		programLit->SetInt(DefaultUniformVars::intTextureDiffuse, 0);
+		programLit->SetInt(DefaultUniformVars::intTextureNormal, 1);
+		programLit->SetInt(DefaultUniformVars::intTextureSpecular, 2);
+		programLit->SetInt(DefaultUniformVars::intTextureReflection, 3);
 
 		_light.ToShader(0);
 
 		_object.Render();
 
+		programUnlit->Use();
+		programUnlit->SetMat4(DefaultUniformVars::mat4Projection, _camera.GetProjectionMatrix());
+		programUnlit->SetMat4(DefaultUniformVars::mat4View, _camera.GetInverseTransformationMatrix());
 
+		Engine::Instance().pTextureManager->White().Bind(0);
+
+		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 0.f, 0.f));
+		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(-1.f, 0.f, 0.f), Vector3(1.f, 0.f, 0.f));
+
+		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f));
+		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(0.f, -1.f, 0.f), Vector3(0.f, 1.f, 0.f));
+
+		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 0.f, 1.f));
+		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(0.f, 0.f, -1.f), Vector3(0.f, 0.f, 1.f));
 
 		::SwapBuffers(viewportDC);
 	};
+
+	static LPARAM DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	static LPARAM ViewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 };
 
 //static
-INT_PTR DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+INT_PTR RSDialog::DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	RSDialog *rs = (RSDialog*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
@@ -166,7 +180,7 @@ INT_PTR DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		HWND viewport = ::CreateWindow(viewportClassName, NULL, WS_CHILD | WS_BORDER | WS_VISIBLE, 0, 0, rect.right, rect.bottom, vp, NULL, instance, NULL);
 		rs->viewportDC = ::GetDC(viewport);
 		rs->InitScene(rect.right, rect.bottom);
-		::SetWindowLongPtr(viewport, GWLP_USERDATA, (LONG_PTR)&rs->viewportInfo);
+		::SetWindowLongPtr(viewport, GWLP_USERDATA, (LONG_PTR)rs);
 	}
 
 	break;
@@ -213,27 +227,27 @@ INT_PTR DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	return TRUE;
 }
 
-LPARAM viewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+LPARAM RSDialog::ViewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	VPInfo *vpInfo = (VPInfo*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	RSDialog *rs = (RSDialog*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
 	switch (msg)
 	{
 	case WM_LBUTTONDOWN:
-		vpInfo->moving = true;
+		rs->_moving = true;
 		break;
 	case WM_RBUTTONDOWN:
-		vpInfo->sizing = true;
+		rs->_sizing = true;
 		break;
 	case WM_LBUTTONUP:
-		vpInfo->moving = false;
+		rs->_moving = false;
 		break;
 	case WM_RBUTTONUP:
-		vpInfo->sizing = false;
+		rs->_sizing = false;
 		break;
 
 	case WM_MOUSEMOVE:
-		if (vpInfo->moving || vpInfo->sizing)
+		if (rs->_moving || rs->_sizing)
 		{
 			RECT rect;
 			::GetWindowRect(hwnd, &rect);
@@ -248,18 +262,16 @@ LPARAM viewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 			::SetCursorPos(midPointX, midPointY);
 
-			if (vpInfo->moving)
+			if (rs->_moving)
 			{
-				vpInfo->transform->Rotate(Vector3((float)-deltaY, (float)-deltaX, 0));
+				rs->_cameraRoot.AddRelativeRotation(Vector3((float)deltaY, (float)deltaX, 0));
 			}
 			else
 			{
-				float scaling = deltaY / -50.f;
-				const Vector3& currentScale = vpInfo->transform->GetScale();
-				vpInfo->transform->SetScale(Vector3(currentScale[0] + scaling, currentScale[1] + scaling, currentScale[2] + scaling));
+				rs->_camera.RelativeMove(Vector3(0.f, 0.f, deltaY / 50.f));
 			}
 
-			vpInfo->parent->Draw();
+			rs->Draw();
 		}
 	break;
 
@@ -275,7 +287,7 @@ void ResourceSelect::Initialise()
 {
 	WNDCLASSEXA windowClass = {};
 	windowClass.cbSize = sizeof(WNDCLASSEXA);
-	windowClass.lpfnWndProc = viewportProc;
+	windowClass.lpfnWndProc = RSDialog::ViewportProc;
 	windowClass.hInstance = ::GetModuleHandle(NULL);
 	windowClass.hbrBackground = (HBRUSH)(COLOR_ACTIVECAPTION + 1);
 	windowClass.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
@@ -285,16 +297,16 @@ void ResourceSelect::Initialise()
 	::RegisterClassEx(&windowClass);
 }
 
-String ResourceSelect::Dialog(MaterialManager &materialManager, ModelManager &modelManager, const char *search, HWND parent, ResourceType type, const GLContext &context, const GLProgram &program)
+String ResourceSelect::Dialog(MaterialManager &materialManager, ModelManager &modelManager, const char *search, HWND parent, ResourceType type, const GLContext &context, const GLProgram &programLit, const GLProgram &programUnlit)
 {
-	RSDialog rs(context, program, materialManager, modelManager);
+	RSDialog rs(context, programLit, programUnlit, materialManager, modelManager);
 	rs.isModelSelect = type == ResourceType::MODEL;
 	rs.paths = IO::FindFilesInDirectory(search);
 
 	for (uint32 i = 0; i < rs.paths.GetSize(); ++i)
 		Utilities::StripExtension(rs.paths[i]);
 
-	if (::DialogBoxParam(NULL, MAKEINTRESOURCE(IDD_RES_SELECT), parent, DialogProc, (LPARAM)&rs) == 1)
+	if (::DialogBoxParam(NULL, MAKEINTRESOURCE(IDD_RES_SELECT), parent, RSDialog::DialogProc, (LPARAM)&rs) == 1)
 		return rs.paths[rs.selection];
 
 	return "";

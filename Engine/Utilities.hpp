@@ -43,6 +43,15 @@ namespace Utilities
 		return ptr;
 	}
 
+	inline String GetExtension(const String& string)
+	{
+		for (size_t i = string.GetLength() - 1; i > 0; --i)
+			if (string[i] == '.')
+				return string.SubString(i, string.GetLength());
+
+		return String();
+	}
+
 	inline void StripExtension(String &string)
 	{
 		for (size_t i = string.GetLength() - 1; i > 0; --i)

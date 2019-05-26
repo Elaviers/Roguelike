@@ -8,8 +8,14 @@ void Model::_CMD_model(const Buffer<String> &args)
 {
 	if (args.GetSize() > 0)
 	{
-		_data = IO::ReadOBJFile((Engine::Instance().pModelManager->GetRootPath() + args[0]).GetData());
-	
+		String ext = Utilities::GetExtension(args[0]).ToLower();
+		String path = Engine::Instance().pModelManager->GetRootPath() + args[0];
+
+		if (ext == ".obj")
+			_data = IO::ReadOBJFile(path.GetData());
+		else
+			_data = IO::ReadModelData(path.GetData());
+
 		this->model.Create(_data.vertices.Data(), (GLsizei)_data.vertices.GetSize(), _data.elements.Data(), (GLsizei)_data.elements.GetSize());
 		this->bounds = _data.bounds;
 	}

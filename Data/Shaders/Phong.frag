@@ -18,6 +18,7 @@ uniform sampler2D T_Diffuse;
 uniform sampler2D T_Normal;
 uniform sampler2D T_Specular;
 uniform sampler2D T_Reflection;
+uniform vec4 Colour;
 
 layout(location = 0) in vec3 WorldPosition;
 layout(location = 1) in vec2 UV_IN;
@@ -86,5 +87,5 @@ void main()
 	vec3 CubemapReflection = reflect(-SurfaceToCamera, WorldNormal);
 	vec3 Reflection = SurfaceReflectivity * texture(Cubemap, CubemapReflection).rgb;
 
-	OutColour = vec4(SurfaceColour * AmbientLight + Diffuse + Reflection + Specular, 1.0);
+	OutColour = Colour * vec4(SurfaceColour * AmbientLight + Diffuse + Reflection + Specular, 1.0);
 }

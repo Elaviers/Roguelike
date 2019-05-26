@@ -251,14 +251,14 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 
 	if (ORTHO)
 	{
-		camera.SetProectionType(ProjectionType::ORTHOGRAPHIC);
+		camera.SetProjectionType(ProjectionType::ORTHOGRAPHIC);
 		camera.SetZBounds(-100000.f, 100000.f);
 		camera.SetScale(128.f);
 		camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
 	}
 	else
 	{
-		camera.SetProectionType(ProjectionType::PERSPECTIVE);
+		camera.SetProjectionType(ProjectionType::PERSPECTIVE);
 		camera.SetZBounds(0.001f, 100000.f);
 		camera.SetRelativePosition(Vector3(0.f, 0.f, -5.f));
 	}

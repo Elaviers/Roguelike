@@ -16,6 +16,6 @@ namespace ResourceSelect
 {
 	void Initialise();
 
-	String Dialog(MaterialManager&, ModelManager&, const char *searchDir, HWND parent, ResourceType type, const GLContext &context, const GLProgram &program);
+	String Dialog(MaterialManager&, ModelManager&, const char *searchDir, HWND parent, ResourceType type, const GLContext &context, const GLProgram& programLit, const GLProgram& programUnlit);
 };
 
