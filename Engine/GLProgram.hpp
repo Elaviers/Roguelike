@@ -9,6 +9,8 @@ namespace DefaultUniformVars
 	constexpr const char *mat4View = "M_View";
 	constexpr const char *mat4Model = "M_Model";
 
+	constexpr const char* mat4aBones = "Bones";
+
 	constexpr const char *vec4Colour = "Colour";
 
 	constexpr const char *vec2UVOffset = "UVOffset";
@@ -34,8 +36,9 @@ private:
 
 public:
 	GLProgram() : _channels(0), _id(0) {}
+	GLProgram(const GLProgram&) = delete;
+	GLProgram(GLProgram&& other) noexcept : _id(other._id), _channels(other._channels) { other._id = other._channels = 0; }
 	~GLProgram() {}
-	GLProgram(const GLProgram &) = delete;
 
 	inline static const GLProgram& Current() { return *_currentProgram; }
 
@@ -47,6 +50,8 @@ public:
 
 	inline void Use() const { glUseProgram(_id); _currentProgram = this; }
 	GLint GetUniformLocation(const char *name) const;
+
+	inline GLProgram& operator=(GLProgram&& other) { _id = other._id; _channels = other._channels; other._id = other._channels = 0; }
 
 	//Setter inlines
 

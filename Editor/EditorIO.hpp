@@ -10,5 +10,5 @@ namespace EditorIO
 	String OpenFileDialog(const wchar_t *dir, const Buffer<Pair<const wchar_t*>>& ext);
 	String SaveFileDialog(const wchar_t *dir, const Buffer<Pair<const wchar_t*>>& ext);
 
-	ModelData ReadFBXFile(FbxManager*, const char* filename);
+	Mesh* ReadFBXFile(FbxManager*, const char* filename);
 }

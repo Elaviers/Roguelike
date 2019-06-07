@@ -3,18 +3,19 @@
 #include "Font_Texture.hpp"
 #include "Font_TTF.hpp"
 
-bool FontManager::_CreateResource(Font*& font, const String& name, const String& data)
+Font* FontManager::_CreateResource(const String& name, const String& data)
 {
-	if (data.GetLength() != 0)
+	Font* font = nullptr;
+
+	if (data.GetLength() > 0)
 	{
 		int splitIndex = data.IndexOfAny("\r\n");
 		String firstLine = data.SubString(0, splitIndex).ToLower();
-		Font *newFont;
 
 		if (firstLine == "bitmap")
-			newFont = new FontTexture();
+			font = new FontTexture();
 		else if (firstLine == "ttf")
-			newFont = new FontTTF();
+			font = new FontTTF();
 		else
 		{
 			Debug::Error(CSTR("Unknown type for material \"" + name + '\"'));
@@ -22,11 +23,8 @@ bool FontManager::_CreateResource(Font*& font, const String& name, const String&
 		}
 
 		if (data[splitIndex + 1] != '\0')
-			newFont->FromString(data.SubString(splitIndex + 1));
-
-		font = newFont;
-		return true;
+			font->FromString(data.SubString(splitIndex + 1));
 	}
 
-	return false;
+	return font;
 }

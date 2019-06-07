@@ -1,6 +1,8 @@
 #pragma once
 #include "Types.hpp"
 
+class Quaternion;
+
 namespace Maths
 {
 	constexpr double PI = 3.14159265358979323846;
@@ -8,10 +10,13 @@ namespace Maths
 	constexpr const double RADS_PER_DEG = PI / 180.0;
 
 	template <typename T>
-	inline T Abs(const T& value) { return value < 0 ? -value : value; }
+	T Abs(const T& value) { return value < 0 ? -value : value; }
 
 	template <typename T>
-	inline T Lerp(const T& from, const T& to, float alpha) { return (T)((from * (1.f - alpha)) + (to * alpha)); }
+	T Lerp(const T& from, const T& to, float alpha) { return (T)((from * (1.f - alpha)) + (to * alpha)); }
+
+	template<>
+	Quaternion Lerp(const Quaternion& from, const Quaternion& to, float alpha);
 
 	inline float Round(float x) 
 	{

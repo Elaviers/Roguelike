@@ -1,4 +1,5 @@
 #include "Maths.hpp"
+#include "Quaternion.hpp"
 #include <stdlib.h>
 #include <math.h>
 
@@ -16,6 +17,9 @@ namespace Maths
 	{
 		return sqrtf(x);
 	}
+
+	template <>
+	Quaternion Lerp(const Quaternion& from, const Quaternion& to, float alpha) { return Quaternion::Lerp(from, to, alpha); }
 
 	double SineD(double radians)
 	{

@@ -164,7 +164,8 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	};
 	::RegisterClassEx(&windowClass);
 
-	GLContext dummy = GLContext::CreateDummyAndUse(className);
+	GLContext dummy;
+	dummy.CreateDummyAndUse(className);
 	GL::LoadDummyExtensions();
 
 	window.Create(className, "Window", nullptr);

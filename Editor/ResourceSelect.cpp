@@ -80,7 +80,7 @@ public:
 		if (isModelSelect)
 			_object.SetModel(modelManager->Get(paths[selection]));
 		else
-			_object.SetMaterial(*materialManager->Get(paths[selection]));
+			_object.SetMaterial(materialManager->Get(paths[selection]));
 	}
 
 	void Draw()

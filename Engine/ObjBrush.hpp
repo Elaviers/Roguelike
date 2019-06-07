@@ -28,7 +28,7 @@ public:
 	inline void SetPoint1(const Vector<float, SIZE> &position) { _point1 = position; _UpdateTransform(); }
 	inline void SetPoint2(const Vector<float, SIZE> &position) { _point2 = position; _UpdateTransform(); }
 	inline void SetMaterial(const Material *material) { _material = material; }
-	void SetMaterial(const String &name) { if (Engine::Instance().pMaterialManager)_material = *Engine::Instance().pMaterialManager->Get(name); }
+	void SetMaterial(const String &name) { if (Engine::Instance().pMaterialManager) _material = Engine::Instance().pMaterialManager->Get(name); }
 	
 	inline const Vector<float, SIZE>& GetPoint1() const { return _point1; }
 	inline const Vector<float, SIZE>& GetPoint2() const { return _point2; }

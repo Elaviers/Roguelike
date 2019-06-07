@@ -31,8 +31,8 @@ void ObjBrush2D::Render() const
 void ObjBrush2D::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
 {
 	if (Engine::Instance().pMaterialManager && _material)
-	{																		//TODO: const cast removal
-		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material)));
+	{
+		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(_material));
 		buffer.Write_uint16(id);
 	}
 	else buffer.Write_uint16(0);

@@ -8,11 +8,11 @@ class ResourceManager
 {
 private:
 	Buffer<String> _paths;
-	Map<String, T> _map;
+	Map<String, T*> _map;
 	
 protected:
 	//If raw, then data is the filepath
-	virtual bool _CreateResource(T &resource, const String &name, const String &data) = 0;
+	virtual T* _CreateResource(const String &name, const String &data) = 0;
 
 	virtual void _DestroyResource(T& resource) {}
 
@@ -25,32 +25,42 @@ public:
 	{
 		String lowerName = name.ToLower();
 		
-		T* resource = _map.Find(lowerName);
-		if (resource) return resource;
+		T** resource = _map.Find(lowerName);
+		if (resource) return *resource;
 
 		if (lowerName.GetLength() > 0)
 		{
 			for (size_t i = 0; i < _paths.GetSize(); ++i)
 			{
-				T resource;
-
 				String data = RAW ? (_paths[i] + name) : IO::ReadFileString((_paths[i] + name + ".txt").GetData());
 
-				if (_CreateResource(resource, lowerName, data))
-					return &_map.Set(lowerName, std::move(resource));
+				T* resource = _CreateResource(lowerName, data);
+
+				if (resource)
+				{
+					_map.Set(lowerName, resource);
+					return resource;
+				}
 			}
 		}
 
 		return nullptr;
 	}
 
-	inline T* Find(const String &name) { return _map.Find(name.ToLower()); };
+	inline T* Find(const String& name)
+	{
+		auto found = _map.Find(name.ToLower());
 
-	inline String FindNameOf(const T& resource) const
+		return found ? *found : nullptr;
+	}
+
+	inline String FindNameOf(const T* resource) const
 	{
 		String string;
 
-		const String* found = _map.FindFirstKey(resource);
+		T *const &dumb = const_cast<T *const>(resource);
+
+		const String* found = _map.FindFirstKey(dumb);
 		if (found) string = *found;
 		else string = "None";
 

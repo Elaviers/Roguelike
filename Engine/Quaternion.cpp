@@ -1,6 +1,17 @@
 #include "Quaternion.hpp"
+#include "Maths.hpp"
 
-Quaternion::Quaternion(Vector3 euler)
+Quaternion::Quaternion(const Vector3& axis, float angle)
+{
+	Vector3 a = axis * Maths::SineDegrees(angle / 2.f);
+
+	_x = a[0];
+	_y = a[1];
+	_z = a[2];
+	_w = Maths::CosineDegrees(angle / 2.f);
+}
+
+Quaternion::Quaternion(const Vector3& euler)
 {
 	Quaternion pitch = Quaternion(VectorMaths::V3X, euler[0]);
 	Quaternion yaw = Quaternion(VectorMaths::V3Y, -euler[1]);
@@ -38,4 +49,12 @@ Quaternion Quaternion::operator*(const Quaternion & q) const
 		_w * q._w - _x * q._x - _y * q._y - _z * q._z
 		)
 	);
+}
+
+Quaternion Quaternion::Lerp(const Quaternion& from, const Quaternion& to, float alpha)
+{
+	Quaternion q(Maths::Lerp(from._data, to._data, alpha));
+	q._data.Normalise();
+
+	return q;
 }

@@ -7,9 +7,9 @@
 
 TextureManager::~TextureManager()
 {
-	_colours.white.Delete();
-	_colours.grey.Delete();
-	_colours.uvDefault.Delete();
+	_DestroyResource(_colours.white);
+	_DestroyResource(_colours.grey);
+	_DestroyResource(_colours.uvDefault);
 }
 
 void TextureManager::CMD_mag(const Buffer<String>& args)
@@ -27,22 +27,21 @@ void TextureManager::CMD_mips(const Buffer<String>& args)
 		_nextTextureInfo.mipLevels = args[0].ToInt();
 }
 
-bool TextureManager::_CreateResource(GLTexture& tex, const String& name, const String& filepath)
+GLTexture* TextureManager::_CreateResource(const String& name, const String& filepath)
 {
+	GLTexture* tex = nullptr;
+
 	TextureData data = IO::ReadPNGFile(filepath.GetData());
-
-	bool success = false;
-
 	if (data.IsValid())
 	{
-		tex.Create(data.width, data.height, data.data.Data(), _nextTextureInfo.mipLevels, _nextTextureInfo.magFilter);
-		success	= true;
+		tex = new GLTexture();
+		tex->Create(data.width, data.height, data.data.Data(), _nextTextureInfo.mipLevels, _nextTextureInfo.magFilter);
 	}
 
 	_nextTextureInfo.mipLevels = 8;
 	_nextTextureInfo.magFilter = GL_LINEAR;
 
-	return success;
+	return tex;
 }
 
 void TextureManager::_DestroyResource(GLTexture& tex)

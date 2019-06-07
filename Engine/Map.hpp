@@ -8,7 +8,8 @@ class Map
 public:
 	struct MapNode
 	{
-		MapNode(const KEYTYPE &key, const VALUETYPE &value) : key(key), value(value), left(nullptr), right(nullptr) {}
+		MapNode(const KEYTYPE& key, const VALUETYPE &value) : key(key), value(value), left(nullptr), right(nullptr) {}
+		MapNode(bool lol, const KEYTYPE& key, VALUETYPE&& value) : key(key), value(value), left(nullptr), right(nullptr) {}
 
 		KEYTYPE key;
 		VALUETYPE value;
@@ -127,6 +128,8 @@ public:
 	Map(Map&& other) : _data(other._data) { other._data = nullptr; }
 	
 	inline MapNode* GetFirstNode() { return _data; }
+
+	inline bool IsEmpty() const { return _data == nullptr; }
 
 	void ForEach(void (*function)(const KEYTYPE&, VALUETYPE&))
 	{

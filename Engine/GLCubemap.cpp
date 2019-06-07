@@ -1,17 +1,5 @@
 #include "GLCubemap.hpp"
 
-
-
-GLCubemap::GLCubemap() : _id(0)
-{
-}
-
-
-GLCubemap::~GLCubemap()
-{
-	glDeleteTextures(1, &_id);
-}
-
 void GLCubemap::Create(GLsizei faceWidth, GLsizei faceHeight, const Buffer<byte> faces[6])
 {
 	glGenTextures(1, &_id);

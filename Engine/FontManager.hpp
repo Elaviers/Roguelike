@@ -3,9 +3,9 @@
 
 class Font;
 
-class FontManager : public ResourceManager<Font*>
+class FontManager : public ResourceManager<Font>
 {
-	virtual bool _CreateResource(Font*&, const String&, const String&) override;
+	virtual Font* _CreateResource(const String&, const String&) override;
 	
 	String _systemPath;
 

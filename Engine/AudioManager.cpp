@@ -16,7 +16,7 @@ AudioManager::~AudioManager()
 	TRYRELEASE(_enumerator);
 }
 
-bool AudioManager::_CreateResource(WaveSound& sound, const String& name, const String& data)
+WaveSound* AudioManager::_CreateResource(const String& name, const String& data)
 {
 	String filename;
 	float volume = 1.f;
@@ -39,23 +39,24 @@ bool AudioManager::_CreateResource(WaveSound& sound, const String& name, const S
 		}
 	}
 
-	sound = IO::ReadWaveFile((this->GetRootPath() + filename).GetData());
-	sound.volume = volume;
-	sound.category = category;
+	WaveSound* sound = new WaveSound();
+	*sound = IO::ReadWaveFile((this->GetRootPath() + filename).GetData());
+	sound->volume = volume;
+	sound->category = category;
 
-	if (sound.sampleRate != _waveFormat.nSamplesPerSec)
+	if (sound->sampleRate != _waveFormat.nSamplesPerSec)
 	{
-		byte* originalData = new byte[sound.dataSize];
-		Utilities::CopyBytes(sound.data, originalData, sound.dataSize);
+		byte* originalData = new byte[sound->dataSize];
+		Utilities::CopyBytes(sound->data, originalData, sound->dataSize);
 
-		uint32 cutoff = (uint32)(Utilities::Min<uint32>(sound.sampleRate, _waveFormat.nSamplesPerSec) / 2.f);
+		uint32 cutoff = (uint32)(Utilities::Min<uint32>(sound->sampleRate, _waveFormat.nSamplesPerSec) / 2.f);
 
 		AudioUtilities::LowPassFilter(
 			(int16*)originalData,
-			(int16*)sound.data,
-			sound.channelCount,
-			sound.dataSize / sound.FrameSize,
-			sound.sampleRate,
+			(int16*)sound->data,
+			sound->channelCount,
+			sound->dataSize / sound->FrameSize,
+			sound->sampleRate,
 			cutoff);
 
 		delete[] originalData;
@@ -63,7 +64,7 @@ bool AudioManager::_CreateResource(WaveSound& sound, const String& name, const S
 		//sound.Resample(_waveFormat.nSamplesPerSec);
 	}
 
-	return true;
+	return sound;
 }
 
 void AudioManager::_DestroyResource(WaveSound& sound)
@@ -173,7 +174,7 @@ Finished:
 
 void AudioManager::PlaySound(const WaveSound& sound)
 {
-	List<Sampler>::Node *node = _playingSounds.New();
+	List<Sampler>::Node *node = _playingSounds.Add(Sampler());
 
 	node->obj.SetSound(sound);
 	node->obj.SetLooping(false);

@@ -10,6 +10,8 @@ private:
 
 public:
 	GLTexture() : _id(0), _w(0), _h(0) {}
+	GLTexture(const GLTexture&) = delete;
+	GLTexture(GLTexture&& other) noexcept : _id(other._id), _w(other._w), _h(other._h) { other._id = other._w = other._h = 0; }
 	~GLTexture() {}
 
 	void Create(GLsizei width, GLsizei height, const GLvoid *data, GLint mipLevels, GLint magFilter);

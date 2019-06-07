@@ -10,7 +10,7 @@ private:
 		GLTexture white, grey, uvDefault;
 	} _colours;
 
-	virtual bool _CreateResource(GLTexture&, const String&, const String&);
+	virtual GLTexture* _CreateResource(const String&, const String&);
 
 	virtual void _DestroyResource(GLTexture&);
 

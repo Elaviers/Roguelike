@@ -1,7 +1,10 @@
 #include "IO.hpp"
 #include "Buffer.hpp"
 #include "Debug.hpp"
+#include "Mesh.hpp"
+#include "Mesh_Static.hpp"
 #include "Utilities.hpp"
+#include "Vertex.hpp"
 #include <stdlib.h>
 
 struct OBJVertexDef
@@ -84,15 +87,17 @@ uint32 GetVertexIndex(Buffer<Vertex17F> &vertices, uint32 &vertexCount, const Bu
 	return i;
 }
 
-ModelData IO::ReadOBJFile(const char *filename)
+Mesh_Static* IO::ReadOBJFile(const char *filename)
 {
 	const float scale = 1;
 
-	ModelData data;
-
+	Mesh_Static* mesh = nullptr;
+	
 	String objSrc = IO::ReadFileString(filename);
 	if (objSrc.GetLength())
 	{
+		mesh = new Mesh_Static();
+
 		Buffer<Vector3> positions;
 		Buffer<Vector3> normals;
 		Buffer<Vector2> uvs;
@@ -117,23 +122,23 @@ ModelData IO::ReadOBJFile(const char *filename)
 
 							const Vector3 &newPos = positions.Last();
 
-							if (newPos[0] < data.bounds.min[0])
-								data.bounds.min[0] = newPos[0];
+							if (newPos[0] < mesh->bounds.min[0])
+								mesh->bounds.min[0] = newPos[0];
 
-							if (newPos[1] < data.bounds.min[1])
-								data.bounds.min[1] = newPos[1];
+							if (newPos[1] < mesh->bounds.min[1])
+								mesh->bounds.min[1] = newPos[1];
 
-							if (newPos[2] < data.bounds.min[2])
-								data.bounds.min[2] = newPos[2];
+							if (newPos[2] < mesh->bounds.min[2])
+								mesh->bounds.min[2] = newPos[2];
 
-							if (newPos[0] > data.bounds.max[0])
-								data.bounds.max[0] = newPos[0];
+							if (newPos[0] > mesh->bounds.max[0])
+								mesh->bounds.max[0] = newPos[0];
 
-							if (newPos[1] > data.bounds.max[1])
-								data.bounds.max[1] = newPos[1];
+							if (newPos[1] > mesh->bounds.max[1])
+								mesh->bounds.max[1] = newPos[1];
 
-							if (newPos[2] > data.bounds.max[2])
-								data.bounds.max[2] = newPos[2];
+							if (newPos[2] > mesh->bounds.max[2])
+								mesh->bounds.max[2] = newPos[2];
 						}
 					}
 
@@ -148,37 +153,37 @@ ModelData IO::ReadOBJFile(const char *filename)
 				}
 				else if (tokens[0][0] == 'f')		//Face
 				{
-					if (data.vertices.GetSize() == 0)
+					if (mesh->vertices.GetSize() == 0)
 					{
 						size_t maxSizeSoFar = Utilities::Max(Utilities::Max(positions.GetSize(), normals.GetSize()), uvs.GetSize());
-						data.vertices.SetSize(maxSizeSoFar);
+						mesh->vertices.SetSize(maxSizeSoFar);
 					}
 
 					if (tokens.GetSize() >= 4)		//Triangle
 					{
-						uint32 v1 = GetVertexIndex(data.vertices, vertexCount, positions, normals, uvs, tokens[1].GetData());
-						uint32 v2 = GetVertexIndex(data.vertices, vertexCount, positions, normals, uvs, tokens[2].GetData());
-						uint32 v3 = GetVertexIndex(data.vertices, vertexCount, positions, normals, uvs, tokens[3].GetData());
+						uint32 v1 = GetVertexIndex(mesh->vertices, vertexCount, positions, normals, uvs, tokens[1].GetData());
+						uint32 v2 = GetVertexIndex(mesh->vertices, vertexCount, positions, normals, uvs, tokens[2].GetData());
+						uint32 v3 = GetVertexIndex(mesh->vertices, vertexCount, positions, normals, uvs, tokens[3].GetData());
 
-						size_t last = data.elements.GetSize();
-						data.elements.Append(3);
+						size_t last = mesh->elements.GetSize();
+						mesh->elements.Append(3);
 
-						data.elements[last] = v1;
-						data.elements[last + 1] = v3;
-						data.elements[last + 2] = v2;
-						Vertex17F::CalculateTangents(data.vertices[v1], data.vertices[v3], data.vertices[v2]);
+						mesh->elements[last] = v1;
+						mesh->elements[last + 1] = v3;
+						mesh->elements[last + 2] = v2;
+						Vertex17F::CalculateTangents(mesh->vertices[v1], mesh->vertices[v3], mesh->vertices[v2]);
 
 						if (tokens.GetSize() == 5)	//Quad, add another triangle
 						{
-							uint32 v4 = GetVertexIndex(data.vertices, vertexCount, positions, normals, uvs, tokens[4].GetData());
+							uint32 v4 = GetVertexIndex(mesh->vertices, vertexCount, positions, normals, uvs, tokens[4].GetData());
 
-							size_t last = data.elements.GetSize();
-							data.elements.Append(3);
+							size_t last = mesh->elements.GetSize();
+							mesh->elements.Append(3);
 
-							data.elements[last] = v1;
-							data.elements[last + 1] = v4;
-							data.elements[last + 2] = v3;
-							Vertex17F::CalculateTangents(data.vertices[v1], data.vertices[v4], data.vertices[v3]);
+							mesh->elements[last] = v1;
+							mesh->elements[last + 1] = v4;
+							mesh->elements[last + 2] = v3;
+							Vertex17F::CalculateTangents(mesh->vertices[v1], mesh->vertices[v4], mesh->vertices[v3]);
 						}
 					}
 				}
@@ -186,6 +191,6 @@ ModelData IO::ReadOBJFile(const char *filename)
 		}
 	}
 
-	data.bounds.RecalculateSphereBounds();
-	return data;
+	mesh->bounds.RecalculateSphereBounds();
+	return mesh;
 }

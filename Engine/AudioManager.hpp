@@ -22,7 +22,7 @@ class AudioManager : public ResourceManager<WaveSound>
 
 	List<Sampler> _playingSounds;
 
-	virtual bool _CreateResource(WaveSound& sound, const String&, const String&) override;
+	virtual WaveSound* _CreateResource(const String&, const String&) override;
 
 	virtual void _DestroyResource(WaveSound& sound) override;
 

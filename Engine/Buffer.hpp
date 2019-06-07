@@ -70,23 +70,23 @@ public:
 		return *this; 
 	}
 
-	void Add(const T &item)
+	T& Add(const T &item)
 	{
 		SetSize(_size + 1);
 
-		_data[_size - 1] = item;
+		return _data[_size - 1] = item;
 	}
 
-	void Add(T &&item)
+	T& Add(T &&item)
 	{
 		SetSize(_size + 1);
 
-		_data[_size - 1] = std::move(item);
+		return _data[_size - 1] = std::move(item);
 	}
 
-	void Insert(const T &item, size_t pos)
+	T* Insert(const T &item, size_t pos)
 	{
-		if (pos > _size) return;
+		if (pos > _size) return nullptr;
 
 		T *newData = new T[_size + 1];
 		for (size_t i = 0; i < pos; ++i)
@@ -100,6 +100,8 @@ public:
 		delete[] _data;
 		_data = newData;
 		_size++;
+
+		return &newData[pos];
 	}
 
 	void RemoveIndex(size_t index)

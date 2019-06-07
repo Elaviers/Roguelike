@@ -6,18 +6,19 @@
 #include "TextureManager.hpp"
 #include "Utilities.hpp"
 
-bool MaterialManager::_CreateResource(Material*& material, const String &name, const String &data)
+Material* MaterialManager::_CreateResource(const String &name, const String &data)
 {
-	if (data.GetLength() != 0)
+	Material* mat = nullptr;
+
+	if (data.GetLength() > 0)
 	{
 		int splitIndex = data.IndexOfAny("\r\n");
 		String firstLine = data.SubString(0, splitIndex).ToLower();
-		Material* newMaterial;
-
+		
 		if (firstLine == "surface")
-			newMaterial = new MaterialSurface();
+			mat = new MaterialSurface();
 		else if (firstLine == "grid")
-			newMaterial = new MaterialGrid();
+			mat = new MaterialGrid();
 		else
 		{
 			Debug::Error(CSTR("Unknown material type for material \"" + name + '\"'));
@@ -25,11 +26,8 @@ bool MaterialManager::_CreateResource(Material*& material, const String &name, c
 		}
 
 		if (data[splitIndex + 1] != '\0')
-			newMaterial->FromString(data.SubString(splitIndex + 1));
-
-		material = newMaterial;
-		return true;
+			mat->FromString(data.SubString(splitIndex + 1));
 	}
 
-	return false;
+	return mat;
 }

@@ -70,7 +70,7 @@ void Editor::_Init()
 		windowClass.lpfnWndProc = _vpAreaProc;
 		::RegisterClassEx(&windowClass);
 
-		dummy = GLContext::CreateDummyAndUse(classNameDummy);
+		dummy.CreateDummyAndUse(classNameDummy);
 		GL::LoadDummyExtensions();
 
 		_window.Create(classNameWindow, "Window", this);
@@ -580,19 +580,19 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 				String ext = Utilities::GetExtension(filename).ToLower();
 
-				ModelData model;
+				Mesh *mesh = nullptr;
 
 				if (Utilities::GetExtension(filename) == ".fbx")
 				{
-					model = EditorIO::ReadFBXFile(editor->_fbxManager, filename.GetData());
+					mesh = EditorIO::ReadFBXFile(editor->_fbxManager, filename.GetData());
 				}
 				else if (Utilities::GetExtension(filename) == ".obj")
 				{
-					model = IO::ReadOBJFile(filename.GetData());
+					mesh = IO::ReadOBJFile(filename.GetData());
 				}
 
-				if (model.IsValid())
-					IO::WriteModelData("Data/Models/debug.mesh", model);
+				if (mesh && mesh->IsValid())
+					IO::WriteMesh("Data/Models/debug.mesh", mesh);
 			}
 			break;
 

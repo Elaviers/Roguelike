@@ -38,7 +38,34 @@ public:
 		}
 	}
 
+	List(List&& other) : _first(other._first)
+	{
+		other._first = nullptr;
+	}
+
 	~List() { Clear(); }
+
+	inline List& operator=(List&& other) noexcept
+	{
+		_first = other._first;
+		other._first = nullptr;
+
+		return *this;
+	}
+
+	inline Node* Get(int index)
+	{
+		if (_first == nullptr)
+			return nullptr;
+
+		auto node = _first;
+
+		for (int i = 0; node; node = node->next)
+			if (i++ == index)
+				return node;
+
+		return nullptr;
+	}
 
 	void Clear()
 	{
@@ -53,7 +80,21 @@ public:
 	inline Node* First() { return _first; }
 	inline const Node* First() const { return _first; }
 
-	inline Node* Last()
+	size_t GetSize() const
+	{
+		if (_first == nullptr)
+			return 0;
+
+		Node* node = _first;
+		size_t count = 1;
+
+		while (node = node->next)
+			++count;
+
+		return count;
+	}
+
+	Node* Last()
 	{
 		if (_first == nullptr)
 			return nullptr;
@@ -66,7 +107,7 @@ public:
 		return node;
 	}
 
-	inline const Node* Last() const { return Last(); }
+	inline const Node* Last() const { return const_cast<List&>(this)->Last(); }
 
 	Node* Add(const T& element)
 	{
@@ -79,8 +120,6 @@ public:
 
 		return node;
 	}
-
-	inline Node* New() { return Add(T()); }
 
 	void Remove(Node* target)
 	{

@@ -1,7 +1,7 @@
 #include "GLContext.hpp"
 #include "Window.hpp"
 
-GLContext GLContext::CreateDummyAndUse(LPCTSTR className)
+void GLContext::CreateDummyAndUse(LPCTSTR className)
 {
 	HWND hwnd = ::CreateWindow(className, "temp", 0, 0, 0, 0, 0, NULL, NULL, ::GetModuleHandle(NULL), 0);
 	HDC hdc = ::GetDC(hwnd);
@@ -19,21 +19,10 @@ GLContext GLContext::CreateDummyAndUse(LPCTSTR className)
 
 	::SetPixelFormat(hdc, pfdId, &pfd);
 
-	GLContext context;
-	context.Create(hdc);
-	context.Use(hdc);
+	Create(hdc);
+	Use(hdc);
 
 	::DestroyWindow(hwnd);
-
-	return context;
-}
-
-GLContext::GLContext() : _id(0)
-{
-}
-
-GLContext::~GLContext()
-{
 }
 
 void GLContext::Create(HDC hdc)

@@ -41,8 +41,8 @@ class Registry
 	Map<byte, RegistryNodeBase*> _registry;
 
 public:
-	Registry() {};
-	~Registry() {};
+	Registry() {}
+	~Registry() {}
 
 	template <typename T>
 	void RegisterObjectClass(byte id, const String &name)

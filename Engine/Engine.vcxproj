@@ -182,14 +182,21 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.hpp" />
+    <ClInclude Include="AnimationTrack.hpp" />
     <ClInclude Include="AudioUtilities.hpp" />
     <ClInclude Include="Console.hpp" />
+    <ClInclude Include="Mesh.hpp" />
     <ClInclude Include="Font_TTF.hpp" />
     <ClInclude Include="Font_Texture.hpp" />
     <ClInclude Include="FrameAllocator.hpp" />
     <ClInclude Include="Joint.hpp" />
+    <ClInclude Include="Keyframe.hpp" />
+    <ClInclude Include="Mesh_Skeletal.hpp" />
+    <ClInclude Include="Mesh_Static.hpp" />
     <ClInclude Include="Quaternion.hpp" />
     <ClInclude Include="Rotation.hpp" />
+    <ClInclude Include="Skeleton.hpp" />
     <ClInclude Include="Sound.hpp" />
     <ClInclude Include="AudioManager.hpp" />
     <ClInclude Include="Bounds.hpp" />
@@ -226,7 +233,7 @@
     <ClInclude Include="InputManager.hpp" />
     <ClInclude Include="LevelIO.hpp" />
     <ClInclude Include="lodepng.h" />
-    <ClInclude Include="GLModel.hpp" />
+    <ClInclude Include="GLMeshRenderer.hpp" />
     <ClInclude Include="GLProgram.hpp" />
     <ClInclude Include="GLTexture.hpp" />
     <ClInclude Include="IO.hpp" />
@@ -272,6 +279,7 @@
     <ClInclude Include="Window.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AudioUtilities.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="CvarMap.cpp" />
@@ -280,6 +288,8 @@
     <ClCompile Include="Font_Texture.cpp" />
     <ClCompile Include="FrameAllocator.cpp" />
     <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Mesh_Skeletal.cpp" />
+    <ClCompile Include="Mesh_Static.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelDataIO.cpp" />
     <ClCompile Include="Quaternion.cpp" />
@@ -310,7 +320,7 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="LevelIO.cpp" />
     <ClCompile Include="lodepng.cpp" />
-    <ClCompile Include="GLModel.cpp" />
+    <ClCompile Include="GLMeshRenderer.cpp" />
     <ClCompile Include="GLProgram.cpp" />
     <ClCompile Include="GLTexture.cpp" />
     <ClCompile Include="IO.cpp" />

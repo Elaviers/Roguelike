@@ -12,12 +12,11 @@ void Model::_CMD_model(const Buffer<String> &args)
 		String path = Engine::Instance().pModelManager->GetRootPath() + args[0];
 
 		if (ext == ".obj")
-			_data = IO::ReadOBJFile(path.GetData());
+			_mesh = IO::ReadOBJFile(path.GetData());
 		else
-			_data = IO::ReadModelData(path.GetData());
+			_mesh = IO::ReadMesh(path.GetData());
 
-		this->model.Create(_data.vertices.Data(), (GLsizei)_data.vertices.GetSize(), _data.elements.Data(), (GLsizei)_data.elements.GetSize());
-		this->bounds = _data.bounds;
+		_mesh->CreateGLMeshRenderer(_meshRenderer);
 	}
 }
 
@@ -29,17 +28,17 @@ void Model::_CMD_collision(const Buffer<String>& args)
 		{
 			if (args.GetSize() >= 2)
 			{
-				delete this->collider;
-				this->collider = new ColliderSphere(args[1].ToFloat());
+				delete this->_collider;
+				this->_collider = new ColliderSphere(args[1].ToFloat());
 			}
 			else Debug::Error(CSTR("Insufficient sphere collision arguments"));
 		}
 		else if (args[0] == "aabb")
 		{
-			if (_data.IsValid())
+			if (_mesh->IsValid())
 			{
-				delete collider;
-				collider = new ColliderAABB(_data.bounds.min, _data.bounds.max);
+				delete _collider;
+				_collider = new ColliderAABB(_mesh->bounds.min, _mesh->bounds.max);
 			}
 			else Debug::Error(CSTR("AABB collision cannot be used without specifying the model first!"));
 		}
@@ -52,9 +51,4 @@ void Model::FromString(const String& data)
 
 	for (size_t i = 0; i < lines.GetSize(); ++i)
 		_cvars.HandleCommand(lines[i]);
-
-
-	//Cleanup, these aren't needed now
-	_data.vertices.SetSize(0);
-	_data.elements.SetSize(0);
 }

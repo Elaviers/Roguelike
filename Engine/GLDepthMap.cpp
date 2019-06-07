@@ -1,16 +1,5 @@
 #include "GLDepthMap.hpp"
 
-
-
-GLDepthMap::GLDepthMap()
-{
-}
-
-
-GLDepthMap::~GLDepthMap()
-{
-}
-
 void GLDepthMap::Create()
 {
 	glGenFrameBuffers(1, &_fbo);

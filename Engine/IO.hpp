@@ -1,9 +1,10 @@
 #pragma once
-#include "Sound.hpp"
-#include "Bounds.hpp"
 #include "Buffer.hpp"
-#include "String.hpp"
-#include "Vertex.hpp"
+#include "Mesh_Static.hpp"
+
+struct WaveSound;
+
+class Skeleton;
 
 struct TextureData
 {
@@ -14,30 +15,31 @@ struct TextureData
 	inline bool IsValid() { return data.GetSize() != 0; }
 };
 
-struct ModelData
-{
-	Buffer<Vertex17F> vertices;
-	Buffer<uint32> elements;
-	Bounds bounds;
-
-	inline bool IsValid() { return vertices.GetSize() != 0; }
-};
-
 namespace IO {
+	namespace DataIDs
+	{
+		enum
+		{
+			MESH_STATIC = 0,
+			MESH_SKELETAL = 1,
+			TEXTURE = 10
+		};
+	}
+
 	bool FileExists(const char* filename);
 
 	Buffer<byte> ReadFile(const char *filename);
 	bool WriteFile(const char *filename, const byte *data, size_t dataLength);
 
-	bool WriteModelData(const char* filename, const ModelData& data);
-	ModelData ReadModelData(const char* filename);
+	bool WriteMesh(const char* filename, const Mesh* mesh);
+	Mesh* ReadMesh(const char* filename);
 
 	String ReadFileString(const char *filename);
 
 	WaveSound ReadWaveFile(const char* filename);
 
 	TextureData ReadPNGFile(const char *filename);
-	ModelData ReadOBJFile(const char *filename);
+	Mesh_Static* ReadOBJFile(const char *filename);
 
 	//searchPath must have a wildcard in it, like C:/Example/*.poo
 	Buffer<String> FindFilesInDirectory(const char *searchPath);

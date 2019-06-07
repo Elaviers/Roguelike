@@ -85,6 +85,18 @@
     <Filter Include="Source Files\Audio">
       <UniqueIdentifier>{eb0cf789-b3ea-41a9-9d00-8aeb6adc2b22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Animation">
+      <UniqueIdentifier>{e0bc8e20-5243-4804-8f4f-254f6421900f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Animation">
+      <UniqueIdentifier>{d27ddd08-bf3d-4d3d-b0d4-590204ae0efb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Maths">
+      <UniqueIdentifier>{aa3d1d65-80b8-4009-9bdf-4eae889d5e13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Maths">
+      <UniqueIdentifier>{02cab95f-986f-4bdb-b168-7164162ff200}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Types.hpp">
@@ -108,12 +120,6 @@
     <ClInclude Include="Map.hpp">
       <Filter>Header Files\Templates</Filter>
     </ClInclude>
-    <ClInclude Include="Matrix.hpp">
-      <Filter>Header Files\Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector.hpp">
-      <Filter>Header Files\Templates</Filter>
-    </ClInclude>
     <ClInclude Include="GLTexture.hpp">
       <Filter>Header Files\GL</Filter>
     </ClInclude>
@@ -129,9 +135,6 @@
     <ClInclude Include="InputManager.hpp">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="GLModel.hpp">
-      <Filter>Header Files\GL</Filter>
-    </ClInclude>
     <ClInclude Include="DrawUtils.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
@@ -145,9 +148,6 @@
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="IO.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Maths.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Material.hpp">
@@ -179,9 +179,6 @@
     </ClInclude>
     <ClInclude Include="Collider.hpp">
       <Filter>Header Files\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Ray.hpp">
-      <Filter>Header Files\Classes</Filter>
     </ClInclude>
     <ClInclude Include="ColliderAABB.hpp">
       <Filter>Header Files\Collision</Filter>
@@ -238,9 +235,6 @@
       <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="Direction2D.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector4.hpp">
       <Filter>Header Files\Classes</Filter>
     </ClInclude>
     <ClInclude Include="Engine.hpp">
@@ -336,20 +330,59 @@
     <ClInclude Include="Font_TTF.hpp">
       <Filter>Header Files\Classes</Filter>
     </ClInclude>
-    <ClInclude Include="Joint.hpp">
-      <Filter>Header Files\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="Quaternion.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
     <ClInclude Include="FrameAllocator.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="Rotation.hpp">
       <Filter>Header Files\Classes</Filter>
     </ClInclude>
     <ClInclude Include="lodepng.h">
       <Filter>Header Files\ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="Skeleton.hpp">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Joint.hpp">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.hpp">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector4.hpp">
+      <Filter>Header Files\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Quaternion.hpp">
+      <Filter>Header Files\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.hpp">
+      <Filter>Header Files\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Rotation.hpp">
+      <Filter>Header Files\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix.hpp">
+      <Filter>Header Files\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.hpp">
+      <Filter>Header Files\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Maths.hpp">
+      <Filter>Header Files\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationTrack.hpp">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Keyframe.hpp">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="GLMeshRenderer.hpp">
+      <Filter>Header Files\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.hpp">
+      <Filter>Header Files\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh_Static.hpp">
+      <Filter>Header Files\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh_Skeletal.hpp">
+      <Filter>Header Files\Classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -380,9 +413,6 @@
     <ClCompile Include="lodepng.cpp">
       <Filter>Source Files\ThirdParty</Filter>
     </ClCompile>
-    <ClCompile Include="GLModel.cpp">
-      <Filter>Source Files\GL</Filter>
-    </ClCompile>
     <ClCompile Include="DrawUtils.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
@@ -397,12 +427,6 @@
     </ClCompile>
     <ClCompile Include="ObjReader.cpp">
       <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Maths.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Matrix.cpp">
-      <Filter>Source Files\Classes</Filter>
     </ClCompile>
     <ClCompile Include="Skybox.cpp">
       <Filter>Source Files\Classes</Filter>
@@ -427,9 +451,6 @@
     </ClCompile>
     <ClCompile Include="ColliderSphere.cpp">
       <Filter>Source Files\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector.cpp">
-      <Filter>Source Files\Classes</Filter>
     </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>Source Files\Collision</Filter>
@@ -554,14 +575,35 @@
     <ClCompile Include="Font_TTF.cpp">
       <Filter>Source Files\Classes</Filter>
     </ClCompile>
-    <ClCompile Include="Quaternion.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
     <ClCompile Include="FrameAllocator.cpp">
       <Filter>Source Files\Classes</Filter>
     </ClCompile>
     <ClCompile Include="ModelDataIO.cpp">
       <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Source Files\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Quaternion.cpp">
+      <Filter>Source Files\Maths</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector.cpp">
+      <Filter>Source Files\Maths</Filter>
+    </ClCompile>
+    <ClCompile Include="Maths.cpp">
+      <Filter>Source Files\Maths</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix.cpp">
+      <Filter>Source Files\Maths</Filter>
+    </ClCompile>
+    <ClCompile Include="GLMeshRenderer.cpp">
+      <Filter>Source Files\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh_Skeletal.cpp">
+      <Filter>Source Files\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh_Static.cpp">
+      <Filter>Source Files\Classes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

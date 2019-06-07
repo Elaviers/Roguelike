@@ -1,7 +1,11 @@
 #version 410
+#define BONE_COUNT 25
+#define BONES_PER_VERTEX 2
+
 uniform mat4 M_Model;
 uniform mat4 M_View;
 uniform mat4 M_Projection;
+uniform mat4 Bones[BONE_COUNT];
 uniform vec2 UVOffset;
 uniform vec2 UVScale = vec2(1);
 
@@ -11,6 +15,8 @@ layout(location = 2) in vec4 VertexColour_IN;
 layout(location = 3) in vec3 ModelTangent_IN;
 layout(location = 4) in vec3 ModelBitangent_IN;
 layout(location = 5) in vec3 ModelNormal_IN;
+layout(location = 6) in int BoneIndices[BONES_PER_VERTEX];
+layout(location = 7) in float BoneWeights[BONES_PER_VERTEX];
 
 layout(location = 0) out vec3 WorldPosition;
 layout(location = 1) out vec2 UV;

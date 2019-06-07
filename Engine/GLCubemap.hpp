@@ -8,8 +8,10 @@ private:
 	GLuint _id;
 
 public:
-	GLCubemap();
-	~GLCubemap();
+	GLCubemap() : _id(0) {}
+	GLCubemap(const GLCubemap&) = delete;
+	GLCubemap(GLCubemap&& other) noexcept : _id(other._id) { other._id = 0; }
+	~GLCubemap() { glDeleteTextures(1, &_id); }
 
 	void Create(GLsizei faceWidth, GLsizei faceHeight, const Buffer<byte> faces[6]);
 

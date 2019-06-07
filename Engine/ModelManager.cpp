@@ -12,22 +12,27 @@ ModelManager::ModelManager()
 
 ModelManager::~ModelManager()
 {
-	_line.model.Delete();
-	_plane.model.Delete();
-	_cube.model.Delete();
-	_invCube.model.Delete();
+	_DestroyResource(_line);
+	_DestroyResource(_cube);
+	_DestroyResource(_invCube);
+	_DestroyResource(_plane);
 }
 
-bool ModelManager::_CreateResource(Model& model, const String& name, const String& data)
+Model* ModelManager::_CreateResource(const String& name, const String& data)
 {
-	model.FromString(data);
-	return true;
+	Model* model = nullptr;
+	if (data.GetLength() > 0)
+	{
+		model = new Model();
+		model->FromString(data);
+	}
+
+	return model;
 }
 
 void ModelManager::_DestroyResource(Model& model)
 {
-	model.model.Delete();
-	delete model.collider;
+	model.Delete();
 }
 
 
@@ -92,10 +97,10 @@ void ModelManager::Initialise()
 	for (int i = 0; i < 36; i += 3)
 		Vertex17F::CalculateTangents(cubeData[i], cubeData[i + 1], cubeData[i + 2]);
 
-	_line.model.SetDrawMode(GL_LINES);
-	_line.model.Create(lineVerts, 2);
-	_plane.model.Create(planeVerts, 4, planeElements, 6);
-	_cube.model.Create(cubeData, 36);
+	_line.MeshRenderer().SetDrawMode(GL_LINES);
+	_line.MeshRenderer().Create(lineVerts, 2);
+	_plane.MeshRenderer().Create(planeVerts, 4, planeElements, 6);
+	_cube.MeshRenderer().Create(cubeData, 36);
 
 
 	for (int i = 0; i < 36; i += 3) {
@@ -106,7 +111,5 @@ void ModelManager::Initialise()
 		Utilities::Swap(cubeData[i + 1], cubeData[i + 2]);
 		Vertex17F::CalculateTangents(cubeData[i], cubeData[i + 1], cubeData[i + 2]);
 	}
-	_invCube.model.Create(cubeData, 36);
-
-	_line.defaultMaterial =  _plane.defaultMaterial = _cube.defaultMaterial = _invCube.defaultMaterial = "";
+	_invCube.MeshRenderer().Create(cubeData, 36);
 }

@@ -1,6 +1,5 @@
 #pragma once
 #include "Matrix.hpp"
-#include "Maths.hpp"
 #include "Vector.hpp"
 
 /*
@@ -27,17 +26,9 @@ public:
 	//X, Y, Z, W
 	Quaternion(const Vector4& data) : _data(data) { _data.Normalise(); }
 
-	Quaternion(const Vector3& axis, float angle)
-	{
-		Vector3 a = axis * Maths::SineDegrees(angle / 2.f);
+	Quaternion(const Vector3& axis, float angle);
 
-		_x = a[0];
-		_y = a[1];
-		_z = a[2];
-		_w = Maths::CosineDegrees(angle / 2.f);
-	}
-
-	Quaternion(Vector3 euler);
+	Quaternion(const Vector3& euler);
 
 	Quaternion(const Quaternion& other) : _data(other._data) {}
 
@@ -63,10 +54,6 @@ public:
 
 	inline Vector3 Transform(const Vector3& point) const
 	{
-		//Vector4 v = Vector4(point[0], point[1], point[2], 0.f) * ToMatrix();
-		//return Vector3(v[0], v[1], v[2]);
-
-		//Quaternion result = *this * Quaternion(Vector4(point[0], point[1], point[2], 0.f)) * Inverse();
 		Quaternion result = Inverse() * Quaternion(Vector4(point[0], point[1], point[2], 0.f)) * *this;
 
 		return Vector3(result._x, result._y, result._z);
@@ -87,4 +74,5 @@ public:
 		return Transform(Vector3(0.f, 1.f, 0.f));
 	}
 
+	static Quaternion Lerp(const Quaternion& from, const Quaternion& to, float alpha);
 };

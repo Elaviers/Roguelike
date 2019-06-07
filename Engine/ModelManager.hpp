@@ -10,7 +10,7 @@ private:
 	Model _invCube;
 	Model _plane;
 
-	virtual bool _CreateResource(Model&, const String&, const String&) override;
+	virtual Model* _CreateResource(const String&, const String&) override;
 
 	virtual void _DestroyResource(Model&);
 

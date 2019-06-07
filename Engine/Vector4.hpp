@@ -62,3 +62,8 @@ public:
 		*this /= Length();
 	}
 };
+
+inline Vector4 operator-(float f, const Vector4& v)
+{
+	return Vector4(f - v[0], f - v[1], f - v[2], f - v[3]);
+}

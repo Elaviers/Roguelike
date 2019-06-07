@@ -20,5 +20,5 @@ void UIRect::Render() const
 
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
 	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, _transform.GetTransformationMatrix());
-	Engine::Instance().pModelManager->Plane().model.Render();
+	Engine::Instance().pModelManager->Plane().Render();
 }

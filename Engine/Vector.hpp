@@ -146,9 +146,19 @@ inline Vector<T, SIZE> operator*(T x, const Vector<T, SIZE> &vec)
 template<typename T, int SIZE>
 Vector<T, SIZE> operator/(T x, const Vector<T, SIZE> &vec)
 {
-	Vector<T, SIZE> v(vec);
+	Vector<T, SIZE> v;
 	for (int i = 0; i < SIZE; ++i)
 		v[i] = x / vec[i];
+
+	return v;
+}
+
+template<typename T, int SIZE>
+Vector<T, SIZE> operator-(T x, const Vector<T, SIZE>& vec)
+{
+	Vector<T, SIZE> v;
+	for (int i = 0; i < SIZE; ++i)
+		v[i] = x - vec[i];
 
 	return v;
 }

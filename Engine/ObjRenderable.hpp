@@ -22,14 +22,14 @@ public:
 	inline void SetModel(const Model *model) 
 	{ 
 		_model = model; 
-		if (_model && model->defaultMaterial.GetLength() != 0) 
+		if (_model && model->GetDefaultMaterialName().GetLength() != 0) 
 		{ 
-			SetMaterial(model->defaultMaterial); 
+			SetMaterial(model->GetDefaultMaterialName());
 			_materialIsDefault = true; 
 		} 
 	}
 
-	inline void SetMaterial(const String &name) { if (Engine::Instance().pMaterialManager) SetMaterial(*Engine::Instance().pMaterialManager->Get(name)); }
+	inline void SetMaterial(const String &name) { if (Engine::Instance().pMaterialManager) SetMaterial(Engine::Instance().pMaterialManager->Get(name)); }
 	inline void SetMaterial(const Material *material) { _material = material; _materialIsDefault = false; }
 
 	inline bool MaterialIsDefault() const { return _materialIsDefault; }
@@ -52,7 +52,7 @@ public:
 	//Other
 	virtual Bounds GetBounds() const override 
 	{
-		if (_model) return _model->bounds;
+		if (_model) return _model->GetBounds();
 		return Bounds();
 	}
 };

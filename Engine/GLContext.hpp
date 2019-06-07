@@ -8,9 +8,12 @@ private:
 	HGLRC _id;
 
 public:
-	GLContext();
-	~GLContext();
+	GLContext() : _id(0) {}
+	GLContext(const GLContext&) = delete;
+	GLContext(GLContext&& other) noexcept : _id(other._id) { other._id = 0; }
+	~GLContext() {}
 
+	void CreateDummyAndUse(LPCTSTR className);
 	void Create(HDC);
 	void Use(HDC) const;
 	void Delete();
@@ -19,6 +22,4 @@ public:
 	inline void Use(const Window &window) const { Use(window.GetHDC()); }
 
 	inline bool IsValid() { return _id != 0; }
-
-	static GLContext CreateDummyAndUse(LPCTSTR className);
 };

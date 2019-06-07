@@ -8,8 +8,10 @@ private:
 	GLuint _id;
 
 public:
-	GLDepthMap();
-	~GLDepthMap();
+	GLDepthMap() : _fbo(0), _id(0) {}
+	GLDepthMap(const GLDepthMap&) = delete;
+	GLDepthMap(GLDepthMap&& other) noexcept : _fbo(other._fbo), _id(other._id) { other._fbo = other._id = 0; }
+	~GLDepthMap() {}
 
 	void Create();
 };
