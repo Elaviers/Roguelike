@@ -44,7 +44,7 @@ void GameObject::Render(const ObjCamera &camera) const
 
 //File IO
 
-void GameObject::WriteAllToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
+void GameObject::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const
 {
 	if (_flags & FLAG_SAVEABLE)
 	{

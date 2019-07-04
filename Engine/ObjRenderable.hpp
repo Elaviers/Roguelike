@@ -43,8 +43,8 @@ public:
 	String GetMaterialName() const;
 
 	//File IO
-	virtual void WriteToFile(BufferIterator<byte>&, NumberedSet<String> &strings) const override;
-	virtual void ReadFromFile(BufferIterator<byte>&, const NumberedSet<String> &strings) override;
+	virtual void WriteToFile(BufferWriter<byte>&, NumberedSet<String> &strings) const override;
+	virtual void ReadFromFile(BufferReader<byte>&, const NumberedSet<String> &strings) override;
 
 	//Collision
 	virtual const Collider* GetCollider() const override;

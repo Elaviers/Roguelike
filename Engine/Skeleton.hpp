@@ -32,7 +32,7 @@ private:
 	}
 
 public:
-	Skeleton() : _nextJointID(0), _transformCache(nullptr) {}
+	Skeleton() : _nextJointID(0) {}
 
 	Skeleton(Skeleton&& other) noexcept : _nextJointID(other._nextJointID), _joints(other._joints)
 	{

@@ -1,8 +1,8 @@
 #pragma once
-#include "ResourceManager.hpp"
+#include "AssetManager.hpp"
 #include "Model.hpp"
 
-class ModelManager : public ResourceManager<Model>
+class ModelManager : public AssetManager<Model>
 {
 private:
 	Model _line;

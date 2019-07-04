@@ -174,9 +174,9 @@ public:
 	virtual void GetCvars(CvarMap &properties) { _AddBaseCvars(properties); }
 
 	//File IO
-	void WriteAllToFile(BufferIterator<byte>&, NumberedSet<String> &strings) const;
-	virtual void WriteToFile(BufferIterator<byte>&, NumberedSet<String> &strings) const {}
-	virtual void ReadFromFile(BufferIterator<byte>&, const NumberedSet<String> &strings) {}
+	void WriteAllToFile(BufferWriter<byte>&, NumberedSet<String> &strings) const;
+	virtual void WriteToFile(BufferWriter<byte>&, NumberedSet<String> &strings) const {}
+	virtual void ReadFromFile(BufferReader<byte>&, const NumberedSet<String> &strings) {}
 
 	//Collision
 	virtual const Collider* GetCollider() const { return nullptr; }

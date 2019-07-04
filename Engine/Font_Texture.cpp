@@ -29,7 +29,7 @@ void FontTexture::_CMD_region(const Buffer<String>& args)
 	}
 }
 
-void FontTexture::FromString(const String & string)
+void FontTexture::_ReadText(const String & string)
 {
 	Buffer<String> lines = string.Split("\r\n");
 
@@ -87,7 +87,7 @@ float FontTexture::CalculateStringWidth(const char* string, float scaleX) const
 
 	for (const char* c = string; *c != '\0'; ++c)
 	{
-		const Glyph* glyph = _charMap.Find(*c);
+		const Glyph* glyph = _charMap.Get(*c);
 		if (glyph)
 			width += (glyph->width + glyph->advance) * scale;
 	}
@@ -114,7 +114,7 @@ void FontTexture::RenderString(const char* string, const Transform & transform, 
 		const Vector2 halfTexel(.5f / ((float)_texture->GetWidth() * scale), .5f / ((float)_texture->GetHeight() * scale));
 		const Vector2 texel(1.f / ((float)_texture->GetWidth() * scale), 1.f / ((float)_texture->GetHeight() * scale));
 
-		const Glyph * glyph = _charMap.Find(*c);
+		const Glyph * glyph = _charMap.Get(*c);
 		if (glyph)
 		{
 			float halfCharW = (glyph->width * scale / 2.f);

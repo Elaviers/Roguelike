@@ -63,14 +63,14 @@ Mat4 Transform::MakeInverseTransformationMatrix() const
 	return m;
 }
 
-void Transform::WriteToBuffer(BufferIterator<byte> &buffer) const
+void Transform::WriteToBuffer(BufferWriter<byte> &buffer) const
 {
 	buffer.Write_vector3(_position);
 	buffer.Write_vector3(_rotation.GetEuler());
 	buffer.Write_vector3(_scale);
 }
 
-void Transform::ReadFromBuffer(BufferIterator<byte> &buffer)
+void Transform::ReadFromBuffer(BufferReader<byte> &buffer)
 {
 	_position = buffer.Read_vector3();
 	_rotation = Quaternion(buffer.Read_vector3());

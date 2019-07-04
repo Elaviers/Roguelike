@@ -1,10 +1,20 @@
 #include "Material.hpp"
-#include "GL.hpp"
+#include "Material_Grid.hpp"
+#include "Material_Surface.hpp"
 
-void Material::FromString(const String &data)
+Material* Material::FromText(const String& text)
 {
-	Buffer<String> lines = data.ToLower().Split("\r\n");
+	if (text.GetLength())
+	{
+		int splitIndex = text.IndexOfAny("\r\n");
+		String firstLine = text.SubString(0, splitIndex).ToLower();
+		String relevantData = text.SubString(splitIndex + 1);
 
-	for (size_t i = 0; i < lines.GetSize(); ++i)
-		_cvars.HandleCommand(lines[i]);
+		if (firstLine == "surface")
+			return Asset::FromText<MaterialSurface>(relevantData);
+		else if (firstLine == "grid")
+			return Asset::FromText<MaterialGrid>(relevantData);
+	}
+
+	return nullptr;
 }

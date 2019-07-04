@@ -28,6 +28,15 @@ namespace Maths
 
 	float SquareRoot(float x);
 
+	template<typename T>
+	T Pow(T base, unsigned int index)
+	{
+		T result = (T)1;
+		while (index--) result *= base;
+		return result;
+	}
+
+
 	float Sine(float radians);
 	float Cosine(float radians);
 	float Tangent(float radians);

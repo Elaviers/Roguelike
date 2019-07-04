@@ -99,6 +99,9 @@ public:
 		programLit->SetInt(DefaultUniformVars::intTextureSpecular, 2);
 		programLit->SetInt(DefaultUniformVars::intTextureReflection, 3);
 
+		programLit->SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
+		programLit->SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1, 1));
+
 		_light.ToShader(0);
 
 		_object.Render();

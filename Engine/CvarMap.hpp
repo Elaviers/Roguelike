@@ -14,14 +14,14 @@ public:
 
 	inline Cvar* FindRaw(const String &name) 
 	{ 
-		Cvar** found = _cvars.Find(name); 
+		Cvar** found = _cvars.Get(name); 
 		
 		if (found) return *found;
 		return nullptr;
 	}
 
 	template <typename Type>
-	TypedCvar<Type>* Find(const String &name)
+	TypedCvar<Type>* Get(const String &name)
 	{
 		Cvar** cvar = FindRaw(name);
 
@@ -82,7 +82,7 @@ public:
 	template <typename T>
 	void Set(const String &name, const T &value)
 	{
-		auto cvar = _cvars.Find(name);
+		auto cvar = _cvars.Get(name);
 		if (cvar)
 		{
 			if ((*cvar)->GetType() == TypenameToEnum<T>())

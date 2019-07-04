@@ -1,12 +1,12 @@
 #pragma once
 #include "Material.hpp"
-#include "GLTexture.hpp"
 #include "Buffer.hpp"
+#include "Texture.hpp"
 #include "UVRect.hpp"
 
 class MaterialGrid : public Material
 {
-	const GLTexture *_texture;
+	const Texture *_texture;
 
 	Buffer<int> _rowHeights;
 	Buffer<int> _columnWidths;
@@ -30,7 +30,15 @@ public:
 	virtual ~MaterialGrid() {}
 
 	virtual void Apply(const RenderParam *param) const override;
-	virtual void BindTextures() const override { if (_texture) _texture->Bind(0); }
+	virtual void BindTextures() const override 
+	{ 
+		if (_texture) _texture->Bind(0);
+		else GLTexture::Unbind(0);
+
+		GLTexture::Unbind(1);
+		GLTexture::Unbind(2);
+		GLTexture::Unbind(3);
+	}
 
 	inline const UVRect& GetElement(int r, int c) const { return _elements[r * _columnWidths.GetSize() + c]; }
 };

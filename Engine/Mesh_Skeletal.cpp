@@ -9,7 +9,7 @@ enum class FileVersion
 
 constexpr byte CURRENT_FILE_VERSION = (byte)FileVersion::V1;
 
-void Mesh_Skeletal::ReadData(BufferIterator<byte>& iterator)
+void Mesh_Skeletal::_ReadData(BufferReader<byte>& iterator)
 {
 	iterator.IncrementIndex(1); //Skip type
 
@@ -69,7 +69,7 @@ void Mesh_Skeletal::ReadData(BufferIterator<byte>& iterator)
 	}
 }
 
-void Mesh_Skeletal::WriteData(BufferIterator<byte>& iterator) const
+void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 {
 	static const byte bonesPerVertex = 2;
 
@@ -103,7 +103,7 @@ void Mesh_Skeletal::WriteData(BufferIterator<byte>& iterator) const
 		4 * 3 +												//Bounds min
 		4 * 3);												//Bounds max
 
-	iterator.Write_byte(IO::DataIDs::MESH_SKELETAL);
+	iterator.Write_byte(ASSET_MESH_SKELETAL);
 	iterator.Write_byte(CURRENT_FILE_VERSION);
 	iterator.Write_byte(bonesPerVertex);
 

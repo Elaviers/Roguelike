@@ -56,29 +56,25 @@ String IO::ReadFileString(const char *filename)
 	return string;
 }
 
-TextureData IO::ReadPNGFile(const char *filename)
+Texture* IO::ReadPNGTexture(const Buffer<byte> &data)
 {
-	TextureData out = {};
+	Texture* texture = nullptr;
 
-	Buffer<byte> fileBuffer = IO::ReadFile(filename);
+	unsigned char *buffer;
+	unsigned int width, height;
 
-	if (fileBuffer.GetSize())
+	lodepng_decode_memory(&buffer, &width, &height, data.Data(), data.GetSize(), LCT_RGBA, 8);
+	uint32 bufferSize = width * height * 4;
+
+	if (buffer)
 	{
-		unsigned char *buffer;
-		unsigned int width, height;
-
-		lodepng_decode_memory(&buffer, &width, &height, fileBuffer.Data(), fileBuffer.GetSize(), LCT_RGBA, 8);
-		uint32 bufferSize = width * height * 4;
-
-		out.width = width;
-		out.height = height;
-		out.data.FromCBuffer(buffer, bufferSize);
+		if (bufferSize)
+			texture = new Texture(Buffer<byte>(buffer, bufferSize), width, height);
 
 		free(buffer);
 	}
-	else Debug::Error(CSTR("Could not open file \"" + filename + '\"'));
 
-	return out;
+	return texture;
 }
 
 Buffer<String> IO::FindFilesInDirectory(const char *search)

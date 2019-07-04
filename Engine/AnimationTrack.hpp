@@ -1,11 +1,12 @@
 #pragma once
 #include "Buffer.hpp"
+#include "BufferIterator.hpp"
+#include "Debug.hpp"
 #include "Keyframe.hpp"
 
 template <typename T>
 class AnimationTrack
 {
-private:
 	Buffer<Keyframe<T>> _keyframes;
 
 	int GetKeyIndex(float time) const
@@ -31,6 +32,17 @@ public:
 	AnimationTrack() {}
 	~AnimationTrack() {}
 
+	inline const Buffer<Keyframe<T>>& GetKeyframes() const { return _keyframes; }
+
+	inline void AddKey(float time, const T& value, byte interp = INTERP_LINEAR)
+	{
+		if (_keyframes.GetSize() != 0 || time > _keyframes.Last().time)
+			_keyframes.Add(Keyframe<T>(time, value, interp));
+		else
+			Debug::PrintLine("ERROR: Right now you can't add keyframes that have lower time values than the last one in the buffer");
+
+	}
+
 	inline const Keyframe<T>* GetKey(float time) const
 	{
 		int index = GetKeyIndex(time);
@@ -50,7 +62,7 @@ public:
 
 		const Keyframe<T>& keyframe = _keyframes[index];
 
-		if (keyframe.interpolation == InterpolationType::LINEAR && index < _keyframes.GetSize() - 1)
+		if (keyframe.interpolation == INTERP_LINEAR && index < _keyframes.GetSize() - 1)
 		{
 			value = keyframe.Interpolate(_keyframes[index + 1], time);
 		}

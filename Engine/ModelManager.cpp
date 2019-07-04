@@ -6,7 +6,7 @@
 #include "Utilities.hpp"
 #include "Vector.hpp"
 
-ModelManager::ModelManager()
+ModelManager::ModelManager() : AssetManager("")
 {
 }
 
@@ -20,12 +20,10 @@ ModelManager::~ModelManager()
 
 Model* ModelManager::_CreateResource(const String& name, const String& data)
 {
-	Model* model = nullptr;
-	if (data.GetLength() > 0)
-	{
-		model = new Model();
-		model->FromString(data);
-	}
+	Model* model = Asset::FromText<Model>(data);
+
+	if (model == nullptr)
+		Debug::Error(CSTR("Could not load model \"" + name + '\"'));
 
 	return model;
 }

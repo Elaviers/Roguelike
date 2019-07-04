@@ -72,6 +72,6 @@ public:
 
 	inline Transform Inverse() const { return Transform(_position * -1.f, _rotation.Inverse(), 1.f / _scale); }
 
-	void WriteToBuffer(BufferIterator<byte> &buffer) const;
-	void ReadFromBuffer(BufferIterator<byte> &buffer);
+	void WriteToBuffer(BufferWriter<byte> &buffer) const;
+	void ReadFromBuffer(BufferReader<byte> &buffer);
 };

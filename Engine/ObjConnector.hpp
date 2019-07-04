@@ -16,8 +16,8 @@ public:
 
 	virtual void Render() const;
 
-	virtual void WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const override;
-	virtual void ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet<String> &strings) override;
+	virtual void WriteToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;
+	virtual void ReadFromFile(BufferReader<byte> &buffer, const NumberedSet<String> &strings) override;
 
 	virtual Bounds GetBounds() const override {
 

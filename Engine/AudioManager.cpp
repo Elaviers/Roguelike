@@ -39,8 +39,7 @@ WaveSound* AudioManager::_CreateResource(const String& name, const String& data)
 		}
 	}
 
-	WaveSound* sound = new WaveSound();
-	*sound = IO::ReadWaveFile((this->GetRootPath() + filename).GetData());
+	WaveSound* sound = IO::ReadWaveFile((this->GetRootPath() + filename).GetData());
 	sound->volume = volume;
 	sound->category = category;
 

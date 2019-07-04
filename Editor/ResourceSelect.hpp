@@ -18,4 +18,3 @@ namespace ResourceSelect
 
 	String Dialog(MaterialManager&, ModelManager&, const char *searchDir, HWND parent, ResourceType type, const GLContext &context, const GLProgram& programLit, const GLProgram& programUnlit);
 };
-

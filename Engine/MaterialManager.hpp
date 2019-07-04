@@ -1,15 +1,15 @@
 #pragma once
-#include "ResourceManager.hpp"
+#include "AssetManager.hpp"
 #include "FunctionPointer.hpp"
 #include "Material.hpp"
 
-class MaterialManager : public ResourceManager<Material>
+class MaterialManager : public AssetManager<Material>
 {
 private:
 	virtual Material* _CreateResource(const String&, const String&) override;
 
 public:
-	MaterialManager() {}
+	MaterialManager() : AssetManager("") {}
 	virtual ~MaterialManager() {}
 };
  

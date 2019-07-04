@@ -31,8 +31,15 @@ namespace Utilities
 
 	inline void CopyBytes(const void *src, void *dest, size_t length)
 	{
-		for (uint32 i = 0; i < length; ++i)
+		for (size_t i = 0; i < length; ++i)
 			reinterpret_cast<byte*>(dest)[i] = reinterpret_cast<const byte*>(src)[i];
+	}
+
+	template <typename T>
+	inline void CopyArray(const T* src, T* dest, size_t length)
+	{
+		for (size_t i = 0; i < length; ++i)
+			dest[i] = src[i];
 	}
 
 	template<typename T>
@@ -41,6 +48,14 @@ namespace Utilities
 		T* ptr = reinterpret_cast<T*>(new byte[size]);
 		CopyBytes(&src, ptr, size);
 		return ptr;
+	}
+
+	template <typename T>
+	inline T* CopyOfArray(const T* src, size_t length)
+	{
+		T* dest = new T[length];
+		CopyArray(src, dest, length);
+		return dest;
 	}
 
 	inline String GetExtension(const String& string)

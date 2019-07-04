@@ -1,4 +1,5 @@
 #pragma once
+#include "Asset.hpp"
 #include "Bounds.hpp"
 #include "Collider.hpp"
 #include "CvarMap.hpp"
@@ -6,7 +7,7 @@
 #include "Mesh.hpp"
 #include "String.hpp"
 
-class Model
+class Model : public Asset
 {
 protected:
 	CvarMap _cvars;
@@ -19,6 +20,13 @@ protected:
 
 	void _CMD_model(const Buffer<String> &args);
 	void _CMD_collision(const Buffer<String> &args);
+
+	virtual void _ReadText(const String &string) override
+	{
+		Buffer<String> lines = string.ToLower().Split("\r\n");
+		for (size_t i = 0; i < lines.GetSize(); ++i)
+			_cvars.HandleCommand(lines[i]);
+	}
 
 public:
 	Model() : _mesh(nullptr), _collider(nullptr) { 
@@ -41,6 +49,4 @@ public:
 	inline bool operator==(const Model &other) const { return _meshRenderer == other._meshRenderer; }
 
 	inline void Render() const { _meshRenderer.Render(); }
-
-	void FromString(const String&);
 };

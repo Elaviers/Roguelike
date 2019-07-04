@@ -14,9 +14,13 @@ void Model::_CMD_model(const Buffer<String> &args)
 		if (ext == ".obj")
 			_mesh = IO::ReadOBJFile(path.GetData());
 		else
-			_mesh = IO::ReadMesh(path.GetData());
+		{
+			Buffer<byte> meshData = IO::ReadFile(path.GetData());
+			_mesh = Mesh::FromData(meshData);
+		}
 
-		_mesh->CreateGLMeshRenderer(_meshRenderer);
+		if (_mesh)
+			_mesh->CreateGLMeshRenderer(_meshRenderer);
 	}
 }
 
@@ -43,12 +47,4 @@ void Model::_CMD_collision(const Buffer<String>& args)
 			else Debug::Error(CSTR("AABB collision cannot be used without specifying the model first!"));
 		}
 	}
-}
-
-void Model::FromString(const String& data)
-{
-	Buffer<String> lines = data.ToLower().Split("\r\n");
-
-	for (size_t i = 0; i < lines.GetSize(); ++i)
-		_cvars.HandleCommand(lines[i]);
 }

@@ -21,7 +21,7 @@ namespace LevelMessages
 }
 
 
-inline void WriteStringMessage(BufferIterator<byte> &buffer, const String &string, uint16 id)
+inline void WriteStringMessage(BufferWriter<byte> &buffer, const String &string, uint16 id)
 {
 	buffer.Write_byte(0);
 	buffer.Write_byte(LevelMessages::STRING);
@@ -32,17 +32,17 @@ inline void WriteStringMessage(BufferIterator<byte> &buffer, const String &strin
 bool LevelIO::Write(const GameObject &world, const char *filename)
 {
 	Buffer<byte> buffer1, buffer2;
-	BufferIterator<byte> iterator1(buffer1), iterator2(buffer2);
+	BufferWriter<byte> writer1(buffer1), writer2(buffer2);
 	NumberedSet<String> strings;
 
-	iterator1.Write_string(levelPrefix);
-	iterator1.Write_byte(currentVersion);
+	writer1.Write_string(levelPrefix);
+	writer1.Write_byte(currentVersion);
 
-	world.WriteAllToFile(iterator2, strings);
+	world.WriteAllToFile(writer2, strings);
 
 	auto stringBuffer = strings.ToBuffer();
 	for (uint32 i = 0; i < stringBuffer.GetSize(); ++i)
-		WriteStringMessage(iterator1, *stringBuffer[i].second, *stringBuffer[i].first);
+		WriteStringMessage(writer1, *stringBuffer[i].second, *stringBuffer[i].first);
 
 	Buffer<byte> finalBuffer = buffer1 + buffer2;
 	return IO::WriteFile(filename, finalBuffer.Data(), (uint32)finalBuffer.GetSize());
@@ -55,32 +55,32 @@ bool LevelIO::Read(GameObject &world, const char *filename)
 	if (buffer.GetSize() > 0)
 	{
 		NumberedSet<String> strings;
-		BufferIterator<byte> iterator(buffer);
+		BufferReader<byte> reader(buffer);
 		
-		if (iterator.Read_string() != levelPrefix)
+		if (reader.Read_string() != levelPrefix)
 		{
 			Debug::Error("Is this even a level file? I don't think so.");
 			return false;
 		}
 
-		if (iterator.Read_byte() != currentVersion)
+		if (reader.Read_byte() != currentVersion)
 		{
 			Debug::Error("Unsupported level version");
 			return false;
 		}
 
-		while (iterator.Valid())
+		while (reader.Valid())
 		{
-			byte id = iterator.Read_byte();
+			byte id = reader.Read_byte();
 
 			if (id == 0)
 			{
-				switch (iterator.Read_byte())
+				switch (reader.Read_byte())
 				{
 				case LevelMessages::STRING:
 				{
-					uint16 stringID = iterator.Read_uint16();
-					strings[stringID] = iterator.Read_string();
+					uint16 stringID = reader.Read_uint16();
+					strings[stringID] = reader.Read_string();
 				}
 					break;
 				}
@@ -91,7 +91,7 @@ bool LevelIO::Read(GameObject &world, const char *filename)
 				if (obj)
 				{
 					obj->SetParent(&world);
-					obj->ReadFromFile(iterator, strings);
+					obj->ReadFromFile(reader, strings);
 				}
 				else Debug::Error("Unsupported object ID");
 			}

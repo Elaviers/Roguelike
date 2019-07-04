@@ -14,31 +14,34 @@ Skybox::~Skybox()
 {
 }
 
-void Skybox::Load(const char *faces[6])
+void Skybox::Load(const char *faceFilenames[6])
 {
-	Buffer<byte> faceData[6];
+	Texture* faces[6] = {};
 	uint32 faceWidth, faceHeight;
 
 	for (int i = 0; i < 6; ++i) {
-		TextureData td = IO::ReadPNGFile(CSTR(Engine::Instance().pTextureManager->GetRootPath() + faces[i]));
+		Texture *tex = IO::ReadPNGTexture(CSTR(Engine::Instance().pTextureManager->GetRootPath() + faceFilenames[i]));
 
-		if (!td.IsValid())
+		if (!tex->IsValid())
 			return;
 
 		if (i == 0)
 		{
-			faceWidth = td.width;
-			faceHeight = td.height;
+			faceWidth = tex->GetWidth();
+			faceHeight = tex->GetHeight();
 		}
-		else if (td.width != faceWidth || td.height != faceHeight)
+		else if (tex->GetWidth() != faceWidth || tex->GetHeight() != faceHeight)
 		{
 			Debug::Error("Skybox faces must have the same dimensions");
-			return;
+			break;
 		}
 
-		faceData[i] = std::move(td.data);
+		faces[i] = tex;
 	}
 
-	_cubemap.Create(faceWidth, faceHeight, faceData);
+	_cubemap.Create(faces);
+
+	for (int i = 0; i < 6; ++i)
+		delete faces[i];
 }
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "ResourceManager.hpp"
+#include "AssetManager.hpp"
 #include "FunctionPointer.hpp"
 #include "List.hpp"
 #include "Sampler.hpp"
@@ -9,7 +9,7 @@
 
 #undef PlaySound
 
-class AudioManager : public ResourceManager<WaveSound>
+class AudioManager : public AssetManager<WaveSound>
 {
 	IMMDeviceEnumerator* _enumerator;
 	IMMDevice* _audioDevice;
@@ -27,7 +27,7 @@ class AudioManager : public ResourceManager<WaveSound>
 	virtual void _DestroyResource(WaveSound& sound) override;
 
 public:
-	AudioManager() : _waveFormat{0} {}
+	AudioManager() : AssetManager(""), _waveFormat{0} {}
 	~AudioManager();
 
 	void PlaySound(const WaveSound& sound);

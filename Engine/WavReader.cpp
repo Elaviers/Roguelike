@@ -2,43 +2,43 @@
 #include "BufferIterator.hpp"
 #include "Sound.hpp"
 
-WaveSound IO::ReadWaveFile(const char* filename)
+WaveSound* IO::ReadWaveFile(const char* filename)
 {
 	Buffer<byte> data = IO::ReadFile(filename);
-	BufferIterator<byte> iterator(data);
+	BufferReader<byte> reader(data);
 
-	WaveSound aud = {0};
+	if (!(reader.Read_byte() == 'R' && reader.Read_byte() == 'I' && reader.Read_byte() == 'F' && reader.Read_byte() == 'F'))
+		return nullptr;
 
-	if (!(iterator.Read_byte() == 'R' && iterator.Read_byte() == 'I' && iterator.Read_byte() == 'F' && iterator.Read_byte() == 'F'))
+	uint32 chunkSize = reader.Read_uint32_little();
+
+	if (!(reader.Read_byte() == 'W' && reader.Read_byte() == 'A' && reader.Read_byte() == 'V' && reader.Read_byte() == 'E'))
+		return nullptr;
+
+	if (!(reader.Read_byte() == 'f' && reader.Read_byte() == 'm' && reader.Read_byte() == 't' && reader.Read_byte() == ' '))
+		return nullptr;
+
+	WaveSound* aud = new WaveSound;
+
+	uint32 fmtChunkSize = reader.Read_uint32_little();
+	aud->format = reader.Read_uint16_little();
+	aud->channelCount = reader.Read_uint16_little();
+	aud->sampleRate = reader.Read_uint32_little();
+	aud->byteRate = reader.Read_uint32_little();
+	aud->FrameSize = reader.Read_uint16_little();
+	aud->bitsPerSample = reader.Read_uint16_little();
+	aud->data = NULL;
+
+	if (!(reader.Read_byte() == 'd' && reader.Read_byte() == 'a' && reader.Read_byte() == 't' && reader.Read_byte() == 'a'))
 		return aud;
 
-	uint32 chunkSize = iterator.Read_uint32_little();
-
-	if (!(iterator.Read_byte() == 'W' && iterator.Read_byte() == 'A' && iterator.Read_byte() == 'V' && iterator.Read_byte() == 'E'))
-		return aud;
-
-	if (!(iterator.Read_byte() == 'f' && iterator.Read_byte() == 'm' && iterator.Read_byte() == 't' && iterator.Read_byte() == ' '))
-		return aud;
-
-	uint32 fmtChunkSize = iterator.Read_uint32_little();
-	aud.format = iterator.Read_uint16_little();
-	aud.channelCount = iterator.Read_uint16_little();
-	aud.sampleRate = iterator.Read_uint32_little();
-	aud.byteRate = iterator.Read_uint32_little();
-	aud.FrameSize = iterator.Read_uint16_little();
-	aud.bitsPerSample = iterator.Read_uint16_little();
-	aud.data = NULL;
-
-	if (!(iterator.Read_byte() == 'd' && iterator.Read_byte() == 'a' && iterator.Read_byte() == 't' && iterator.Read_byte() == 'a'))
-		return aud;
-
-	aud.dataSize = iterator.Read_uint32_little();
-	aud.data = new byte[aud.dataSize];
+	aud->dataSize = reader.Read_uint32_little();
+	aud->data = new byte[aud->dataSize];
 
 	//ReadTo is kinda slow here..
-	//size_t bytesRead = iterator.ReadTo(aud.data, aud.dataSize);
+	//size_t bytesRead = reader.ReadTo(aud.data, aud.dataSize);
 
-	Utilities::CopyBytes(iterator.Ptr(), aud.data, aud.dataSize);
+	Utilities::CopyBytes(reader.Ptr(), aud->data, aud->dataSize);
 
 	return aud;
 }

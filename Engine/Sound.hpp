@@ -1,4 +1,5 @@
 #pragma once
+#include "Asset.hpp"
 #include "Types.hpp"
 
 enum class SoundCategory
@@ -13,8 +14,9 @@ enum class SoundCategory
 	WAV File
 */
 
-struct WaveSound
+class WaveSound : public Asset
 {
+public:
 	uint16 format;
 	uint16 channelCount;
 	uint32 sampleRate;
@@ -28,7 +30,7 @@ struct WaveSound
 	float volume;
 	SoundCategory category;
 
-	~WaveSound() { }
+	virtual ~WaveSound() { delete data; }
 
 	void MakeStereo();
 

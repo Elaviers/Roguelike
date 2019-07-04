@@ -82,9 +82,10 @@ void Game::_InitWindow()
 		windowClass.lpszClassName = className;
 		::RegisterClassEx(&windowClass);
 
-		GLContext dummy = GLContext::CreateDummyAndUse(dummyClassName);
+		GLContext dummy;
+		dummy.CreateDummyAndUse(dummyClassName);
 		GL::LoadDummyExtensions();
-
+		
 		_window.Create(className, "Window", this);
 			
 		dummy.Delete();
@@ -193,7 +194,7 @@ void Game::Render()
 	if (_consoleIsActive)
 	{
 		_shader.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
-		Engine::Instance().pConsole->Render(**Engine::Instance().pFontManager->Get("consolas"), _deltaTime);
+		Engine::Instance().pConsole->Render(*Engine::Instance().pFontManager->Get("consolas"), _deltaTime);
 	}
 
 	_window.SwapBuffers();

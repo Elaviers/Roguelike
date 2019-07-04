@@ -1,4 +1,5 @@
 #pragma once
+#include "Asset.hpp"
 #include "CvarMap.hpp"
 #include "Engine.hpp"
 #include "ShaderChannel.hpp"
@@ -7,7 +8,7 @@
 
 struct RenderParam;
 
-class Material
+class Material : public Asset
 {
 protected:
 	CvarMap _cvars;
@@ -20,10 +21,17 @@ protected:
 		_cvars.CreateVar("mips", CommandPtr(Engine::Instance().pTextureManager, &TextureManager::CMD_mips));
 	}
 
-	virtual ~Material() {}
+	virtual void _ReadText(const String& string) override
+	{
+		Buffer<String> lines = string.ToLower().Split("\r\n");
+		for (size_t i = 0; i < lines.GetSize(); ++i)
+			_cvars.HandleCommand(lines[i]);
+	}
 
 public:
-	void FromString(const String& string);
+	virtual ~Material() {}
+
+	static Material* FromText(const String&);
 
 	virtual void Apply(const RenderParam *param = nullptr) const {}
 	virtual void BindTextures() const {}

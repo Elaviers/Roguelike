@@ -9,6 +9,11 @@ namespace Debug
 		::DebugBreak();
 	}
 
+	void Print(const char* string)
+	{
+		::OutputDebugStringA(CSTR(string));
+	}
+
 	void PrintLine(const char *string)
 	{
 		::OutputDebugStringA(CSTR(string + '\n'));

@@ -20,17 +20,12 @@ void MaterialSurface::_CMD_tex(const Buffer<String>& args)
 	}
 }
 
+#define BIND(PTEX, UNIT) if (PTEX) PTEX->Bind(UNIT); else GLTexture::Unbind(UNIT)
+
 void MaterialSurface::BindTextures() const
 {
-	if (_diffuse)
-		_diffuse->Bind(0);
-
-	if (_normal)
-		_normal->Bind(1);
-
-	if (_specular)
-		_specular->Bind(2);
-
-	if (_reflection)
-		_reflection->Bind(3);
+	BIND(_diffuse, 0);
+	BIND(_normal, 1);
+	BIND(_specular, 2);
+	BIND(_reflection, 3);
 }

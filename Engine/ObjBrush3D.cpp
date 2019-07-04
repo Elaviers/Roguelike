@@ -76,7 +76,7 @@ void ObjBrush3D::Render() const
 	}
 }
 
-void ObjBrush3D::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
+void ObjBrush3D::WriteToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const
 {
 	if (Engine::Instance().pMaterialManager && _material)
 	{																	//todo: const cast removal
@@ -89,9 +89,9 @@ void ObjBrush3D::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &
 	buffer.Write_vector3(GetRelativeScale());
 }
 
-void ObjBrush3D::ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet<String> &strings)
+void ObjBrush3D::ReadFromFile(BufferReader<byte> &buffer, const NumberedSet<String> &strings)
 {
-	const String *materialName = strings.Find(buffer.Read_uint16());
+	const String *materialName = strings.Get(buffer.Read_uint16());
 	if (materialName)
 		SetMaterial(*materialName);
 

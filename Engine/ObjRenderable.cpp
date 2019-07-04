@@ -48,7 +48,7 @@ String ObjRenderable::GetMaterialName() const
 	return "Unknown";
 }
 
-void ObjRenderable::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
+void ObjRenderable::WriteToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const
 {
 	if (Engine::Instance().pModelManager && _model)
 	{
@@ -67,14 +67,14 @@ void ObjRenderable::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String
 	RelativeTransform().WriteToBuffer(buffer);
 }
 
-void ObjRenderable::ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet<String> &strings)
+void ObjRenderable::ReadFromFile(BufferReader<byte> &buffer, const NumberedSet<String> &strings)
 {
 	const String *string;
 
-	if (string = strings.Find(buffer.Read_uint16()))
+	if (string = strings.Get(buffer.Read_uint16()))
 		SetModel(*string);
 
-	if (string = strings.Find(buffer.Read_uint16()))
+	if (string = strings.Get(buffer.Read_uint16()))
 		SetMaterial(*string);
 
 	RelativeTransform().ReadFromBuffer(buffer);

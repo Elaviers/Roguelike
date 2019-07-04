@@ -16,6 +16,7 @@ constexpr GLfloat lineW = 1;
 
 const Buffer<Pair<const wchar_t*>> levelDialogFilter({ Pair<const wchar_t*>(L"Level File", L"*.lvl"), Pair<const wchar_t*>(L"All Files", L"*.*") });
 
+const Buffer<Pair<const wchar_t*>> openAnimationFilter({Pair<const wchar_t*>(L"FBX Scene", L"*.fbx")});
 const Buffer<Pair<const wchar_t*>> openModelFilter({Pair<const wchar_t*>(L"FBX Scene", L"*.fbx"), Pair<const wchar_t*>(L"OBJ Model", L"*.obj")});
 const Buffer<Pair<const wchar_t*>> openTextureFilter({Pair<const wchar_t*>(L"PNG Image", L"*.png")});
 
@@ -574,6 +575,15 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			}
 			break;
 
+			case ID_IMPORT_ANIMATION:
+			{
+				String filename = EditorIO::OpenFileDialog(L"\\Data\\Animations", openAnimationFilter);
+
+				Animation* animation = EditorIO::ReadFBXAnimation(editor->_fbxManager, filename.GetData());
+
+
+			}
+
 			case ID_IMPORT_MODEL:
 			{
 				String filename = EditorIO::OpenFileDialog(L"\\Data\\Models", openModelFilter);
@@ -584,7 +594,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 				if (Utilities::GetExtension(filename) == ".fbx")
 				{
-					mesh = EditorIO::ReadFBXFile(editor->_fbxManager, filename.GetData());
+					mesh = EditorIO::ReadFBXMesh(editor->_fbxManager, filename.GetData());
 				}
 				else if (Utilities::GetExtension(filename) == ".obj")
 				{
@@ -592,7 +602,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 				}
 
 				if (mesh && mesh->IsValid())
-					IO::WriteMesh("Data/Models/debug.mesh", mesh);
+					IO::WriteFile("Data/Models/debug.mesh", mesh->GetAsData());
 			}
 			break;
 
@@ -707,3 +717,43 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 }
 
 #pragma endregion
+
+/*
+	//UNUSED: HASHMAP TESTER
+
+	Hashmap<String, int> test;
+
+	String alph = IO::ReadFileString("file.txt");
+	Buffer<String> lines = alph.Split("\r\n");
+
+	int inc = 0;
+	for (size_t i = 0; i < lines.GetSize(); ++i)
+		test[lines[i]] = inc++;
+
+	int d = 0;
+	while (true)
+	{
+		auto b = test.ToBuffer(d);
+
+		if (b.GetSize() == 0)
+			break;
+
+
+		Debug::Print(CSTR("\nDepth " + String::FromInt(d) + " : "));
+
+		for (int i = 0; i < b.GetSize(); ++i)
+		{
+			auto keys = b[i];
+
+			Debug::Print(CSTR(String::FromInt(Hasher<uint32>::Hash<String>(keys->First()->obj.first)) + ": {"));
+
+			for (auto node = keys->First(); node; node = node->next)
+			{
+				Debug::Print(CSTR('\'' + node->obj.first + "' : " + String::FromInt(node->obj.second) + "  "));
+			}
+
+			Debug::Print("} ");
+		}
+		++d;
+	}
+	*/

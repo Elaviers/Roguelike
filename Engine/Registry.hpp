@@ -49,7 +49,7 @@ public:
 	{
 		Debug::Assert(id != 0, "An invalid object ID was registered");
 
-		if (_registry.Find(id))
+		if (_registry.Get(id))
 			Debug::Error("Multiple classes can not have the same ID!");
 		
 		RegistryNode<T> *newNode = new RegistryNode<T>(name);
@@ -113,7 +113,7 @@ public:
 
 	inline RegistryNodeBase* GetNode(byte id)
 	{
-		auto regNode = _registry.Find(id);
+		auto regNode = _registry.Get(id);
 		if (regNode)
 			return *regNode;
 

@@ -22,6 +22,8 @@ public:
 			_data[i] = array.begin()[i];
 	}
 
+	Buffer(T* data, size_t size) : _data(Utilities::CopyOfArray(data, size)), _size(size) {}
+
 	~Buffer() { delete[] _data; }
 
 	Buffer(const Buffer& other) : _size(other._size), _data(new T[other._size])
@@ -129,16 +131,6 @@ public:
 			else
 				++i;
 		}
-	}
-
-	void FromCBuffer(T *data, size_t size)
-	{ 
-		if (_size) delete[] _data;
-		_size = size;
-		_data = new T[_size];
-
-		for (size_t i = 0; i < _size; ++i)
-			_data[i] = data[i];
 	}
 
 	inline size_t GetSize() const					{ return _size; }

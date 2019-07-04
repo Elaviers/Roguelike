@@ -1,4 +1,5 @@
 #pragma once
+#include "Asset.hpp"
 #include "CvarMap.hpp"
 #include "Engine.hpp"
 #include "GLTexture.hpp"
@@ -12,21 +13,23 @@
 	Font
 */
 
-class Font
+class Font : public Asset
 {
 protected:
 	CvarMap _cvars;
 
 	Font() {}
-public:
-	virtual ~Font() {}
 
-	virtual void FromString(const String& string) 
+	virtual void _ReadText(const String& string) override
 	{
 		Buffer<String> lines = string.Split("\r\n");
 		for (size_t i = 0; i < lines.GetSize(); ++i)
 			_cvars.HandleCommand(lines[i].ToLower());
 	}
+public:
+	virtual ~Font() {}
+
+	static Font* FromText(const String& string);
 
 	virtual float CalculateStringWidth(const char* string, float scaleX) const = 0;
 

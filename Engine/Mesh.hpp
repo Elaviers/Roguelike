@@ -1,10 +1,10 @@
 #pragma once
+#include "Asset.hpp"
 #include "Bounds.hpp"
-#include "BufferIterator.hpp"
 
 class GLMeshRenderer;
 
-class Mesh
+class Mesh : public Asset
 {
 protected:
 	Mesh() {}
@@ -14,10 +14,9 @@ public:
 
 	virtual ~Mesh() {}
 
-	virtual bool IsValid() const { return false; }
+	static Mesh* FromData(Buffer<byte>&);
 
-	virtual void WriteData(BufferIterator<byte>&) const {}
-	virtual void ReadData(BufferIterator<byte>&) {}
+	virtual bool IsValid() const { return false; }
 
 	virtual void CreateGLMeshRenderer(GLMeshRenderer&) {}
 };

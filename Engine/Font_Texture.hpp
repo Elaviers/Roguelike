@@ -3,15 +3,15 @@
 #include "CvarMap.hpp"
 #include "Engine.hpp"
 #include "FunctionPointer.hpp"
-#include "GLTexture.hpp"
 #include "Glyph.hpp"
 #include "String.hpp"
+#include "Texture.hpp"
 #include "TextureManager.hpp"
 
 
 class FontTexture : public Font
 {
-	const GLTexture* _texture;
+	const Texture* _texture;
 	Map<byte, Glyph> _charMap;
 
 	int _size;
@@ -20,6 +20,9 @@ class FontTexture : public Font
 
 	void _CMD_texture(const Buffer<String>& args);
 	void _CMD_region(const Buffer<String>& args);
+
+protected:
+	virtual void _ReadText(const String&) override;
 
 public:
 	FontTexture() : _texture(nullptr) {
@@ -33,8 +36,6 @@ public:
 	}
 
 	virtual ~FontTexture() {}
-
-	virtual void FromString(const String& fileString) override;
 
 	virtual float CalculateStringWidth(const char* string, float scaleX) const override;
 

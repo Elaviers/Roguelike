@@ -73,7 +73,7 @@ void InputManager::KeyDown(Keycode key)
 {
 	_keyStates[(byte)key] = 1;
 
-	KeyBind **keyBind = _keyBinds.Find(key);
+	KeyBind **keyBind = _keyBinds.Get(key);
 
 	if (keyBind)
 		(*keyBind)->KeyDown();
@@ -83,7 +83,7 @@ void InputManager::KeyUp(Keycode key)
 {
 	_keyStates[(byte)key] = 0;
 
-	KeyBind **keyBind = _keyBinds.Find(key);
+	KeyBind **keyBind = _keyBinds.Get(key);
 
 	if (keyBind)
 		(*keyBind)->KeyUp();
@@ -91,8 +91,8 @@ void InputManager::KeyUp(Keycode key)
 
 void InputManager::MouseMove(short x, short y)
 {
-	auto mouseX = _axisBinds.Find(AxisType::MOUSE_X);
-	auto mouseY = _axisBinds.Find(AxisType::MOUSE_Y);
+	auto mouseX = _axisBinds.Get(AxisType::MOUSE_X);
+	auto mouseY = _axisBinds.Get(AxisType::MOUSE_Y);
 
 	if (mouseX)
 		**mouseX = (float)x;

@@ -13,8 +13,8 @@ public:
 	NumberedSet(uint32 initialID = 1) : nextId(initialID) {}
 	~NumberedSet() {}
 
-	inline T* Find(NSInt id) { return _map.Find(id); }
-	inline const T* Find(NSInt id) const { return _map.Find(id); }
+	inline T* Get(NSInt id) { return _map.Get(id); }
+	inline const T* Get(NSInt id) const { return _map.Get(id); }
 
 	inline uint32* IDOf(const T &value) { return _map.FindFirstKey(value); }
 	inline const uint32* IDOf(const T &value) const { return _map.FindFirstKey(value); }

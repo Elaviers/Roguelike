@@ -1,10 +1,16 @@
 #include "EditorIO.hpp"
+#include <Engine/Animation.hpp>
 #include <Engine/Debug.hpp>
 #include <Engine/Map.hpp>
 #include <Engine/Mesh_Skeletal.hpp>
 #include <Engine/Mesh_Static.hpp>
 
 inline Vector3 FbxVec4ToVector3(const FbxVector4 &v)
+{
+	return Vector3(-v[0], v[2], -v[1]);
+}
+
+inline Vector3 FbxD3ToVector3(const FbxDouble3& v)
 {
 	return Vector3(-v[0], v[2], -v[1]);
 }
@@ -178,7 +184,7 @@ void LoadSkeleton(FbxNode* node, Skeleton &skeleton, Joint* parentJoint = nullpt
 }
 
 void LoadNodeChildren(FbxNode *parent, 
-	Buffer<Vertex17F>& vertices, Buffer<uint32>& elements, Map<String, Buffer<uint32>>& vertexMappings, Skeleton &skeleton,
+	Buffer<Vertex17F>& vertices, Buffer<uint32>& elements, Map<String, Buffer<uint32>>& vertexMappings, Skeleton &skeleton, FbxNode*& skeletonNode,
 	FbxTransform *parentTransform = nullptr)
 {
 	for (int i = 0; i < parent->GetChildCount(); ++i)
@@ -195,14 +201,15 @@ void LoadNodeChildren(FbxNode *parent,
 			skeleton.Clear();
 
 			LoadSkeleton(node, skeleton);
+			skeletonNode = node;
 			continue;
 		}
 
-		LoadNodeChildren(node, vertices, elements, vertexMappings, skeleton);
+		LoadNodeChildren(node, vertices, elements, vertexMappings, skeleton, skeletonNode);
 	}
 }
 
-Mesh* EditorIO::ReadFBXFile(FbxManager *fbxManager, const char* filename)
+Mesh* EditorIO::ReadFBXMesh(FbxManager *fbxManager, const char* filename)
 {
 	FbxImporter* importer = FbxImporter::Create(fbxManager, "");
 
@@ -219,12 +226,14 @@ Mesh* EditorIO::ReadFBXFile(FbxManager *fbxManager, const char* filename)
 
 		importer->Destroy();
 
-
+		FbxNode* skeletonNode = nullptr;
 		FbxNode* root = scene->GetRootNode();
+
 		if (root)
 		{
-			LoadNodeChildren(root, verts, elements, vertexMappings, skeleton);
+			LoadNodeChildren(root, verts, elements, vertexMappings, skeleton, skeletonNode);
 		}
+		
 
 		scene->Destroy();
 	}
@@ -255,7 +264,7 @@ Mesh* EditorIO::ReadFBXFile(FbxManager *fbxManager, const char* filename)
 			{
 				Joint& j = node->obj;
 
-				Buffer<uint32> *vertsWithJoint = vertexMappings.Find(j.name);
+				Buffer<uint32> *vertsWithJoint = vertexMappings.Get(j.name);
 
 				if (vertsWithJoint)
 				{
@@ -292,6 +301,82 @@ Mesh* EditorIO::ReadFBXFile(FbxManager *fbxManager, const char* filename)
 
 			return staticMesh;
 		}
+	}
+
+	return nullptr;
+}
+
+void FBXEvaluateAnimForNode(FbxNode* node, Animation& anim, float startTime, float endTime, float frameRate)
+{
+	String name = node->GetName();
+
+	float frameTime = 1.f / frameRate;
+
+	auto translations = anim.GetTranslationTrack(name);
+	auto rotations = anim.GetRotationTrack(name);
+	auto scales = anim.GetScalingTrack(name);
+
+	for (float t = startTime; t < endTime; t += frameTime)
+	{
+		translations->AddKey(t, FbxD3ToVector3(node->LclTranslation.EvaluateValue(t)));
+		rotations->AddKey(t, FbxD3ToVector3(node->LclRotation.EvaluateValue(t)));
+		scales->AddKey(t, FbxD3ToVector3(node->LclScaling.EvaluateValue(t)));
+	}
+
+	for (int i = 0; i < node->GetChildCount(); ++i)
+		FBXEvaluateAnimForNode(node->GetChild(i), anim, startTime, endTime, frameRate);
+}
+
+FbxNode* FindSkeletonRoot(FbxNode* node)
+{
+	if (node->GetSkeleton())
+		return node;
+
+	for (int i = 0; i < node->GetChildCount(); ++i)
+	{
+		FbxNode* foundNode = FindSkeletonRoot(node->GetChild(i));
+		if (foundNode)
+			return foundNode;
+	}
+
+	return nullptr;
+}
+
+Animation* EditorIO::ReadFBXAnimation(FbxManager* fbxManager, const char* filename)
+{
+	FbxImporter* importer = FbxImporter::Create(fbxManager, "");
+
+	Skeleton skeleton;
+
+	if (importer->Initialize(filename, -1, fbxManager->GetIOSettings()))
+	{
+		FbxScene* scene = FbxScene::Create(fbxManager, "importScene");
+
+		importer->Import(scene);
+
+		importer->Destroy();
+
+		FbxNode* skeletonNode = nullptr;
+		FbxNode* root = scene->GetRootNode();
+
+		if (root)
+		{
+			FbxNode* skeletonRoot = FindSkeletonRoot(root);
+
+			if (skeletonRoot)
+			{
+				Animation* anim = new Animation();
+
+				auto ts = scene->GetSrcObject<FbxAnimStack>(0)->GetLocalTimeSpan();
+
+				FBXEvaluateAnimForNode(skeletonNode, *anim, ts.GetStart().GetMilliSeconds() / 1000.f, ts.GetStop().GetMilliSeconds() / 1000.f, 30.f);
+			
+				return anim;
+			}
+		}
+
+
+		scene->Destroy();
 	}
 
 	return nullptr;

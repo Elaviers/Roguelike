@@ -76,7 +76,7 @@ float FontTTF::CalculateStringWidth(const char* string, float scaleX) const
 
 	for (const char* c = string; *c != '\0'; ++c)
 	{
-		const TTFGlyph* glyph = _charMap.Find(*c);
+		const TTFGlyph* glyph = _charMap.Get(*c);
 		if (glyph)
 			width += (glyph->advance >> 6) * scale;
 	}
@@ -117,7 +117,7 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 		}
 		else
 		{
-			const TTFGlyph* glyph = _charMap.Find(*c);
+			const TTFGlyph* glyph = _charMap.Get(*c);
 			if (glyph)
 			{
 				glBindTexture(GL_TEXTURE_2D, glyph->texID);

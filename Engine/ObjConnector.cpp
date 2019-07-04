@@ -53,14 +53,14 @@ void ObjConnector::Render() const {
 	}
 }
 
-void ObjConnector::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
+void ObjConnector::WriteToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const
 {
 	buffer.Write_byte((byte)direction);
 	buffer.Write_vector3(_min);
 	buffer.Write_vector3(_max);
 }
 
-void ObjConnector::ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet<String> &strings)
+void ObjConnector::ReadFromFile(BufferReader<byte> &buffer, const NumberedSet<String> &strings)
 {
 	direction = (Direction2D)buffer.Read_byte();
 	_min = buffer.Read_vector3();

@@ -28,7 +28,7 @@ void ObjBrush2D::Render() const
 }
 
 
-void ObjBrush2D::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &strings) const
+void ObjBrush2D::WriteToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const
 {
 	if (Engine::Instance().pMaterialManager && _material)
 	{
@@ -43,9 +43,9 @@ void ObjBrush2D::WriteToFile(BufferIterator<byte> &buffer, NumberedSet<String> &
 	buffer.Write_float(GetRelativeScale()[1]);
 }
 
-void ObjBrush2D::ReadFromFile(BufferIterator<byte> &buffer, const NumberedSet<String> &strings)
+void ObjBrush2D::ReadFromFile(BufferReader<byte> &buffer, const NumberedSet<String> &strings)
 {
-	const String *materialName = strings.Find(buffer.Read_uint16());
+	const String *materialName = strings.Get(buffer.Read_uint16());
 	if (materialName)
 		SetMaterial(*materialName);
 

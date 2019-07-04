@@ -6,6 +6,10 @@
 
 class Mesh_Skeletal : public Mesh
 {
+protected:
+	virtual void _ReadData(BufferReader<byte>& data) override;
+	virtual void _WriteData(BufferWriter<byte>&) const override;
+
 public:
 	Mesh_Skeletal() {}
 	virtual ~Mesh_Skeletal() {}
@@ -16,8 +20,5 @@ public:
 
 	virtual bool IsValid() const { return vertices.GetSize() != 0; }
 
-	virtual void WriteData(BufferIterator<byte>&) const;
-	virtual void ReadData(BufferIterator<byte>&);
-
-	virtual void CreateGLMeshRenderer(GLMeshRenderer&);
+	virtual void CreateGLMeshRenderer(GLMeshRenderer &out);
 };
