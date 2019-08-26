@@ -108,18 +108,21 @@ public:
 
 	void RemoveIndex(size_t index)
 	{
-		if (index > _size) return;
-		_size--;
+		if (index < _size)
+		{
+			_size--;
 
-		T *newData = new T[_size];
-		for (size_t i = 0; i < index; ++i)
-			newData[i] = std::move(_data[i]);
+			T* newData = new T[_size];
+			for (size_t i = 0; i < index; ++i)
+#pragma warning(suppress: 6386) //False positive
+				newData[i] = std::move(_data[i]);
 
-		for (size_t i = index; i < _size; ++i)
-			newData[i] = std::move(_data[i + 1]);
+			for (size_t i = index; i < _size; ++i)
+				newData[i] = std::move(_data[i + 1]);
 
-		delete[] _data;
-		_data = newData;
+			delete[] _data;
+			_data = newData;
+		}
 	}
 
 	void Remove(const T &item)
@@ -154,6 +157,17 @@ public:
 			result._data[_size + i] = other._data[i];
 
 		return result;
+	}
+
+	bool operator==(const Buffer& other) const
+	{
+		if (_size != other._size) return false;
+
+		for (size_t i = 0; i < _size; ++i)
+			if (_data[i] != other._data[i])
+				return false;
+
+		return true;
 	}
 
 	void Shuffle()

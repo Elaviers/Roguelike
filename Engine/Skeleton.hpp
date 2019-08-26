@@ -15,16 +15,16 @@ private:
 	{
 		if (parent == nullptr)
 		{
-			for (const List<Joint>::Node* node = _joints.First(); node != nullptr; node = node->next)
-				if (node->obj.GetParent() == nullptr)
+			for (auto it = _joints.First(); it; ++it)
+				if (it->GetParent() == nullptr)
 					return false;
 
 			return true;
 		}
 		else
 		{
-			for (const List<Joint>::Node* node = _joints.First(); node != nullptr; node = node->next)
-				if (&node->obj == parent)
+			for (auto it = _joints.First(); it; ++it)
+				if (&*it == parent)
 					return true;
 
 			return false;
@@ -55,13 +55,13 @@ public:
 
 	inline size_t GetJointCount() const { return _joints.GetSize(); }
 
-	inline List<Joint>::Node* FirstListNode() { return _joints.First(); }
-	inline const List<Joint>::Node* FirstListNode() const { return _joints.First(); }
+	inline List<Joint>::Iterator FirstListElement() { return _joints.First(); }
+	inline const List<Joint>::Iterator FirstListElement() const { return _joints.First(); }
 
 	Joint* CreateJoint(Joint *parent)
 	{
 		if (_CanAddJoint(parent))
-			return &_joints.Add(Joint(_nextJointID++, parent))->obj;
+			return &*_joints.Add(Joint(_nextJointID++, parent));
 
 		if (_transformCache.GetSize() != 0)
 			UpdateCache();
@@ -71,9 +71,9 @@ public:
 
 	inline Joint* GetJointWithID(int id)
 	{
-		auto node = _joints.Get(id);
+		auto it = _joints.Get(id);
 
-		return node ? &node->obj : nullptr;
+		return it ? &*it : nullptr;
 	}
 
 	//Updates the internal cache of joints to be sent to the shader

@@ -24,7 +24,7 @@ protected:
 	{
 		Buffer<String> lines = string.Split("\r\n");
 		for (size_t i = 0; i < lines.GetSize(); ++i)
-			_cvars.HandleCommand(lines[i].ToLower());
+			String unused = _cvars.HandleCommand(lines[i].ToLower());
 	}
 public:
 	virtual ~Font() {}

@@ -1,10 +1,10 @@
 #pragma once
 #include "Cvar.hpp"
-#include "Map.hpp"
+#include "Hashmap.hpp"
 
 class CvarMap
 {
-	Map<String, Cvar*> _cvars;
+	Hashmap<String, Cvar*> _cvars;
 
 	int _count;
 
@@ -90,9 +90,13 @@ public:
 		}
 	}
 
-	inline void Clear() { _cvars.Clear(); _count = 0; }
+	inline void Clear() 
+	{ 
+		_cvars.Clear(); 
+		_count = 0;
+	}
 
-	inline Buffer<Pair<const String*, Cvar* const *>> GetAll() { return _cvars.ToBuffer();}
+	inline Buffer<Pair<const String, Cvar*> *> GetAll() { return _cvars.ToKVBuffer();}
 
 	CvarMap& operator=(const CvarMap &other)
 	{
@@ -115,12 +119,12 @@ public:
 
 	void TransferValuesTo(CvarMap &other)
 	{
-		auto buffer = _cvars.ToBuffer();
+		Buffer<Pair<const String, Cvar*>*> buffer = _cvars.ToKVBuffer();
 
 		for (uint32 i = 0; i < buffer.GetSize(); ++i)
 		{
-			Cvar *key = *buffer[i].second;
-			Cvar *otherKey = other._cvars[*buffer[i].first];
+			Cvar *key = buffer[i]->second;
+			Cvar *otherKey = other._cvars[buffer[i]->first];
 			if (otherKey && key->GetType() == otherKey->GetType())
 			{
 				key->TransferTo(*otherKey);

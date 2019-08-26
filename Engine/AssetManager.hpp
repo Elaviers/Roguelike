@@ -14,12 +14,11 @@ private:
 	const String _defaultTextExtension;
 
 protected:
-	//If there r
 	virtual T* _CreateResource(const String& name, const Buffer<byte>& data) { return nullptr; }
 	virtual T* _CreateResource(const String& name, const String& textData) { return nullptr; }
 
 	//Called before deleting a resource
-	virtual void _DestroyResource(T& resource) {}
+	virtual void _DestroyResource(T* resource) {}
 
 	AssetManager(const String &defaultBinaryExtension = "", const String &defaultTextExtension = ".txt") : 
 		_defaultBinaryExtension(defaultBinaryExtension), _defaultTextExtension(defaultTextExtension)
@@ -31,26 +30,35 @@ protected:
 
 	virtual ~AssetManager() 
 	{
-		auto buffer = _map.ToBuffer();
+		Buffer<Pair<const String, T*>*> buffer = _map.ToKVBuffer();
 
 		for (size_t i = 0; i < buffer.GetSize(); ++i)
 		{
-			auto keys = buffer[i];
-
-			for (auto node = keys->First(); node; node = node->next)
-			{
-				_DestroyResource(*node->obj.second);
-				delete node->obj.second;
-			}
+			_DestroyResource(buffer[i]->second);
+			delete buffer[i]->second;
 		}
 	}
 
+	T*& _MapValue(const String& name) { return _map[name]; }
+
 public:
+	const Hashmap<String, T*>& GetMap() const { return _map; }
+
+	//Only adds if key does not exist, otherwise returns false
+	inline bool Add(const String& name, T* value) 
+	{
+		if (_map.Get(name))
+			return false;
+
+		_map[name] = value;
+		return true;
+	}
 
 	T* Get(const String& name)
 	{
 		String lowerName = name.ToLower();
-		bool hasExtension = Utilities::GetExtension(name).GetLength() != 0;
+		String extension = Utilities::GetExtension(name);
+		bool hasExtension = extension.GetLength() != 0;
 		
 		T** resource = _map.Get(lowerName);
 		if (resource) return *resource;
@@ -62,7 +70,10 @@ public:
 				String baseName = _paths[i] + name;
 				T* resource = nullptr;
 
-				if (hasExtension || _defaultTextExtension.GetLength() != 0)
+				bool textOnly = _defaultTextExtension.GetLength() && extension == _defaultTextExtension;
+				bool dataOnly = _defaultBinaryExtension.GetLength() && extension == _defaultBinaryExtension;
+
+				if (!textOnly)
 				{
 					String filename = (hasExtension ? baseName : (baseName + _defaultBinaryExtension)).GetData();
 
@@ -74,7 +85,7 @@ public:
 					}
 				}
 
-				if (resource == nullptr && (hasExtension || _defaultTextExtension.GetLength() != 0))
+				if (!dataOnly && resource == nullptr)
 				{
 					String filename = (hasExtension ? baseName : (baseName + _defaultTextExtension)).GetData();
 

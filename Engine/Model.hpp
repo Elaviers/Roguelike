@@ -25,19 +25,22 @@ protected:
 	{
 		Buffer<String> lines = string.ToLower().Split("\r\n");
 		for (size_t i = 0; i < lines.GetSize(); ++i)
-			_cvars.HandleCommand(lines[i]);
+			String unused = _cvars.HandleCommand(lines[i]);
 	}
 
 public:
-	Model() : _mesh(nullptr), _collider(nullptr) { 
+	//This is stupid. The model is responsible for deletion of these pointers, so don't delete them after using this!
+	Model(Mesh *mesh = nullptr, Collider *collider = nullptr) : _mesh(mesh), _collider(collider) {
 		_cvars.CreateVar("model", CommandPtr(this, &Model::_CMD_model));
 		_cvars.CreateVar("collision", CommandPtr(this, &Model::_CMD_collision));
-		_cvars.Add("material", _defaultMaterialName); }
+		_cvars.Add("material", _defaultMaterialName);
+	}
 
 	inline void Delete()
 	{
 		_meshRenderer.Delete();
 		delete _collider;
+		delete _mesh;
 	}
 
 	inline GLMeshRenderer& MeshRenderer() { return _meshRenderer; }

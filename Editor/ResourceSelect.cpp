@@ -11,6 +11,7 @@
 #include <Engine/ObjCamera.hpp>
 #include <Engine/ObjLight.hpp>
 #include <Engine/ObjRenderable.hpp>
+#include <Engine/ObjSprite.hpp>
 #include <Engine/Utilities.hpp>
 #include <Engine/Window.hpp>
 #include "resource.h"
@@ -21,7 +22,7 @@ class RSDialog
 {
 private:
 	const GLContext *glContext;
-	const GLProgram *programLit;
+	GLProgram *programLit;
 	const GLProgram *programUnlit;
 	MaterialManager* const materialManager;
 	ModelManager* const modelManager;
@@ -29,14 +30,21 @@ private:
 	GameObject _cameraRoot;
 	ObjCamera _camera;
 	ObjRenderable _object;
+	ObjSprite _sprite;
 	ObjLight _light;
 
 	bool _moving;
 	bool _sizing;
 
 public:
-	Buffer<String> paths;
-	int selection = 0;
+	String currentName = "";
+
+	union
+	{
+		Model* selectionAsModel;
+		Material* selectionAsMaterial;
+		Asset* selection = nullptr;
+	};
 
 	bool isModelSelect = false;
 
@@ -44,8 +52,16 @@ public:
 
 	HIMAGELIST imageList = NULL;
 
-	RSDialog(const GLContext &context, const GLProgram &programLit, const GLProgram &programUnlit, MaterialManager& materialManager, ModelManager &modelManager) : 
-		glContext(&context), programLit(&programLit), programUnlit(&programUnlit), materialManager(&materialManager), modelManager(&modelManager), viewportDC(NULL) {}
+	RSDialog(const GLContext &context, GLProgram &programLit, const GLProgram &programUnlit, MaterialManager& materialManager, ModelManager &modelManager) : 
+		_moving(false),
+		_sizing(false),
+		glContext(&context), 
+		programLit(&programLit), 
+		programUnlit(&programUnlit), 
+		materialManager(&materialManager), 
+		modelManager(&modelManager), 
+		viewportDC(NULL)
+	{}
 
 	inline const String &GetRootPath() { return isModelSelect ? modelManager->GetRootPath() : materialManager->GetRootPath(); }
 
@@ -56,6 +72,7 @@ public:
 		glContext->Use(viewportDC);
 
 		glViewport(0, 0, vpW, vpH);
+
 		_camera.SetViewport(vpW, vpH);
 
 		_camera.SetParent(&_cameraRoot);
@@ -78,9 +95,20 @@ public:
 	void Update()
 	{
 		if (isModelSelect)
-			_object.SetModel(modelManager->Get(paths[selection]));
+			_object.SetModel(selectionAsModel);
 		else
-			_object.SetMaterial(materialManager->Get(paths[selection]));
+		{
+			if (dynamic_cast<MaterialSprite*>(selectionAsMaterial))
+			{
+				_sprite.SetMaterial((MaterialSprite*)selectionAsMaterial);
+				_object.SetMaterial(nullptr);
+			}
+			else
+			{
+				_sprite.SetMaterial(nullptr);
+				_object.SetMaterial(selectionAsMaterial);
+			}
+		}
 	}
 
 	void Draw()
@@ -89,28 +117,30 @@ public:
 
 		glDepthFunc(GL_LESS);
 
-		programLit->Use();
-		programLit->SetMat4(DefaultUniformVars::mat4Projection, _camera.GetProjectionMatrix());
-		programLit->SetMat4(DefaultUniformVars::mat4View, _camera.GetInverseTransformationMatrix());
-		programLit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
 
-		programLit->SetInt(DefaultUniformVars::intTextureDiffuse, 0);
-		programLit->SetInt(DefaultUniformVars::intTextureNormal, 1);
-		programLit->SetInt(DefaultUniformVars::intTextureSpecular, 2);
-		programLit->SetInt(DefaultUniformVars::intTextureReflection, 3);
+		if (_object.GetMaterial())
+		{
+			programLit->Use();
+			_camera.Use();
+			programLit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
 
-		programLit->SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
-		programLit->SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1, 1));
+			programLit->SetInt(DefaultUniformVars::intTextureDiffuse, 0);
+			programLit->SetInt(DefaultUniformVars::intTextureNormal, 1);
+			programLit->SetInt(DefaultUniformVars::intTextureSpecular, 2);
+			programLit->SetInt(DefaultUniformVars::intTextureReflection, 3);
 
-		_light.ToShader(0);
+			programLit->SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
+			programLit->SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1, 1));
 
-		_object.Render();
+			_light.ToShader(0);
+
+			_object.Render(RenderChannel::SURFACE);
+		}
 
 		programUnlit->Use();
-		programUnlit->SetMat4(DefaultUniformVars::mat4Projection, _camera.GetProjectionMatrix());
-		programUnlit->SetMat4(DefaultUniformVars::mat4View, _camera.GetInverseTransformationMatrix());
+		_camera.Use();
 
-		Engine::Instance().pTextureManager->White().Bind(0);
+		Engine::Instance().pTextureManager->White()->Bind(0);
 
 		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 0.f, 0.f));
 		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(-1.f, 0.f, 0.f), Vector3(1.f, 0.f, 0.f));
@@ -121,11 +151,14 @@ public:
 		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 0.f, 1.f));
 		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(0.f, 0.f, -1.f), Vector3(0.f, 0.f, 1.f));
 
+		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f));
+		_sprite.Render(RenderChannel::SPRITE);
+
 		::SwapBuffers(viewportDC);
 	};
 
-	static LPARAM DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-	static LPARAM ViewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	static INT_PTR DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	static LRESULT ViewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 };
 
 //static
@@ -167,11 +200,18 @@ INT_PTR RSDialog::DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		insertStruct.item.iSelectedImage = 1;
 		insertStruct.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
-		for (uint32 i = 0; i < rs->paths.GetSize(); ++i)
+		Buffer<const String*> keynames;
+
+		if (rs->isModelSelect)
+			keynames = Engine::Instance().pModelManager->GetMap().ToKBuffer();
+		else
+			keynames = Engine::Instance().pMaterialManager->GetMap().ToKBuffer();
+
+		for (uint32 i = 0; i < keynames.GetSize(); ++i)
 		{
 			insertStruct.item.lParam = (LPARAM)i;
-			insertStruct.item.pszText = &rs->paths[i][0];
-			insertStruct.item.cchTextMax = (int)rs->paths[i].GetLength();
+			insertStruct.item.pszText = &(*keynames[i])[0];
+			insertStruct.item.cchTextMax = (int)keynames[i]->GetLength();
 			::SendDlgItemMessage(hwnd, IDC_TREE, TVM_INSERTITEM, 0, (LPARAM)&insertStruct);
 		}
 
@@ -208,17 +248,34 @@ INT_PTR RSDialog::DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{
 		LPNMHDR notify = (LPNMHDR)lparam;
 
+#pragma warning(suppress: 26454)
 		if (notify->code == TVN_SELCHANGED && notify->idFrom == IDC_TREE)
 		{
+			constexpr int bufSize = 256;
+			char textBuffer[bufSize];
+
 			LPNMTREEVIEW nmtv = (LPNMTREEVIEW)lparam;
-			rs->selection = (int)nmtv->itemNew.lParam;
+			nmtv->itemNew.mask = TVIF_TEXT;
+			nmtv->itemNew.pszText = textBuffer;
+			nmtv->itemNew.cchTextMax = bufSize;
+			auto result = ::SendDlgItemMessageA(hwnd, IDC_TREE, TVM_GETITEM, 0, (LPARAM)&nmtv->itemNew);
+			
+			rs->currentName = textBuffer;
+
+			if (rs->isModelSelect)
+				rs->selection = Engine::Instance().pModelManager->Get(rs->currentName);
+			else
+				rs->selection = Engine::Instance().pMaterialManager->Get(rs->currentName);
+
 			rs->Update();
 			rs->Draw();
 
-			String fullpath = rs->GetRootPath() + rs->paths[rs->selection] + ".txt";
+			String fullpath = rs->GetRootPath() + rs->currentName + ".txt";
 
 			::SendDlgItemMessage(hwnd, IDC_NAME, WM_SETTEXT, 0, (LPARAM)fullpath.GetData());
-			::SendDlgItemMessage(hwnd, IDC_INFO, WM_SETTEXT, 0, (LPARAM)IO::ReadFileString(fullpath.GetData()).GetData());
+
+			::SendDlgItemMessage(hwnd, IDC_INFO, WM_SETTEXT, 0, 
+				(LPARAM)Utilities::WithCarriageReturns(IO::ReadFileString(fullpath.GetData(), true)).GetData());
 		}
 	}
 	break;
@@ -230,7 +287,7 @@ INT_PTR RSDialog::DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	return TRUE;
 }
 
-LPARAM RSDialog::ViewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+LRESULT RSDialog::ViewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	RSDialog *rs = (RSDialog*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
@@ -290,7 +347,7 @@ void ResourceSelect::Initialise()
 {
 	WNDCLASSEXA windowClass = {};
 	windowClass.cbSize = sizeof(WNDCLASSEXA);
-	windowClass.lpfnWndProc = RSDialog::ViewportProc;
+	windowClass.lpfnWndProc = (WNDPROC)RSDialog::ViewportProc;
 	windowClass.hInstance = ::GetModuleHandle(NULL);
 	windowClass.hbrBackground = (HBRUSH)(COLOR_ACTIVECAPTION + 1);
 	windowClass.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
@@ -300,17 +357,13 @@ void ResourceSelect::Initialise()
 	::RegisterClassEx(&windowClass);
 }
 
-String ResourceSelect::Dialog(MaterialManager &materialManager, ModelManager &modelManager, const char *search, HWND parent, ResourceType type, const GLContext &context, const GLProgram &programLit, const GLProgram &programUnlit)
+String ResourceSelect::Dialog(MaterialManager &materialManager, ModelManager &modelManager, const char *search, HWND parent, ResourceType type, const GLContext &context, GLProgram &programLit, const GLProgram &programUnlit)
 {
 	RSDialog rs(context, programLit, programUnlit, materialManager, modelManager);
 	rs.isModelSelect = type == ResourceType::MODEL;
-	rs.paths = IO::FindFilesInDirectory(search);
 
-	for (uint32 i = 0; i < rs.paths.GetSize(); ++i)
-		Utilities::StripExtension(rs.paths[i]);
-
-	if (::DialogBoxParam(NULL, MAKEINTRESOURCE(IDD_RES_SELECT), parent, RSDialog::DialogProc, (LPARAM)&rs) == 1)
-		return rs.paths[rs.selection];
+	if (::DialogBoxParam(NULL, MAKEINTRESOURCE(IDD_RES_SELECT), parent, (DLGPROC)RSDialog::DialogProc, (LPARAM)&rs) == 1)
+		return rs.currentName;
 
 	return "";
 }

@@ -9,7 +9,8 @@
 
 void GameObject::_AddBaseCvars(CvarMap &cvars)
 {
-	cvars.Add("UID", const_cast<uint32&>(_uid), PropertyFlags::READONLY);
+	cvars.Add("Name",		Getter<const String&>(this, &GameObject::GetName), Setter<String>(this, &GameObject::SetName));
+	cvars.Add("UID",		const_cast<uint32&>(_uid), CvarFlags::READONLY);
 	cvars.Add("Position",	Getter<const Vector3&>(&_transform, &Transform::GetPosition), Setter<Vector3>(&_transform, &Transform::SetPosition));
 	cvars.Add("Rotation",	Getter<const Vector3&>(&_transform, &Transform::GetRotationEuler), Setter<Vector3>(&_transform, &Transform::SetRotationEuler));
 	cvars.Add("Scale",		Getter<const Vector3&>(&_transform, &Transform::GetScale), Setter<Vector3>(&_transform, &Transform::SetScale));
@@ -33,13 +34,31 @@ Mat4 GameObject::GetInverseTransformationMatrix() const
 	return _transform.GetInverseTransformationMatrix();
 }
 
-void GameObject::Render(const ObjCamera &camera) const
+void GameObject::Render(const ObjCamera &camera, EnumRenderChannel channels) const
 {
 	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags & FLAG_DBG_ALWAYS_DRAW)
-		Render();
+		Render(channels);
 
 	for (uint32 i = 0; i < _children.GetSize(); ++i)
-		_children[i]->Render(camera);
+		_children[i]->Render(camera, channels);
+}
+
+void GameObject::Delete()
+{
+	if (Engine::Instance().pObjectTracker)
+	{
+		Engine::Instance().pObjectTracker->Null(this);
+	}
+
+
+	DeleteChildren();
+	SetParent(nullptr);
+
+	if (_dynamic)
+	{
+		delete this;
+		return;
+	}
 }
 
 //File IO
@@ -48,16 +67,41 @@ void GameObject::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> 
 {
 	if (_flags & FLAG_SAVEABLE)
 	{
-		byte id = Engine::Instance().registry.GetFirstCompatibleID(this);
+		auto id = GetTypeID();
 		if (id != 0)
 		{
 			buffer.Write_byte(id);
-			WriteToFile(buffer, strings);
+			WriteData(buffer, strings);
 		}
 	}
 
 	for (uint32 i = 0; i < _children.GetSize(); ++i)
 		_children[i]->WriteAllToFile(buffer, strings);
+}
+
+//static
+GameObject* GameObject::CreateFromData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+{
+	byte id = reader.Read_byte();
+	GameObject* obj = Engine::Instance().registry.GetNode(id)->New();
+	if (obj)
+		obj->ReadData(reader, strings);
+	else 
+		Debug::Error(CSTR("Cannot create gameobject with ID " + String::FromInt(id)));
+
+	return obj;
+}
+
+void GameObject::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
+{
+	_transform.WriteToBuffer(writer);
+	writer.Write_string(_name.GetData());
+}
+
+void GameObject::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+{
+	_transform.ReadFromBuffer(reader);
+	_name = reader.Read_string();
 }
 
 //Collision

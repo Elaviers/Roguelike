@@ -1,4 +1,0 @@
-segment Sample/Cross.lvl
-segment Sample/Straight.lvl
-segment Sample/Corner.lvl
-depth 10

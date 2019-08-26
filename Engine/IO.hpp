@@ -3,18 +3,18 @@
 #include "Mesh_Static.hpp"
 #include "Texture.hpp"
 
-struct WaveSound;
+class WaveSound;
 
 class Skeleton;
 
 namespace IO {
 	bool FileExists(const char* filename);
 
-	Buffer<byte> ReadFile(const char *filename);
+	Buffer<byte> ReadFile(const char *filename, bool silent = false);
 	bool WriteFile(const char *filename, const byte *data, size_t dataLength);
 	inline bool WriteFile(const char* filename, const Buffer<byte>& buffer) { return WriteFile(filename, buffer.Data(), buffer.GetSize()); }
 
-	String ReadFileString(const char *filename);
+	String ReadFileString(const char *filename, bool silent = false);
 
 	WaveSound* ReadWaveFile(const char* filename);
 

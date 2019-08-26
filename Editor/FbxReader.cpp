@@ -7,17 +7,17 @@
 
 inline Vector3 FbxVec4ToVector3(const FbxVector4 &v)
 {
-	return Vector3(-v[0], v[2], -v[1]);
+	return Vector3((float)-v[0], (float)v[2], (float)-v[1]);
 }
 
 inline Vector3 FbxD3ToVector3(const FbxDouble3& v)
 {
-	return Vector3(-v[0], v[2], -v[1]);
+	return Vector3((float)-v[0], (float)v[2], (float)-v[1]);
 }
 
 inline Vector2 FbxVec2ToVector2(const FbxVector2& v)
 {
-	return Vector2(v[0], v[1]);
+	return Vector2((float)v[0], (float)v[1]);
 }
 
 Vertex17F GetFBXVertex(const FbxMesh* fbxMesh, int polygonIndex, int vertexIndex, const char *uvSet)
@@ -248,7 +248,7 @@ Mesh* EditorIO::ReadFBXMesh(FbxManager *fbxManager, const char* filename)
 			skeletalMesh->vertices.SetSize(verts.GetSize());
 			nextBoneIndices.SetSize(verts.GetSize());
 
-			for (int i = 0; i < nextBoneIndices.GetSize(); ++i)
+			for (size_t i = 0; i < nextBoneIndices.GetSize(); ++i)
 				nextBoneIndices[i] = 0;
 
 			for (size_t i = 0; i < skeletalMesh->vertices.GetSize(); ++i)
@@ -260,17 +260,15 @@ Mesh* EditorIO::ReadFBXMesh(FbxManager *fbxManager, const char* filename)
 				skeletalMesh->vertices[i].uvOffset = verts[i].uvOffset;
 			}
 
-			for (auto node = skeleton.FirstListNode(); node; node = node->next)
+			for (auto it = skeleton.FirstListElement(); it; ++it)
 			{
-				Joint& j = node->obj;
-
-				Buffer<uint32> *vertsWithJoint = vertexMappings.Get(j.name);
+				Buffer<uint32> *vertsWithJoint = vertexMappings.Get(it->name);
 
 				if (vertsWithJoint)
 				{
-					int jointID = j.GetID();
+					int jointID = it->GetID();
 
-					for (int i = 0; i < vertsWithJoint->GetSize(); ++i)
+					for (size_t i = 0; i < vertsWithJoint->GetSize(); ++i)
 					{
 						uint32 boneIndex = nextBoneIndices[i]++;
 
@@ -310,6 +308,9 @@ void FBXEvaluateAnimForNode(FbxNode* node, Animation& anim, float startTime, flo
 {
 	String name = node->GetName();
 
+	FbxTime time;
+	time.SetSecondDouble(0.0);
+
 	float frameTime = 1.f / frameRate;
 
 	auto translations = anim.GetTranslationTrack(name);
@@ -318,9 +319,10 @@ void FBXEvaluateAnimForNode(FbxNode* node, Animation& anim, float startTime, flo
 
 	for (float t = startTime; t < endTime; t += frameTime)
 	{
-		translations->AddKey(t, FbxD3ToVector3(node->LclTranslation.EvaluateValue(t)));
-		rotations->AddKey(t, FbxD3ToVector3(node->LclRotation.EvaluateValue(t)));
-		scales->AddKey(t, FbxD3ToVector3(node->LclScaling.EvaluateValue(t)));
+		time.SetSecondDouble(t);
+		translations->AddKey(t, FbxD3ToVector3(node->LclTranslation.EvaluateValue(time)));
+		rotations->AddKey(t, FbxD3ToVector3(node->LclRotation.EvaluateValue(time)));
+		scales->AddKey(t, FbxD3ToVector3(node->LclScaling.EvaluateValue(time)));
 	}
 
 	for (int i = 0; i < node->GetChildCount(); ++i)

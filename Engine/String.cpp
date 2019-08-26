@@ -20,7 +20,7 @@ String::String(const String &other) : _length(other._length)
 	_data = new char[_length + 1];
 	_data[_length] = '\0';
 
-	for (unsigned int i = 0; i < _length; ++i)
+	for (size_t i = 0; i < _length; ++i)
 		_data[i] = other._data[i];
 }
 
@@ -41,7 +41,7 @@ String::String(const char *string) : _length(0)
 	_data = new char[_length + 1];
 	_data[_length] = '\0';
 
-	for (unsigned int i = 0; i < _length; ++i)
+	for (size_t i = 0; i < _length; ++i)
 		_data[i] = string[i];
 }
 
@@ -67,7 +67,7 @@ inline bool IsPartOfToken(char c, const char *delimiters, size_t delimiterCount)
 	if (c == '\0')
 		return false;
 
-	for (unsigned int i = 0; i < delimiterCount; ++i)
+	for (size_t i = 0; i < delimiterCount; ++i)
 		if (c == delimiters[i])
 			return false;
 
@@ -136,7 +136,7 @@ String String::SubString(size_t start, size_t end) const
 	return string;
 }
 
-int String::IndexOf(char c) const
+size_t String::IndexOf(char c) const
 {
 	for (size_t i = 0; i < _length; ++i)
 		if (_data[i] == c)
@@ -145,7 +145,7 @@ int String::IndexOf(char c) const
 	return -1;
 }
 
-int String::IndexOfAny(const char* chars) const
+size_t String::IndexOfAny(const char* chars) const
 {
 	for (size_t i = 0; i < _length; ++i)
 		for (const char* c = chars; *c != '\0'; ++c)
@@ -183,6 +183,31 @@ void String::Trim()
 
 ////
 
+char& String::Insert(char c, size_t index)
+{
+	if (index > _length)
+		index = _length;
+
+	char* new_data = new char[_length + 2];
+
+	for (size_t i = 0; i < index; ++i)
+		new_data[i] = _data[i];
+
+	new_data[index] = c;
+
+	for (size_t i = index; i < _length; ++i)
+		new_data[i + 1] = _data[i];
+
+	delete[] _data;
+	_data = new_data;
+	_length++;
+	_data[_length] = '\0';
+
+	return _data[index];
+}
+
+////
+
 String& String::operator=(const String &other)
 {
 	_length = other._length;
@@ -190,7 +215,7 @@ String& String::operator=(const String &other)
 	delete[] _data;
 	_data = new char[_length + 1];
 
-	for (unsigned int i = 0; i < _length; ++i)
+	for (size_t i = 0; i < _length; ++i)
 		_data[i] = other._data[i];
 
 	_data[_length] = '\0';
@@ -215,7 +240,7 @@ String& String::operator=(const char* string)
 	delete[] _data;
 	_data = new char[_length + 1];
 
-	for (unsigned int i = 0; i < _length; ++i)
+	for (size_t i = 0; i < _length; ++i)
 		_data[i] = string[i];
 
 	_data[_length] = '\0';
@@ -226,10 +251,10 @@ String& String::operator+=(const String &other)
 {
 	char *new_data = new char[_length + other._length + 1];
 
-	for (unsigned int i = 0; i < _length; ++i)
+	for (size_t i = 0; i < _length; ++i)
 		new_data[i] = _data[i];
 
-	for (unsigned int i = 0; i < other._length; ++i)
+	for (size_t i = 0; i < other._length; ++i)
 		new_data[_length + i] = other._data[i];
 
 	_length += other._length;
@@ -245,10 +270,10 @@ String& String::operator+=(const char *string)
 	size_t length = StringLength(string);
 	char *new_data = new char[_length + length + 1];
 
-	for (unsigned int i = 0; i < _length; ++i)
+	for (size_t i = 0; i < _length; ++i)
 		new_data[i] = _data[i];
 
-	for (unsigned int i = 0; i < length; ++i)
+	for (size_t i = 0; i < length; ++i)
 		new_data[_length + i] = string[i];
 
 	_length += length;
@@ -261,7 +286,7 @@ String& String::operator+=(char character)
 {
 	char *new_data = new char[_length + 2];
 
-	for (unsigned int i = 0; i < _length; ++i)
+	for (size_t i = 0; i < _length; ++i)
 		new_data[i] = _data[i];
 
 	new_data[_length] = character;
@@ -279,10 +304,10 @@ String String::operator+(const String& other) const
 {
 	String product(_length + other._length);
 
-	for (unsigned int i = 0; i < _length; ++i)
+	for (size_t i = 0; i < _length; ++i)
 		product[i] = _data[i];
 
-	for (unsigned int i = 0; i < other._length; ++i)
+	for (size_t i = 0; i < other._length; ++i)
 		product[_length + i] = other._data[i];
 
 	return product;
@@ -290,11 +315,11 @@ String String::operator+(const String& other) const
 
 ////
 
-int String::Compare(const String &other) const
+size_t String::Compare(const String &other) const
 {
 	auto minLength = _length < other._length ? _length : other._length;
 
-	for (unsigned int i = 0; i < minLength; ++i)
+	for (size_t i = 0; i < minLength; ++i)
 		if (_data[i] != other[i])
 			return _data[i] < other[i] ? -1 : 1;
 
@@ -311,7 +336,7 @@ String String::ToLower() const
 	String string;
 	string.SetLength(_length);
 
-	for (unsigned int i = 0; i < _length; ++i)
+	for (size_t i = 0; i < _length; ++i)
 		if (_data[i] >= 'A' && _data[i] <= 'Z')
 			string._data[i] += _data[i] + ('a' - 'A');
 		else
@@ -383,7 +408,7 @@ String String::FromInt(__int64 number, unsigned int minimum, byte base)
 
 	String string(digit_count + (neg ? 1 : 0));
 
-	for (unsigned int i = 0; i < digit_count; ++i) {
+	for (size_t i = 0; i < digit_count; ++i) {
 		string[digit_count - 1 - i + (neg ? 1 : 0)] = '0' + (number % base);
 		number /= base;
 	}
@@ -400,7 +425,11 @@ String String::FromFloat(double number, unsigned int minimum, unsigned int maxDe
 {
 	if (number == INFINITY)
 		return "infinity";
+
+#pragma warning(push)
+#pragma warning(disable : 26451)
 	if (number == NAN)
+#pragma warning(pop)
 		return "NAN";
 
 	int64 whole_number = (int64)number;
@@ -426,7 +455,7 @@ String String::FromFloat(double number, unsigned int minimum, unsigned int maxDe
 
 	if (fraction < 0.0) fraction *= -1.0;
 
-	for (unsigned int i = 0; i < fraction_digit_count; ++i) {
+	for (size_t i = 0; i < fraction_digit_count; ++i) {
 		fraction *= base;
 
 		digit = (int)fraction;
@@ -476,7 +505,7 @@ String String::FromWideString(const wchar_t *string)
 
 bool StringsInequal(const char *a, const char *b)
 {
-	unsigned int i = 0;
+	size_t i = 0;
 	while (1)
 	{
 		if (a[i] != b[i])
@@ -489,7 +518,7 @@ bool StringsInequal(const char *a, const char *b)
 
 bool StringsEqual(const char *a, const char *b)
 {
-	unsigned int i = 0;
+	size_t i = 0;
 	while (1)
 	{
 		if (a[i] != b[i])
@@ -504,7 +533,7 @@ bool StringContains(const char *string, const char *phrase)
 {
 	for (; string[0] != '\0'; ++string)
 	{
-		for (unsigned int i = 0; string[i] != '\0'; ++i)
+		for (size_t i = 0; string[i] != '\0'; ++i)
 		{
 			if (phrase[i] == '\0')
 				return true;

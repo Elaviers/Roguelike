@@ -3,7 +3,7 @@
 #include <Windows.h>
 
 
-Timer::Timer()
+Timer::Timer() : _start(0)
 {
 	LARGE_INTEGER freq;
 	if (::QueryPerformanceFrequency(&freq) == FALSE)

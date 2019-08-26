@@ -81,8 +81,32 @@ namespace Maths
 		return atanf(x);
 	}
 
+	void SetRandomSeed(unsigned int seed)
+	{
+		srand(seed);
+	}
+
 	float Random()
 	{
-		return (float)rand() / (float)RAND_MAX;
+		return (float)rand() / ((float)RAND_MAX + 1.f);
+	}
+
+	float RandomInRange(float min, float max)
+	{
+		return (Random() * (max - min)) + min;
+	}
+
+	float ArcTangentDegrees2(float y, float x)
+	{
+		if (x > 0.f)
+			return ArcTangentDegrees(y / x);
+		else if (x < 0.f)
+			return ArcTangentDegrees(y / x) + ((y < 0.f) ? -180.f : 180.f);
+
+		//x == 0
+		if (y == 0.f)
+			return 0.f;
+
+		return y < 0.f ? -90.f : 90.f;
 	}
 }

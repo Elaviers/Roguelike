@@ -3,47 +3,102 @@
 template <typename T>
 class List
 {
-public:
-	struct Node
+	struct _Node
 	{
 		T obj;
 
-		Node* next;
+		_Node* next;
 
-		Node() : obj(), next(nullptr) {}
-		Node(const T& element) : obj(element), next(nullptr) {}
+		_Node() : obj(), next(nullptr) {}
+		_Node(const T& element) : obj(element), next(nullptr) {}
+
+		void DeleteAll()
+		{
+			if (next)
+				next->DeleteAll();
+
+			delete this;
+			return;
+		}
+
+		size_t Count()
+		{
+			int i = 1;
+			for (auto node = next; node; node = node->next)
+				++i;
+
+			return i;
+		}
+
+		_Node* Last()
+		{
+			if (next) return next->Last();
+			return this;
+		}
+
+		const _Node* Last() const
+		{
+			if (next) return next->Last();
+			return this;
+		}
+
+		static _Node* CopyOf(const _Node* from)
+		{
+			if (from == nullptr) return nullptr;
+
+			_Node* result = new _Node(*from);
+			_Node* to = result;
+			
+			while (from->next)
+			{
+				from = from->next;
+				to = to->next = new _Node(*from);
+			}
+
+			return result;
+		}
 	};
 
-private:
-	Node* _first;
+	_Node* _first;
 
 public:
-	List() : _first(nullptr) {}
-
-	List(const List& other) : _first(nullptr)
+	class Iterator
 	{
-		if (other._first)
-		{
-			_first = new Node(other._first->obj);
+		_Node* _node;
 
-			Node* destNode = _first;
-			Node* srcNode = _first->next;
-			while (srcNode)
-			{
-				destNode->next = new Node(srcNode->obj);
-				destNode = destNode->next;
-				
-				srcNode = srcNode->next;
-			}
+		friend class List;
+
+	public:
+		Iterator(_Node* node) : _node(node) {}
+		~Iterator() {}
+
+		inline Iterator Next() const { return _node->next; }
+
+		inline Iterator& operator++() 
+		{ 
+			_node = _node->next;
+			return *this;
 		}
-	}
 
-	List(List&& other) : _first(other._first)
+		inline T* operator->() const	{ return &_node->obj; }
+		inline T& operator*() const		{ return _node->obj; }
+
+		inline operator bool() const	{ return _node != nullptr; }
+		inline bool IsValid() const		{ return _node != nullptr; }
+	};
+
+	List() : _first(nullptr) {}
+	List(const List& other) : _first(_Node::CopyOf(other._first)) {}
+	List(List&& other) : _first(other._first) { other._first = nullptr; }
+	
+	~List() { if (_first) _first->DeleteAll(); }
+
+	inline List& operator=(const List& other)
 	{
-		other._first = nullptr;
+		Clear();
+		_first = _Node::CopyOf(other._first);
+		return *this;
 	}
-
-	~List() { Clear(); }
 
 	inline List& operator=(List&& other) noexcept
 	{
@@ -53,13 +108,32 @@ public:
 		return *this;
 	}
 
-	inline Node* Get(int index)
+	inline List& operator+=(const T& element)
 	{
-		if (_first == nullptr)
-			return nullptr;
+		Add(element);
+		return *this;
+	}
 
+	inline void Clear() 
+	{ 
+		if (_first)
+		{
+			_first->DeleteAll();
+			_first = nullptr;
+		}
+	}
+
+	inline size_t GetSize() const { return _first ? _first->Count() : 0; }
+	inline bool IsEmpty() const { return _first == nullptr; }
+
+	inline Iterator First() { return _first; }
+	inline Iterator First() const { return _first; }
+	inline Iterator Last() { return _first ? _first->Last() : nullptr; }
+	inline Iterator Last() const { return _first ? _first->Last() : nullptr; }
+
+	inline Iterator Get(int index)
+	{
 		auto node = _first;
-
 		for (int i = 0; node; node = node->next)
 			if (i++ == index)
 				return node;
@@ -67,73 +141,57 @@ public:
 		return nullptr;
 	}
 
-	void Clear()
+	Iterator Add(const T& element)
 	{
-		while (_first)
+		_Node* node = new _Node(element);
+		
+		if (_first)	_first->Last()->next = node;
+		else		_first = node;
+
+		return node;
+	}
+
+	void Remove(const T& element)
+	{
+		_Node* prev = nullptr;
+
+		for (auto node = _first; node;)
 		{
-			Node* next = _first->next;
-			delete _first;
-			_first = next;
+			if (node->obj == element)
+			{
+				auto next = node->next;
+
+				if (prev)	prev->next = next;
+				else		_first = next;
+
+				delete node;
+				node = next;
+			}
+			else
+				node = node->next;
+
+			prev = node;
 		}
 	}
 
-	inline Node* First() { return _first; }
-	inline const Node* First() const { return _first; }
-
-	size_t GetSize() const
+	void Remove(const Iterator &target)
 	{
-		if (_first == nullptr)
-			return 0;
+		_Node* prev = nullptr;
 
-		Node* node = _first;
-		size_t count = 1;
-
-		while (node = node->next)
-			++count;
-
-		return count;
-	}
-
-	Node* Last()
-	{
-		if (_first == nullptr)
-			return nullptr;
-
-		Node* node = _first;
-
-		while (node->next)
-			node = node->next;
-
-		return node;
-	}
-
-	inline const Node* Last() const { return const_cast<List&>(this)->Last(); }
-
-	Node* Add(const T& element)
-	{
-		Node* node = new Node(element);
-		
-		if (_first)
-			Last()->next = node;
-		else
-			_first = node;
-
-		return node;
-	}
-
-	void Remove(Node* target)
-	{
-		for (Node* node = _first; node; node = node->next)
-			if (node == target)
+		for (_Node* node = _first; node; node = node->next)
+		{
+			if (node == target._node)
 			{
-				if (node == _first)
-					_first = target->next;
+				if (prev)
+					prev->next = node->next;
 				else
-					node->next = target->next;
-				
-				delete target;
+					_first = node->next;
+
+				delete node;
 				return;
 			}
-	}
 
+			prev = node;
+		}
+	}
 };

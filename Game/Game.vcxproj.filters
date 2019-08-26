@@ -55,12 +55,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Data\Shaders\basic.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Data\Shaders\basic.vert">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\Data\Shaders\Phong.frag">
       <Filter>Shaders</Filter>
     </None>

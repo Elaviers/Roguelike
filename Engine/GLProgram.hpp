@@ -30,28 +30,26 @@ class GLProgram
 {
 private:
 	GLuint _id;
-	byte _channels;
 
 	static const GLProgram* _currentProgram;
 
 public:
-	GLProgram() : _channels(0), _id(0) {}
+	GLProgram() : _id(0) {}
 	GLProgram(const GLProgram&) = delete;
-	GLProgram(GLProgram&& other) noexcept : _id(other._id), _channels(other._channels) { other._id = other._channels = 0; }
+	GLProgram(GLProgram&& other) noexcept : _id(other._id) { other._id = 0; }
 	~GLProgram() {}
 
 	inline static const GLProgram& Current() { return *_currentProgram; }
 
 	inline GLuint GetID() const { return _id; }
-	inline byte GetChannels() const { return _channels; }
 
-	void Create(const char *vertSource, const char *fragSource, byte channels);
-	void Load(const char *vertFile, const char *fragFile, byte channels);
+	void Create(const char *vertSource, const char *fragSource);
+	void Load(const char *vertFile, const char *fragFile);
 
 	inline void Use() const { glUseProgram(_id); _currentProgram = this; }
 	GLint GetUniformLocation(const char *name) const;
 
-	inline GLProgram& operator=(GLProgram&& other) { _id = other._id; _channels = other._channels; other._id = other._channels = 0; }
+	inline GLProgram& operator=(GLProgram&& other) noexcept { _id = other._id; other._id = 0; }
 
 	//Setter inlines
 

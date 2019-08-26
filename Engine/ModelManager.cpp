@@ -1,5 +1,5 @@
 #include "ModelManager.hpp"
-#include "ColliderAABB.hpp"
+#include "ColliderBox.hpp"
 #include "ColliderSphere.hpp"
 #include "Debug.hpp"
 #include "IO.hpp"
@@ -12,10 +12,6 @@ ModelManager::ModelManager() : AssetManager("")
 
 ModelManager::~ModelManager()
 {
-	_DestroyResource(_line);
-	_DestroyResource(_cube);
-	_DestroyResource(_invCube);
-	_DestroyResource(_plane);
 }
 
 Model* ModelManager::_CreateResource(const String& name, const String& data)
@@ -39,75 +35,88 @@ void ModelManager::Initialise()
 	const Vector3 white(1.f, 1.f, 1.f);
 
 	//Line
-
-	Vertex17F lineVerts[2]
-	{
-		//pos						uv			colour		tangent			bitangent			normal
-		{Vector3(0.f, -.5f, 0.f), Vector2(0, 0), white, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1)},
-		{Vector3(0.f, .5f, 0.f), Vector2(1, 0), white, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1)}
-	};
+	Mesh_Static* lineMesh = new Mesh_Static(
+		Buffer<Vertex17F>({
+			//pos						uv			colour		tangent			bitangent			normal
+			{Vector3(0.f, -.5f, 0.f), Vector2(0, 0), white, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1)},
+			{Vector3(0.f, .5f, 0.f), Vector2(1, 0), white, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1)}
+		})
+	);
 
 	//Plane
-
-	Vertex17F planeVerts[4] =
-	{
-		{ Vector3(-.5f, -.5f, 0), Vector2(0, 0),	white, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1) },
-		{ Vector3(.5f, -.5f, 0), Vector2(1, 0),		white, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1) },
-		{ Vector3(-.5f, .5f, 0), Vector2(0, 1),		white, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1) },
-		{ Vector3(.5f, .5f, 0), Vector2(1, 1),		white, Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1) }
-	};
-
-	uint32 planeElements[6] =
-	{
-		0, 1, 2,
-		3, 2, 1
-	};
+	Mesh_Static* planeMesh = new Mesh_Static(
+		Buffer<Vertex17F>({
+			{ Vector3(-.5f, -.5f, 0), Vector2(0, 0),	white, Vector3(), Vector3(), Vector3(0, 0, -1) },
+			{ Vector3(.5f, -.5f, 0), Vector2(1, 0),		white, Vector3(), Vector3(), Vector3(0, 0, -1) },
+			{ Vector3(-.5f, .5f, 0), Vector2(0, 1),		white, Vector3(), Vector3(), Vector3(0, 0, -1) },
+			{ Vector3(.5f, .5f, 0), Vector2(1, 1),		white, Vector3(), Vector3(), Vector3(0, 0, -1) }
+		}),
+		Buffer<uint32>({
+			0, 1, 2,
+			3, 2, 1
+		}));
+	
+	Vertex17F::CalculateTangents(planeMesh->vertices[0], planeMesh->vertices[1], planeMesh->vertices[2]);
+	Vertex17F::CalculateTangents(planeMesh->vertices[3], planeMesh->vertices[2], planeMesh->vertices[1]);
 
 	//Cube
+	Mesh_Static* cubeMesh = new Mesh_Static(
+		Buffer<Vertex17F>({
+			//Bottom
+			VERT14F_TRI(Vector3(.5f, -.5f, -.5f),	Vector3(-.5f, -.5f, -.5f),	Vector3(.5f, -.5f, .5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, -1, 0)),
+			VERT14F_TRI(Vector3(-.5f, -.5f, .5f),	Vector3(.5f, -.5f, .5f),	Vector3(-.5f, -.5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, -1, 0)),
 
-	Vertex17F cubeData[36] =
-	{
-		//Bottom
-		VERT14F_TRI(Vector3(.5f, -.5f, -.5f),	Vector3(-.5f, -.5f, -.5f),	Vector3(.5f, -.5f, .5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, -1, 0)),
-		VERT14F_TRI(Vector3(-.5f, -.5f, .5f),	Vector3(.5f, -.5f, .5f),	Vector3(-.5f, -.5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, -1, 0)),
+			//Top
+			VERT14F_TRI(Vector3(-.5f, .5f, -.5f),	Vector3(.5f, .5f, -.5f),	Vector3(-.5f, .5f, .5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 1, 0)),
+			VERT14F_TRI(Vector3(.5f, .5f, .5f),		Vector3(-.5f, .5f, .5f),	Vector3(.5f, .5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 1, 0)),
 
-		//Top
-		VERT14F_TRI(Vector3(-.5f, .5f, -.5f),	Vector3(.5f, .5f, -.5f),	Vector3(-.5f, .5f, .5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 1, 0)),
-		VERT14F_TRI(Vector3(.5f, .5f, .5f),		Vector3(-.5f, .5f, .5f),	Vector3(.5f, .5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 1, 0)),
+			//Front
+			VERT14F_TRI(Vector3(-.5f, -.5f, -.5f),	Vector3(.5f, -.5f, -.5f),	Vector3(-.5f, .5f, -.5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 0, -1)),
+			VERT14F_TRI(Vector3(.5f, .5f, -.5f),	Vector3(-.5f, .5f, -.5f),	Vector3(.5f, -.5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 0, -1)),
 
-		//Front
-		VERT14F_TRI(Vector3(-.5f, -.5f, -.5f),	Vector3(.5f, -.5f, -.5f),	Vector3(-.5f, .5f, -.5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 0, -1)),
-		VERT14F_TRI(Vector3(.5f, .5f, -.5f),	Vector3(-.5f, .5f, -.5f),	Vector3(.5f, -.5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 0, -1)),
+			//Right
+			VERT14F_TRI(Vector3(.5f, -.5f, -.5f),	Vector3(.5f, -.5f, .5f),	Vector3(.5f, .5f, -.5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(1, 0, 0)),
+			VERT14F_TRI(Vector3(.5f, .5f, .5f),		Vector3(.5f, .5f, -.5f),	Vector3(.5f, -.5f, .5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(1, 0, 0)),
 
-		//Right
-		VERT14F_TRI(Vector3(.5f, -.5f, -.5f),	Vector3(.5f, -.5f, .5f),	Vector3(.5f, .5f, -.5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(1, 0, 0)),
-		VERT14F_TRI(Vector3(.5f, .5f, .5f),		Vector3(.5f, .5f, -.5f),	Vector3(.5f, -.5f, .5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(1, 0, 0)),
+			//Back
+			VERT14F_TRI(Vector3(.5f, -.5f, .5f),	Vector3(-.5f, -.5f, .5f),	Vector3(.5f, .5f, .5f),		Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 0, 1)),
+			VERT14F_TRI(Vector3(-.5f, .5f, .5f),	Vector3(.5f, .5f, .5f),		Vector3(-.5f, -.5f, .5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 0, 1)),
 
-		//Back
-		VERT14F_TRI(Vector3(.5f, -.5f, .5f),	Vector3(-.5f, -.5f, .5f),	Vector3(.5f, .5f, .5f),		Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(0, 0, 1)),
-		VERT14F_TRI(Vector3(-.5f, .5f, .5f),	Vector3(.5f, .5f, .5f),		Vector3(-.5f, -.5f, .5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(0, 0, 1)),
+			//Left
+			VERT14F_TRI(Vector3(-.5f, -.5f, .5f),	Vector3(-.5f, -.5f, -.5f),	Vector3(-.5f, .5f, .5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(-1, 0, 0)),
+			VERT14F_TRI(Vector3(-.5f, .5f, -.5f),	Vector3(-.5f, .5f, .5f),	Vector3(-.5f, -.5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(-1, 0, 0))
+		})
+	);
 
-		//Left
-		VERT14F_TRI(Vector3(-.5f, -.5f, .5f),	Vector3(-.5f, -.5f, -.5f),	Vector3(-.5f, .5f, .5f),	Vector2(0.f, 0.f),	Vector2(1.f, 0.f),	Vector2(0.f, 1.f),	Vector3(-1, 0, 0)),
-		VERT14F_TRI(Vector3(-.5f, .5f, -.5f),	Vector3(-.5f, .5f, .5f),	Vector3(-.5f, -.5f, -.5f),	Vector2(1.f, 1.f),	Vector2(0.f, 1.f),	Vector2(1.f, 0.f),	Vector3(-1, 0, 0)),
-	};
+	for (size_t i = 0; i < 36; i += 3)
+		Vertex17F::CalculateTangents(cubeMesh->vertices[i], cubeMesh->vertices[i + 1], cubeMesh->vertices[i + 2]);
 
-	for (int i = 0; i < 36; i += 3)
-		Vertex17F::CalculateTangents(cubeData[i], cubeData[i + 1], cubeData[i + 2]);
+	lineMesh->bounds = Bounds(Vector3(0.f, 0.5f, 0.f));
+	planeMesh->bounds = Bounds(Vector3(.5f, .5f, 0.f));
+	cubeMesh->bounds = Bounds(Vector3(.5f, .5f, .5f));
 
-	_line.MeshRenderer().SetDrawMode(GL_LINES);
-	_line.MeshRenderer().Create(lineVerts, 2);
-	_plane.MeshRenderer().Create(planeVerts, 4, planeElements, 6);
-	_cube.MeshRenderer().Create(cubeData, 36);
+	_MapValue("line") = _line = new Model(lineMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(lineMesh->bounds.min, lineMesh->bounds.max)));
+	_MapValue("plane") = _plane = new Model(planeMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(planeMesh->bounds.min, planeMesh->bounds.max)));
+	_MapValue("cube") = _cube = new Model(cubeMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(cubeMesh->bounds.min, cubeMesh->bounds.max)));
 
+	_line->MeshRenderer().SetDrawMode(GL_LINES);
+	lineMesh->CreateGLMeshRenderer(_line->MeshRenderer());
+	planeMesh->CreateGLMeshRenderer(_plane->MeshRenderer());
+	
+	cubeMesh->CreateGLMeshRenderer(_cube->MeshRenderer());
 
-	for (int i = 0; i < 36; i += 3) {
-		cubeData[i].normal *= -1;
-		cubeData[i + 1].normal *= -1;
-		cubeData[i + 2].normal *= -1;
+	Mesh_Static* invCubeMesh = new Mesh_Static(*cubeMesh);
+	invCubeMesh->bounds = cubeMesh->bounds;
 
-		Utilities::Swap(cubeData[i + 1], cubeData[i + 2]);
-		Vertex17F::CalculateTangents(cubeData[i], cubeData[i + 1], cubeData[i + 2]);
+	for (size_t i = 0; i < 36; i += 3) {
+		invCubeMesh->vertices[i].normal *= -1;
+		invCubeMesh->vertices[i + 1].normal *= -1;
+		invCubeMesh->vertices[i + 2].normal *= -1;
+
+		Utilities::Swap(invCubeMesh->vertices[i + 1], invCubeMesh->vertices[i + 2]);
+		Vertex17F::CalculateTangents(invCubeMesh->vertices[i], invCubeMesh->vertices[i + 1], invCubeMesh->vertices[i + 2]);
 	}
-	_invCube.MeshRenderer().Create(cubeData, 36);
+
+	_MapValue("invcube") = _invCube = new Model(invCubeMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(invCubeMesh->bounds.min, invCubeMesh->bounds.max)));
+	invCubeMesh->CreateGLMeshRenderer(_invCube->MeshRenderer());
 }

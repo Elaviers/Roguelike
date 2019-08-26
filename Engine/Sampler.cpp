@@ -15,12 +15,14 @@ uint32 Sampler::ReadToSoundBuffer(byte* dest, uint32 destFrameCount, uint32 dest
 
 	do
 	{
+		uint32 offset = _currentFrame * _sound->FrameSize;
+
 		framesWritten = AudioUtilities::ResampleTo(
-			(int16*)(_sound->data + (_currentFrame * _sound->FrameSize)), _sound->sampleRate, _sound->channelCount, _sound->dataSize / _sound->FrameSize - _currentFrame,
+			(int16*)(_sound->data + offset), _sound->sampleRate, _sound->channelCount, _sound->dataSize / _sound->FrameSize - _currentFrame,
 			(int16*)dest, destSampleRate, destChannelCount, destFrameCount, mix, 3);
 	} while (_loop && framesWritten < destFrameCount);
 
-	_currentFrame += framesWritten * (float)_sound->sampleRate / (float)destSampleRate;
+	_currentFrame += (uint32)((float)framesWritten * (float)_sound->sampleRate / (float)destSampleRate);
 
 	return framesWritten;
 }

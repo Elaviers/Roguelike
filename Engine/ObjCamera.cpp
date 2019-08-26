@@ -1,5 +1,15 @@
 #include "ObjCamera.hpp"
+#include "GLProgram.hpp"
 #include "Ray.hpp"
+
+const ObjCamera* ObjCamera::_currentCamera = nullptr;
+
+void ObjCamera::Use()
+{
+	_currentCamera = this;
+	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Projection, _projection);
+	GLProgram::Current().SetMat4(DefaultUniformVars::mat4View, GetInverseTransformationMatrix());
+}
 
 void ObjCamera::GetCvars(CvarMap &properties)
 {
@@ -14,7 +24,7 @@ void ObjCamera::UpdateProjectionMatrix()
 		_projection = Matrix::Perspective(_fov, _near, _far, (float)_viewport[0] / (float)_viewport[1]);
 		break;
 	case ProjectionType::ORTHOGRAPHIC:
-		_projection = Matrix::Ortho(_viewport[0], _viewport[1], _near, _far, _scale);
+		_projection = Matrix::Ortho(_viewport[0] / -2.f, _viewport[0] / 2.f, _viewport[1] / -2.f, _viewport[1] / 2.f, _near, _far, _scale);
 		break;
 	}
 }
@@ -34,7 +44,7 @@ Ray ObjCamera::ScreenCoordsToRay(const Vector2 &coords) const
 		Vector2 scale = GetZPlaneDimensions();
 		Vector3 pointOnPlane = GetWorldRotation().GetQuat().Transform(Vector3(coords[0] * scale[0], coords[1] * scale[1], 1.f));
 		pointOnPlane.Normalise();
-		return Ray(GetWorldPosition(), pointOnPlane);
+		return Ray(GetWorldPosition(), pointOnPlane, COLL_ALL_CHANNELS);
 	}
 	else
 	{
@@ -43,7 +53,7 @@ Ray ObjCamera::ScreenCoordsToRay(const Vector2 &coords) const
 		return Ray(GetWorldPosition() + 
 			wt.GetRightVector() * ((_viewport[0] * coords[0]) / _scale) + 
 			wt.GetUpVector() * ((_viewport[1] * coords[1]) / _scale), 
-			wt.GetForwardVector());
+			wt.GetForwardVector(), COLL_ALL_CHANNELS);
 	}
 }
 
@@ -77,4 +87,30 @@ bool ObjCamera::FrustumOverlaps(const Bounds &b) const
 	v[2] /= v[3];
 
 	return Collision::SphereOverlapsAABB(v3, clipRadius, Vector3(-1, -1, -1), Vector3(1, 1, 1));
+}
+
+void ObjCamera::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
+{
+	GameObject::WriteData(writer, strings);
+
+	writer.Write_byte((byte)_type);
+	writer.Write_float(_fov);
+	writer.Write_float(_scale);
+	writer.Write_float(_near);
+	writer.Write_float(_far);
+	writer.Write_uint16(_viewport[0]);
+	writer.Write_uint16(_viewport[1]);
+}
+
+void ObjCamera::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+{
+	GameObject::ReadData(reader, strings);
+
+	_type = ProjectionType(reader.Read_byte());
+	_fov = reader.Read_float();
+	_scale = reader.Read_float();
+	_near = reader.Read_float();
+	_far = reader.Read_float();
+	_viewport[0] = reader.Read_uint16();
+	_viewport[1] = reader.Read_uint16();
 }

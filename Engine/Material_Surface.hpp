@@ -13,7 +13,7 @@ private:
 	void _CMD_tex(const Buffer<String>& args);
 public:
 	MaterialSurface(const Texture*diffuse = nullptr, const Texture*normal = nullptr, const Texture*specular = nullptr, const Texture*reflection = nullptr)
-		: Material(ShaderChannel::SURFACE), _diffuse(diffuse), _normal(normal), _specular(specular), _reflection(reflection)
+		: Material(RenderChannel::SURFACE), _diffuse(diffuse), _normal(normal), _specular(specular), _reflection(reflection)
 	{
 		_cvars.CreateVar("tex", CommandPtr(this, &MaterialSurface::_CMD_tex));
 	}
@@ -25,8 +25,7 @@ public:
 	inline void SetSpecular(const Texture* texture) { _specular = texture; }
 	inline void SetReflection(const Texture* texture) { _reflection = texture; }
 
-	virtual void Apply(const RenderParam *param = nullptr) const override { BindTextures(); }
-	virtual void BindTextures() const override;
-
+	virtual void Apply(const RenderParam* param = nullptr) const override;
+	
 	inline bool operator==(const MaterialSurface &other) { return _diffuse == other._diffuse && _normal == other._normal && _specular == other._specular; }
 };

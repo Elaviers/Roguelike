@@ -5,7 +5,7 @@ uint32 Hashing::MurmurHash2(const void* ptr, size_t len, uint32 seed)
 	const unsigned int m = 0x5bd1e995;
 	const int r = 24;
 
-	uint32 h = seed ^ len;
+	uint32 h = seed ^ (uint32)len;
 
 	const byte* data = (const byte*)ptr;
 

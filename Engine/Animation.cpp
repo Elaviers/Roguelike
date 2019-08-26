@@ -16,9 +16,9 @@ Animation* Animation::FromData(const Buffer<byte>& data)
 
 void Animation::Evaluate(Skeleton& outSkeleton, float time) const
 {
-	for (auto node = outSkeleton.FirstListNode(); node; node = node->next)
+	for (auto it = outSkeleton.FirstListElement(); it; ++it)
 	{
-		Joint& j = node->obj;
+		Joint& j = *it;
 
 		auto translationTrack = _translationTracks.Get(j.name);
 		auto rotationTrack = _rotationTracks.Get(j.name);
@@ -88,18 +88,18 @@ void Animation::_WriteData(BufferWriter<byte> &iterator) const
 {
 	iterator.Write_byte(ASSET_ANIMATION);
 
-	auto tTrackBuffer = _translationTracks.ToBuffer();
-	auto rTrackBuffer = _rotationTracks.ToBuffer();
-	auto sTrackBuffer = _scalingTracks.ToBuffer();
+	auto tTrackBuffer = _translationTracks.ToKVBuffer();
+	auto rTrackBuffer = _rotationTracks.ToKVBuffer();
+	auto sTrackBuffer = _scalingTracks.ToKVBuffer();
 
-	iterator.Write_uint32(tTrackBuffer.GetSize());
+	iterator.Write_uint32((uint32)tTrackBuffer.GetSize());
 	for (uint32 i = 0; i < tTrackBuffer.GetSize(); ++i)
 	{
 		iterator.Write_string(tTrackBuffer[i].first->GetData());
 		
 		auto keyframes = tTrackBuffer[i].second->GetKeyframes();
 		
-		iterator.Write_uint32(keyframes.GetSize());
+		iterator.Write_uint32((uint32)keyframes.GetSize());
 		for (uint32 i = 0; i < keyframes.GetSize(); ++i)
 		{
 			iterator.Write_float(keyframes[i].time);
@@ -108,14 +108,14 @@ void Animation::_WriteData(BufferWriter<byte> &iterator) const
 		}
 	}
 
-	iterator.Write_uint32(rTrackBuffer.GetSize());
+	iterator.Write_uint32((uint32)rTrackBuffer.GetSize());
 	for (uint32 i = 0; i < rTrackBuffer.GetSize(); ++i)
 	{
 		iterator.Write_string(rTrackBuffer[i].first->GetData());
 
 		auto keyframes = rTrackBuffer[i].second->GetKeyframes();
 
-		iterator.Write_uint32(keyframes.GetSize());
+		iterator.Write_uint32((uint32)keyframes.GetSize());
 		for (uint32 i = 0; i < keyframes.GetSize(); ++i)
 		{
 			iterator.Write_float(keyframes[i].time);
@@ -124,14 +124,14 @@ void Animation::_WriteData(BufferWriter<byte> &iterator) const
 		}
 	}
 
-	iterator.Write_uint32(sTrackBuffer.GetSize());
+	iterator.Write_uint32((uint32)sTrackBuffer.GetSize());
 	for (uint32 i = 0; i < sTrackBuffer.GetSize(); ++i)
 	{
 		iterator.Write_string(sTrackBuffer[i].first->GetData());
 
 		auto keyframes = sTrackBuffer[i].second->GetKeyframes();
 
-		iterator.Write_uint32(keyframes.GetSize());
+		iterator.Write_uint32((uint32)keyframes.GetSize());
 		for (uint32 i = 0; i < keyframes.GetSize(); ++i)
 		{
 			iterator.Write_float(keyframes[i].time);

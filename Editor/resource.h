@@ -36,13 +36,22 @@
 #define ID_IMPORT_TEXTURE               40013
 #define ID_FILE_IMPORTANIMATION         40014
 #define ID_IMPORT_ANIMATION             40015
+#define ID_VIEW_UNLIT                   40016
+#define ID_VIEW_SHADED                  40017
+#define ID_SHADINGMODE_UNLIT            40018
+#define ID_SHADINGMODE_LIT              40019
+#define ID_VIEW_                        40020
+#define ID_SHADING_UNLIT                40021
+#define ID_SHADING_PHONG                40022
+#define ID_VIEW_DRAWEDITORONLYFEATURES  40023
+#define ID_DRAWEDITORFEATURES           40024
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        120
-#define _APS_NEXT_COMMAND_VALUE         40016
+#define _APS_NEXT_COMMAND_VALUE         40025
 #define _APS_NEXT_CONTROL_VALUE         1014
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

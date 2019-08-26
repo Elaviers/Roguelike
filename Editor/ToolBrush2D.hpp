@@ -1,5 +1,5 @@
 #pragma once
-#include "Tool.h"
+#include "Tool.hpp"
 #include <Engine/CvarMap.hpp>
 #include <Engine/ObjBrush2D.hpp>
 
@@ -24,6 +24,6 @@ public:
 	virtual void MouseDown(const MouseData&) override;
 	virtual void MouseUp(const MouseData&) override;
 
-	virtual void Render() const override;
+	virtual void Render(EnumRenderChannel) const override;
 };
 

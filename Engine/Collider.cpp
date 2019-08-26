@@ -1,16 +1,18 @@
 #include "Collider.hpp"
-#include "ColliderAABB.hpp"
+#include "ColliderBox.hpp"
 #include "ColliderSphere.hpp"
 #include "Collision.hpp"
 
 bool Collider::Overlaps(const Collider &other, const Transform &otherTransform, const Transform &_transform) const
 {
-	if (_type == ColliderType::AABB && other.GetType() == ColliderType::AABB)
-	{
-		auto a = reinterpret_cast<const ColliderAABB&>(*this);
-		auto b = reinterpret_cast<const ColliderAABB&>(other);
+	if (!CanCollideWith(other)) return false;
 
-		return Collision::AABBOverlapsAABB(a.min * _transform.GetTransformationMatrix(), a.max * _transform.GetTransformationMatrix(), b.min * otherTransform.GetTransformationMatrix(), b.max * otherTransform.GetTransformationMatrix());
+	if (_type == ColliderType::BOX && other.GetType() == ColliderType::BOX)
+	{
+		auto a = reinterpret_cast<const ColliderBox&>(*this);
+		auto b = reinterpret_cast<const ColliderBox&>(other);
+
+		return Collision::BoxOverlapsBox(a.transform * _transform, a.extent, b.transform * otherTransform, b.extent);
 	}
 
 	if (_type == ColliderType::SPHERE && other.GetType() == ColliderType::SPHERE)
@@ -21,20 +23,20 @@ bool Collider::Overlaps(const Collider &other, const Transform &otherTransform, 
 		return Collision::SphereOverlapsSphere(_transform, a.GetRadius(), otherTransform, b.GetRadius());
 	}
 
-	if (_type == ColliderType::SPHERE && other.GetType() == ColliderType::AABB)
+	if (_type == ColliderType::SPHERE && other.GetType() == ColliderType::BOX)
 	{
 		auto a = reinterpret_cast<const ColliderSphere&> (*this);
-		auto b = reinterpret_cast<const ColliderAABB&> (other);
+		auto b = reinterpret_cast<const ColliderBox&> (other);
 
-		return Collision::SphereOverlapsAABB(_transform, a.GetRadius(), b.min * otherTransform.GetTransformationMatrix(), b.max * otherTransform.GetTransformationMatrix());
+		return Collision::SphereOverlapsBox(_transform, a.GetRadius(), b.transform * otherTransform, b.extent);
 	}
 
-	if (_type == ColliderType::AABB && other.GetType() == ColliderType::SPHERE)
+	if (_type == ColliderType::BOX && other.GetType() == ColliderType::SPHERE)
 	{
-		auto a = reinterpret_cast<const ColliderAABB&> (*this);
+		auto a = reinterpret_cast<const ColliderBox&> (*this);
 		auto b = reinterpret_cast<const ColliderSphere&> (other);
 
-		return Collision::SphereOverlapsAABB(otherTransform, b.GetRadius(), a.min * _transform.GetTransformationMatrix(), a.max * _transform.GetTransformationMatrix());
+		return Collision::SphereOverlapsBox(otherTransform, b.GetRadius(), a.transform * _transform, a.extent);
 	}
 
 	return false;

@@ -4,6 +4,7 @@
 #include <Engine/DrawUtils.hpp>
 #include <Engine/InputManager.hpp>
 #include <Engine/IO.hpp>
+#include <Engine/ObjLight.hpp>
 #include <Engine/ObjRenderable.hpp>
 #include <Engine/Ray.hpp>
 #include "EditorIO.hpp"
@@ -19,15 +20,6 @@ const Buffer<Pair<const wchar_t*>> levelDialogFilter({ Pair<const wchar_t*>(L"Le
 const Buffer<Pair<const wchar_t*>> openAnimationFilter({Pair<const wchar_t*>(L"FBX Scene", L"*.fbx")});
 const Buffer<Pair<const wchar_t*>> openModelFilter({Pair<const wchar_t*>(L"FBX Scene", L"*.fbx"), Pair<const wchar_t*>(L"OBJ Model", L"*.obj")});
 const Buffer<Pair<const wchar_t*>> openTextureFilter({Pair<const wchar_t*>(L"PNG Image", L"*.png")});
-
-enum
-{
-	TBITEM_SELECT = 0,
-	TBITEM_EDIT = 1,
-	TBITEM_BRUSH = 2,
-	TBITEM_ENTITY = 3,
-	TBITEM_CONNECTOR = 4
-};
 
 Editor::~Editor()
 {
@@ -80,6 +72,9 @@ void Editor::_Init()
 
 	ResourceSelect::Initialise();
 
+	HierachyWindow::Initialise(_windowBrush);
+	_hierachyWindow.Create(&_window);
+
 	PropertyWindow::Initialise(_windowBrush);
 	_propertyWindow.Create(_window);
 
@@ -118,7 +113,7 @@ void Editor::_Init()
 	CameraRef(3).SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
 
 	_fbxManager = FbxManager::Create();
-	Engine::Instance().CreateAllManagers();
+	Engine::Instance().Init(ENG_ALL);
 
 	InputManager* inputManager = Engine::Instance().pInputManager;
 
@@ -127,7 +122,7 @@ void Editor::_Init()
 	inputManager->BindKeyAxis(Keycode::D, &_axisMoveX, 1.f);
 	inputManager->BindKeyAxis(Keycode::A, &_axisMoveX, -1.f);
 	inputManager->BindKeyAxis(Keycode::SPACE, &_axisMoveZ, 1.f);
-	inputManager->BindKeyAxis(Keycode::CTRL, &_axisMoveZ, -1.f);
+	inputManager->BindKeyAxis(Keycode::SHIFT, &_axisMoveZ, -1.f);
 
 	inputManager->BindKeyAxis(Keycode::UP, &_axisLookY, 1.f);
 	inputManager->BindKeyAxis(Keycode::DOWN, &_axisLookY, -1.f);
@@ -138,12 +133,19 @@ void Editor::_Init()
 	inputManager->BindKey(Keycode::ESCAPE, *this, &Editor::KeyCancel);
 	inputManager->BindKey(Keycode::DEL, *this, &Editor::KeyDelete);
 
+	inputManager->BindKey(Keycode::TILDE, *this, &Editor::RefreshLevel);
+
+	_level.onNameChanged += Callback(this, &Editor::RefreshLevel);
+	_level.onChildChanged += Callback(this, &Editor::RefreshLevel);
+
 	//Tool data init
-	_tools.brush2D.Initialise();
-	_tools.brush3D.Initialise();
-	_tools.connector.Initialise();
-	_tools.entity.Initialise();
-	_tools.select.Initialise();
+	tools.brush2D.Initialise();
+	tools.brush3D.Initialise();
+	tools.connector.Initialise();
+	tools.entity.Initialise();
+	tools.select.Initialise();
+
+	SetTool(TOOL_SELECT);
 }
 
 void Editor::_InitGL()
@@ -163,8 +165,8 @@ void Editor::_InitGL()
 
 	glLineWidth(lineW);
 
-	_shaderLit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Phong.frag", ShaderChannel::ALL);
-	_shaderUnlit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag", ShaderChannel::ALL);
+	_shaderLit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Phong.frag");
+	_shaderUnlit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
 }
 
 #pragma endregion
@@ -199,6 +201,8 @@ void Editor::Run()
 	for (int i = 0; i < VIEWPORTCOUNT; ++i)
 		_viewports[i].Show();
 
+	_hierachyWindow.Show();
+
 	_propertyWindow.Show();
 
 	_toolWindow.Show();
@@ -231,9 +235,9 @@ void Editor::Frame()
 
 	ObjCamera &perspCam = CameraRef(_activeVP);
 	perspCam.RelativeMove(
-		perspCam.RelativeTransform().GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed
-		+ perspCam.RelativeTransform().GetRightVector() * _deltaTime * _axisMoveX * moveSpeed
-		+ perspCam.RelativeTransform().GetUpVector() * _deltaTime * _axisMoveZ * moveSpeed);
+		perspCam.GetRelativeTransform().GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed
+		+ perspCam.GetRelativeTransform().GetRightVector() * _deltaTime * _axisMoveX * moveSpeed
+		+ perspCam.GetRelativeTransform().GetUpVector() * _deltaTime * _axisMoveZ * moveSpeed);
 
 	perspCam.AddRelativeRotation(Vector3(_deltaTime * _axisLookY * rotSpeed, _deltaTime * _axisLookX * rotSpeed, 0.f));
 
@@ -256,8 +260,7 @@ void Editor::Render()
 	RenderViewport(3, Direction::RIGHT);
 
 	_shaderUnlit.Use();
-	_shaderUnlit.SetMat4(DefaultUniformVars::mat4Projection, _uiCam.GetProjectionMatrix());
-	_shaderUnlit.SetMat4(DefaultUniformVars::mat4View, _uiCam.GetInverseTransformationMatrix());
+	_uiCam.Use();
 	Engine::Instance().pDebugManager->RenderScreen();
 }
 
@@ -271,27 +274,67 @@ void Editor::RenderViewport(int index, Direction dir)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDepthFunc(GL_LEQUAL);
 	
+	{	//LIT PASS
+		_shaderLit.Use();
+		camera.Use();
+		_shaderLit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+
+		_shaderLit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
+		_shaderLit.SetInt(DefaultUniformVars::intTextureNormal, 1);
+		_shaderLit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
+		_shaderLit.SetInt(DefaultUniformVars::intTextureReflection, 3);
+
+		_shaderLit.SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
+		_shaderLit.SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1, 1));
+
+		Buffer<ObjLight*> lights = _level.FindChildrenOfType<ObjLight>(true);
+
+		for (size_t i = 0; i < 8; ++i)
+		{
+			if (i < lights.GetSize())
+				lights[i]->ToShader((int)i);
+			else
+			{
+				float zero = 0.f;
+				glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR("Lights[" + String::FromInt(i) + "].Radius")), 1, &zero);
+			}
+		}
+
+		_level.Render(CameraRef(0), _litRenderChannels);
+	}
+
+	//UNLIT PASS
 	_shaderUnlit.Use();
-	_shaderUnlit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
-	_shaderUnlit.SetMat4(DefaultUniformVars::mat4View, camera.GetInverseTransformationMatrix());
+	camera.Use();
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
-	_level.Render(CameraRef(0));
 
-	if (!persp) glDepthFunc(GL_ALWAYS);
+	_level.Render(CameraRef(0), EnumRenderChannel(_unlitRenderChannels | (_drawEditorFeatures ? RenderChannel::EDITOR : 0)));
 	
-	glLineWidth(lineW);
+	if (_drawEditorFeatures)
+	{
+		if (!persp) glDepthFunc(GL_ALWAYS);
 
-	Engine::Instance().pTextureManager->White().Bind(0);
-	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.75f, .75f, .75f, 1.f));
-	DrawUtils::DrawGrid(*Engine::Instance().pModelManager, camera, dir, 1.f, 1.f, gridLimit);
+		glLineWidth(lineW);
 
-	if (persp) glDepthFunc(GL_LEQUAL);
-	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.5f, .5f, 1.f, 1.f));
-	DrawUtils::DrawGrid(*Engine::Instance().pModelManager, camera, dir, 1.f, 10.f, gridLimit);
+		Engine::Instance().pTextureManager->White()->Bind(0);
+		_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.75f, .75f, .75f, 1.f));
+		DrawUtils::DrawGrid(*Engine::Instance().pModelManager, camera, dir, 1.f, 1.f, gridLimit);
 
-	Engine::Instance().pDebugManager->RenderWorld();
+		if (persp) glDepthFunc(GL_LEQUAL);
+		_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.5f, .5f, 1.f, 1.f));
+		DrawUtils::DrawGrid(*Engine::Instance().pModelManager, camera, dir, 1.f, 10.f, gridLimit);
 
-	if (_currentTool) _currentTool->Render();
+		Engine::Instance().pDebugManager->RenderWorld();
+	}
+
+	Engine::Instance().pTextureManager->White()->Bind(0);
+	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+	if (_currentTool) _currentTool->Render(RenderChannel::ALL);
+
+	glDepthFunc(GL_ALWAYS);
+	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+	_level.Render(CameraRef(0), RenderChannel::SPRITE);
+	glDepthFunc(GL_LEQUAL);
 
 	_viewports[index].SwapBuffers();
 }
@@ -338,13 +381,55 @@ String Editor::SelectModelDialog()
 	return string;
 }
 
+void Editor::SetTool(ToolEnum tool, bool changeToolbar)
+{
+	if (changeToolbar)
+		SendMessage(_toolbar, TB_CHECKBUTTON, tool, MAKELONG(TRUE, 0));
+
+	Tool* newTool = nullptr;
+
+	switch (tool)
+	{
+	case TOOL_SELECT:
+		newTool = &tools.select;
+		break;
+	case TOOL_BRUSH2D:
+		newTool = &tools.brush2D;
+		break;
+	case TOOL_BRUSH3D:
+		newTool = &tools.brush3D;
+		break;
+	case TOOL_ENTITY:
+		newTool = &tools.entity;
+		break;
+	case TOOL_CONNECTOR:
+		newTool = &tools.connector;
+		break;
+	}
+
+	if (_currentTool)
+		_currentTool->Deactivate();
+
+	_currentTool = newTool;
+	_currentTool->Activate(_propertyWindow, _toolWindow.PropertyWindow());
+}
+
 #pragma region Input
 
 void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y)
 {
+	if (_mouseData.viewport != vpIndex)
+	{
+		if (_mouseData.isLeftDown)
+			LeftMouseUp();
+
+		if (_mouseData.isRightDown)
+			RightMouseUp();
+	}
+
 	ObjCamera& camera = CameraRef(vpIndex);
-	Vector3 right = camera.RelativeTransform().GetRightVector();
-	Vector3 up = camera.RelativeTransform().GetUpVector();
+	Vector3 right = camera.GetRelativeTransform().GetRightVector();
+	Vector3 up = camera.GetRelativeTransform().GetUpVector();
 
 	if (camera.GetProjectionType() == ProjectionType::PERSPECTIVE)
 		_mouseData.rightElement = _mouseData.upElement = _mouseData.forwardElement = 0;
@@ -355,8 +440,8 @@ void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y
 		_mouseData.forwardElement = (_mouseData.rightElement != 0 && _mouseData.upElement != 0) ? 0 : (_mouseData.rightElement != 1 && _mouseData.upElement != 1) ? 1 : 2;
 	}
 
-	float prevUnitX = _mouseData.unitX;
-	float prevUnitY = _mouseData.unitY;
+	_mouseData.prevUnitX = _mouseData.unitX;
+	_mouseData.prevUnitY = _mouseData.unitY;
 	int prevViewport = _mouseData.viewport;
 
 	_mouseData.viewport = vpIndex;
@@ -370,8 +455,8 @@ void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y
 		if (camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
 		{
 			Vector3 v;
-			v[_mouseData.rightElement] = prevUnitX - _mouseData.unitX;
-			v[_mouseData.upElement] = prevUnitY - _mouseData.unitY;
+			v[_mouseData.rightElement] = _mouseData.prevUnitX - _mouseData.unitX;
+			v[_mouseData.upElement] = _mouseData.prevUnitY - _mouseData.unitY;
 			camera.RelativeMove(v);
 
 			_mouseData.unitX = camera.GetRelativePosition()[_mouseData.rightElement] + (float)_mouseData.x / camera.GetScale();
@@ -379,7 +464,7 @@ void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y
 		}
 		else
 		{
-			camera.AddRelativeRotation(Vector3((prevUnitY - _mouseData.unitY) / -2.f, (prevUnitX - _mouseData.unitX) / -2.f, 0.f));
+			camera.AddRelativeRotation(Vector3((_mouseData.prevUnitY - _mouseData.unitY) / -2.f, (_mouseData.prevUnitX - _mouseData.unitX) / -2.f, 0.f));
 		}
 	}
 
@@ -403,6 +488,8 @@ void Editor::LeftMouseDown()
 	::SetFocus(_window.GetHwnd());
 
 	_mouseData.isLeftDown = true;
+	_mouseData.heldUnitX = _mouseData.unitX;
+	_mouseData.heldUnitY = _mouseData.unitY;
 	_mouseData.heldUnitX_rounded = _mouseData.unitX_rounded;
 	_mouseData.heldUnitY_rounded = _mouseData.unitY_rounded;
 
@@ -449,6 +536,11 @@ void Editor::KeyDelete()
 		_currentTool->KeyDelete();
 }
 
+void Editor::RefreshLevel()
+{
+	_hierachyWindow.Refresh(_level);
+}
+
 void Editor::Zoom(float amount)
 {
 	ObjCamera& camera = CameraRef(_mouseData.viewport);
@@ -461,7 +553,7 @@ void Editor::Zoom(float amount)
 		float moveY = mouseOffsetUnitsY - ((float)mouseOffsetUnitsY / (float)amount);
 
 		camera.SetScale(camera.GetScale() * amount);
-		camera.RelativeMove(camera.RelativeTransform().GetRightVector() * moveX + camera.RelativeTransform().GetUpVector() * moveY);
+		camera.RelativeMove(camera.GetRelativeTransform().GetRightVector() * moveX + camera.GetRelativeTransform().GetUpVector() * moveY);
 	}
 
 }
@@ -488,11 +580,6 @@ LRESULT CALLBACK AboutProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	}
 
 	return 0;
-}
-
-inline String GetCurrentDir()
-{
-
 }
 
 LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -538,18 +625,17 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 		TBBUTTON tbButtons[] =
 		{
-			{0, TBITEM_SELECT,  TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Select") },
-			{1, TBITEM_EDIT, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Edit")},
-			{2, TBITEM_BRUSH, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Brush")},
-			{3, TBITEM_ENTITY, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Entity")},
-			{4, TBITEM_CONNECTOR, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Connector")}
+			{0, TOOL_SELECT,  TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Select") },
+			{1, TOOL_BRUSH2D, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Edit")},
+			{2, TOOL_BRUSH3D, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Brush")},
+			{3, TOOL_ENTITY, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Entity")},
+			{4, TOOL_CONNECTOR, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Connector")}
 		};
 
 		SendMessage(editor->_toolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
 		SendMessage(editor->_toolbar, TB_ADDBUTTONS, (WPARAM)5, (LPARAM)&tbButtons);
 
 		SendMessage(editor->_toolbar, TB_AUTOSIZE, 0, 0);
-		SendMessage(editor->_toolbar, TB_SETSTATE, TBITEM_EDIT, MAKELONG(TBSTATE_ENABLED | TBSTATE_CHECKED, 0));
 	}
 	break;
 
@@ -630,13 +716,30 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			}
 			break;
 
-#define SETTOOL(NAME) editor->_currentTool = &editor->_tools.NAME; editor->_currentTool->Activate(editor->_propertyWindow, editor->_toolWindow.PropertyWindow())
+			case ID_SHADING_UNLIT:
+				editor->_litRenderChannels = RenderChannel::NONE;
+				editor->_unlitRenderChannels = EnumRenderChannel(RenderChannel::SURFACE | RenderChannel::UNLIT);
+				break;
 
-			case TBITEM_SELECT:	SETTOOL(select);	break;
-			case TBITEM_EDIT:	SETTOOL(brush2D);	break;
-			case TBITEM_BRUSH:	SETTOOL(brush3D);	break;
-			case TBITEM_ENTITY:	SETTOOL(entity);	break;
-			case TBITEM_CONNECTOR: SETTOOL(connector); break;
+			case ID_SHADING_PHONG:
+				editor->_litRenderChannels = RenderChannel::SURFACE;
+				editor->_unlitRenderChannels = RenderChannel::UNLIT;
+				break;
+
+			case ID_DRAWEDITORFEATURES:
+				editor->_drawEditorFeatures = !editor->_drawEditorFeatures;
+
+				::CheckMenuItem(::GetMenu(hwnd), ID_DRAWEDITORFEATURES, editor->_drawEditorFeatures ? MF_CHECKED : MF_UNCHECKED);
+				break;
+
+
+			case TOOL_SELECT:
+			case TOOL_BRUSH2D:
+			case TOOL_BRUSH3D:
+			case TOOL_ENTITY:
+			case TOOL_CONNECTOR:
+				editor->SetTool((ToolEnum)LOWORD(wparam), false);
+				break;
 			}
 			break;
 		}
@@ -657,25 +760,29 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 	{
 		uint16 w = LOWORD(lparam);
 		uint16 h = HIWORD(lparam);
-		const int propertiesW = 256;
-		const int toolbarH = 64;
+		const int leftW = 256;
+		const int rightW = 256;
+		const int topH = 64;
 		const int toolWindowH = 256;
 
-		editor->_vpArea.SetSizeAndPos(0, toolbarH, w - propertiesW, h - toolbarH);
-		editor->_propertyWindow.SetSizeAndPos(w - propertiesW, toolbarH, propertiesW, h - toolbarH - toolWindowH);
-		editor->_toolWindow.SetSizeAndPos(w - propertiesW, h - toolWindowH, propertiesW, toolWindowH);
-		WindowFunctions::SetHWNDSizeAndPos(editor->_toolbar, 0, 0, w, toolbarH);
+		editor->_vpArea.SetSizeAndPos(leftW, topH, w - leftW - rightW, h - topH);
+		editor->_propertyWindow.SetSizeAndPos(w - rightW, topH, rightW, h - topH - toolWindowH);
+		editor->_hierachyWindow.SetSizeAndPos(0, topH, leftW, h - topH);
+		editor->_toolWindow.SetSizeAndPos(w - rightW, h - toolWindowH, rightW, toolWindowH);
+		WindowFunctions::SetHWNDSizeAndPos(editor->_toolbar, 0, 0, w, topH);
 	}
 	break;
 
+	case WM_SYSKEYDOWN:
 	case WM_KEYDOWN:
 		if (lparam & (1 << 30))
 			break; //Key repeats ignored
 
 		Engine::Instance().pInputManager->KeyDown((Keycode)wparam);
 		break;
-	case WM_KEYUP:
 
+	case WM_SYSKEYUP:
+	case WM_KEYUP:
 		Engine::Instance().pInputManager->KeyUp((Keycode)wparam);
 		break;
 
@@ -733,7 +840,7 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 	int d = 0;
 	while (true)
 	{
-		auto b = test.ToBuffer(d);
+		auto b = test.ToKVBuffer(d);
 
 		if (b.GetSize() == 0)
 			break;

@@ -12,11 +12,12 @@ protected:
 	Vector4 _colour;
 
 	DebugObject(float time, Vector4 colour) : _timeRemaining(time), _colour(colour) {}
-	virtual ~DebugObject() {}
 
 	void _PreRender() const;
 
 public:
+	virtual ~DebugObject() {}
+
 	void Update(float deltaTime);
 
 	virtual void Render() const = 0;

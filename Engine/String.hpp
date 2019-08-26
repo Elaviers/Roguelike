@@ -26,8 +26,8 @@ public:
 	Buffer<String> Split(const char *delimiters) const;
 	String SubString(size_t start, size_t end) const;
 	inline String SubString(size_t start) const { return SubString(start, _length); }
-	int IndexOf(char) const;
-	int IndexOfAny(const char* possibleChars) const;
+	size_t IndexOf(char) const;
+	size_t IndexOfAny(const char* possibleChars) const;
 
 	void SetLength(size_t length);
 	inline void Clear() { SetLength(0); }
@@ -38,6 +38,8 @@ public:
 	inline size_t GetLength() const { return _length; }
 	inline char& operator[](size_t position) const { return _data[position]; }
 
+	char& Insert(char c, size_t position);
+
 	String& operator=(const String&);
 	String& operator=(String&&) noexcept;
 	String& operator=(const char*);
@@ -47,7 +49,7 @@ public:
 
 	String operator+(const String&) const;
 
-	int Compare(const String &other) const;
+	size_t Compare(const String &other) const;
 	inline bool operator<(const String &other) const	{ return Compare(other) < 0;	}
 	inline bool operator>(const String &other) const	{ return Compare(other) > 0;	}
 

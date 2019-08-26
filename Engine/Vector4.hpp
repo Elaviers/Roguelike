@@ -47,6 +47,11 @@ public:
 	inline Vector4 operator*(float f) { Vector4 v(*this); return v *= f; }
 	inline Vector4 operator/(float f) { Vector4 v(*this); return v /= f; }
 
+	inline bool operator==(const Vector4& other) const 
+	{ 
+		return _data[0] == other._data[0] && _data[1] == other._data[1] && _data[2] == other._data[2] && _data[3] == other._data[3];
+	}
+
 	inline float LengthSquared() const
 	{
 		return _data[0] * _data[0] + _data[1] * _data[1] + _data[2] * _data[2] + _data[3] * _data[3];

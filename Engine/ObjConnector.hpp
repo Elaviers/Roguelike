@@ -6,7 +6,7 @@
 class ObjConnector : public ObjBox
 {
 public:
-	GAMEOBJECT_FUNCS(ObjConnector)
+	GAMEOBJECT_FUNCS(ObjConnector, ObjectIDS::LEVEL_CONNECTOR)
 
 	Direction2D direction;
 	bool connected;
@@ -14,10 +14,10 @@ public:
 	ObjConnector() : ObjBox(FLAG_SAVEABLE), direction(Direction2D::NORTH), connected(false) { }
 	virtual ~ObjConnector() {}
 
-	virtual void Render() const;
+	virtual void Render(EnumRenderChannel) const;
 
-	virtual void WriteToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;
-	virtual void ReadFromFile(BufferReader<byte> &buffer, const NumberedSet<String> &strings) override;
+	virtual void WriteData(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;
+	virtual void ReadData(BufferReader<byte> &buffer, const NumberedSet<String> &strings) override;
 
 	virtual Bounds GetBounds() const override {
 

@@ -51,8 +51,8 @@ struct Vertex19F2I
 
 	#define BONE_COUNT 2
 
-	uint32 boneIndices[BONE_COUNT];
-	float boneWeights[BONE_COUNT];
+	uint32 boneIndices[BONE_COUNT] = {};
+	float boneWeights[BONE_COUNT] = {};
 
 	static void CalculateTangents(Vertex19F2I& vertex1, Vertex19F2I& vertex2, Vertex19F2I& vertex3);
 };

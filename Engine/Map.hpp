@@ -101,6 +101,14 @@ class Map
 			return node;
 		}
 
+		void AddToK(Buffer<const K*>& buffer) const
+		{
+			buffer.Add(&key);
+
+			if (left)	left->AddToK(buffer);
+			if (right)	right->AddToK(buffer);
+		}
+
 		void AddTo(Buffer<Pair<const K*, const V*>>& buffer) const
 		{
 			buffer.Add(Pair<const K*, const V*>(&key, &value));
@@ -124,10 +132,9 @@ public:
 	~Map() { delete _data; }
 
 	Map(const Map &other) : _data(nullptr) { if (other._data) _data = other._data->Copy(); }
-
 	Map(Map&& other) : _data(other._data) { other._data = nullptr; }
 
-	inline void Clear()				{ delete _data; }
+	inline void Clear()				{ delete _data; _data = nullptr; }
 	inline uint32 GetSize() const	{ return _data ? _data->Count() : 0; }
 	inline bool IsEmpty() const		{ return _data == nullptr; }
 
@@ -177,7 +184,14 @@ public:
 		return *this;
 	}
 
-	inline Buffer<Pair<const K*, const V*>> ToBuffer() const
+	inline Buffer<const K*> ToKBuffer() const
+	{
+		Buffer<const K*> buffer;
+		if (_data) _data->AddToK(buffer);
+		return buffer;
+	}
+
+	inline Buffer<Pair<const K*, const V*>> ToKVBuffer() const
 	{
 		Buffer<Pair<const K*, const V*>> buffer;
 		if (_data) _data->AddTo(buffer);

@@ -106,13 +106,13 @@ namespace Matrix
 		return Scale(scale) * rotation.ToMatrix() * Translation(translation);
 	}
 
-	Mat4 Ortho(float width, float height, float near, float far, float scale)
+	Mat4 Ortho(float l, float r, float b, float t, float near, float far, float scale)
 	{
 		RETURNMAT4(
-			2.f * scale / width,	0.f,					0.f,							0.f,
-			0.f,					2.f * scale / height,	0.f,							0.f,
+			2.f * scale / (r - l),	0.f,					0.f,							0.f,
+			0.f,					2.f * scale / (t - b),	0.f,							0.f,
 			0.f,					0.f,					2.f / (far - near),				0.f,
-			0.f,					0.f,					(-far - near) / (far - near),	1.f
+			(-r - l) / (r - l),		(-t - b) / (t - b),		(-far - near) / (far - near),	1.f
 		);
 	}
 

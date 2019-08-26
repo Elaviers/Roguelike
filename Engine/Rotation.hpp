@@ -79,5 +79,10 @@ public:
 	{
 		return _quatBased ? Rotation(_quaternion.Inverse()) : Rotation(_euler * -1.f);
 	}
+
+	inline bool operator==(const Rotation& other) const
+	{
+		return _euler == other._euler;
+	}
 };
 

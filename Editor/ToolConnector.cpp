@@ -31,7 +31,7 @@ void ToolConnector::SetConnectorDirection(const String &dir)
 
 void ToolConnector::Initialise()
 {
-	_cvars.Add("Direction", Getter<String>(this, &ToolConnector::GetConnectorDirection), Setter<String>(this, &ToolConnector::SetConnectorDirection), PropertyFlags::DIRECTION);
+	_cvars.Add("Direction", Getter<String>(this, &ToolConnector::GetConnectorDirection), Setter<String>(this, &ToolConnector::SetConnectorDirection), CvarFlags::DIRECTION);
 
 	_connector.SetRenderColour(Vector4(0.f, 1.f, 0.f, .5f));
 }
@@ -102,8 +102,8 @@ void ToolConnector::KeySubmit()
 	_connector.SetMax(Vector3());
 }
 
-void ToolConnector::Render() const
+void ToolConnector::Render(EnumRenderChannel channels) const
 {
 	glLineWidth(3);
-	_connector.Render();
+	_connector.Render(channels);
 }

@@ -20,15 +20,16 @@ enum class CvarType
 	NONE = 0
 };
 
-namespace PropertyFlags
+namespace CvarFlags
 {
-	enum PropertyFlag
+	enum CvarFlag
 	{
 		READONLY = 0x01,
 		MODEL = 0x02,
 		MATERIAL = 0x04,
 		CLASSID = 0x08,
-		DIRECTION = 0x10
+		DIRECTION = 0x10,
+		CHECKBOX = 0x20
 	};
 }
 

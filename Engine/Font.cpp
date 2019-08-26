@@ -6,7 +6,7 @@ Font* Font::FromText(const String& text)
 {
 	if (text.GetLength())
 	{
-		int splitIndex = text.IndexOfAny("\r\n");
+		size_t splitIndex = text.IndexOfAny("\r\n");
 		String firstLine = text.SubString(0, splitIndex).ToLower();
 		String relevantData = text.SubString(splitIndex + 1);
 

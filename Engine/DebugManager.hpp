@@ -24,8 +24,8 @@ public:
 	void RenderWorld() const;
 	void RenderScreen() const;
 
-	inline void AddToWorld(const DebugObject &obj) { _worldObjects.Add(Utilities::CopyOf(obj, obj.SizeOf())); }
-	inline void AddToScreen(const DebugObject &obj) { _worldObjects.Add(Utilities::CopyOf(obj, obj.SizeOf())); }
+	inline void AddToWorld(const DebugObject &obj)	{ _worldObjects.Add(Utilities::CopyOf(obj, obj.SizeOf())); }
+	inline void AddToScreen(const DebugObject &obj) { _screenObjects.Add(Utilities::CopyOf(obj, obj.SizeOf())); }
 
 	void AddString(const String &string);
 };

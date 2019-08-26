@@ -2,7 +2,7 @@
 #include "Asset.hpp"
 #include "CvarMap.hpp"
 #include "Engine.hpp"
-#include "ShaderChannel.hpp"
+#include "RenderChannel.hpp"
 #include "String.hpp"
 #include "TextureManager.hpp"
 
@@ -13,9 +13,9 @@ class Material : public Asset
 protected:
 	CvarMap _cvars;
 
-	byte _shaderChannels;
+	byte _renderChannels;
 
-	Material(byte channels) : _shaderChannels(channels) 
+	Material(byte channels) : _renderChannels(channels) 
 	{ 
 		_cvars.CreateVar("mag", CommandPtr(Engine::Instance().pTextureManager, &TextureManager::CMD_mag));
 		_cvars.CreateVar("mips", CommandPtr(Engine::Instance().pTextureManager, &TextureManager::CMD_mips));
@@ -25,7 +25,7 @@ protected:
 	{
 		Buffer<String> lines = string.ToLower().Split("\r\n");
 		for (size_t i = 0; i < lines.GetSize(); ++i)
-			_cvars.HandleCommand(lines[i]);
+			String unused = _cvars.HandleCommand(lines[i]);
 	}
 
 public:
@@ -34,7 +34,6 @@ public:
 	static Material* FromText(const String&);
 
 	virtual void Apply(const RenderParam *param = nullptr) const {}
-	virtual void BindTextures() const {}
 
-	inline byte GetShaderChannels() const { return _shaderChannels; }
+	inline byte GetRenderChannels() const { return _renderChannels; }
 };

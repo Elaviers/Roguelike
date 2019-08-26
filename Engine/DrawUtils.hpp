@@ -11,4 +11,6 @@ namespace DrawUtils
 	void DrawLine(const ModelManager&, const Vector3 &p1, const Vector3 &p2);
 
 	void DrawBox(const ModelManager&, const Vector3 &p1, const Vector3 &p2);
+
+	void DrawRing(const ModelManager&, const Vector3& centre, const Vector3& nomal, float radius, int segments);
 }

@@ -38,7 +38,7 @@ void Hashing::HashSha256(const void* in, size_t length, byte out[32]) {
 
 	data[length] = 0b10000000;
 
-	uint64 stringbitlength = length * 8;
+	uint64 stringbitlength = (uint64)length * 8;
 	data[full_length - 8] = (byte)((stringbitlength & 0xFF00000000000000) >> 56);
 	data[full_length - 7] = (byte)((stringbitlength & 0x00FF000000000000) >> 48);
 	data[full_length - 6] = (byte)((stringbitlength & 0x0000FF0000000000) >> 40);
@@ -99,5 +99,8 @@ void Hashing::HashSha256(const void* in, size_t length, byte out[32]) {
 	delete[] data;
 
 	for (int i = 0; i < 8; ++i)
-		Uint32ToBytes(hashvalues[i], out + i * 4);
+	{
+		int offset = i * 4;
+		Uint32ToBytes(hashvalues[i], out + offset);
+	}
 }

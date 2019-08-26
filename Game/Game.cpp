@@ -106,23 +106,13 @@ void Game::_InitGL()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
-	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag", ShaderChannel::ALL);
+	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
 }
 
 void Game::_Init()
 {
-	Engine::Instance().Init();
-	Engine::Instance().CreateAllManagers();
-
-	String fontDir;
-	fontDir.SetLength(MAX_PATH);
-
-	::GetWindowsDirectoryA(&fontDir[0], fontDir.GetLength());
-
-	fontDir.Trim();
-	fontDir += "\\FONTS\\";
-
-	Engine::Instance().pFontManager->AddPath(fontDir);
+	Engine::Instance().Init(ENG_ALL);
+	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	_consoleIsActive = false;
 
@@ -186,8 +176,7 @@ void Game::Render()
 	glDepthFunc(GL_LEQUAL);
 
 	_shader.Use();
-	_shader.SetMat4(DefaultUniformVars::mat4Projection, _uiCamera.GetProjectionMatrix());
-	_shader.SetMat4(DefaultUniformVars::mat4View, _uiCamera.GetInverseTransformationMatrix());
+	_uiCamera.Use();
 
 	_ui.Render();
 

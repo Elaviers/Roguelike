@@ -16,8 +16,8 @@ struct Keyframe
 
 	T value;
 	
-	Keyframe() : time(-1.f) {}
-	Keyframe(float time, const T& value, byte interp = INTERP_LINEAR) : time(time), value(value), interpolation(interpolation) {}
+	Keyframe() : time(-1.f), interpolation(INTERP_NONE) {}
+	Keyframe(float time, const T& value, byte interp = INTERP_LINEAR) : time(time), value(value), interpolation(interp) {}
 
 	inline T Interpolate(const Keyframe& to, float t) const
 	{

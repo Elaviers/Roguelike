@@ -6,7 +6,7 @@ class Editor;
 
 class ToolWindow : public Window
 {
-	static LPCTSTR _className;
+	static const TCHAR* _className;
 	static LRESULT _WindowProc(HWND, UINT, WPARAM, LPARAM);
 
 	PropertyWindow _propertyWindow;

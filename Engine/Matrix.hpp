@@ -33,7 +33,8 @@ public:
 				else
 					_data[r][c] = 0;
 	}
-
+	
+#pragma warning(suppress: 26495) //All of data is initialised here; False positive
 	SquareMatrix(T data[SIZE][SIZE])
 	{
 		int sizeSq = SIZE * SIZE;
@@ -117,6 +118,7 @@ namespace Matrix
 	Mat4 Transformation(const Vector3 &translation, const Vector3 &rotation, const Vector3 &scale);
 	Mat4 Transformation(const Vector3 &translation, const Quaternion &rotation, const Vector3 &scale);
 
-	Mat4 Ortho(float width, float height, float near, float far, float scale = 1.f);
+	Mat4 Ortho(float left, float right, float bottom, float top, float near, float far, float scale = 1.f);
+
 	Mat4 Perspective(float fieldOfView, float near, float far, float aspectRatio);
 }

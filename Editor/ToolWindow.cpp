@@ -30,7 +30,7 @@ void ToolWindow::Initialise(HBRUSH brush)
 {
 	WNDCLASSEXA windowClass = {};
 	windowClass.cbSize = sizeof(WNDCLASSEXA);
-	windowClass.lpfnWndProc = _WindowProc;
+	windowClass.lpfnWndProc = (WNDPROC)_WindowProc;
 	windowClass.hInstance = ::GetModuleHandle(NULL);
 	windowClass.hbrBackground = brush;
 	windowClass.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);

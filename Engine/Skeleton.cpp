@@ -8,13 +8,13 @@ void Skeleton::UpdateCache()
 	if (_transformCache.GetSize() != jointCount)
 		_transformCache.SetSize(jointCount);
 
-	for (auto node = _joints.First(); node; node = node->next)
-		_transformCache[node->obj.GetID()] = node->obj.localTransform.GetTransformationMatrix();
+	for (auto it = _joints.First(); it; ++it)
+		_transformCache[it->GetID()] = it->localTransform.GetTransformationMatrix();
 }
 
 void Skeleton::ToShader() const
 {
 	if (_transformCache.GetSize())
 		glUniformMatrix4fv(GLProgram::Current().GetUniformLocation(DefaultUniformVars::mat4aBones), 
-			_transformCache.GetSize(), GL_FALSE, (float*)_transformCache.Data());
+			(GLsizei)_transformCache.GetSize(), GL_FALSE, (float*)_transformCache.Data());
 }

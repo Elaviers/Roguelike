@@ -9,20 +9,18 @@ void ToolEntity::_SetClassID(const byte &id)
 {
 	_classID = id;
 
-	_owner.PropertyWindowRef().SetObject(Engine::Instance().registry.GetNode(_classID)->Object());
+	if (_placement)
+		_placement->Delete();
+
+	_placement = Engine::Instance().pObjectTracker->Track(Engine::Instance().registry.GetNode(_classID)->New());
+
+	_owner.PropertyWindowRef().SetObject(_placement.Ptr());
 }
 
 void ToolEntity::Initialise()
 {
 	_classID = 1;
-	_cvars.Add("Class", Getter<byte>(this, &ToolEntity::_GetClassID), Setter<byte>(this, &ToolEntity::_SetClassID), PropertyFlags::CLASSID);
-
-	//Defaults
-	Registry &reg = Engine::Instance().registry;
-
-	reg.GetFirstNodeOfType<ObjBrush2D>()->object.SetMaterial("bricks");
-	reg.GetFirstNodeOfType<ObjBrush3D>()->object.SetMaterial("bricks");
-	reg.GetFirstNodeOfType<ObjRenderable>()->object.SetModel("sphere");
+	_cvars.Add("Class", Getter<byte>(this, &ToolEntity::_GetClassID), Setter<byte>(this, &ToolEntity::_SetClassID), CvarFlags::CLASSID);
 }
 
 void ToolEntity::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
@@ -30,14 +28,25 @@ void ToolEntity::Activate(PropertyWindow &properties, PropertyWindow &toolProper
 	properties.Clear();
 	toolProperties.SetCvars(_cvars);
 
-	_owner.PropertyWindowRef().SetObject(Engine::Instance().registry.GetNode(_classID)->Object());
+	//Creates the placement object
+	_SetClassID(_classID);
+
+	_readyToPlace = false;
 }
 
-void ToolEntity::MouseDown(const MouseData &mouseData)
+void ToolEntity::Deactivate()
 {
-	if (_owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::PERSPECTIVE)
+	if (_placement)
+		_placement->Delete();
+	
+	_placement.Clear();
+}
+
+void ToolEntity::MouseMove(const MouseData& mouseData)
+{
+	if (_placement && _owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::PERSPECTIVE)
 	{
-		ObjCamera &camera = _owner.CameraRef(mouseData.viewport);
+		ObjCamera& camera = _owner.CameraRef(mouseData.viewport);
 		RECT windowDims;
 		::GetClientRect(_owner.ViewportRef(mouseData.viewport).GetHwnd(), &windowDims);
 		Ray r = camera.ScreenCoordsToRay(Vector2((float)mouseData.x / (float)windowDims.right, (float)mouseData.y / (float)windowDims.bottom));
@@ -45,17 +54,36 @@ void ToolEntity::MouseDown(const MouseData &mouseData)
 
 		if (results.GetSize() > 0)
 		{
-			GameObject *newObj = Engine::Instance().registry.GetNode(_classID)->New();
-			newObj->SetParent(&_owner.LevelRef());
-
-			CvarMap newObjCvars;
-			newObj->GetCvars(newObjCvars);
-			_owner.PropertyWindowRef().GetCvars().TransferValuesTo(newObjCvars);
-
 			Vector3 pos = r.origin + r.direction * results[0].entryTime;
-			pos[1] -= newObj->GetBounds().min[1];
-			newObj->SetRelativePosition(pos);
+			pos[1] -= _placement->GetWorldBounds(true).min[1];
+			_placement->SetRelativePosition(pos);
+		
+			_readyToPlace = true;
+			return;
 		}
+	}
+
+	_readyToPlace = false;
+}
+
+void ToolEntity::MouseDown(const MouseData &mouseData)
+{
+	if (_placement && _readyToPlace)
+	{
+		GameObject* newObj = Engine::Instance().registry.GetNode(_classID)->New();
+		newObj->SetParent(&_owner.LevelRef());
+
+		CvarMap newObjCvars;
+		newObj->GetCvars(newObjCvars);
+		_owner.PropertyWindowRef().GetCvars().TransferValuesTo(newObjCvars);
 	}
 }
 
+void ToolEntity::Render(EnumRenderChannel channels) const
+{
+	if (_placement && _readyToPlace)
+	{
+		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 0.5f));
+		_placement->Render(channels);
+	}
+}

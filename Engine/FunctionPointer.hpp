@@ -2,113 +2,156 @@
 #include "Debug.hpp"
 #include "Utilities.hpp"
 
+class _PtrData
+{
+public:
+	void* obj;
+	void* ptr;
+
+	_PtrData(void* obj, void* ptr) : obj(obj), ptr(ptr) {}
+
+	inline bool operator==(const _PtrData& other) const { return ptr == other.ptr && obj == other.obj; }
+};
+
+/*
+	FunctionPointer
+
+	A pointer to any function, as either a static function or a member function of a specific class instance
+*/
+
 template <typename RETURNTYPE, typename ...Args>
 class FunctionPointer
 {
-	enum Exception
+	class FunctionPointerBase
 	{
-		EXCEPTION_NULL_STATIC_CALLBACK
-	};
+	protected:
+		virtual _PtrData _GetPtrData() const = 0;
 
-	class BaseCallback
-	{
 	public:
-		virtual ~BaseCallback() {}
+		virtual ~FunctionPointerBase() {}
 
 		virtual RETURNTYPE Call(Args...) = 0;
 		virtual RETURNTYPE Call(Args...) const = 0;
-		virtual size_t SizeOf() const = 0;
+		virtual bool IsCallable() const = 0;
+
+		inline void TryCall(Args... args)		{ if (IsCallable()) Call(args...); }
+		inline void TryCall(Args... args) const	{ if (IsCallable()) Call(args...); }
+
+		inline bool operator==(const FunctionPointerBase& other) const { return _GetPtrData() == other._GetPtrData(); }
 	};
 
-	class StaticCallback : public BaseCallback
+	class FunctionPointerStatic : public FunctionPointerBase
 	{
-		RETURNTYPE (*_function)(Args...);
+		RETURNTYPE(*_function)(Args...);
+
+	protected:
+		virtual _PtrData _GetPtrData() const override { return _PtrData(nullptr, _function); }
 
 	public:
-		StaticCallback(RETURNTYPE (*function)(Args...)) : _function(function) {}
-		virtual ~StaticCallback() {}
+		FunctionPointerStatic(RETURNTYPE(*function)(Args...)) : _function(function) {}
+		virtual ~FunctionPointerStatic() {}
 
-		virtual RETURNTYPE Call(Args ...args) override 
-		{ 
-			if (_function == nullptr)
-			{
-				Debug::FatalError("Something called a StaticCallback with a nullptr");
-				throw EXCEPTION_NULL_STATIC_CALLBACK;
-			}
-
-			return _function(args...); 
-		}
-
-		virtual RETURNTYPE Call(Args ...args) const override
-		{
-			if (_function == nullptr)
-			{
-				Debug::FatalError("Something called a StaticCallback with a nullptr");
-				throw EXCEPTION_NULL_STATIC_CALLBACK;
-			}
-
-			return _function(args...);
-		}
-
-		virtual size_t SizeOf() const override { return sizeof(*this); }
+		virtual RETURNTYPE Call(Args ...args) override			{ return _function(args...); }
+		virtual RETURNTYPE Call(Args ...args) const override	{ return _function(args...); }
+		virtual bool IsCallable() const							{ return _function != nullptr; }
 	};
 
 	template<typename T>
-	class MemberCallback : public BaseCallback
+	class FunctionPointerMember : public FunctionPointerBase
 	{
-		T *_object;
+		T* _object;
 
 		union
 		{
-			RETURNTYPE(T::*_function)(Args...);
-			RETURNTYPE(T::*_constFunction)(Args...) const;
+			RETURNTYPE(T::* _function)(Args...);
+			RETURNTYPE(T::* _constFunction)(Args...) const;
+
+			void* _voidPtr;
 		};
 
 		bool _isConstFunction;
 
-	public:
-		MemberCallback(T *object, RETURNTYPE(T::*function)(Args...)) : _object(object), _function(function), _isConstFunction(false) {}
-		MemberCallback(T *object, RETURNTYPE(T::*function)(Args...) const) : _object(object), _constFunction(function), _isConstFunction(true) {}
-
-		virtual ~MemberCallback() {}
+	protected:
+		virtual _PtrData _GetPtrData() const override { return _PtrData(_object, _voidPtr); }
 		
-		virtual RETURNTYPE Call(Args... args) override { return _isConstFunction ? (_object->*_constFunction)(args...) : (_object->*_function)(args...); }
-		virtual RETURNTYPE Call(Args... args) const override { return _isConstFunction ? (_object->*_constFunction)(args...) : (_object->*_function)(args...); }
-		virtual size_t SizeOf() const override { return sizeof(*this); }
+	public:
+		FunctionPointerMember() : _object(nullptr), _function(nullptr), _isConstFunction(false) {}
+
+		FunctionPointerMember(T* object, RETURNTYPE(T::* function)(Args...)) : 
+			_object(object), 
+			_function(function), 
+			_isConstFunction(false) 
+		{}
+
+		FunctionPointerMember(T* object, RETURNTYPE(T::* function)(Args...) const) : 
+			_object(object), 
+			_constFunction(function), 
+			_isConstFunction(true)
+		{}
+
+		virtual ~FunctionPointerMember() {}
+
+		virtual RETURNTYPE Call(Args... args) override			{ return _isConstFunction ? (_object->*_constFunction)(args...) : (_object->*_function)(args...); }
+		virtual RETURNTYPE Call(Args... args) const override	{ return _isConstFunction ? (_object->*_constFunction)(args...) : (_object->*_function)(args...); }
+		virtual bool IsCallable() const							{ return _function != nullptr; }
 	};
 
 	/////
+	union Union
+	{
+		FunctionPointerStatic					fptrStatic;
+		FunctionPointerMember<FunctionPointer>	fptrMember;
 
-	BaseCallback *_cb;
+		Union(const FunctionPointerStatic& _static) : fptrStatic(_static) {}
+
+		template<typename T>
+		Union(const FunctionPointerMember<T>& _member) : fptrMember() 
+		{
+			//This is disgostan
+			Utilities::CopyBytes(&_member, this, sizeof(_member));
+		}
+
+		~Union() {}
+	} _u;
+
+	inline FunctionPointerBase& _Fptr()				{ return reinterpret_cast<FunctionPointerBase&>(_u); }
+	inline const FunctionPointerBase& _Fptr() const	{ return reinterpret_cast<const FunctionPointerBase&>(_u); }
 
 public:
-	FunctionPointer(RETURNTYPE (*function)(Args...) = nullptr) : _cb(nullptr)			{ if (function) _cb = new StaticCallback(function); }
+	FunctionPointer(RETURNTYPE(*function)(Args...) = nullptr) : _u(function) {}
 
 	template<typename T>
-	FunctionPointer(T *object, RETURNTYPE (T::*function)(Args...)) : _cb(nullptr)		{ if (object && function) _cb = new MemberCallback<T>(object, function); }
+	FunctionPointer(T* object, RETURNTYPE(T::* function)(Args...)) : _u(FunctionPointerMember<T>(object, function)) {}
 
 	template<typename T>
-	FunctionPointer(T *object, RETURNTYPE(T::*function)(Args...) const) : _cb(nullptr)	{ if (object && function) _cb = new MemberCallback<T>(object, function); }
+	FunctionPointer(T* object, RETURNTYPE(T::* function)(Args...) const) : _u(FunctionPointerMember<T>(object, function)) {}
 
-	FunctionPointer(const FunctionPointer &other) : _cb(nullptr) { operator=(other); }
+	FunctionPointer(const FunctionPointer& other) : _u(nullptr) { operator=(other); }
 
-	FunctionPointer(FunctionPointer &&other) { _cb = other._cb; other._cb = nullptr; }
+	FunctionPointer(FunctionPointer&& other) { operator=(other); }
 
-	~FunctionPointer() { delete[] _cb; }
+	~FunctionPointer() { }
 
-	inline FunctionPointer& operator=(const FunctionPointer &other)
+	inline FunctionPointer& operator=(const FunctionPointer& other)
 	{
-		if (other._cb)
-			_cb = Utilities::CopyOf(*other._cb, other._cb->SizeOf());
-		else
-			_cb = nullptr;
-
+		Utilities::CopyBytes(&other._u, &_u, sizeof(_u));
 		return *this;
 	}
 
-	inline RETURNTYPE operator()(Args ...args)			{ return _cb->Call(args...); }
-	inline RETURNTYPE operator()(Args ...args) const	{ return _cb->Call(args...); }
-	inline bool IsCallable() const						{ return _cb != nullptr; }
+	inline FunctionPointer& operator=(FunctionPointer&& other)
+	{
+		Utilities::CopyBytes(&other._u, &_u, sizeof(_u));
+		other._Fptr() = FunctionPointerStatic(nullptr);
+		return *this;
+	}
+
+	inline RETURNTYPE operator()(Args ...args)			{ return _Fptr().Call(args...); }
+	inline RETURNTYPE operator()(Args ...args) const	{ return _Fptr().Call(args...); }
+	inline bool IsCallable() const						{ return _Fptr().IsCallable(); }
+	inline void TryCall(Args ...args)					{ _Fptr().TryCall(args...); }
+	inline void TryCall(Args ...args) const				{ _Fptr().TryCall(args...); }
+
+	inline bool operator==(const FunctionPointer& other) const { return (FunctionPointerBase&)_u == (FunctionPointerBase&)other._u; }
 };
 
 typedef FunctionPointer<void> Callback;

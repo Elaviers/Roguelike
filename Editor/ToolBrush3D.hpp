@@ -1,5 +1,5 @@
 #pragma once
-#include "Tool.h"
+#include "Tool.hpp"
 #include <Engine/CvarMap.hpp>
 #include <Engine/ObjBrush3D.hpp>
 
@@ -24,6 +24,6 @@ public:
 	virtual void MouseDown(const MouseData&) override;
 	virtual void KeySubmit() override;
 
-	virtual void Render() const override;
+	virtual void Render(EnumRenderChannel) const override;
 };
 

@@ -1,5 +1,5 @@
 #include "Model.hpp"
-#include "ColliderAABB.hpp"
+#include "ColliderBox.hpp"
 #include "ColliderSphere.hpp"
 #include "Engine.hpp"
 #include "ModelManager.hpp"
@@ -26,25 +26,25 @@ void Model::_CMD_model(const Buffer<String> &args)
 
 void Model::_CMD_collision(const Buffer<String>& args)
 {
-	if (args.GetSize() > 2)
+	if (args.GetSize() > 0)
 	{
 		if (args[0] == "sphere")
 		{
 			if (args.GetSize() >= 2)
 			{
 				delete this->_collider;
-				this->_collider = new ColliderSphere(args[1].ToFloat());
+				this->_collider = new ColliderSphere(COLL_SURFACE, args[1].ToFloat());
 			}
 			else Debug::Error(CSTR("Insufficient sphere collision arguments"));
 		}
-		else if (args[0] == "aabb")
+		else if (args[0] == "box")
 		{
-			if (_mesh->IsValid())
+			if (_mesh && _mesh->IsValid())
 			{
 				delete _collider;
-				_collider = new ColliderAABB(_mesh->bounds.min, _mesh->bounds.max);
+				_collider = new ColliderBox(COLL_SURFACE, Box::FromMinMax(_mesh->bounds.min, _mesh->bounds.max));
 			}
-			else Debug::Error(CSTR("AABB collision cannot be used without specifying the model first!"));
+			else Debug::Error(CSTR("Box collision cannot be used without specifying the model first!"));
 		}
 	}
 }

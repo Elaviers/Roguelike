@@ -24,7 +24,7 @@ void CompileShader(GLuint shader, const char *src)
 	}
 }
 
-void GLProgram::Create(const char *vertSrc, const char *fragSrc, byte channels)
+void GLProgram::Create(const char *vertSrc, const char *fragSrc)
 {
 	GLuint vert = glCreateShader(GL_VERTEX_SHADER);
 	GLuint frag = glCreateShader(GL_FRAGMENT_SHADER);
@@ -56,18 +56,16 @@ void GLProgram::Create(const char *vertSrc, const char *fragSrc, byte channels)
 		return;
 	}
 
-	_channels = channels;
-
 	glDeleteShader(frag);
 	glDeleteShader(vert);
 }
 
-void GLProgram::Load(const char *vertFile, const char *fragFile, byte channels)
+void GLProgram::Load(const char *vertFile, const char *fragFile)
 {
 	String vertSrc = IO::ReadFileString(vertFile);
 	String fragSrc = IO::ReadFileString(fragFile);
 
-	Create(vertSrc.GetData(), fragSrc.GetData(), channels);
+	Create(vertSrc.GetData(), fragSrc.GetData());
 }
 
 GLint GLProgram::GetUniformLocation(const char *name) const

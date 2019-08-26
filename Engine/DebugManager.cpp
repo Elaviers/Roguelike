@@ -12,7 +12,10 @@ void DebugManager::Update(float deltaTime)
 		_worldObjects[i]->Update(deltaTime);
 
 		if (_worldObjects[i]->ShouldBeRemoved())
+		{
+			delete _worldObjects[i];
 			_worldObjects.RemoveIndex(i);
+		}
 		else
 			i++;
 	}
@@ -22,7 +25,10 @@ void DebugManager::Update(float deltaTime)
 		_worldObjects[i]->Update(deltaTime);
 
 		if (_screenObjects[i]->ShouldBeRemoved())
+		{
+			delete _screenObjects[i];
 			_screenObjects.RemoveIndex(i);
+		}
 		else
 			i++;
 	}

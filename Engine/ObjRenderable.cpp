@@ -6,24 +6,24 @@
 void ObjRenderable::GetCvars(CvarMap &cvars)
 {
 	_AddBaseCvars(cvars);
-	cvars.Add("Model", Getter<String>(this, &ObjRenderable::GetModelName), Setter<String>(this, &ObjRenderable::SetModel), PropertyFlags::MODEL);
-	cvars.Add("Material", Getter<String>(this, &ObjRenderable::GetMaterialName), Setter<String>(this, &ObjRenderable::SetMaterial), PropertyFlags::MATERIAL);
+	cvars.Add("Model", Getter<String>(this, &ObjRenderable::GetModelName), Setter<String>(this, &ObjRenderable::SetModel), CvarFlags::MODEL);
+	cvars.Add("Material", Getter<String>(this, &ObjRenderable::GetMaterialName), Setter<String>(this, &ObjRenderable::SetMaterial), CvarFlags::MATERIAL);
 }
 
-void ObjRenderable::Render() const
+void ObjRenderable::Render(EnumRenderChannel channels) const
 {
 	if (_model)
 	{
 		if (_material)
 		{
-			if (! (GLProgram::Current().GetChannels() & _material->GetShaderChannels()))
+			if (! (channels & _material->GetRenderChannels()))
 				return;
 
 			_material->Apply();
 		}
 
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
-		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
 		_model->Render();
 	}
 }
@@ -48,34 +48,38 @@ String ObjRenderable::GetMaterialName() const
 	return "Unknown";
 }
 
-void ObjRenderable::WriteToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const
+void ObjRenderable::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
 {
+	GameObject::WriteData(writer, strings);
+
 	if (Engine::Instance().pModelManager && _model)
 	{
 		uint16 id = strings.Add(Engine::Instance().pModelManager->FindNameOf(_model));
-		buffer.Write_uint16(id);
+		writer.Write_uint16(id);
 	}
-	else buffer.Write_uint16(0);
+	else writer.Write_uint16(0);
 
 	if (!_materialIsDefault && Engine::Instance().pMaterialManager && _material)
 	{																	//todo: const cast removal
 		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material)));
-		buffer.Write_uint16(id);
+		writer.Write_uint16(id);
 	}
-	else buffer.Write_uint16(0);
+	else writer.Write_uint16(0);
 
-	RelativeTransform().WriteToBuffer(buffer);
+	writer.Write_vector4(_colour);
 }
 
-void ObjRenderable::ReadFromFile(BufferReader<byte> &buffer, const NumberedSet<String> &strings)
+void ObjRenderable::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
 {
+	GameObject::ReadData(reader, strings);
+
 	const String *string;
 
-	if (string = strings.Get(buffer.Read_uint16()))
+	if (string = strings.Get(reader.Read_uint16()))
 		SetModel(*string);
 
-	if (string = strings.Get(buffer.Read_uint16()))
+	if (string = strings.Get(reader.Read_uint16()))
 		SetMaterial(*string);
 
-	RelativeTransform().ReadFromBuffer(buffer);
+	_colour = reader.Read_vector4();
 }

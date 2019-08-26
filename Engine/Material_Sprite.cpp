@@ -1,0 +1,9 @@
+#include "Material_Sprite.hpp"
+
+void MaterialSprite::_CMD_tex(const Buffer<String>& args)
+{
+	if (args.GetSize() > 0)
+	{
+		_diffuse = Engine::Instance().pTextureManager->Get(args[0]);
+	}
+}

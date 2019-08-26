@@ -15,8 +15,7 @@ class Transform
 	inline void _Update()
 	{
 		_matrixStatus = MAT_EMPTY;
-		if (_onChanged.IsCallable())
-			_onChanged();
+		_onChanged.TryCall();
 	}
 
 	Mat4 _matrix;
@@ -31,11 +30,49 @@ class Transform
 	void _MakeInverseTransformationMatrix(Mat4&) const;
 
 public:
-	Transform(const Callback &callback = Callback(nullptr)) : _onChanged(callback), _scale(1.f, 1.f, 1.f), _matrixStatus(MAT_EMPTY) {}
 	Transform(const Vector3& position, const Rotation& rotation = Rotation(), const Vector3& scale = Vector3(1, 1, 1), const Callback& callback = Callback(nullptr)) :
-		_position(position), _rotation(rotation), _scale(scale), _onChanged(callback), _matrixStatus(MAT_EMPTY) {}
+		_position(position), 
+		_rotation(rotation), 
+		_scale(scale), 
+		_onChanged(callback), 
+		_matrixStatus(MAT_EMPTY) 
+	{
+		_onChanged.TryCall();
+	}
+
+	Transform(const Callback& callback = Callback(nullptr)) : Transform(Vector3(), Rotation(), Vector3(1, 1, 1), callback) {}
 	
+	Transform(const Transform& other) : 
+		_onChanged(),
+		_position(other._position), 
+		_rotation(other._rotation), 
+		_scale(other._scale), 
+		_matrix(other._matrix),
+		_matrixStatus(other._matrixStatus)
+	{}
+
+	Transform(const Transform&& other) noexcept :
+		_onChanged(),
+		_position(other._position),
+		_rotation(other._rotation),
+		_scale(other._scale),
+		_matrix(other._matrix),
+		_matrixStatus(other._matrixStatus)
+	{}
+
 	~Transform() {}
+
+	Transform& operator=(const Transform& other)
+	{
+		_position = other._position;
+		_rotation = other._rotation;
+		_scale = other._scale;
+		_matrix = other._matrix;
+		_matrixStatus = other._matrixStatus;
+
+		_Update();
+		return *this;
+	}
 
 	inline const Vector3& GetPosition() const			{ return _position; }
 	inline const Rotation& GetRotation() const			{ return _rotation; }
@@ -46,7 +83,7 @@ public:
 	inline void SetRotation(const Rotation &rotation)	{ _rotation = rotation; _Update(); }
 	inline void SetRotationEuler(const Vector3& euler)  { SetRotation(Rotation(euler)); }
 	inline void SetScale(const Vector3 &scale)			{ _scale = scale;		_Update(); }
-	inline void SetCallback(const Callback &callback)	{ _onChanged = callback; }
+	inline void SetCallback(const Callback& callback) { _onChanged = callback; _onChanged.TryCall(); }
 
 	inline void Move(const Vector3 &delta)				{ _position += delta;				_Update(); }
 	inline void Rotate(const Rotation &delta)			{ _rotation = delta * _rotation;	_Update(); }

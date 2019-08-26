@@ -17,18 +17,18 @@ enum class SoundCategory
 class WaveSound : public Asset
 {
 public:
-	uint16 format;
-	uint16 channelCount;
-	uint32 sampleRate;
-	uint32 byteRate;
-	uint16 FrameSize;
-	uint16 bitsPerSample;
+	uint16 format = 0;
+	uint16 channelCount = 0;
+	uint32 sampleRate = 0;
+	uint32 byteRate = 0;
+	uint16 FrameSize = 0;
+	uint16 bitsPerSample = 0;
 
-	byte* data;
-	uint32 dataSize;
+	byte* data = nullptr;
+	uint32 dataSize = 0;
 
-	float volume;
-	SoundCategory category;
+	float volume = 0.f;
+	SoundCategory category = SoundCategory::GENERIC;
 
 	virtual ~WaveSound() { delete data; }
 

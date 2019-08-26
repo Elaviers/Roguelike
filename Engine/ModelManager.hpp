@@ -5,10 +5,10 @@
 class ModelManager : public AssetManager<Model>
 {
 private:
-	Model _line;
-	Model _cube;
-	Model _invCube;
-	Model _plane;
+	Model *_line = nullptr;
+	Model *_cube = nullptr;
+	Model *_invCube = nullptr;
+	Model *_plane = nullptr;
 
 	virtual Model* _CreateResource(const String&, const String&) override;
 
@@ -20,8 +20,8 @@ public:
 
 	void Initialise();
 
-	inline const Model& Line() const			{ return _line; }
-	inline const Model& Plane() const			{ return _plane; }
-	inline const Model& Cube() const			{ return _cube; }
-	inline const Model& InverseCube() const		{ return _invCube; }
+	inline const Model& Line() const			{ return *_line; }
+	inline const Model& Plane() const			{ return *_plane; }
+	inline const Model& Cube() const			{ return *_cube; }
+	inline const Model& InverseCube() const		{ return *_invCube; }
 };

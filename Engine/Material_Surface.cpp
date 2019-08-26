@@ -22,7 +22,7 @@ void MaterialSurface::_CMD_tex(const Buffer<String>& args)
 
 #define BIND(PTEX, UNIT) if (PTEX) PTEX->Bind(UNIT); else GLTexture::Unbind(UNIT)
 
-void MaterialSurface::BindTextures() const
+void MaterialSurface::Apply(const RenderParam *param) const
 {
 	BIND(_diffuse, 0);
 	BIND(_normal, 1);

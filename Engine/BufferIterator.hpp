@@ -1,6 +1,7 @@
 #pragma once
 #include "Buffer.hpp"
 #include "String.hpp"
+#include "Vector4.hpp"
 
 struct Float_IEEE754
 {
@@ -139,6 +140,16 @@ public:
 		v[0] = Read_float();
 		v[1] = Read_float();
 		v[2] = Read_float();
+		return v;
+	}
+
+	inline Vector4 Read_vector4()
+	{
+		Vector4 v;
+		v[0] = Read_float();
+		v[1] = Read_float();
+		v[2] = Read_float();
+		v[3] = Read_float();
 		return v;
 	}
 };
@@ -289,4 +300,11 @@ public:
 		Write_float(v[2]);
 	}
 
+	inline void Write_vector4(const Vector4& v)
+	{
+		Write_float(v[0]);
+		Write_float(v[1]);
+		Write_float(v[2]);
+		Write_float(v[3]);
+	}
 };

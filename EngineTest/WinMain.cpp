@@ -1,5 +1,7 @@
 #include <Windowsx.h>
 #include <Engine\DrawUtils.hpp>
+#include <Engine\Font.hpp>
+#include <Engine\FontManager.hpp>
 #include <Engine\GL.hpp>
 #include <Engine\GLContext.hpp>
 #include <Engine\GLProgram.hpp>
@@ -9,6 +11,7 @@
 #include <Engine\ObjRenderable.hpp>
 #include <Engine\ModelManager.hpp>
 #include <Engine\Skybox.hpp>
+#include <Engine\StackAllocator.hpp>
 #include <Engine\String.hpp>
 #include <Engine\TextureManager.hpp>
 #include <Engine\Timer.hpp>
@@ -17,6 +20,7 @@
 
 #define ORTHO 0
 
+const char* fontName = "consolas.txt";
 const char *modelName = "Model";
 const char *texDiffuse = "Diffuse.png";
 const char *texNormal = "Normal.png";
@@ -46,6 +50,8 @@ ObjRenderable cube;
 GameObject cubeParent;
 Vector3 cubeParentRotationOffset(2.f, 11.7f, 0.f);
 Vector3 cubeRotationOffset(9.f, 23.f, 0.f);
+
+Mat4 cameraMatrix;
 //
 
 Skybox sky;
@@ -55,7 +61,6 @@ GLContext glContext;
 GLProgram program_Lit;
 GLProgram program_Unlit;
 GLProgram program_Sky;
-GLProgram program_UI;
 Window window;
 
 bool cursorLocked = false;
@@ -103,6 +108,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		glViewport(0, 0, w, h);
 		camera.SetViewport(w, h);
+		cameraMatrix = Matrix::Ortho(0, w, 0, h, -100.f, 100.f, 1.f);
 
 		if (running) Frame(); //Please pretend this line doesn't exist
 	}
@@ -186,6 +192,8 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glFrontFace(GL_CCW);
 
@@ -197,22 +205,25 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	//Compile & link shaders
 	window.SetTitle("Compiling Shaders...");
 	//
-	program_Lit.Load("Data/Shader.vert", "Data/Phong.frag", ShaderChannel::ALL);
-	program_Unlit.Load("Data/Shader.vert", "Data/Unlit.frag", ShaderChannel::ALL);
-	program_Sky.Load("Data/Sky.vert", "Data/Sky.frag", ShaderChannel::ALL);
-	program_UI.Load("Data/Basic.vert", "Data/Basic.frag", ShaderChannel::ALL);
+	program_Lit.Load("Data/Shader.vert", "Data/Phong.frag");
+	program_Unlit.Load("Data/Shader.vert", "Data/Unlit.frag");
+	program_Sky.Load("Data/Sky.vert", "Data/Sky.frag");
 
 	//
 	//Initialise managers
 	window.SetTitle("Manager Init");
+
 	//
-	Engine::Instance().CreateAllManagers();
+	Engine::Instance().Init(ENG_ALL);
+	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
+
 	ModelManager& modelManager = *Engine::Instance().pModelManager;
 	TextureManager& textureManager = *Engine::Instance().pTextureManager;
 	InputManager& inputManager = *Engine::Instance().pInputManager;
 
 	modelManager.SetRootPath("Data/");
 	textureManager.SetRootPath("Data/");
+	Engine::Instance().pFontManager->SetRootPath("Data/");
 
 	inputManager.BindKeyAxis(Keycode::A, &axisX, -1);
 	inputManager.BindKeyAxis(Keycode::D, &axisX, 1);
@@ -238,13 +249,17 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	window.SetTitle("Loading Models...");
 	modelManager.Get(modelName);
 
-	window.SetTitle("Loading Textures...");
+	window.SetTitle("Loading Material Textures...");
 	textureManager.Get(texDiffuse);
 	textureManager.Get(texNormal);
 	textureManager.Get(texSpecular);
 	textureManager.Get(texReflection);
+
+	window.SetTitle("Loading Skybox Textures...");
 	sky.Load(skyFaces);
 
+	window.SetTitle("Loading Fonts...");
+	Engine::Instance().pFontManager->Get(fontName);
 	//
 	//World setup
 	window.SetTitle("Creating World...");
@@ -333,9 +348,9 @@ void Frame()
 	float moveAmount = MOVERATE * dt;
 	float turnAmount = TURNRATE * dt;
 
-	camera.RelativeMove(camera.RelativeTransform().GetForwardVector() * axisZ * moveAmount +
-		camera.RelativeTransform().GetRightVector() * axisX * moveAmount +
-		camera.RelativeTransform().GetUpVector() * axisY * moveAmount);
+	camera.RelativeMove(camera.GetRelativeTransform().GetForwardVector() * axisZ * moveAmount +
+		camera.GetRelativeTransform().GetRightVector() * axisX * moveAmount +
+		camera.GetRelativeTransform().GetUpVector() * axisY * moveAmount);
 
 	camera.AddRelativeRotation(Vector3(lookX * turnAmount, lookY * turnAmount, lookZ * turnAmount));
 
@@ -351,20 +366,8 @@ void Frame()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//
-		program_Unlit.Use();
-		program_Unlit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
-		program_Unlit.SetMat4(DefaultUniformVars::mat4View, camera.GetInverseTransformationMatrix());
-
-		light1.Render();
-		light2.Render();
-		light3.Render();
-		light4.Render();
-		//
-
-		//
 		program_Lit.Use();
-		program_Lit.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
-		program_Lit.SetMat4(DefaultUniformVars::mat4View, camera.GetInverseTransformationMatrix());
+		camera.Use();
 		program_Lit.SetInt(DefaultUniformVars::intCubemap, UNIT_CUBEMAP);
 		program_Lit.SetInt(DefaultUniformVars::intTextureDiffuse, UNIT_DIFFUSE);
 		program_Lit.SetInt(DefaultUniformVars::intTextureNormal, UNIT_NORMAL);
@@ -385,12 +388,12 @@ void Frame()
 		textureManager.Get(texSpecular)->Bind(UNIT_SPECULAR);
 		textureManager.Get(texReflection)->Bind(UNIT_REFLECTION);
 		
-		cube.Render();
+		cube.Render(RenderChannel::ALL);
 
-		textureManager.UVDefault().Bind(UNIT_NORMAL);
-		textureManager.White().Bind(UNIT_SPECULAR);
-		textureManager.White().Bind(UNIT_REFLECTION);
-		renderable.Render();
+		textureManager.NormalDefault()->Bind(UNIT_NORMAL);
+		textureManager.White()->Bind(UNIT_SPECULAR);
+		textureManager.White()->Bind(UNIT_REFLECTION);
+		renderable.Render(RenderChannel::ALL);
 		//
 
 		//
@@ -414,25 +417,75 @@ void Frame()
 			float vpScale = camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC ? 1.f : 10.f;
 			float w = 2.f;
 
-			program_UI.Use();
-			program_UI.SetMat4(DefaultUniformVars::mat4Projection, camera.GetProjectionMatrix());
-			program_UI.SetMat4(DefaultUniformVars::mat4View, camera.GetInverseTransformationMatrix());
+			program_Unlit.Use();
+			camera.Use();
+
+			textureManager.White()->Bind(0);
+
+			light1.Render(RenderChannel::ALL);
+			light2.Render(RenderChannel::ALL);
+			light3.Render(RenderChannel::ALL);
+			light4.Render(RenderChannel::ALL);
 
 			glDisable(GL_CULL_FACE);
 			
-			program_UI.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 0.f, 0.f, 1.f));
+			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 0.f, 0.f, 1.f));
 			DrawUtils::DrawGrid(modelManager, camera, Direction::FORWARD, w, 1.f, vpScale);
 
-			program_UI.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
+			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
 			DrawUtils::DrawGrid(modelManager, camera, Direction::UP, w, 1.f, vpScale);
 
-			program_UI.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 0.f, 1.f, 1.f));
+			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 0.f, 1.f, 1.f));
 			DrawUtils::DrawGrid(modelManager, camera, Direction::RIGHT, w, 1.f, vpScale);
 
 			glEnable(GL_CULL_FACE);
+
+
+			//UI
+			glDepthFunc(GL_ALWAYS);
+			program_Unlit.SetMat4(DefaultUniformVars::mat4Projection, cameraMatrix);
+			program_Unlit.SetMat4(DefaultUniformVars::mat4View, Matrix::Identity());
+			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+
+			static StackAllocator ftAllocator(1024);
+			static String fpsString;
+			static float timeTillUpdate = 0.f;
+			static int sampledFrameCount = 0;
+
+			timeTillUpdate -= dt;
+			
+			*ftAllocator.Push<float>() = 1.f / dt;
+			sampledFrameCount++;
+
+			if (timeTillUpdate <= 0.f)
+			{
+				auto ff = ftAllocator.GetFirstFrame();
+
+				if (ff)
+				{
+					float avg = 0.f;
+					for (int i = 0; i < sampledFrameCount; ++i)
+					{
+						avg += *(float*)ff;
+						ff += sizeof(float) + StackAllocator::GetOverheadBytesPerFrame();
+					}
+
+					avg /= sampledFrameCount;
+
+					fpsString = String::FromFloat(avg);
+				}
+
+				ftAllocator.Reset();
+				timeTillUpdate = 0.05f;
+				sampledFrameCount = 0;
+			}
+
+			Transform fontTransform(Vector3(0, 0, 0), Rotation(), Vector3(64, 0, 0));
+			Engine::Instance().pFontManager->Get(fontName)->RenderString(fpsString.GetData(), fontTransform);
+
+			glDepthFunc(GL_LESS);
 		}
 		//
-
 		window.SwapBuffers();
 	}
 

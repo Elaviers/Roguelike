@@ -67,6 +67,28 @@ namespace Utilities
 		return String();
 	}
 
+	inline String WithCarriageReturns(const String& string)
+	{
+		String result(string);
+
+		for (size_t i = 0; i < result.GetLength(); )
+		{
+			if (result[i] == '\n')
+			{
+				if (i <= 0 || result[i - 1] != '\r')
+				{
+					result.Insert('\r', i);
+					i += 2;
+					continue;
+				}
+			}
+
+			++i;
+		}
+
+		return result;
+	}
+
 	inline void StripExtension(String &string)
 	{
 		for (size_t i = string.GetLength() - 1; i > 0; --i)
@@ -82,5 +104,58 @@ namespace Utilities
 		for (unsigned int i = 0; i < string.GetLength(); ++i)
 			if (string[i] >= 'A' && string[i] <= 'Z')
 				string[i] += ('a' - 'A');
+	}
+
+
+	String GetSystemFontDir();
+
+	template <typename T>
+	void TransferLE(T from, byte *to)
+	{
+		auto sz = sizeof(T);
+		T mask = 0xFF;
+		for (byte i = 0; i < sz; ++i)
+		{
+			to[i] = (from & mask) >> (8 * i);
+			mask <<= 8;
+		}
+	}
+
+	template <typename T>
+	void TransferBE(T from, byte *to)
+	{
+		auto sz = sizeof(T);
+		T mask = 0xFF;
+		for (byte i = 0; i < sz; ++i)
+		{
+			to[sz - 1 - i] = (from & mask) >> (8 * i);
+			mask <<= 8;
+		}
+	}
+
+	template <typename T>
+	T TransferLE(byte* from)
+	{
+		T result = 0;
+		byte shift = 8 * (sizeof(T) - 1);
+		for (byte i = 0; i < sizeof(T); ++i)
+		{
+			result += from[i] << shift;
+			shift -= 8;
+		}
+		return result;
+	}
+
+	template <typename T>
+	T TransferBE(byte *from)
+	{
+		T result = 0;
+		byte shift = 0;
+		for (byte i = 0; i < sizeof(T); ++i)
+		{
+			result += from[i] << shift;
+			shift += 8;
+		}
+		return result;
 	}
 }

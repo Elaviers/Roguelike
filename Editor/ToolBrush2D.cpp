@@ -7,7 +7,7 @@ void ToolBrush2D::Initialise()
 	_object.SetRelativeScale(Vector3());
 	_object.SetMaterial("bricks");
 
-	_cvars.Add("Material", Getter<String>((ObjBrush<2>*)&_object, &ObjBrush<2>::GetMaterialName), Setter<String>((ObjBrush<2>*)&_object, &ObjBrush<2>::SetMaterial), PropertyFlags::MATERIAL);
+	_cvars.Add("Material", Getter<String>((ObjBrush<2>*)&_object, &ObjBrush<2>::GetMaterialName), Setter<String>((ObjBrush<2>*)&_object, &ObjBrush<2>::SetMaterial), CvarFlags::MATERIAL);
 	_cvars.Add("Level", _object.level);
 }
 
@@ -58,8 +58,8 @@ void ToolBrush2D::MouseUp(const MouseData &mouseData)
 	}
 }
 
-void ToolBrush2D::Render() const
+void ToolBrush2D::Render(EnumRenderChannel channels) const
 {
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(.8f, .8f, .8f, .5f));
-	_object.Render();
+	_object.Render(channels);
 }

@@ -1,3 +1,5 @@
 model debug.mesh
+
 material bricks
-collision aabb
+
+collision box

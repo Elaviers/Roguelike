@@ -1,18 +1,14 @@
 #pragma once
+#include "CollisionChannel.hpp"
 #include "Vector.hpp"
-
-enum class RayChannel
-{
-	CAMERA,
-	COLLISION
-};
 
 struct Ray
 {
 	Vector3 origin;
 	Vector3 direction;
 
-	RayChannel channel;
+	CollisionChannel channels;
 
-	Ray(Vector3 origin, Vector3 direction, RayChannel channel = RayChannel::COLLISION) : origin(origin), direction(direction), channel(channel) {}
+	Ray() : channels(COLL_ALL_CHANNELS) {}
+	Ray(Vector3 origin, Vector3 direction, CollisionChannel channels) : origin(origin), direction(direction), channels(channels) {}
 };

@@ -1,10 +1,10 @@
 #pragma once
+#include "FbxSdk.hpp"
 #include <Engine/Animation.hpp>
 #include <Engine/Buffer.hpp>
 #include <Engine/IO.hpp>
 #include <Engine/Pair.hpp>
 #include <Engine/String.hpp>
-#include <fbxsdk.h>
 
 namespace EditorIO
 {

@@ -57,7 +57,7 @@ void FontTexture::_ReadText(const String & string)
 					glyph.width = tokens[1].ToInt();
 					glyph.advance = tokens[2].ToInt();
 
-					if (cX + glyph.width >= _texture->GetWidth())
+					if (cX + glyph.width >= (int)_texture->GetWidth())
 					{
 						cX = 0;
 						cY += _rowH;
@@ -75,7 +75,7 @@ void FontTexture::_ReadText(const String & string)
 			break;
 		}
 
-		_cvars.HandleCommand(loweredLine);
+		String unused = _cvars.HandleCommand(loweredLine);
 	}
 }
 

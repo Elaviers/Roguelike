@@ -8,7 +8,7 @@ class ObjBox : public GameObject
 	Vector3 _p1, _p2;
 
 	void _UpdateMinMax();
-	void _UpdateTransform();
+	void _OnTransformChanged();
 
 protected:
 	Vector3 _min, _max;
@@ -16,12 +16,12 @@ protected:
 	Vector4 _colour;
 
 public:
-	GAMEOBJECT_FUNCS(ObjBox)
+	GAMEOBJECT_FUNCS(ObjBox, ObjectIDS::BOX)
 
 	ObjBox(byte flags = 0) : GameObject(flags), _colour(1.f, 1.f, 1.f, 1.f) {}
 	virtual ~ObjBox() {}
 
-	virtual void Render() const override;
+	virtual void Render(EnumRenderChannel) const override;
 
 	virtual Bounds GetBounds() const override { return Bounds(_min, _max); }
 

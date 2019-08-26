@@ -180,9 +180,6 @@
     <ClInclude Include="Collider.hpp">
       <Filter>Header Files\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="ColliderAABB.hpp">
-      <Filter>Header Files\Collision</Filter>
-    </ClInclude>
     <ClInclude Include="ColliderSphere.hpp">
       <Filter>Header Files\Collision</Filter>
     </ClInclude>
@@ -291,9 +288,6 @@
     <ClInclude Include="Debug.hpp">
       <Filter>Header Files\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderChannel.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="List.hpp">
       <Filter>Header Files\Templates</Filter>
     </ClInclude>
@@ -311,9 +305,6 @@
     </ClInclude>
     <ClInclude Include="AudioUtilities.hpp">
       <Filter>Header Files\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="FrameAllocator.hpp">
-      <Filter>Header Files\Classes</Filter>
     </ClInclude>
     <ClInclude Include="lodepng.h">
       <Filter>Header Files\ThirdParty</Filter>
@@ -404,6 +395,39 @@
     </ClInclude>
     <ClInclude Include="Hashmap.hpp">
       <Filter>Header Files\Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="StackAllocator.hpp">
+      <Filter>Header Files\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionChannel.hpp">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="ColliderBox.hpp">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Box.hpp">
+      <Filter>Header Files\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderChannel.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjSprite.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Material_Sprite.hpp">
+      <Filter>Header Files\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectIDS.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedPointer.hpp">
+      <Filter>Header Files\Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="Tracker.hpp">
+      <Filter>Header Files\Templates</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.hpp">
+      <Filter>Header Files\Classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -551,9 +575,6 @@
     <ClCompile Include="Debug.cpp">
       <Filter>Source Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="ColliderAABB.cpp">
-      <Filter>Source Files\Collision</Filter>
-    </ClCompile>
     <ClCompile Include="AudioManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
@@ -577,9 +598,6 @@
     </ClCompile>
     <ClCompile Include="AudioUtilities.cpp">
       <Filter>Source Files\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="FrameAllocator.cpp">
-      <Filter>Source Files\Classes</Filter>
     </ClCompile>
     <ClCompile Include="Animation.cpp">
       <Filter>Source Files\Animation</Filter>
@@ -640,6 +658,24 @@
     </ClCompile>
     <ClCompile Include="SHA256.cpp">
       <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="StackAllocator.cpp">
+      <Filter>Source Files\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="ColliderBox.cpp">
+      <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjSprite.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Material_Sprite.cpp">
+      <Filter>Source Files\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="SharedPointer.cpp">
+      <Filter>Source Files\Classes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

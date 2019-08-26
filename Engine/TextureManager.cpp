@@ -36,7 +36,11 @@ Texture* TextureManager::_CreateResource(const String& name, const Buffer<byte> 
 
 void TextureManager::Initialise()
 {
-	_colours.white.Create(1, GL_NEAREST);
-	_colours.grey.Create(1, GL_NEAREST);
-	_colours.uvDefault.Create(1, GL_NEAREST);
+	_MapValue("white") = _colours.white = new Texture(Buffer<byte>({ 255, 255, 255, 255 }), 1, 1);
+	_MapValue("gray") = _colours.grey = new Texture(Buffer<byte>({ 127, 127, 127, 255 }), 1, 1);
+	_MapValue("normal_default") = _colours.normalDefault = new Texture(Buffer<byte>({ 127, 127, 255, 255 }), 1, 1);
+
+	_colours.white->Create(1, GL_NEAREST);
+	_colours.grey->Create(1, GL_NEAREST);
+	_colours.normalDefault->Create(1, GL_NEAREST);
 }

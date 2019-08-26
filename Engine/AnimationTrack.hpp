@@ -9,7 +9,7 @@ class AnimationTrack
 {
 	Buffer<Keyframe<T>> _keyframes;
 
-	int GetKeyIndex(float time) const
+	size_t GetKeyIndex(float time) const
 	{
 		for (size_t i = 0; i < _keyframes.GetSize(); ++i)
 		{
@@ -55,7 +55,7 @@ public:
 
 	const bool Evaluate(T &value, float time) const
 	{
-		int index = GetKeyIndex(time);
+		size_t index = GetKeyIndex(time);
 
 		if (index < 0)
 			return false;

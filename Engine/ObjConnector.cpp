@@ -3,13 +3,12 @@
 #include "Engine.hpp"
 #include "GLProgram.hpp"
 #include "ModelManager.hpp"
-#include "ShaderChannel.hpp"
 #include "TextureManager.hpp"
 
-void ObjConnector::Render() const {
-	if (Engine::Instance().pModelManager && GLProgram::Current().GetChannels() & ShaderChannel::UNLIT)
+void ObjConnector::Render(EnumRenderChannel channels) const {
+	if (Engine::Instance().pModelManager && channels & RenderChannel::UNLIT)
 	{
-		Engine::Instance().pTextureManager->White().Bind(0);
+		Engine::Instance().pTextureManager->White()->Bind(0);
 
 		Vector3 c = (_min + _max) / 2.f;
 		Vector3 size = _max - _min;
@@ -53,16 +52,20 @@ void ObjConnector::Render() const {
 	}
 }
 
-void ObjConnector::WriteToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const
+void ObjConnector::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
 {
-	buffer.Write_byte((byte)direction);
-	buffer.Write_vector3(_min);
-	buffer.Write_vector3(_max);
+	GameObject::WriteData(writer, strings);
+
+	writer.Write_byte((byte)direction);
+	writer.Write_vector3(_min);
+	writer.Write_vector3(_max);
 }
 
-void ObjConnector::ReadFromFile(BufferReader<byte> &buffer, const NumberedSet<String> &strings)
+void ObjConnector::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
 {
-	direction = (Direction2D)buffer.Read_byte();
-	_min = buffer.Read_vector3();
-	_max = buffer.Read_vector3();
+	GameObject::ReadData(reader, strings);
+
+	direction = (Direction2D)reader.Read_byte();
+	_min = reader.Read_vector3();
+	_max = reader.Read_vector3();
 }

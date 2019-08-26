@@ -16,7 +16,7 @@ void UIRect::Render() const
 	if (_texture)
 		_texture->Bind(0);
 	else
-		Engine::Instance().pTextureManager->White().Bind(0);
+		Engine::Instance().pTextureManager->White()->Bind(0);
 
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
 	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, _transform.GetTransformationMatrix());

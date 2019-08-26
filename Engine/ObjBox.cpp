@@ -2,11 +2,10 @@
 #include "DrawUtils.hpp"
 #include "Engine.hpp"
 #include "GLProgram.hpp"
-#include "ShaderChannel.hpp"
 
-void ObjBox::Render() const
+void ObjBox::Render(EnumRenderChannel channels) const
 {
-	if (Engine::Instance().pModelManager && GLProgram::Current().GetChannels() == ShaderChannel::UNLIT)
+	if (Engine::Instance().pModelManager && channels & RenderChannel::UNLIT)
 	{
 		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
 		DrawUtils::DrawBox(*Engine::Instance().pModelManager, _min, _max);

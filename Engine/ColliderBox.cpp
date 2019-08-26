@@ -1,4 +1,4 @@
-#include "ColliderAABB.hpp"
+#include "ColliderBox.hpp"
 #include "ColliderSphere.hpp"
 #include "Collision.hpp"
 #include "GameObject.hpp"
@@ -38,15 +38,26 @@ inline void FindT(const float &originComponent, const float &directionComponent,
 	}
 }
 
-bool ColliderAABB::IntersectsRay(const Ray &ray, RaycastResult &result, const Transform &transform) const
+bool ColliderBox::IntersectsRay(const Ray &ray, RaycastResult &result, const Transform &worldTransform) const
 {
-	Vector3 worldMin = min * transform.GetTransformationMatrix();
-	Vector3 worldMax = max * transform.GetTransformationMatrix();
+	if (!CanCollideWithChannels(ray.channels))
+		return false;
+
+	Transform t = transform * worldTransform;
+
+	Mat4 mat = t.GetRotation().GetQuat().Inverse().ToMatrix();
+	//Quaternion invRotation = t.GetRotation().GetQuat().Inverse();
+
+	Vector3 origin = (ray.origin - t.GetPosition()) * mat;
+	Vector3 dir = ray.direction * mat;
+	
+	Vector3 scaledMin = -1.f * extent * t.GetScale();
+	Vector3 scaledMax = extent * t.GetScale();
 
 	float minT, maxT;
 	float minT_y, maxT_y;
-	FindT(ray.origin[0], ray.direction[0], worldMin[0], worldMax[0], minT, maxT);
-	FindT(ray.origin[1], ray.direction[1], worldMin[1], worldMax[1], minT_y, maxT_y);
+	FindT(origin[0], dir[0], scaledMin[0], scaledMax[0], minT, maxT);
+	FindT(origin[1], dir[1], scaledMin[1], scaledMax[1], minT_y, maxT_y);
 
 	if (minT > maxT_y || minT_y > maxT)
 		return false;
@@ -55,7 +66,7 @@ bool ColliderAABB::IntersectsRay(const Ray &ray, RaycastResult &result, const Tr
 	maxT = Utilities::Min(maxT, maxT_y);
 
 	float minT_z, maxT_z;
-	FindT(ray.origin[2], ray.direction[2], worldMin[2], worldMax[2], minT_z, maxT_z);
+	FindT(origin[2], dir[2], scaledMin[2], scaledMax[2], minT_z, maxT_z);
 
 	if (minT > maxT_z || minT_z > maxT)
 		return false;

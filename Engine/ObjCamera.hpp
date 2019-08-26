@@ -12,6 +12,8 @@ enum class ProjectionType
 class ObjCamera : public GameObject
 {
 private:
+	static const ObjCamera* _currentCamera;
+
 	Mat4 _projection;
 
 	ProjectionType _type;
@@ -24,10 +26,13 @@ private:
 
 	void UpdateProjectionMatrix();
 public:
-	GAMEOBJECT_FUNCS(ObjCamera)
+	GAMEOBJECT_FUNCS(ObjCamera, ObjectIDS::CAMERA)
 
 	ObjCamera() : _type(ProjectionType::PERSPECTIVE), _fov(90.f), _scale(1.f), _near(.001f), _far(100.f) { }
 	~ObjCamera() {}
+
+	void Use();
+	inline static const ObjCamera* Current() { return _currentCamera; }
 
 	inline void SetProjectionType(ProjectionType type)	{ _type = type; UpdateProjectionMatrix(); }
 	inline void SetFOV(float fieldOfView)				{ _fov = fieldOfView; UpdateProjectionMatrix(); }
@@ -39,11 +44,11 @@ public:
 	inline float GetFOV() const							{ return _fov; }
 	inline float GetFOVHorizontal() const				{ return _fov * (float)_viewport[0] / (float)_viewport[1]; }
 	inline float GetScale() const						{ return _scale; }
-	inline Vector<uint16, 2> GetViewport() const		{ return _viewport; }
+	inline const Vector<uint16, 2>& GetViewport() const	{ return _viewport; }
 	inline float GetNear() const						{ return _near; }
 	inline float GetFar() const							{ return _far; }
 
-	inline Mat4 GetProjectionMatrix() const				{ return _projection; }
+	inline const Mat4& GetProjectionMatrix() const		{ return _projection; }
 
 	bool FrustumOverlaps(const Bounds &b) const;
 
@@ -53,4 +58,8 @@ public:
 	Vector2 GetZPlaneDimensions() const;
 
 	virtual void GetCvars(CvarMap&) override;
+
+	//File IO
+	virtual void WriteData(BufferWriter<byte>&, NumberedSet<String>& strings) const override;
+	virtual void ReadData(BufferReader<byte>&, const NumberedSet<String>& strings) override;
 };

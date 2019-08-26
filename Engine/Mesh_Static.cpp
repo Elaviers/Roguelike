@@ -63,7 +63,7 @@ void Mesh_Static::_WriteData(BufferWriter<byte>& iterator) const
 	iterator.Write_byte(ASSET_MESH_STATIC);
 	iterator.Write_byte(CURRENT_FILE_VERSION);
 
-	iterator.Write_uint32(vertices.GetSize());
+	iterator.Write_uint32((uint32)vertices.GetSize());
 
 	for (size_t i = 0; i < vertices.GetSize(); ++i)
 	{
@@ -74,7 +74,7 @@ void Mesh_Static::_WriteData(BufferWriter<byte>& iterator) const
 		iterator.Write_vector2(v.uvOffset);
 	}
 
-	iterator.Write_uint32(elements.GetSize());
+	iterator.Write_uint32((uint32)elements.GetSize());
 
 	for (size_t i = 0; i < elements.GetSize(); ++i)
 		iterator.Write_uint32(elements[i]);
@@ -83,4 +83,7 @@ void Mesh_Static::_WriteData(BufferWriter<byte>& iterator) const
 	iterator.Write_vector3(bounds.max);
 }
 
-void Mesh_Static::CreateGLMeshRenderer(GLMeshRenderer& renderer) { renderer.Create(vertices.Data(), vertices.GetSize(), elements.Data(), elements.GetSize()); }
+void Mesh_Static::CreateGLMeshRenderer(GLMeshRenderer& renderer) 
+{ 
+	renderer.Create(vertices.Data(), (GLsizei)vertices.GetSize(), elements.Data(), (GLsizei)elements.GetSize());
+}

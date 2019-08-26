@@ -6,7 +6,7 @@ void ToolBrush3D::Initialise()
 {
 	_object.SetRelativeScale(Vector3());
 	_object.SetMaterial("alt");
-	_cvars.Add("Material", Getter<String>((ObjBrush<3>*)&_object, &ObjBrush<3>::GetMaterialName), Setter<String>((ObjBrush<3>*)&_object, &ObjBrush<3>::SetMaterial), PropertyFlags::MATERIAL);
+	_cvars.Add("Material", Getter<String>((ObjBrush<3>*)&_object, &ObjBrush<3>::GetMaterialName), Setter<String>((ObjBrush<3>*)&_object, &ObjBrush<3>::SetMaterial), CvarFlags::MATERIAL);
 }
 
 void ToolBrush3D::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
@@ -70,9 +70,9 @@ void ToolBrush3D::KeySubmit()
 	_object.Clone()->SetParent(&_owner.LevelRef());
 }
 
-void ToolBrush3D::Render() const
+void ToolBrush3D::Render(EnumRenderChannel channels) const
 {
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(.8f, .8f, .8f, .5f));
-	_object.Render();
+	_object.Render(channels);
 }
 

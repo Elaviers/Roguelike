@@ -1,3 +1,6 @@
+#pragma warning(disable : 26451)
+/////////
+
 /*
 LodePNG version 20180326
 

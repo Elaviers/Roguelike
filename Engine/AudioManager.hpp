@@ -24,7 +24,7 @@ class AudioManager : public AssetManager<WaveSound>
 
 	virtual WaveSound* _CreateResource(const String&, const String&) override;
 
-	virtual void _DestroyResource(WaveSound& sound) override;
+	virtual void _DestroyResource(WaveSound* sound) override;
 
 public:
 	AudioManager() : AssetManager(""), _waveFormat{0} {}

@@ -5,7 +5,9 @@
 #include <Engine/Registry.hpp>
 #include <Engine/Timer.hpp>
 #include <Engine/Window.hpp>
-#include "MouseData.h"
+#include "FbxSdk.hpp"
+#include "HierachyWindow.hpp"
+#include "MouseData.hpp"
 #include "PropertyWindow.hpp"
 #include "ToolBrush2D.hpp"
 #include "ToolBrush3D.hpp"
@@ -15,10 +17,17 @@
 #include "ToolWindow.hpp"
 #include "Viewport.hpp"
 #include <CommCtrl.h>
-#include <fbxsdk.h>
 
 #define VIEWPORTCOUNT 4
 
+enum ToolEnum
+{
+	TOOL_SELECT = 0,
+	TOOL_BRUSH2D = 1,
+	TOOL_BRUSH3D = 2,
+	TOOL_ENTITY = 3,
+	TOOL_CONNECTOR = 4
+};
 
 class Editor
 {
@@ -35,6 +44,7 @@ private:
 	//Window stuff
 	Window _window;
 	Window _vpArea;
+	HierachyWindow _hierachyWindow;
 	PropertyWindow _propertyWindow;
 	ToolWindow _toolWindow;
 
@@ -52,22 +62,16 @@ private:
 	GLProgram _shaderUnlit;
 
 	//Editor
+	bool _drawEditorFeatures = true;
+
+	EnumRenderChannel _litRenderChannels = RenderChannel::NONE;
+	EnumRenderChannel _unlitRenderChannels = EnumRenderChannel(RenderChannel::SURFACE | RenderChannel::UNLIT);
+
 	GameObject _level;
 
 	Tool *_currentTool = nullptr;
 
 	int _activeVP = 0;
-
-	struct _EditorTools
-	{
-		ToolSelect select;
-		ToolBrush2D brush2D;
-		ToolBrush3D brush3D;
-		ToolEntity entity;
-		ToolConnector connector;
-
-		_EditorTools(Editor &editor) : select(editor), brush2D(editor), brush3D(editor), entity(editor), connector(editor) {}
-	} _tools;
 
 
 	MouseData _mouseData;
@@ -85,7 +89,18 @@ private:
 	void _InitGL();
 
 public:
-	Editor() : _fbxManager(nullptr), _propertyWindow(this), _toolWindow(this), _tools(*this) {}
+	struct _EditorTools
+	{
+		ToolSelect select;
+		ToolBrush2D brush2D;
+		ToolBrush3D brush3D;
+		ToolEntity entity;
+		ToolConnector connector;
+
+		_EditorTools(Editor& editor) : select(editor), brush2D(editor), brush3D(editor), entity(editor), connector(editor) {}
+	} tools;
+
+	Editor() : _fbxManager(nullptr), _hierachyWindow(this), _propertyWindow(this), _toolWindow(this), tools(*this), _level(0, "Level") {}
 	~Editor();
 
 	void Run();
@@ -105,10 +120,14 @@ public:
 	void KeyCancel();
 	void KeyDelete();
 
+	void RefreshLevel();
+
 	void ResizeViews(uint16 w, uint16 h);
 
 	String SelectMaterialDialog();
 	String SelectModelDialog();
+
+	void SetTool(ToolEnum tool, bool changeToolbarSelection = true);
 
 	//For Tools
 	inline GameObject& LevelRef() { return _level; }

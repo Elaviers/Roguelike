@@ -73,7 +73,7 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 {
 	static const byte bonesPerVertex = 2;
 
-	uint32 jointCount = skeleton.GetJointCount();
+	uint32 jointCount = (uint32)skeleton.GetJointCount();
 
 	Buffer<const Joint*> jointBuffer;
 	jointBuffer.SetSize(jointCount);
@@ -82,12 +82,11 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 
 	size_t jointDataSize = 0;
 
-	for (const List<Joint>::Node* node = skeleton.FirstListNode(); node != nullptr; node = node->next)
+	for (auto it = skeleton.FirstListElement(); it; ++it)
 	{
-		jointBuffer[jointId++] = &node->obj;
+		jointBuffer[jointId++] = &*it;
 
-		const Joint& j = node->obj;
-		jointDataSize += 4 + (node->obj.name.GetLength() + 1) + (4 * (3 + 3 + 3));
+		jointDataSize += 4 + (it->name.GetLength() + 1) + (4 * (3 + 3 + 3));
 	}
 
 	iterator.EnsureSpace(
@@ -107,7 +106,7 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 	iterator.Write_byte(CURRENT_FILE_VERSION);
 	iterator.Write_byte(bonesPerVertex);
 
-	iterator.Write_uint32(vertices.GetSize());
+	iterator.Write_uint32((uint32)vertices.GetSize());
 
 	for (size_t i = 0; i < vertices.GetSize(); ++i)
 	{
@@ -124,18 +123,18 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 		}
 	}
 
-	iterator.Write_uint32(elements.GetSize());
+	iterator.Write_uint32((uint32)elements.GetSize());
 
 	for (size_t i = 0; i < elements.GetSize(); ++i)
 		iterator.Write_uint32(elements[i]);
 
-	iterator.Write_uint32(jointBuffer.GetSize());
+	iterator.Write_uint32((uint32)jointBuffer.GetSize());
 
 	for (size_t i = 0; i < jointBuffer.GetSize(); ++i)
 	{
 		const Joint* joint = jointBuffer[i];
 
-		uint32 parentId = 0;
+		size_t parentId = 0;
 		for (size_t id = 0; id < jointBuffer.GetSize(); ++id)
 		{
 			if (joint->GetParent() == jointBuffer[id])
@@ -145,7 +144,7 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 			}
 		}
 
-		iterator.Write_uint32(parentId);
+		iterator.Write_uint32((uint32)parentId);
 		iterator.Write_string(joint->name.GetData());
 		joint->localTransform.WriteToBuffer(iterator);
 	}
@@ -154,4 +153,7 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 	iterator.Write_vector3(bounds.max);
 }
 
-void Mesh_Skeletal::CreateGLMeshRenderer(GLMeshRenderer& renderer) { renderer.Create(vertices.Data(), vertices.GetSize(), elements.Data(), elements.GetSize()); }
+void Mesh_Skeletal::CreateGLMeshRenderer(GLMeshRenderer& renderer) 
+{ 
+	renderer.Create(vertices.Data(), (GLsizei)vertices.GetSize(), elements.Data(), (GLsizei)elements.GetSize()); 
+}

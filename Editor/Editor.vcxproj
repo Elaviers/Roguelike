@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{99562569-A4D4-4BE3-A9D4-CC0DF1DFBF4C}</ProjectGuid>
     <RootNamespace>Editor</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -99,10 +99,9 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;opengl32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
@@ -121,10 +120,9 @@ EXIT 0</Command>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;opengl32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
@@ -150,7 +148,7 @@ EXIT 0</Command>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;opengl32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
@@ -176,7 +174,7 @@ EXIT 0</Command>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;opengl32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
@@ -194,6 +192,10 @@ EXIT 0</Command>
     <ClCompile Include="EditorIO.cpp" />
     <ClCompile Include="EditorUtil.cpp" />
     <ClCompile Include="FbxReader.cpp" />
+    <ClCompile Include="GizmoAxis.cpp" />
+    <ClCompile Include="GizmoPlane.cpp" />
+    <ClCompile Include="GizmoRing.cpp" />
+    <ClCompile Include="HierachyWindow.cpp" />
     <ClCompile Include="PropertyWindow.cpp" />
     <ClCompile Include="ResourceSelect.cpp" />
     <ClCompile Include="ToolBrush2D.cpp" />
@@ -209,7 +211,14 @@ EXIT 0</Command>
     <ClInclude Include="Editor.hpp" />
     <ClInclude Include="EditorIO.hpp" />
     <ClInclude Include="EditorUtil.hpp" />
-    <ClInclude Include="MouseData.h" />
+    <ClInclude Include="FbxSdk.hpp" />
+    <ClInclude Include="Gizmo.hpp" />
+    <ClInclude Include="GizmoAxis.hpp" />
+    <ClInclude Include="GizmoComponent.hpp" />
+    <ClInclude Include="GizmoPlane.hpp" />
+    <ClInclude Include="GizmoRing.hpp" />
+    <ClInclude Include="HierachyWindow.hpp" />
+    <ClInclude Include="MouseData.hpp" />
     <ClInclude Include="PropertyWindow.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceSelect.hpp" />
@@ -226,12 +235,6 @@ EXIT 0</Command>
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Data\Shaders\Basic.frag">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\Data\Shaders\Basic.vert">
-      <FileType>Document</FileType>
-    </None>
     <None Include="..\Data\Shaders\Phong.frag">
       <FileType>Document</FileType>
     </None>
@@ -256,6 +259,11 @@ EXIT 0</Command>
     <Image Include="ToolSelect.bmp" />
     <Image Include="TreeNode.bmp" />
     <Image Include="TreeNode2.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.vcxproj">
+      <Project>{910514df-e498-4cb8-bec5-304060e649b8}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -53,7 +53,7 @@ OBJVertexDef ParseOBJVertex(const String &term)
 }
 
 template<typename T>
-inline const uint32 OBJIndexToCIndex(const Buffer<T> &buf, size_t objIndex)
+inline const size_t OBJIndexToCIndex(const Buffer<T> &buf, size_t objIndex)
 {
 	if (objIndex == 0)
 		return 0;
@@ -189,8 +189,9 @@ Mesh_Static* IO::ReadOBJFile(const char *filename)
 				}
 			}
 		}
+		
+		mesh->bounds.RecalculateSphereBounds();
 	}
 
-	mesh->bounds.RecalculateSphereBounds();
 	return mesh;
 }

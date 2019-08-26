@@ -22,6 +22,12 @@
     <Filter Include="Header Files\Tools">
       <UniqueIdentifier>{4c5567ff-7798-49f6-95c2-393dc0210a07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tools\Gizmo">
+      <UniqueIdentifier>{3c5cdbea-6e8b-4686-8ea7-125ecf07085f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tools\Gizmo">
+      <UniqueIdentifier>{bc679d0b-4ce7-4cd4-99e2-4bdef1835ce3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Editor.cpp">
@@ -65,6 +71,18 @@
     </ClCompile>
     <ClCompile Include="FbxReader.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HierachyWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GizmoAxis.cpp">
+      <Filter>Source Files\Tools\Gizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="GizmoPlane.cpp">
+      <Filter>Source Files\Tools\Gizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="GizmoRing.cpp">
+      <Filter>Source Files\Tools\Gizmo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,7 +128,28 @@
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="MouseData.h">
+    <ClInclude Include="HierachyWindow.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MouseData.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Gizmo.hpp">
+      <Filter>Header Files\Tools\Gizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="GizmoAxis.hpp">
+      <Filter>Header Files\Tools\Gizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="GizmoComponent.hpp">
+      <Filter>Header Files\Tools\Gizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="GizmoPlane.hpp">
+      <Filter>Header Files\Tools\Gizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="GizmoRing.hpp">
+      <Filter>Header Files\Tools\Gizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxSdk.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -120,16 +159,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Data\Shaders\basic.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Data\Shaders\basic.vert">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\Data\Shaders\Phong.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Data\Shaders\Shader.vert">
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\Data\Shaders\Sky.frag">
@@ -139,6 +169,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\Data\Shaders\Unlit.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Data\Shaders\Shader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
@@ -152,9 +185,6 @@
     <Image Include="ToolEdit.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="ToolSelect.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="ToolEntity.bmp">
       <Filter>Resource Files</Filter>
     </Image>
@@ -162,6 +192,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="ToolBrush.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="ToolSelect.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

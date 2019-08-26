@@ -56,13 +56,15 @@ void FontTTF::_CMD_LoadFont(const Buffer<String>& args)
 			
 			TTFGlyph glyph = {
 				texture,
-				Vector2(_face->glyph->bitmap.width, _face->glyph->bitmap.rows),
-				Vector2(_face->glyph->bitmap_left, _face->glyph->bitmap_top),
+				Vector2((float)_face->glyph->bitmap.width, (float)_face->glyph->bitmap.rows),
+				Vector2((float)_face->glyph->bitmap_left, (float)_face->glyph->bitmap_top),
 				_face->glyph->advance.x
 			};
 
 			_charMap[(char)i] = glyph;
 		}
+
+		_descender = _face->descender >> 6;
 
 		FT_Done_Face(_face);
 	}
@@ -97,7 +99,7 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 
 	float line = 0.f;
 
-	float yOffset = (_face->descender >> 6);
+	float yOffset = (float)_descender;
 
 	t.Move(downDirection * yOffset);
 
@@ -131,7 +133,7 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 
 				Engine::Instance().pModelManager->Plane().Render();
 
-				t.Move(advanceDirection * (glyph->advance >> 6) * scale);
+				t.Move(advanceDirection * (float)(glyph->advance >> 6) * scale);
 			}
 		}
 	}

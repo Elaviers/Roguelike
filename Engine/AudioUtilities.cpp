@@ -14,14 +14,14 @@ void AudioUtilities::LowPassFilter(const int16 *src, int16 *dest, int channelCou
 		for (int c = 0; c < channelCount; ++c)
 			dest[c] = src[c];
 
-		for (int f = 1; f < frameCount; ++f)
+		for (size_t f = 1; f < frameCount; ++f)
 		{
 			for (int c = 0; c < channelCount; ++c)
 			{
-				int index = f * channelCount + c;
-				int prevIndex = index - channelCount;
+				size_t index = f * channelCount + c;
+				size_t prevIndex = index - channelCount;
 
-				dest[index] = dest[prevIndex] + (alpha * (src[index] - dest[prevIndex]));
+				dest[index] = dest[prevIndex] + (uint32)(alpha * (src[index] - dest[prevIndex]));
 			}
 		}
 	}
@@ -34,7 +34,7 @@ float LanczosKernel(float x, unsigned int filterSize)
 
 	if (x < filterSize && x >= -(int)filterSize)
 	{
-		return ((float)filterSize * Maths::Sine(Maths::PI * x) * Maths::Sine(Maths::PI * x / filterSize)) / (Maths::PI * Maths::PI * x * x);
+		return ((float)filterSize * Maths::Sine(Maths::PI_F * x) * Maths::Sine(Maths::PI_F * x / (float)filterSize)) / (Maths::PI_F * Maths::PI_F * x * x);
 	}
 
 	return 0.f;
@@ -66,9 +66,9 @@ uint32 AudioUtilities::ResampleTo(int16 *src, uint32 srcSampleRate, uint16 srcCh
 	const float srcFramesPerDestFrame = (float)srcSampleRate / (float)destSampleRate;
 	const float destFramesPerSrcFrame = (float)destSampleRate / (float)srcSampleRate;
 
-	uint32 framesToWrite = Utilities::Min<uint32>(srcFrameCount * destFramesPerSrcFrame, destFrameCount);
+	uint32 framesToWrite = Utilities::Min<uint32>((uint32)((float)srcFrameCount * destFramesPerSrcFrame), destFrameCount);
 
-	for (int f = 0; f < framesToWrite; ++f)
+	for (uint32 f = 0; f < framesToWrite; ++f)
 	{
 		//t is in src frames
 		float t = f * srcFramesPerDestFrame;

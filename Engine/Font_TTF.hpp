@@ -9,17 +9,19 @@ private:
 
 	struct TTFGlyph
 	{
-		GLuint texID;
+		GLuint texID = 0;
 
 		Vector2 size;
 		Vector2 bearing;
 
-		FT_Pos advance;
+		FT_Pos advance = 0;
 	};
 
 
 
 	FT_Face _face;
+
+	int _descender;
 
 	Map<char, TTFGlyph> _charMap;
 
@@ -30,7 +32,7 @@ private:
 	void _CMD_LoadFont(const Buffer<String>& args);
 
 public:
-	FontTTF() : _face(nullptr), _vao(0), _vbo(0), _size(0) 
+	FontTTF() : _face(nullptr), _vao(0), _vbo(0), _size(0), _descender(0)
 	{
 		_cvars.CreateVar("filename", CommandPtr(this, &FontTTF::_CMD_LoadFont));
 		_cvars.Add("rendersize", _size);

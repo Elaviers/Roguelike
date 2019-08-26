@@ -1,5 +1,6 @@
 #pragma once
 #include "PropertyWindow.hpp"
+#include <Engine/RenderChannel.hpp>
 
 class Editor;
 struct MouseData;
@@ -26,6 +27,6 @@ public:
 	virtual void KeySubmit()					{}
 	virtual void KeyDelete()					{}
 
-	virtual void Render() const					{}
+	virtual void Render(EnumRenderChannel) const{}
 };
 

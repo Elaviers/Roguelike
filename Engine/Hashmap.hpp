@@ -1,4 +1,5 @@
 #pragma once
+#include "Buffer.hpp"
 #include "List.hpp"
 #include "Hashing.hpp"
 #include "Pair.hpp"
@@ -24,6 +25,7 @@ class Hashmap
 	static H_TYPE _Hash(const K& key) { return Hasher<H_TYPE>::template Hash<K>(key); }
 
 	typedef Pair<const K, V> KVPair;
+	typedef Pair<const K, const V> KVPairConst;
 
 	class HashNode
 	{
@@ -53,9 +55,9 @@ class Hashmap
 
 		inline V* GetValueForKey(const K &key)
 		{
-			for (auto n = keys.First(); n; n = n->next)
-				if (n->obj.first == key)
-					return &n->obj.second;
+			for (auto it = keys.First(); it; ++it)
+				if (it->first == key)
+					return &it->second;
 
 			return nullptr;
 		}
@@ -94,9 +96,9 @@ class Hashmap
 
 		KVPair* GetWithValue(const V& v)
 		{
-			for (auto node = keys.First(); node; node = node->next)
-				if (node->obj.second == v)
-					return &node->obj;
+			for (auto it = keys.First(); it; ++it)
+				if (it->second == v)
+					return &*it;
 
 			KVPair* pair;
 			if (left && (pair =		left->GetWithValue(v)))		return pair;
@@ -115,16 +117,42 @@ class Hashmap
 			return node;
 		}
 
-		void AddTo(Buffer<List<KVPair>*> &buffer, int depth, int currentDepth = 0)
+		void AddToK(Buffer<const K*>& buffer) const
 		{
-			if (currentDepth == depth)
-			{
-				buffer.Add(&keys);
-				return;
-			}
+			for (auto it = keys.First(); it; ++it)
+				buffer.Add(&it->first);
+
+			if (left)	left->AddToK(buffer);
+			if (right)	right->AddToK(buffer);
+		}
+
+		void AddTo(Buffer<KVPair*> &buffer, int depth, int currentDepth = 0)
+		{
+			if (depth < 0 || currentDepth == depth)
+				for (auto it = keys.First(); it; ++it)
+					buffer.Add(&*it);
 			
 			if (left)	left->AddTo(buffer, depth, currentDepth + 1);
 			if (right)	right->AddTo(buffer, depth, currentDepth + 1);
+		}
+
+		void AddTo(Buffer<KVPairConst*>& buffer, int depth, int currentDepth = 0)
+		{
+			if (depth < 0 || currentDepth == depth)
+				for (auto it = keys.First(); it; ++it)
+					buffer.Add(reinterpret_cast<KVPairConst*>(&*it));
+
+			if (left)	left->AddTo(buffer, depth, currentDepth + 1);
+			if (right)	right->AddTo(buffer, depth, currentDepth + 1);
+		}
+
+		void ForEach(void (*function)(const K&, V&))
+		{
+			for (auto it = keys.First(); it; ++it)
+				function(it->first, it->second);
+			
+			if (left)	left->ForEach(function);
+			if (right)	right->ForEach(function);
 		}
 	};
 
@@ -132,9 +160,10 @@ class Hashmap
 
 public:
 	Hashmap() : _data(nullptr) {}
+	Hashmap(const Hashmap& other) : _data(nullptr) { if (other._data) _data = other._data->Copy(); }
 	~Hashmap() { delete _data; }
 
-	inline void Clear() { delete _data; }
+	inline void Clear() { delete _data; _data = nullptr; }
 	inline uint32 GetSize() const { return _data ? _data->Count() : 0; }
 	inline bool IsEmpty() const { return _data == nullptr; }
 
@@ -171,11 +200,11 @@ public:
 			V* value = node.GetValueForKey(key);
 			if (value) return *value;
 
-			return node.keys.Add(KVPair(key, V()))->obj.second;
+			return node.keys.Add(KVPair(key, V()))->second;
 		}
 
 		_data = new HashNode(_Hash(key));
-		return _data->keys.Add(KVPair(key, V()))->obj.second;
+		return _data->keys.Add(KVPair(key, V()))->second;
 	}
 
 	V& Set(const K& key, const V& value)
@@ -188,19 +217,45 @@ public:
 			if (v)
 				return (*v = value);
 
-			return node.keys.Add(KVPair(key, value))->obj.second;
+			return node.keys.Add(KVPair(key, value))->second;
 		}
 
 		_data = new HashNode(_Hash(key));
-		_data->keys.Add(KVPair(key, value))->obj.second;
+		return _data->keys.Add(KVPair(key, value))->second;
 	}
 
 	inline V* Get(const K& key) { return const_cast<V*>(((const Hashmap*)this)->Get(key)); }
 
-	Buffer<List<KVPair>*> ToBuffer(int depth = -1)
+	inline Hashmap& operator=(const Hashmap& other)
 	{
-		Buffer<List<KVPair>*> buffer;
+		Clear();
+		if (other._data) _data = other._data->Copy();
+		return *this;
+	}
+
+	inline Buffer<const K*> ToKBuffer() const
+	{
+		Buffer<const K*> buffer;
+		if (_data) _data->AddToK(buffer);
+		return buffer;
+	}
+
+	Buffer<KVPair*> ToKVBuffer(int depth = -1)
+	{
+		Buffer<KVPair*> buffer;
 		if (_data) _data->AddTo(buffer, depth);
 		return buffer;
+	}
+
+	Buffer<KVPairConst*> ToKVBuffer() const
+	{
+		Buffer<KVPairConst*> buffer;
+		if (_data) _data->AddTo(buffer, -1);
+		return buffer;
+	}
+
+	inline void ForEach(void (*function)(const K&, V&))
+	{
+		if (_data) _data->ForEach(function);
 	}
 };

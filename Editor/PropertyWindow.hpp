@@ -17,7 +17,7 @@ struct PropertyHWND
 
 class PropertyWindow : public Window
 {
-	static LPCTSTR _className;
+	static const TCHAR* _className;
 	static LRESULT _WindowProc(HWND, UINT, WPARAM, LPARAM);
 
 	static LRESULT _EditProc(HWND, UINT, WPARAM, LPARAM);

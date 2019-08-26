@@ -1,4 +1,5 @@
 #include "CvarMap.hpp"
+#include "Buffer.hpp"
 #include "FunctionPointer.hpp"
 
 String CvarMap::HandleCommand(const String& command)

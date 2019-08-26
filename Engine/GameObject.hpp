@@ -1,13 +1,17 @@
 #pragma once
 #include "Bounds.hpp"
 #include "BufferIterator.hpp"
+#include "Event.hpp"
 #include "Map.hpp"
 #include "NumberedSet.hpp"
+#include "ObjectIDS.hpp"
+#include "RenderChannel.hpp"
 #include "Transform.hpp"
 #include <cstdlib>
 
-#define GAMEOBJECT_FUNCS(CLASSNAME)															\
+#define GAMEOBJECT_FUNCS(CLASSNAME, ID)														\
 public:																						\
+	virtual ObjectIDS::ObjectID GetTypeID() const { return ID; }							\
 	virtual size_t SizeOf() const { return sizeof(*this); }									\
 	virtual GameObject* Clone() const { return GameObject::_CreateCopy<CLASSNAME>(*this); } \
 	inline CLASSNAME* TypedClone() const { return (CLASSNAME*)Clone(); }					\
@@ -23,12 +27,24 @@ class GameObject
 {
 	Transform _transform;
 
+	String _name;
+
+	void _OnTransformChanged() { onTransformChanged(); }
+
+	inline void _OnChildChanged()
+	{
+		onChildChanged();
+
+		if (_parent)
+			_parent->_OnChildChanged();
+	}
 protected:
 	static void* operator new(size_t size) { return ::operator new(size); }
-	
+	void operator delete(void* ptr) { ::operator delete(ptr); }
+
 	const uint32 _uid;
 
-	const byte _flags;
+	byte _flags;
 	const bool _dynamic;
 
 	GameObject *_parent;
@@ -36,20 +52,34 @@ protected:
 
 	void _AddBaseCvars(CvarMap&);
 
-	virtual void _OnTransformChanged() {}
-
 public:
-	enum
+	Event<> onNameChanged;
+	Event<> onChildChanged;
+	Event<> onTransformChanged;
+
+	enum Flag
 	{
 		FLAG_SAVEABLE = 0x1,
 		FLAG_DBG_ALWAYS_DRAW = 0x2
 	};
 
-	GAMEOBJECT_FUNCS(GameObject)
+	GAMEOBJECT_FUNCS(GameObject, ObjectIDS::GAMEOBJECT)
 
-	GameObject(byte flags = 0) : _uid(GetNextUID()), _flags(flags), _dynamic(false), _parent(nullptr), _transform(Callback(this, &GameObject::_OnTransformChanged)) {}
+	GameObject(byte flags = 0, const String &name = String()) : 
+		_name(name), 
+		_uid(GetNextUID()), 
+		_flags(flags), 
+		_dynamic(false), 
+		_parent(nullptr), 
+		_transform(Callback(this, &GameObject::_OnTransformChanged)) 
+	{}
 
-	GameObject(const GameObject &other) : _uid(GetNextUID()), _flags(other._flags), _dynamic(false), _parent(other._parent), _transform(other._transform)
+	GameObject(const GameObject &other) : 
+		_uid(GetNextUID()), 
+		_flags(other._flags), 
+		_dynamic(false), 
+		_parent(other._parent), 
+		_transform(other._transform)
 	{
 		_transform.SetCallback(Callback(this, &GameObject::_OnTransformChanged));
 		CloneChildrenFrom(other);
@@ -63,20 +93,21 @@ public:
 			delete &other;
 	}
 
-	virtual ~GameObject()
-	{
-		DeleteChildren();
+	virtual ~GameObject() {}
 
-		if (_parent)
-			_parent->_children.Remove(this);
+	void Delete();
+
+	inline void DeleteChildren()
+	{
+		while (_children.GetSize())
+			_children[0]->Delete();
 	}
 	
 	//Transform
-	inline Transform& RelativeTransform()							{ return _transform; }
-	inline const Transform& RelativeTransform() const				{ return _transform; }
-	inline const Vector3& GetRelativePosition() const				{ return RelativeTransform().GetPosition(); }
-	inline const Rotation& GetRelativeRotation() const				{ return RelativeTransform().GetRotation(); }
-	inline const Vector3& GetRelativeScale() const					{ return RelativeTransform().GetScale(); }
+	inline const Transform& GetRelativeTransform() const			{ return _transform; }
+	inline const Vector3& GetRelativePosition() const				{ return GetRelativeTransform().GetPosition(); }
+	inline const Rotation& GetRelativeRotation() const				{ return GetRelativeTransform().GetRotation(); }
+	inline const Vector3& GetRelativeScale() const					{ return GetRelativeTransform().GetScale(); }
 
 	inline void AddRelativeRotation(const Vector3& euler)			{ _transform.AddRotation(euler); }
 
@@ -138,24 +169,51 @@ public:
 	inline GameObject* GetParent() const { return _parent; }
 	inline const Buffer<GameObject*>& Children() const { return _children; }
 
-	inline void SetParent(GameObject *parent)
+	GameObject* FindByUID(uint32 uid)
+	{
+		if (_uid == uid)
+			return this;
+
+		for (size_t i = 0; i < _children.GetSize(); ++i)
+		{
+			GameObject* result = _children[i]->FindByUID(uid);
+			if (result) return result;
+		}
+
+		return nullptr;
+	}
+
+	template<typename T>
+	void FindChildrenOfType(Buffer<T*> &out, bool searchChildren)
+	{
+		for (size_t i = 0; i < _children.GetSize(); ++i)
+		{
+			if (_children[i]->IsType<T>())
+				out.Add((T*)_children[i]);
+
+			if (searchChildren)
+				_children[i]->FindChildrenOfType<T>(out, true);
+		}
+	}
+
+	template<typename T>
+	inline Buffer<T*> FindChildrenOfType(bool searchChildren) { Buffer<T*> buffer; FindChildrenOfType<T>(buffer, searchChildren); return buffer; }
+
+	void SetParent(GameObject *parent)
 	{ 
 		if (_parent)
+		{
 			_parent->_children.Remove(this);
+			_parent->_OnChildChanged();
+		}
 
 		_parent = parent;
 
 		if (_parent)
-			_parent->_children.Add(this); 
-	}
-
-	inline void DeleteChildren()
-	{
-		while (_children.GetSize() > 0)
-			if (_children[0]->_dynamic)
-				delete _children[0];
-			else
-				_children[0]->SetParent(nullptr);
+		{
+			_parent->_children.Add(this);
+			_parent->_OnChildChanged();
+		}
 	}
 
 	inline void CloneChildrenFrom(const GameObject &src)
@@ -164,19 +222,38 @@ public:
 			src._children[i]->Clone()->SetParent(this);
 	}
 
+	inline bool IsChildOf(const GameObject* parent) const
+	{
+		if (_parent == nullptr)
+			return false;
+
+		if (_parent == parent)
+			return true;
+
+		return _parent->IsChildOf(parent);
+	}
+
 	//General
+	inline const String& GetName() const { return _name; }
+	inline void SetName(const String& name) { _name = name; onNameChanged(); if (_parent) _parent->_OnChildChanged(); }
+
 	inline byte GetFlags() const { return _flags; }
+	inline void SetFlags(byte flags) { _flags = flags; }
 
 	virtual void Update() {}
-	virtual void Render() const {}
-	void Render(const ObjCamera &camera) const;
+	virtual void Render(EnumRenderChannel channels) const {}
+	void Render(const ObjCamera &camera, EnumRenderChannel channels) const;
 
 	virtual void GetCvars(CvarMap &properties) { _AddBaseCvars(properties); }
 
+	inline uint32 GetUID() const { return _uid; }
+
 	//File IO
 	void WriteAllToFile(BufferWriter<byte>&, NumberedSet<String> &strings) const;
-	virtual void WriteToFile(BufferWriter<byte>&, NumberedSet<String> &strings) const {}
-	virtual void ReadFromFile(BufferReader<byte>&, const NumberedSet<String> &strings) {}
+	static GameObject* CreateFromData(BufferReader<byte>&, const NumberedSet<String>& strings);
+
+	virtual void WriteData(BufferWriter<byte>&, NumberedSet<String>& strings) const;
+	virtual void ReadData(BufferReader<byte>&, const NumberedSet<String>& strings);
 
 	//Collision
 	virtual const Collider* GetCollider() const { return nullptr; }
@@ -208,11 +285,35 @@ public:
 
 	//Other
 	virtual Bounds GetBounds() const { return Bounds(); }
-	inline Bounds GetWorldBounds() const 
+
+	inline Bounds GetWorldBounds(bool noTranslation = false) const 
 	{
 		Bounds b = GetBounds();
 		Mat4 wt = GetWorldTransform().GetTransformationMatrix();
-		return Bounds(b.min * wt, b.max * wt);
+		if (noTranslation) wt[3][0] = wt[3][1] = wt[3][2] = 0.f;
+
+		//Yeah, this is not optimised at all...
+		Vector3 testPoints[8] = {
+			b.min * wt,
+			b.max * wt,
+			Vector3(b.min[0], b.min[1], b.max[2]) * wt,
+			Vector3(b.min[0], b.max[1], b.min[2]) * wt,
+			Vector3(b.min[0], b.max[1], b.max[2]) * wt,
+			Vector3(b.max[0], b.min[1], b.min[2]) * wt,
+			Vector3(b.max[0], b.min[1], b.max[2]) * wt,
+			Vector3(b.max[0], b.max[1], b.min[2]) * wt
+		};
+
+		Vector3 min = testPoints[0];
+		Vector3 max = min;
+
+		for (int i = 0; i < 8; ++i)
+		{
+			min = Vector3(Utilities::Min(min[0], testPoints[i][0]), Utilities::Min(min[1], testPoints[i][1]), Utilities::Min(min[2], testPoints[i][2]));
+			max = Vector3(Utilities::Max(max[0], testPoints[i][0]), Utilities::Max(max[1], testPoints[i][1]), Utilities::Max(max[2], testPoints[i][2]));
+		}
+
+		return Bounds(min, max);
 	}
 
 	template<typename T>
@@ -240,6 +341,8 @@ protected:
 	{
 		GameObject *go = new T(other);
 		const_cast<bool&>(go->_dynamic) = true;
+		go->SetParent(other._parent);
+		const_cast<byte&>(go->_flags) = other._flags;
 		return dynamic_cast<T*>(go);
 	}
 };

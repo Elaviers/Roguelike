@@ -10,8 +10,10 @@ protected:
 	virtual void _WriteData(BufferWriter<byte>& data) const override;
 
 public:
-	Mesh_Static() {}
-	~Mesh_Static() {}
+	Mesh_Static(const Buffer<Vertex17F>& vertices = Buffer<Vertex17F>(), const Buffer<uint32>& elements = Buffer<uint32>()) : vertices(vertices), elements(elements) 
+	{}
+
+	virtual ~Mesh_Static() {}
 
 	Buffer<Vertex17F> vertices;
 	Buffer<uint32> elements;

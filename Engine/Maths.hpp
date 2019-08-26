@@ -6,6 +6,7 @@ class Quaternion;
 namespace Maths
 {
 	constexpr double PI = 3.14159265358979323846;
+	constexpr float PI_F = (float)PI;
 	constexpr const double DEGS_PER_RAD = 180.0 / PI;
 	constexpr const double RADS_PER_DEG = PI / 180.0;
 
@@ -20,10 +21,38 @@ namespace Maths
 
 	inline float Round(float x) 
 	{
-		uint32 asInt = (uint32)x;
+		int32 asInt = (int32)x;
 		float dec = x - asInt;
 
-		return (dec >= .5f) ? (float)asInt : ((float)asInt + 1.f);
+		return dec >= .5f ? (float)asInt + 1.f : (float)asInt;
+	}
+
+	inline float Round(float x, float nearest)
+	{
+		float inv = 1.f / nearest;
+		return Round(x * inv) / inv;
+	}
+
+	inline int Floor(float x)
+	{
+		return (int)(x < 0 ? x - 1 : x);
+	}
+
+	inline float Floor(float x, float nearest)
+	{
+		float inv = 1.f / nearest;
+		return Floor(x * inv) / inv;
+	}
+
+	inline int Trunc(float x)
+	{
+		return (int)x;
+	}
+
+	inline float Trunc(float x, float nearest)
+	{
+		float inv = 1.f / nearest;
+		return Trunc(x * inv) / inv;
 	}
 
 	float SquareRoot(float x);
@@ -51,12 +80,7 @@ namespace Maths
 	inline float ArcCoineDegrees(float x) { return (float)DEGS_PER_RAD * ArcCosine(x); }
 	inline float ArcTangentDegrees(float x) { return (float)DEGS_PER_RAD * ArcTangent(x); }
 
-	inline float ArcTangentDegrees2(float y, float x)
-	{ 
-		if (x) return ArcTangentDegrees(y / x);
-		if (y < 0.f) return -90.f;
-		return 90.f;
-	}
+	float ArcTangentDegrees2(float y, float x);
 
 	double SineD(double radians);
 	double CosineD(double radians);
@@ -79,5 +103,32 @@ namespace Maths
 		return 90.0;
 	}
 
+	void SetRandomSeed(unsigned int seed);
+
+	//Returns number where 0 <= x < 1
 	float Random();
+
+	//min <= x < max
+	float RandomInRange(float min, float max);
+
+	inline int RandomInRange(int lowest, int highest) { return (int)RandomInRange((float)lowest, ((float)highest) + 1); }
+
+	inline float SmallestAngularDiff(float to, float from)
+	{
+		if (to == from) return 0.f;
+
+		float diff = to - from;
+		while (diff > 180.f)
+			diff -= 360.f;
+		while (diff < -180.f)
+			diff += 360.f;
+
+		return diff;
+	}
+
+	template<typename T>
+	inline bool AlmostEqual(const T& a, const T& b, const T& tolerance)
+	{
+		return (a >= b - tolerance && a <= b + tolerance);
+	}
 }

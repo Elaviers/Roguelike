@@ -40,9 +40,9 @@ bool LevelIO::Write(const GameObject &world, const char *filename)
 
 	world.WriteAllToFile(writer2, strings);
 
-	auto stringBuffer = strings.ToBuffer();
+	auto stringBuffer = strings.ToKVBuffer();
 	for (uint32 i = 0; i < stringBuffer.GetSize(); ++i)
-		WriteStringMessage(writer1, *stringBuffer[i].second, *stringBuffer[i].first);
+		WriteStringMessage(writer1, stringBuffer[i]->second, stringBuffer[i]->first);
 
 	Buffer<byte> finalBuffer = buffer1 + buffer2;
 	return IO::WriteFile(filename, finalBuffer.Data(), (uint32)finalBuffer.GetSize());
@@ -91,7 +91,7 @@ bool LevelIO::Read(GameObject &world, const char *filename)
 				if (obj)
 				{
 					obj->SetParent(&world);
-					obj->ReadFromFile(reader, strings);
+					obj->ReadData(reader, strings);
 				}
 				else Debug::Error("Unsupported object ID");
 			}

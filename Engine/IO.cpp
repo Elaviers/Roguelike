@@ -13,7 +13,7 @@ bool IO::FileExists(const char* filename)
 	return file != INVALID_HANDLE_VALUE;
 }
 
-Buffer<byte> IO::ReadFile(const char *filename)
+Buffer<byte> IO::ReadFile(const char *filename, bool silent)
 {
 	Buffer<byte> buffer;
 	
@@ -24,11 +24,16 @@ Buffer<byte> IO::ReadFile(const char *filename)
 		::GetFileSizeEx(file, &fileSize);
 		buffer.SetSize(fileSize.LowPart);
 
-		::ReadFile(file, buffer.Data(), fileSize.LowPart, NULL, NULL);
+		#pragma warning(suppress: 28193) //False positive
+		BOOL success = ::ReadFile(file, buffer.Data(), fileSize.LowPart, NULL, NULL);
+
+		if (!silent && success == FALSE)
+			Debug::Error(CSTR("Could not read file \"" + filename + '\"'));
+
 		::CloseHandle(file);
 	}
-	else
-		Debug::Error(CSTR("Could not read file \"" + filename + '\"'));
+	else if (!silent)
+		Debug::Error(CSTR("Could not open file \"" + filename + '\"'));
 
 	return buffer;
 }
@@ -45,9 +50,9 @@ bool IO::WriteFile(const char *filename, const byte *data, size_t length)
 	return success;
 }
 
-String IO::ReadFileString(const char *filename)
+String IO::ReadFileString(const char *filename, bool silent)
 {
-	Buffer<byte> buffer = ReadFile(filename);
+	Buffer<byte> buffer = ReadFile(filename, silent);
 	String string(buffer.GetSize());
 
 	for (uint32 i = 0; i < string.GetLength(); ++i)

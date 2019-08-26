@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{910514DF-E498-4CB8-BEC5-304060E649B8}</ProjectGuid>
     <RootNamespace>Engine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -111,11 +111,12 @@
       <EnablePREfast>true</EnablePREfast>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>freetype.lib;opengl32.lib;ole32.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib;</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
+
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -128,11 +129,12 @@
       <EnablePREfast>true</EnablePREfast>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>freetype.lib;opengl32.lib;ole32.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib;</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
+
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -151,11 +153,12 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>freetype.lib;opengl32.lib;ole32.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib;</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
+
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -174,11 +177,12 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>freetype.lib;opengl32.lib;ole32.lib</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib;</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
+
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -187,13 +191,20 @@
     <ClInclude Include="AnimationTrack.hpp" />
     <ClInclude Include="Asset.hpp" />
     <ClInclude Include="AudioUtilities.hpp" />
+    <ClInclude Include="Box.hpp" />
+    <ClInclude Include="CollisionChannel.hpp" />
     <ClInclude Include="Console.hpp" />
+    <ClInclude Include="Event.hpp" />
     <ClInclude Include="Hashing.hpp" />
     <ClInclude Include="Hashmap.hpp" />
+    <ClInclude Include="Material_Sprite.hpp" />
     <ClInclude Include="Mesh.hpp" />
     <ClInclude Include="Font_TTF.hpp" />
     <ClInclude Include="Font_Texture.hpp" />
-    <ClInclude Include="FrameAllocator.hpp" />
+    <ClInclude Include="ObjectIDS.hpp" />
+    <ClInclude Include="ObjSprite.hpp" />
+    <ClInclude Include="SharedPointer.hpp" />
+    <ClInclude Include="StackAllocator.hpp" />
     <ClInclude Include="Joint.hpp" />
     <ClInclude Include="Keyframe.hpp" />
     <ClInclude Include="Mesh_Skeletal.hpp" />
@@ -217,7 +228,7 @@
     <ClInclude Include="Collider.hpp" />
     <ClInclude Include="Collision.hpp" />
     <ClInclude Include="ObjConnector.hpp" />
-    <ClInclude Include="ColliderAABB.hpp" />
+    <ClInclude Include="ColliderBox.hpp" />
     <ClInclude Include="DebugFrustum.hpp" />
     <ClInclude Include="DebugManager.hpp" />
     <ClInclude Include="DebugObject.hpp" />
@@ -261,13 +272,14 @@
     <ClInclude Include="AssetManager.hpp" />
     <ClInclude Include="NumberedSet.hpp" />
     <ClInclude Include="Sampler.hpp" />
-    <ClInclude Include="ShaderChannel.hpp" />
+    <ClInclude Include="RenderChannel.hpp" />
     <ClInclude Include="Skybox.hpp" />
     <ClInclude Include="ColliderSphere.hpp" />
     <ClInclude Include="String.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="TextureManager.hpp" />
     <ClInclude Include="Timer.hpp" />
+    <ClInclude Include="Tracker.hpp" />
     <ClInclude Include="Transform.hpp" />
     <ClInclude Include="Types.hpp" />
     <ClInclude Include="UIButton.hpp" />
@@ -293,7 +305,10 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="Font_TTF.cpp" />
     <ClCompile Include="Font_Texture.cpp" />
-    <ClCompile Include="FrameAllocator.cpp" />
+    <ClCompile Include="Material_Sprite.cpp" />
+    <ClCompile Include="ObjSprite.cpp" />
+    <ClCompile Include="SharedPointer.cpp" />
+    <ClCompile Include="StackAllocator.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Mesh_Skeletal.cpp" />
@@ -314,7 +329,7 @@
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="ObjConnector.cpp" />
-    <ClCompile Include="ColliderAABB.cpp" />
+    <ClCompile Include="ColliderBox.cpp" />
     <ClCompile Include="DebugFrustum.cpp" />
     <ClCompile Include="DebugManager.cpp" />
     <ClCompile Include="DebugObject.cpp" />
@@ -357,6 +372,7 @@
     <ClCompile Include="UILabel.cpp" />
     <ClCompile Include="UIPanel.cpp" />
     <ClCompile Include="UIRect.cpp" />
+    <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="WavReader.cpp" />

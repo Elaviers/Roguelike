@@ -11,7 +11,10 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev, _In_ LPST
 {
 	::InitCommonControls();
 
-	Editor editor;
-	editor.Run();
+	{
+		Editor editor;
+		editor.Run();
+	}
+
 	return 0;
 }

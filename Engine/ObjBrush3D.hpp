@@ -6,18 +6,18 @@
 class ObjBrush3D : public ObjBrush<3>
 {
 protected:
-	virtual void _UpdateTransform() override;
+	virtual void _OnTransformChanged() override;
 
 public:
-	GAMEOBJECT_FUNCS(ObjBrush3D)
+	GAMEOBJECT_FUNCS(ObjBrush3D, ObjectIDS::BRUSH)
 
 	ObjBrush3D() {}
 	virtual ~ObjBrush3D() {}
 
-	virtual void Render() const override;
+	virtual void Render(EnumRenderChannel) const override;
 
-	virtual void WriteToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;
-	virtual void ReadFromFile(BufferReader<byte> &buffer, const NumberedSet<String> &strings) override;
+	virtual void WriteData(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;
+	virtual void ReadData(BufferReader<byte> &buffer, const NumberedSet<String> &strings) override;
 
 	virtual void GetCvars(CvarMap&) override;
 };

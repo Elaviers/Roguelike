@@ -11,5 +11,7 @@ private:
 public:
 	MaterialManager() : AssetManager("") {}
 	virtual ~MaterialManager() {}
+
+	void Initialise();
 };
  

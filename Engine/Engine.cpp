@@ -15,36 +15,57 @@ Engine::~Engine()
 	FT_Done_FreeType(_ftLib);
 }
 
-void Engine::Init()
+#define CREATE(CONDITION, PTR) (CONDITION) ? (PTR) : nullptr 
+
+void Engine::Init(EngineCreateFlags flags)
 {
 	FT_Error error = FT_Init_FreeType(&_ftLib);
 	if (error) { Debug::Error("Freetype init error"); }
-}
+	
+	registry.RegisterEngineObjects();
 
-void Engine::CreateAllManagers()
-{
-	this->registry.RegisterEngineObjects();
+	pConsole =			CREATE(flags & ENG_CONSOLE,		new Console());
+	pAudioManager =		CREATE(flags & ENG_AUDIOMGR,	new AudioManager());
+	pDebugManager =		CREATE(flags & ENG_DBGMGR,		new DebugManager());
+	pFontManager =		CREATE(flags & ENG_FONTMGR,		new FontManager());
+	pInputManager =		CREATE(flags & ENG_INPUTMGR,	new InputManager());
+	pMaterialManager =	CREATE(flags & ENG_MATERIALMGR, new MaterialManager());
+	pModelManager =		CREATE(flags & ENG_MODELMGR,	new ModelManager());
+	pTextureManager =	CREATE(flags & ENG_TEXTUREMGR,	new TextureManager());
+	pInputManager =		CREATE(flags & ENG_INPUTMGR,	new InputManager());
+	pObjectTracker =	CREATE(flags & ENG_OBJTRACKER,	new Tracker<GameObject>());
 
-	this->pConsole = new Console();
-	this->pAudioManager = new AudioManager();
-	this->pDebugManager = new DebugManager();
-	this->pFontManager = new FontManager();
-	this->pInputManager = new InputManager();
-	this->pMaterialManager = new MaterialManager();
-	this->pModelManager = new ModelManager();
-	this->pTextureManager = new TextureManager();
+	if (pConsole)
+	{
+		pConsole->Initialise();
 
-	this->pConsole->Initialise();
-	this->pAudioManager->Initialise();
-	this->pModelManager->Initialise();
-	this->pTextureManager->Initialise();
+		//Commands
+		pConsole->Cvars().CreateVar("play", CommandPtr(this->pAudioManager, &AudioManager::CMD_play));
+	}
 
-	this->pAudioManager->SetRootPath("Data/Audio/");
-	this->pFontManager->SetRootPath("Data/Fonts/");
-	this->pMaterialManager->SetRootPath("Data/Materials/");
-	this->pModelManager->SetRootPath("Data/Models/");
-	this->pTextureManager->SetRootPath("Data/Textures/");
+	if (pAudioManager)
+	{
+		pAudioManager->Initialise();
+		pAudioManager->SetRootPath("Data/Audio/");
+	}
 
-	//Commands
-	this->pConsole->Cvars().CreateVar("play", CommandPtr(this->pAudioManager, &AudioManager::CMD_play));
+	if (pModelManager)
+	{
+		pModelManager->Initialise();
+		pModelManager->SetRootPath("Data/Models/");
+	}
+
+	if (pTextureManager)
+	{
+		pTextureManager->Initialise();
+		pTextureManager->SetRootPath("Data/Textures/");
+	}
+
+	if (pMaterialManager)
+	{
+		pMaterialManager->Initialise();
+		pMaterialManager->SetRootPath("Data/Materials/");
+	}
+
+	if (pFontManager) pFontManager->SetRootPath("Data/Fonts/");
 }

@@ -6,7 +6,7 @@
 LPCTSTR Viewport::_className = TEXT("VIEWPORTCLASS");
 
 //static
-LRESULT CALLBACK Viewport::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+LRESULT Viewport::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	Viewport *viewport = (Viewport*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
@@ -51,7 +51,7 @@ void Viewport::Initialise()
 {
 	WNDCLASSEXA windowClass = {};
 	windowClass.cbSize = sizeof(WNDCLASSEXA);
-	windowClass.lpfnWndProc = _WindowProc;
+	windowClass.lpfnWndProc = (WNDPROC)_WindowProc;
 	windowClass.hInstance = ::GetModuleHandle(NULL);
 	windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	windowClass.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);

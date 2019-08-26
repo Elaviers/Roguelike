@@ -1,11 +1,14 @@
 #include "ColliderSphere.hpp"
-#include "ColliderAABB.hpp"
+#include "ColliderBox.hpp"
 #include "GameObject.hpp"
 #include "RaycastResult.hpp"
 
 bool ColliderSphere::IntersectsRay(const Ray &ray, RaycastResult &result, const Transform &transform) const
 {
-	//Assuming ray.direction is noramlised
+	if (!CanCollideWithChannels(ray.channels))
+		return false;
+
+	//Assuming ray.direction is normalised
 
 	if (transform.GetScale()[0] != transform.GetScale()[1] || transform.GetScale()[0] != transform.GetScale()[2])
 		Debug::PrintLine("WARNING: Sphere collision used with nonuniform scaling");

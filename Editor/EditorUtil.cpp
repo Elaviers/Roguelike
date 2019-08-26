@@ -1,5 +1,5 @@
 #include "EditorUtil.hpp"
-#include "MouseData.h"
+#include "MouseData.hpp"
 
 namespace EditorUtil
 {

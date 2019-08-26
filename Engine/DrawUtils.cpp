@@ -210,10 +210,7 @@ namespace DrawUtils
 
 		Vector3 dir = (b - a).Normalise();
 
-		if (dir[2] >= 0.f)
-			t.SetRotation(Vector3(90 + Maths::ArcSineDegrees(dir[1]), Maths::ArcTangentDegrees2(dir[0], dir[2]), 0.f));
-		else
-			t.SetRotation(Vector3(90 - Maths::ArcSineDegrees(dir[1]), Maths::ArcTangentDegrees2(dir[0], dir[2]), 0.f));
+		t.SetRotation(Vector3(90 + Maths::ArcSineDegrees(dir[1]), Maths::ArcTangentDegrees2(dir[0], dir[2]), 0.f));
 
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
 		modelManager.Line().Render();
@@ -238,4 +235,29 @@ namespace DrawUtils
 		DrawLine(modelManager, Vector3(p1[0], p1[1], p2[2]), Vector3(p1[0], p2[1], p2[2]));
 	}
 
+	void DrawRing(const ModelManager& modelManager, const Vector3& centre, const Vector3& normal, float radius, int segments)
+	{
+		const float angStep = 2.f * Maths::PI_F / (float)segments;
+
+		Vector3 r = VectorMaths::GetPerpendicularVector(normal);
+		Vector3 u = Vector3::Cross(normal, r).Normalise();
+
+		r *= radius;
+		u *= radius;
+
+		float angle = 0.f;
+		float x1 = 1.f, y1 = 0.f;
+		float x2, y2;
+		for (int i = 0; i < segments; ++i)
+		{
+			angle += angStep;
+			x2 = Maths::Cosine(angle);
+			y2 = Maths::Sine(angle);
+
+			DrawLine(modelManager, centre + r * x1 + u * y1, centre + r * x2 + u * y2);
+
+			x1 = x2;
+			y1 = y2;
+		}
+	}
 }

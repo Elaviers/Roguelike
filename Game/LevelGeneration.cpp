@@ -90,7 +90,7 @@ GameObject LevelGeneration::GenerateLevel(const String &string)
 						if (LevelIO::Read(*level, CSTR(root + tokens[1])))
 							bag.AddLevel(*level, 1);
 						else
-							delete level;
+							level->Delete();
 					}
 			}
 		}

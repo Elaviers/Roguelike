@@ -1,12 +1,12 @@
 #pragma once
-#include "Map.hpp"
+#include "Hashmap.hpp"
 
 typedef uint16 NSInt;
 
 template<typename T>
 class NumberedSet 
 {
-	Map<NSInt, T> _map;
+	Hashmap<NSInt, T> _map;
 	NSInt nextId;
 
 public:
@@ -16,8 +16,7 @@ public:
 	inline T* Get(NSInt id) { return _map.Get(id); }
 	inline const T* Get(NSInt id) const { return _map.Get(id); }
 
-	inline uint32* IDOf(const T &value) { return _map.FindFirstKey(value); }
-	inline const uint32* IDOf(const T &value) const { return _map.FindFirstKey(value); }
+	inline const NSInt* IDOf(const T &value) const { return _map.FindFirstKey(value); }
 
 	//Adds item if not present, returns ID
 	inline NSInt Add(const T &value) 
@@ -30,7 +29,7 @@ public:
 		return nextId++;
 	}
 
-	inline Buffer<Pair<const NSInt*, const String*>> ToBuffer() const { return _map.ToBuffer(); }
+	inline Buffer<Pair<const NSInt, const String>*> ToKVBuffer() const { return _map.ToKVBuffer(); }
 
 	inline T& operator[](NSInt id) { return _map[id]; }
 };

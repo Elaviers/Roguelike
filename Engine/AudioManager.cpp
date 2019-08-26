@@ -66,9 +66,9 @@ WaveSound* AudioManager::_CreateResource(const String& name, const String& data)
 	return sound;
 }
 
-void AudioManager::_DestroyResource(WaveSound& sound)
+void AudioManager::_DestroyResource(WaveSound* sound)
 {
-	sound.Destroy();
+	sound->Destroy();
 }
 
 #define CHECK(result) if (!SUCCEEDED(result)) goto Finished
@@ -77,9 +77,9 @@ void AudioManager::Initialise(uint32 minimumBufferDurationMillis)
 {
 	WAVEFORMATEX* descriptor = NULL;
 
-	CoInitialize(NULL);
+	HRESULT result = CoInitialize(NULL);
 
-	HRESULT result = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**) &_enumerator);
+	result = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**) &_enumerator);
 	CHECK(result);
 
 	result = _enumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &_audioDevice);
@@ -94,7 +94,7 @@ void AudioManager::Initialise(uint32 minimumBufferDurationMillis)
 	CHECK(result);
 
 	{
-		const REFERENCE_TIME buffer_duration = Utilities::Max((REFERENCE_TIME)(minimumBufferDurationMillis * 10000), minimumDevicePeriod);
+		const REFERENCE_TIME buffer_duration = Utilities::Max((REFERENCE_TIME)minimumBufferDurationMillis * 10000, minimumDevicePeriod);
 
 		result = _audioClient->GetMixFormat(&descriptor);
 		CHECK(result);
@@ -143,22 +143,22 @@ void AudioManager::FillBuffer()
 		result = _renderClient->GetBuffer(availableFrames, &buffer);
 		CHECK(result);
 
-		ZeroMemory(buffer, availableFrames * _waveFormat.nBlockAlign);
+		ZeroMemory(buffer, (size_t)availableFrames * _waveFormat.nBlockAlign);
 
-		List<Sampler>::Node* node = _playingSounds.First();
+		List<Sampler>::Iterator it = _playingSounds.First();
 
-		while (node)
+		while (it)
 		{
-			List<Sampler>::Node* next = node->next;
+			List<Sampler>::Iterator next = it.Next();
 
-			uint32 framesWritten = node->obj.ReadToSoundBuffer(buffer, availableFrames, _waveFormat.nSamplesPerSec, _waveFormat.nChannels, .5f);
+			uint32 framesWritten = it->ReadToSoundBuffer(buffer, availableFrames, _waveFormat.nSamplesPerSec, _waveFormat.nChannels, .5f);
 
 			destFramesWritten = Utilities::Max(destFramesWritten, framesWritten);
 
 			if (framesWritten == 0)
-				_playingSounds.Remove(node);
+				_playingSounds.Remove(it);
 
-			node = next;
+			it = next;
 		}
 
 		result = _renderClient->ReleaseBuffer(destFramesWritten, 0);
@@ -173,10 +173,10 @@ Finished:
 
 void AudioManager::PlaySound(const WaveSound& sound)
 {
-	List<Sampler>::Node *node = _playingSounds.Add(Sampler());
+	List<Sampler>::Iterator it = _playingSounds.Add(Sampler());
 
-	node->obj.SetSound(sound);
-	node->obj.SetLooping(false);
+	it->SetSound(sound);
+	it->SetLooping(false);
 }
 
 void AudioManager::CMD_play(const Buffer<String> &args)

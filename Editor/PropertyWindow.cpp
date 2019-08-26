@@ -66,9 +66,9 @@ LRESULT PropertyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 			String string;
 
-			if (pw->_child_hwnds[id].cvar->GetFlags() & PropertyFlags::MATERIAL)
+			if (pw->_child_hwnds[id].cvar->GetFlags() & CvarFlags::MATERIAL)
 				string = pw->_owner->SelectMaterialDialog();
-			else if (pw->_child_hwnds[id].cvar->GetFlags() & PropertyFlags::MODEL)
+			else if (pw->_child_hwnds[id].cvar->GetFlags() & CvarFlags::MODEL)
 				string = pw->_owner->SelectModelDialog();
 			else break;
 
@@ -84,7 +84,7 @@ LRESULT PropertyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 		{
 			LRESULT cbIndex = ::SendMessage((HWND)lparam, CB_GETCURSEL, 0, 0);
 
-			if (pw->_child_hwnds[LOWORD(wparam)].cvar->GetFlags() & PropertyFlags::CLASSID)
+			if (pw->_child_hwnds[LOWORD(wparam)].cvar->GetFlags() & CvarFlags::CLASSID)
 			{
 				auto regTypes = Engine::Instance().registry.GetRegisteredTypes();
 				reinterpret_cast<TypedCvar<byte>*>(pw->_child_hwnds[LOWORD(wparam)].cvar)->Set(*regTypes[cbIndex].first);
@@ -143,7 +143,7 @@ void PropertyWindow::Initialise(HBRUSH brush)
 {
 	WNDCLASSEXA windowClass = {};
 	windowClass.cbSize = sizeof(WNDCLASSEXA);
-	windowClass.lpfnWndProc = _WindowProc;
+	windowClass.lpfnWndProc = (WNDPROC)_WindowProc;
 	windowClass.hInstance = ::GetModuleHandle(NULL);
 	windowClass.hbrBackground = brush;
 	windowClass.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
@@ -165,19 +165,22 @@ void PropertyWindow::_CreateHWNDs(bool readOnly)
 
 	for (uint32 i = 0; i < properties.GetSize(); ++i)
 	{
-		const char *name = properties[i].first->GetData();
+		const char *name = properties[i]->first.GetData();
 
 		HINSTANCE instance = ::GetModuleHandle(NULL);
 
-		HWND label = ::CreateWindow(WC_STATIC, name, WS_CHILD | WS_VISIBLE, 0, y, w, boxH, _hwnd, (HMENU)i, instance, NULL);
+#pragma warning(suppress: 4312)
+		HMENU menu = (HMENU)i;
+
+		HWND label = ::CreateWindow(WC_STATIC, name, WS_CHILD | WS_VISIBLE, 0, y, w, boxH, _hwnd, menu, instance, NULL);
 
 		HWND box, button = 0;
 
-		if ((*properties[i].second)->GetFlags() & PropertyFlags::CLASSID && (*properties[i].second)->GetType() == CvarType::BYTE)
+		if (properties[i]->second->GetFlags() & CvarFlags::CLASSID && properties[i]->second->GetType() == CvarType::BYTE)
 		{
-			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_COMBOBOXA, (*properties[i].second)->GetAsString().GetData(), WS_CHILD | WS_VISIBLE | CBS_HASSTRINGS | CBS_DROPDOWNLIST, w, y, w, boxH, _hwnd, (HMENU)i, instance, NULL);
+			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_COMBOBOXA, properties[i]->second->GetAsString().GetData(), WS_CHILD | WS_VISIBLE | CBS_HASSTRINGS | CBS_DROPDOWNLIST, w, y, w, boxH, _hwnd, menu, instance, NULL);
 
-			byte current = reinterpret_cast<TypedCvar<byte>*>((*properties[i].second))->Get();
+			byte current = reinterpret_cast<TypedCvar<byte>*>(properties[i]->second)->Get();
 
 			auto listItems = Engine::Instance().registry.GetRegisteredTypes();
 			for (uint32 i = 0; i < listItems.GetSize(); ++i)
@@ -188,16 +191,16 @@ void PropertyWindow::_CreateHWNDs(bool readOnly)
 					::SendMessage(box, CB_SETCURSEL, i, 0);
 			}
 		}
-		else if ((*properties[i].second)->GetFlags() & PropertyFlags::DIRECTION)
+		else if (properties[i]->second->GetFlags() & CvarFlags::DIRECTION)
 		{
-			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_COMBOBOXA, (*properties[i].second)->GetAsString().GetData(), WS_CHILD | WS_VISIBLE | CBS_HASSTRINGS | CBS_DROPDOWNLIST, w, y, w, boxH, _hwnd, (HMENU)i, instance, NULL);
+			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_COMBOBOXA, properties[i]->second->GetAsString().GetData(), WS_CHILD | WS_VISIBLE | CBS_HASSTRINGS | CBS_DROPDOWNLIST, w, y, w, boxH, _hwnd, menu, instance, NULL);
 
 			::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)"north");
 			::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)"east");
 			::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)"south");
 			::SendMessage(box, CB_ADDSTRING, 0, (LPARAM)"west");
 
-			String value = (*properties[i].second)->GetAsString();
+			String value = properties[i]->second->GetAsString();
 
 			if (value == "north")
 				::SendMessage(box, CB_SETCURSEL, 0, 0);
@@ -210,13 +213,13 @@ void PropertyWindow::_CreateHWNDs(bool readOnly)
 		}
 		else
 		{
-			if (!readOnly && (*properties[i].second)->GetFlags() & (PropertyFlags::MODEL | PropertyFlags::MATERIAL))
-				button = ::CreateWindow(WC_BUTTON, "...", WS_CHILD | WS_VISIBLE, w * 2 - buttonW, y, 20, boxH, _hwnd, (HMENU)i, instance, NULL);
+			if (!readOnly && properties[i]->second->GetFlags() & (CvarFlags::MODEL | CvarFlags::MATERIAL))
+				button = ::CreateWindow(WC_BUTTON, "...", WS_CHILD | WS_VISIBLE, w * 2 - buttonW, y, 20, boxH, _hwnd, menu, instance, NULL);
 
 			DWORD boxStyle = ES_LOWERCASE | WS_CHILD | WS_VISIBLE;
 			if (readOnly) boxStyle |= ES_READONLY;
 
-			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, (*properties[i].second)->GetAsString().GetData(), boxStyle, w, y, w - (button ? buttonW : 0), boxH, _hwnd, (HMENU)i, instance, NULL);
+			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, properties[i]->second->GetAsString().GetData(), boxStyle, w, y, w - (button ? buttonW : 0), boxH, _hwnd, menu, instance, NULL);
 
 			if (!_defaultEditProc)
 				_defaultEditProc = (WNDPROC)::GetWindowLongPtr(box, GWLP_WNDPROC);
