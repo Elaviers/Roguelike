@@ -74,9 +74,11 @@ StyleCopReport.xml
 #I've commented this out as obj files are only used for models outside of intermediate directories
 #*.obj
 
+#PDB files are used during the build process
+#*.pdb
+
 *.iobj
 *.pch
-*.pdb
 *.ipdb
 *.pgc
 *.pgd
