@@ -14,7 +14,10 @@ namespace IO {
 	bool WriteFile(const char *filename, const byte *data, size_t dataLength);
 	inline bool WriteFile(const char* filename, const Buffer<byte>& buffer) { return WriteFile(filename, buffer.Data(), buffer.GetSize()); }
 
-	String ReadFileString(const char *filename, bool silent = false);
+	inline String ReadFileString(const char* filename, bool silent = false)
+	{
+		return String((char*)(ReadFile(filename, silent) + '\0').Data());
+	}
 
 	WaveSound* ReadWaveFile(const char* filename);
 

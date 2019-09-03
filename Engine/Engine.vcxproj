@@ -203,6 +203,7 @@
     <ClInclude Include="Font_Texture.hpp" />
     <ClInclude Include="ObjectIDS.hpp" />
     <ClInclude Include="ObjSprite.hpp" />
+    <ClInclude Include="Random.hpp" />
     <ClInclude Include="SharedPointer.hpp" />
     <ClInclude Include="StackAllocator.hpp" />
     <ClInclude Include="Joint.hpp" />
@@ -278,6 +279,7 @@
     <ClInclude Include="String.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="TextureManager.hpp" />
+    <ClInclude Include="Time.hpp" />
     <ClInclude Include="Timer.hpp" />
     <ClInclude Include="Tracker.hpp" />
     <ClInclude Include="Transform.hpp" />
@@ -307,6 +309,7 @@
     <ClCompile Include="Font_Texture.cpp" />
     <ClCompile Include="Material_Sprite.cpp" />
     <ClCompile Include="ObjSprite.cpp" />
+    <ClCompile Include="Random.cpp" />
     <ClCompile Include="SharedPointer.cpp" />
     <ClCompile Include="StackAllocator.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -364,6 +367,7 @@
     <ClCompile Include="ColliderSphere.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="Time.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="UIButton.cpp" />

@@ -472,7 +472,7 @@ void Frame()
 
 					avg /= sampledFrameCount;
 
-					fpsString = String::FromFloat(avg);
+					fpsString = String::From(avg);
 				}
 
 				ftAllocator.Reset();

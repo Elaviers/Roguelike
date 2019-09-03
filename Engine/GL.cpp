@@ -106,7 +106,7 @@ namespace GL
 	void AssertExtension(const char *extension_str, const char *extension)
 	{
 		if (!StringContains(extension_str, extension))
-			Debug::FatalError(CSTR("OpenGL extension \"" + extension + "\" not supported!"));
+			Debug::FatalError(CSTR("OpenGL extension \"", extension, "\" not supported!"));
 	}
 
 #define LOAD_GL_FUNC(FUNC, TYPE) FUNC = (TYPE)Get(#FUNC)

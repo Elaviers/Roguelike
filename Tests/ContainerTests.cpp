@@ -6,17 +6,18 @@
 #include <Engine/Maths.hpp>
 #include <Engine/Hashmap.hpp>
 #include <Engine/NumberedSet.hpp>
+#include <Engine/Random.hpp>
 #include <Engine/String.hpp>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-String RandomString()
+String RandomString(Random &random)
 {
-	size_t length = Maths::RandomInRange(1, 1000);
-	String string(length);
+	size_t length = random.Next(1, 1000);
+	String string('?', length);
 	
 	for (size_t i = 0; i < length; ++i)
-		string[i] = (char)Maths::RandomInRange((float)'1', 255.f);
+		string[i] = (char)random.Next('1', 255);
 
 	return string;
 }
@@ -80,6 +81,7 @@ namespace EngineTests
 
 		TEST_METHOD(TestList)
 		{
+			Random random;
 			List<String> list;
 			constexpr int size = 1000;
 			constexpr int count = 1;
@@ -90,8 +92,7 @@ namespace EngineTests
 
 				for (int i = 0; i < size; ++i)
 				{
-					list += RandomString();
-					Logger::WriteMessage(CSTR(String::FromInt(i)));
+					list += RandomString(random);
 				}
 
 				Assert::IsTrue(list.GetSize() == size, L"List size is incorrect");
@@ -103,7 +104,7 @@ namespace EngineTests
 				Assert::IsTrue(itCount == size, L"List iterator error");
 
 				for (int listSize = size; listSize > 0; --listSize)
-					list.Remove(list.Get(Maths::RandomInRange(0, listSize - 1)));
+					list.Remove(list.Get(random.Next(0, listSize - 1)));
 
 				Assert::IsTrue(list.IsEmpty() && list.GetSize() == 0, L"List remove error");
 			}

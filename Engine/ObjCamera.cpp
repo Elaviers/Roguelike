@@ -76,7 +76,7 @@ bool ObjCamera::FrustumOverlaps(const Bounds &b) const
 	else
 		clipRadius = (b.radius * _scale) / (float)Utilities::Min(_viewport[0], _viewport[1]) * 2.f;
 
-	Debug::PrintLine(CSTR(String::FromVector3(v3) + ", " + String::FromFloat(v[3]) + " (" + String::FromFloat(clipRadius) + ")"));
+	Debug::PrintLine(CSTR(v3, ", ", v[3], " (", clipRadius, ")"));
 	
 	//View To Clip
 	v = v * _projection;

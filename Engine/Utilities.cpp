@@ -4,14 +4,13 @@
 
 String Utilities::GetSystemFontDir()
 {
-	String fontDir;
-	fontDir.SetLength(MAX_PATH);
+	char str[MAX_PATH];
 
-	UINT length = ::GetWindowsDirectoryA(&fontDir[0], (UINT)fontDir.GetLength());
+	UINT length = ::GetWindowsDirectoryA(str, MAX_PATH);
 
 	if (length > MAX_PATH) Debug::PrintLine("ERROR: (GetSystemFontDir) length returned was somehow bigger than max path");
 
-	fontDir.Trim();
+	String fontDir(str);
 	fontDir += "\\FONTS\\";
 
 	return fontDir;

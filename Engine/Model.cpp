@@ -35,7 +35,7 @@ void Model::_CMD_collision(const Buffer<String>& args)
 				delete this->_collider;
 				this->_collider = new ColliderSphere(COLL_SURFACE, args[1].ToFloat());
 			}
-			else Debug::Error(CSTR("Insufficient sphere collision arguments"));
+			else Debug::Error("Insufficient sphere collision arguments");
 		}
 		else if (args[0] == "box")
 		{
@@ -44,7 +44,7 @@ void Model::_CMD_collision(const Buffer<String>& args)
 				delete _collider;
 				_collider = new ColliderBox(COLL_SURFACE, Box::FromMinMax(_mesh->bounds.min, _mesh->bounds.max));
 			}
-			else Debug::Error(CSTR("Box collision cannot be used without specifying the model first!"));
+			else Debug::Error("Box collision cannot be used without specifying the model first!");
 		}
 	}
 }

@@ -19,7 +19,7 @@ Model* ModelManager::_CreateResource(const String& name, const String& data)
 	Model* model = Asset::FromText<Model>(data);
 
 	if (model == nullptr)
-		Debug::Error(CSTR("Could not load model \"" + name + '\"'));
+		Debug::Error(CSTR("Could not load model \"", name, '\"'));
 
 	return model;
 }

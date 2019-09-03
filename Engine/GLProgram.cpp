@@ -16,9 +16,10 @@ void CompileShader(GLuint shader, const char *src)
 	{
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &value);
 		
-		String error((size_t)value);
-		glGetShaderInfoLog(shader, value, &value, &error[0]);
-		Debug::Error(error.GetData());
+		char* error = new char[value];
+		glGetShaderInfoLog(shader, value, &value, error);
+		Debug::Error(CSTR("Error compiling shader\n", error));
+		delete[] error;
 
 		glDeleteShader(shader);
 	}
@@ -46,9 +47,10 @@ void GLProgram::Create(const char *vertSrc, const char *fragSrc)
 
 		glGetProgramInfoLog(_id, value, &value, error_str);
 
-		String error((size_t)value);
-		glGetProgramInfoLog(_id, value, &value,  &error[0]);
-		Debug::Error(error.GetData());
+		char* error = new char[value];
+		glGetProgramInfoLog(_id, value, &value,  error);
+		Debug::Error(error);
+		delete[] error;
 
 		glDeleteShader(frag);
 		glDeleteShader(vert);

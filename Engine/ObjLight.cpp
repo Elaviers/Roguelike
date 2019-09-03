@@ -24,10 +24,10 @@ void ObjLight::ToShader(int glArrayIndex)
 {
 	Mat4 worldTransform = GetWorldTransform().GetTransformationMatrix();
 
-	String arrayElemName = String("Lights[") + String::FromInt(glArrayIndex) + ']';
-	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName + ".Position")),		1, worldTransform[3]);
-	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName + ".Colour")),			1, &_colour[0]);
-	glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName + ".Radius")),			1, &_radius);
+	String arrayElemName = String("Lights[") + String::From(glArrayIndex) + ']';
+	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Position")),		1, worldTransform[3]);
+	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Colour")),			1, &_colour[0]);
+	glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Radius")),			1, &_radius);
 }
 
 void ObjLight::Render(EnumRenderChannel channels) const

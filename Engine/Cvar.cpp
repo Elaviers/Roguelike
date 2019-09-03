@@ -30,15 +30,15 @@ String Cvar::GetAsString() const
 	{
 	case CvarType::FUNCTION:return "(Command)";
 	case CvarType::STRING:	return GETASTYPE(String);
-	case CvarType::FLOAT:	return String::FromFloat(GETASTYPE(float));
-	case CvarType::VECTOR2: return String::FromVector2(GETASTYPE(Vector2));
-	case CvarType::VECTOR3: return String::FromVector3(GETASTYPE(Vector3));
-	case CvarType::UINT16:	return String::FromInt(GETASTYPE(uint16));
-	case CvarType::UINT32:	return String::FromInt(GETASTYPE(uint32));
-	case CvarType::UINT64:	return String::FromInt(GETASTYPE(uint64));
-	case CvarType::INT16:	return String::FromInt(GETASTYPE(int16));
-	case CvarType::INT32:	return String::FromInt(GETASTYPE(int32));
-	case CvarType::INT64:	return String::FromInt(GETASTYPE(int64));
+	case CvarType::FLOAT:	return String::From(GETASTYPE(float));
+	case CvarType::VECTOR2: return String::From(GETASTYPE(Vector2));
+	case CvarType::VECTOR3: return String::From(GETASTYPE(Vector3));
+	case CvarType::UINT16:	return String::From(GETASTYPE(uint16));
+	case CvarType::UINT32:	return String::From(GETASTYPE(uint32));
+	case CvarType::UINT64:	return String::From(GETASTYPE(uint64));
+	case CvarType::INT16:	return String::From(GETASTYPE(int16));
+	case CvarType::INT32:	return String::From(GETASTYPE(int32));
+	case CvarType::INT64:	return String::From(GETASTYPE(int64));
 	}
 
 	return "UNSUPPORTED";

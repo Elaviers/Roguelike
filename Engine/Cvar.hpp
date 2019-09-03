@@ -33,19 +33,19 @@ namespace CvarFlags
 	};
 }
 
-template <typename T> inline CvarType TypenameToEnum() { return CvarType::NONE; }
+template <typename T> inline CvarType TypenameToEnum()	{ return CvarType::NONE; }
 template<> inline CvarType TypenameToEnum<CommandPtr>() { return CvarType::FUNCTION; }
-template<> inline CvarType TypenameToEnum<float>() { return CvarType::FLOAT; }
-template<> inline CvarType TypenameToEnum<byte>() { return CvarType::BYTE; }
-template<> inline CvarType TypenameToEnum<uint16>() { return CvarType::UINT16; }
-template<> inline CvarType TypenameToEnum<uint32>() { return CvarType::UINT32; }
-template<> inline CvarType TypenameToEnum<uint64>() { return CvarType::UINT64; }
-template<> inline CvarType TypenameToEnum<int16>() { return CvarType::INT16; }
-template<> inline CvarType TypenameToEnum<int32>() { return CvarType::INT32; }
-template<> inline CvarType TypenameToEnum<int64>() { return CvarType::INT64; }
-template<> inline CvarType TypenameToEnum<Vector2>() { return CvarType::VECTOR2; }
-template<> inline CvarType TypenameToEnum<Vector3>() { return CvarType::VECTOR3; }
-template<> inline CvarType TypenameToEnum<String>() { return CvarType::STRING; }
+template<> inline CvarType TypenameToEnum<float>()		{ return CvarType::FLOAT; }
+template<> inline CvarType TypenameToEnum<byte>()		{ return CvarType::BYTE; }
+template<> inline CvarType TypenameToEnum<uint16>()		{ return CvarType::UINT16; }
+template<> inline CvarType TypenameToEnum<uint32>()		{ return CvarType::UINT32; }
+template<> inline CvarType TypenameToEnum<uint64>()		{ return CvarType::UINT64; }
+template<> inline CvarType TypenameToEnum<int16>()		{ return CvarType::INT16; }
+template<> inline CvarType TypenameToEnum<int32>()		{ return CvarType::INT32; }
+template<> inline CvarType TypenameToEnum<int64>()		{ return CvarType::INT64; }
+template<> inline CvarType TypenameToEnum<Vector2>()	{ return CvarType::VECTOR2; }
+template<> inline CvarType TypenameToEnum<Vector3>()	{ return CvarType::VECTOR3; }
+template<> inline CvarType TypenameToEnum<String>()		{ return CvarType::STRING; }
 
 class Cvar
 {

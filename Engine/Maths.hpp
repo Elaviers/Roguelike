@@ -102,17 +102,7 @@ namespace Maths
 		if (y < 0.f) return -90.0;
 		return 90.0;
 	}
-
-	void SetRandomSeed(unsigned int seed);
-
-	//Returns number where 0 <= x < 1
-	float Random();
-
-	//min <= x < max
-	float RandomInRange(float min, float max);
-
-	inline int RandomInRange(int lowest, int highest) { return (int)RandomInRange((float)lowest, ((float)highest) + 1); }
-
+	
 	inline float SmallestAngularDiff(float to, float from)
 	{
 		if (to == from) return 0.f;

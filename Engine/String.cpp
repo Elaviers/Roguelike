@@ -13,6 +13,15 @@ String::String() : _length(0)
 	_data[0] = '\0';
 }
 
+String::String(char c, size_t length) : _length(length)
+{
+	_data = new char[_length + 1];
+	_data[_length] = '\0';
+	
+	for (int i = 0; i < _length; ++i)
+		_data[i] = c;
+}
+
 //Copy constructor
 
 String::String(const String &other) : _length(other._length)
@@ -50,14 +59,6 @@ String::String(char character) : _length(1)
 	_data = new char[2];
 	_data[0] = character;
 	_data[1] = '\0';
-}
-
-////
-
-String::String(size_t length)
-{
-	_length = length;
-	_data = new char[_length + 1]();
 }
 
 ////
@@ -103,7 +104,7 @@ Buffer<String> String::Split(const char *delimiters) const
 				for (size_t j = i; IsPartOfToken(_data[j], delimiters, delimiterCount); ++j)
 					++length;
 
-				result[token].SetLength(length);
+				result[token]._SetLength(length);
 
 				for (size_t j = 0; j < length; ++j)
 					result[token][j] = _data[i + j];
@@ -129,7 +130,8 @@ String String::SubString(size_t start, size_t end) const
 	if (end > _length)
 		end = _length;
 
-	String string(end - start);
+	String string;
+	string._SetLength(end - start);
 	for (size_t i = start; i < end; ++i)
 		string._data[i - start] = _data[i];
 
@@ -157,7 +159,7 @@ size_t String::IndexOfAny(const char* chars) const
 
 ////
 
-void String::SetLength(size_t length)
+void String::_SetLength(size_t length)
 {
 	size_t minLength = length < _length ? length : _length;
 
@@ -170,17 +172,6 @@ void String::SetLength(size_t length)
 	_length = length;
 	_data = new_data;
 }
-
-void String::Trim()
-{
-	size_t length = 0;
-
-	for (const char* c = _data; *c != '\0'; ++c)
-		++length;
-
-	SetLength(length);
-}
-
 ////
 
 char& String::Insert(char c, size_t index)
@@ -302,7 +293,8 @@ String& String::operator+=(char character)
 
 String String::operator+(const String& other) const
 {
-	String product(_length + other._length);
+	String product;
+	product._SetLength(_length + other._length);
 
 	for (size_t i = 0; i < _length; ++i)
 		product[i] = _data[i];
@@ -334,7 +326,7 @@ size_t String::Compare(const String &other) const
 String String::ToLower() const
 {
 	String string;
-	string.SetLength(_length);
+	string._SetLength(_length);
 
 	for (size_t i = 0; i < _length; ++i)
 		if (_data[i] >= 'A' && _data[i] <= 'Z')
@@ -389,7 +381,7 @@ Vector3 String::ToVector3() const
 
 ////Conversion
 
-String String::FromInt(__int64 number, unsigned int minimum, byte base)
+String String::From(int64 number, unsigned int minimum, byte base)
 {
 	size_t digit_count = 1;
 
@@ -406,7 +398,8 @@ String String::FromInt(__int64 number, unsigned int minimum, byte base)
 		neg = true;
 	}
 
-	String string(digit_count + (neg ? 1 : 0));
+	String string;
+	string._SetLength(digit_count + (neg ? 1 : 0));
 
 	for (size_t i = 0; i < digit_count; ++i) {
 		string[digit_count - 1 - i + (neg ? 1 : 0)] = '0' + (number % base);
@@ -421,7 +414,7 @@ String String::FromInt(__int64 number, unsigned int minimum, byte base)
 
 #include <math.h>
 
-String String::FromFloat(double number, unsigned int minimum, unsigned int maxDecimal, byte base)
+String String::From(double number, unsigned int minimum, unsigned int maxDecimal, byte base)
 {
 	if (number == INFINITY)
 		return "infinity";
@@ -439,9 +432,9 @@ String String::FromFloat(double number, unsigned int minimum, unsigned int maxDe
 
 	//This is here because negative numbers with a whole part of zero would return as if positive otherwise
 	if (number < 0.0)
-		whole_string = String('-') + FromInt(-whole_number, minimum, base);
+		whole_string = String('-') + From(-whole_number, minimum, base);
 	else
-		whole_string = FromInt(whole_number, minimum, base);
+		whole_string = From(whole_number, minimum, base);
 
 	size_t fraction_digit_count = 0;
 	for (double d = fraction; d != 0.f && fraction_digit_count < maxDecimal;) {
@@ -450,7 +443,8 @@ String String::FromFloat(double number, unsigned int minimum, unsigned int maxDe
 		++fraction_digit_count;
 	}
 
-	String fraction_string(fraction_digit_count);
+	String fraction_string;
+	fraction_string._SetLength(fraction_digit_count);
 	int digit;
 
 	if (fraction < 0.0) fraction *= -1.0;
@@ -469,24 +463,25 @@ String String::FromFloat(double number, unsigned int minimum, unsigned int maxDe
 	return whole_string;
 }
 
-String String::FromVector2(const Vector2 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
+String String::From(const Vector2 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
 {
 	const char *seperator = ", ";
-	return FromFloat(vector[0], minimum, maxDecimal, base) + seperator + FromFloat(vector[1], minimum, maxDecimal, base);
+	return From(vector[0], minimum, maxDecimal, base) + seperator + From(vector[1], minimum, maxDecimal, base);
 }
 
-String String::FromVector3(const Vector3 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
+String String::From(const Vector3 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
 {
 	const char *seperator = ", ";
-	return FromFloat(vector[0], minimum, maxDecimal, base) + seperator + FromFloat(vector[1], minimum, maxDecimal, base) + seperator + FromFloat(vector[2], minimum, maxDecimal, base);
+	return From(vector[0], minimum, maxDecimal, base) + seperator + From(vector[1], minimum, maxDecimal, base) + seperator + From(vector[2], minimum, maxDecimal, base);
 }
 
-String String::FromWideString(const wchar_t *string)
+String String::From(const wchar_t *string)
 {
 	size_t i = 0;
 
 	while (string[++i] != 0x0000);
-	String result(i);
+	String result;
+	result._SetLength(i);
 
 	i = 0;
 	do

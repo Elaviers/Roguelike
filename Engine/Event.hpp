@@ -16,7 +16,7 @@ public:
 	Event() {}
 	~Event() {}
 
-	inline Event& operator+=(const FunctionPointer<void, Args...>& function) 
+	Event& operator+=(const FunctionPointer<void, Args...>& function) 
 	{
 		for (auto it = _list.First(); it; ++it)
 			if (*it == function)

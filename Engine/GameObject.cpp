@@ -87,7 +87,7 @@ GameObject* GameObject::CreateFromData(BufferReader<byte>& reader, const Numbere
 	if (obj)
 		obj->ReadData(reader, strings);
 	else 
-		Debug::Error(CSTR("Cannot create gameobject with ID " + String::FromInt(id)));
+		Debug::Error(CSTR("Cannot create gameobject with ID ", (int)id));
 
 	return obj;
 }

@@ -12,7 +12,7 @@ Material* MaterialManager::_CreateResource(const String &name, const String &dat
 	Material* mat = Material::FromText(data);
 
 	if (mat == nullptr)
-		Debug::Error(CSTR("Could not load material \"" + name + '\"'));
+		Debug::Error(CSTR("Could not load material \"", name, '\"'));
 
 	return mat;
 }

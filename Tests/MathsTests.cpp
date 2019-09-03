@@ -1,5 +1,6 @@
 #include "CppUnitTest.h"
 
+#include <Engine/Random.hpp>
 #include <Engine/Rotation.hpp>
 #include <Engine/Vector.hpp>
 
@@ -12,22 +13,18 @@ namespace EngineTests
 	public:
 		TEST_METHOD(TestRandom)
 		{
+			Random r;
+
 			for (int i = 0; i < 100000; ++i)
 			{
-				float x = Maths::Random();
-				Assert::IsTrue(x >= 0.f && x < 1.f, L"Maths::Random returned out of range");
+				float x = r.NextFloat();
+				Assert::IsTrue(x >= 0.f && x < 1.f, L"Random::NextFloat returned out of range");
 			}
 
 			for (int i = 0; i < 100000; ++i)
 			{
-				float x = Maths::RandomInRange(10.f, 12.f);
-				Assert::IsTrue(x >= 10.f && x < 12.f, L"RandomInRange float error");
-			}
-
-			for (int i = 0; i < 100000; ++i)
-			{
-				int x = Maths::RandomInRange(5, 6);
-				Assert::IsTrue(x >= 5 && x <= 6, L"RandomInRange integer error");
+				int x = r.Next(5, 6);
+				Assert::IsTrue(x >= 5 && x <= 6, L"Random::NextBetween returned out of range");
 			}
 		}
 

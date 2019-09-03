@@ -11,23 +11,23 @@ namespace Debug
 
 	void Print(const char* string)
 	{
-		::OutputDebugStringA(CSTR(string));
+		::OutputDebugStringA(string);
 	}
 
 	void PrintLine(const char *string)
 	{
-		::OutputDebugStringA(CSTR(string + '\n'));
+		::OutputDebugStringA(CSTR(string, '\n'));
 	}
 
 	void Error(const char *string)
 	{
-		PrintLine(CSTR("ERROR: " + string));
+		PrintLine(CSTR("ERROR: ", string));
 		::MessageBoxA(NULL, string, "Error", MB_OK);
 	}
 
 	void FatalError(const char *string)
 	{
-		PrintLine(CSTR("FATAL ERROR! " + '\"'  + string + '\"'));
+		PrintLine(CSTR("FATAL ERROR! ", '\"', string, '\"'));
 		::MessageBoxA(NULL, string, "Fatal Error", MB_OK);
 
 		Break();

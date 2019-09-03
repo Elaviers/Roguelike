@@ -10,7 +10,7 @@ const int linesToDraw = 15;
 void Console::_CMD_echo(const Buffer<String>& tokens)
 {
 	if (tokens.GetSize() > 0)
-		Print(CSTR(tokens[0] + '\n'));
+		Print(CSTR(tokens[0], '\n'));
 }
 
 void Console::_SetNextChar(char c)

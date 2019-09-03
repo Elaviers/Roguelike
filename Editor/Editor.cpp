@@ -182,7 +182,7 @@ void Editor::Run()
 	{
 		Utilities::StripExtension(filenames[i]);
 
-		_window.SetTitle(CSTR("Loading material \"" + filenames[i] + "\"..."));
+		_window.SetTitle(CSTR("Loading material \"", filenames[i], "\"..."));
 		Engine::Instance().pMaterialManager->Get(filenames[i]);
 	}
 
@@ -192,7 +192,7 @@ void Editor::Run()
 	{
 		Utilities::StripExtension(filenames[i]);
 
-		_window.SetTitle(CSTR("Loading model \"" + filenames[i] + "\"..."));
+		_window.SetTitle(CSTR("Loading model \"", filenames[i], "\"..."));
 		Engine::Instance().pModelManager->Get(filenames[i]);
 	}
 
@@ -296,7 +296,7 @@ void Editor::RenderViewport(int index, Direction dir)
 			else
 			{
 				float zero = 0.f;
-				glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR("Lights[" + String::FromInt(i) + "].Radius")), 1, &zero);
+				glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR("Lights[", i, "].Radius")), 1, &zero);
 			}
 		}
 
@@ -473,9 +473,9 @@ void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y
 	_mouseData.unitY_rounded = _mouseData.unitY < 0.f ? (int)(_mouseData.unitY - 1.f) : (int)_mouseData.unitY;
 
 	if (camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
-		_window.SetTitle(CSTR(String::FromInt(_mouseData.viewport) + " Mouse X:" + String::FromInt(_mouseData.x) + " (" + String::FromFloat(_mouseData.unitX, 0, 2) + " ) Mouse Y:" + String::FromInt(_mouseData.y) + " (" + String::FromFloat(_mouseData.unitY, 0, 2) + ')'));
+		_window.SetTitle(CSTR(_mouseData.viewport, " Mouse X:", _mouseData.x, " (", _mouseData.unitX, " ) Mouse Y:", _mouseData.y, " (", _mouseData.unitY, ')'));
 	else
-		_window.SetTitle(CSTR(String::FromInt(_mouseData.viewport) + " Mouse X:" + String::FromInt(_mouseData.x) + " Mouse Y:" + String::FromInt(_mouseData.y)));
+		_window.SetTitle(CSTR(_mouseData.viewport, " Mouse X:", _mouseData.x, " (", _mouseData.unitX, " ) Mouse Y:", _mouseData.y));
 
 	if (_currentTool)
 		_currentTool->MouseMove(_mouseData);

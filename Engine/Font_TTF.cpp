@@ -22,7 +22,7 @@ void FontTTF::_CMD_LoadFont(const Buffer<String>& args)
 		FT_Error error = FT_New_Face(Engine::Instance().GetFTLibrary(), fp.GetData(), 0, &_face);
 		if (error)
 		{
-			Debug::Error(CSTR("Could not load font file \"" + fp + '\"'));
+			Debug::Error(CSTR("Could not load font file \"", fp, '\"'));
 			return;
 		}
 
@@ -38,7 +38,7 @@ void FontTTF::_CMD_LoadFont(const Buffer<String>& args)
 
 			if (error)
 			{
-				Debug::PrintLine(CSTR("COULD NOT LOAD CHAR \'" + (char)i) + '\'');
+				Debug::PrintLine(CSTR("COULD NOT LOAD CHAR \'", (char)i, '\''));
 				continue;
 			}
 

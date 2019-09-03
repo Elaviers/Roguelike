@@ -16,7 +16,7 @@ void MenuStartLevel::Initialise(const FunctionPointer<void, const String&> &onLe
 	_panel.SetMaterial(_buttonMaterial);
 	_panel.SetBorderSize(-8.f);
 
-	Buffer<String> filenames = IO::FindFilesInDirectory(CSTR(LevelGeneration::root + "*.txt"));
+	Buffer<String> filenames = IO::FindFilesInDirectory(CSTR(LevelGeneration::root, "*.txt"));
 
 	const float btnH = 32.f;
 

@@ -1,21 +1,15 @@
 #pragma once
 #include <Engine/Buffer.hpp>
 #include <Engine/GameObject.hpp>
+#include <Engine/Pair.hpp>
+
+class Random;
 
 class LevelBag
 {
-	struct LevelPtrWithChance
-	{
-		GameObject *level;
-		int dominance;
-
-		LevelPtrWithChance() : level(nullptr), dominance(0) {}
-		LevelPtrWithChance(GameObject &level, int dominance) : level(&level), dominance(dominance) {}
-	};
-
 	int _totalSize;
 
-	Buffer<LevelPtrWithChance> _levels;
+	Buffer<Pair<GameObject*, int>> _levels;
 
 public:
 	LevelBag() : _totalSize(0) {}
@@ -26,11 +20,11 @@ public:
 	inline void RemoveLevel(const GameObject *level) 
 	{
 		for (uint32 i = 0; i < _levels.GetSize();)
-			if (_levels[i].level == level)
+			if (_levels[i].first == level)
 				_levels.RemoveIndex(i);
 			else
 				++i;
 	}
 
-	const GameObject& GetNextLevel() const;
+	const GameObject& GetNextLevel(Random&) const;
 };

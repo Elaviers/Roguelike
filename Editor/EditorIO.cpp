@@ -49,7 +49,7 @@ String EditorIO::OpenFileDialog(const wchar_t *dir, const Buffer<Pair<const wcha
 				result = item->GetDisplayName(SIGDN_FILESYSPATH, &chosenPath);
 
 				if (SUCCEEDED(result))
-					value = String::FromWideString(chosenPath);
+					value = String::From(chosenPath);
 
 				item->Release();
 			}
@@ -94,7 +94,7 @@ String EditorIO::SaveFileDialog(const wchar_t *dir, const Buffer<Pair<const wcha
 
 				if (SUCCEEDED(result))
 				{
-					value = String::FromWideString(chosenPath);
+					value = String::From(chosenPath);
 				}
 
 				item->Release();

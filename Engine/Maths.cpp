@@ -86,16 +86,6 @@ namespace Maths
 		srand(seed);
 	}
 
-	float Random()
-	{
-		return (float)rand() / ((float)RAND_MAX + 1.f);
-	}
-
-	float RandomInRange(float min, float max)
-	{
-		return (Random() * (max - min)) + min;
-	}
-
 	float ArcTangentDegrees2(float y, float x)
 	{
 		if (x > 0.f)

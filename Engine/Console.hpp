@@ -58,7 +58,7 @@ public:
 	{
 		if (_prompt.GetLength())
 		{
-			_prompt.SetLength(_prompt.GetLength() - 1);
+			_prompt.Shrink(1);
 			_ResetBlink();
 		}
 	}

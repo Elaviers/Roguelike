@@ -34,6 +34,15 @@ public:
 
 	Buffer(Buffer&& buffer) noexcept : _data(buffer._data), _size(buffer._size) { buffer._data = nullptr; }
 
+	inline size_t GetSize() const	{ return _size; }
+	inline		 T* Data()			{ return _data; }
+	inline const T* Data() const	{ return _data; }
+	inline		 T& Last()			{ return _data[_size - 1]; }
+	inline const T& Last() const	{ return _data[_size - 1]; }
+
+	inline		 T& operator[](size_t index)		{ return _data[index]; }
+	inline const T& operator[](size_t index) const	{ return _data[index]; }
+
 	void SetSize(size_t size)
 	{
 		T *newData = new T[size];
@@ -46,45 +55,27 @@ public:
 		_size = size;
 	}
 
-	inline void Clear() { SetSize(0); }
-
-	inline void Append(size_t elements) { SetSize(_size + elements); }
-
-	Buffer& operator=(const Buffer &other)
-	{
-		delete[] _data;
-		_size = other._size;
-		_data = new T[_size];
-
-		for (size_t i = 0; i < _size; ++i)
-			_data[i] = other._data[i];
-
-		return *this;
-	}
-
-	inline Buffer& operator=(Buffer &&other) noexcept 
-	{ 
-		_data = other._data;
-		_size = other._size;
-		other._data = nullptr;
-		other._size = 0;
-
-		return *this; 
-	}
-
-	T& Add(const T &item)
+	inline T& Add(const T& item)
 	{
 		SetSize(_size + 1);
-
 		return _data[_size - 1] = item;
 	}
 
-	T& Add(T &&item)
+	inline T& Add(T&& item)
 	{
 		SetSize(_size + 1);
-
 		return _data[_size - 1] = std::move(item);
 	}
+
+	inline Buffer& operator+=(const T& item)
+	{
+		Add(item);
+		return *this;
+	}
+
+	inline void Clear() { SetSize(0); }
+
+	inline void Append(size_t elements) { SetSize(_size + elements); }
 
 	T* Insert(const T &item, size_t pos)
 	{
@@ -136,14 +127,39 @@ public:
 		}
 	}
 
-	inline size_t GetSize() const					{ return _size; }
-	inline		 T* Data()							{ return _data; }
-	inline const T* Data() const					{ return _data; }
-	inline		 T& Last()							{ return _data[_size - 1]; }
-	inline const T& Last() const					{ return _data[_size - 1]; }
+	Buffer operator+(const T& other)
+	{
+		Buffer result;
+		result.SetSize(_size + 1);
 
-	inline		 T&	operator[](size_t index)		{ return _data[index]; }
-	inline const T& operator[](size_t index) const	{ return _data[index]; }
+		for (size_t i = 0; i < _size; ++i)
+			result._data[i] = _data[i];
+
+		result._data[_size] = other;
+		return result;
+	}
+
+	Buffer& operator=(const Buffer& other)
+	{
+		delete[] _data;
+		_size = other._size;
+		_data = new T[_size];
+
+		for (size_t i = 0; i < _size; ++i)
+			_data[i] = other._data[i];
+
+		return *this;
+	}
+
+	inline Buffer& operator=(Buffer&& other) noexcept
+	{
+		_data = other._data;
+		_size = other._size;
+		other._data = nullptr;
+		other._size = 0;
+
+		return *this;
+	}
 
 	Buffer operator+(const Buffer &other) const
 	{
