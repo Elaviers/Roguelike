@@ -84,6 +84,9 @@
     <ClCompile Include="GizmoRing.cpp">
       <Filter>Source Files\Tools\Gizmo</Filter>
     </ClCompile>
+    <ClCompile Include="StringSelect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Viewport.hpp">
@@ -150,6 +153,9 @@
       <Filter>Header Files\Tools\Gizmo</Filter>
     </ClInclude>
     <ClInclude Include="FbxSdk.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StringSelect.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

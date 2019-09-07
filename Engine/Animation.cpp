@@ -95,9 +95,9 @@ void Animation::_WriteData(BufferWriter<byte> &iterator) const
 	iterator.Write_uint32((uint32)tTrackBuffer.GetSize());
 	for (uint32 i = 0; i < tTrackBuffer.GetSize(); ++i)
 	{
-		iterator.Write_string(tTrackBuffer[i].first->GetData());
+		iterator.Write_string(tTrackBuffer[i]->first.GetData());
 		
-		auto keyframes = tTrackBuffer[i].second->GetKeyframes();
+		auto keyframes = tTrackBuffer[i]->second.GetKeyframes();
 		
 		iterator.Write_uint32((uint32)keyframes.GetSize());
 		for (uint32 i = 0; i < keyframes.GetSize(); ++i)
@@ -111,9 +111,9 @@ void Animation::_WriteData(BufferWriter<byte> &iterator) const
 	iterator.Write_uint32((uint32)rTrackBuffer.GetSize());
 	for (uint32 i = 0; i < rTrackBuffer.GetSize(); ++i)
 	{
-		iterator.Write_string(rTrackBuffer[i].first->GetData());
+		iterator.Write_string(rTrackBuffer[i]->first.GetData());
 
-		auto keyframes = rTrackBuffer[i].second->GetKeyframes();
+		auto keyframes = rTrackBuffer[i]->second.GetKeyframes();
 
 		iterator.Write_uint32((uint32)keyframes.GetSize());
 		for (uint32 i = 0; i < keyframes.GetSize(); ++i)
@@ -127,9 +127,9 @@ void Animation::_WriteData(BufferWriter<byte> &iterator) const
 	iterator.Write_uint32((uint32)sTrackBuffer.GetSize());
 	for (uint32 i = 0; i < sTrackBuffer.GetSize(); ++i)
 	{
-		iterator.Write_string(sTrackBuffer[i].first->GetData());
+		iterator.Write_string(sTrackBuffer[i]->first.GetData());
 
-		auto keyframes = sTrackBuffer[i].second->GetKeyframes();
+		auto keyframes = sTrackBuffer[i]->second.GetKeyframes();
 
 		iterator.Write_uint32((uint32)keyframes.GetSize());
 		for (uint32 i = 0; i < keyframes.GetSize(); ++i)

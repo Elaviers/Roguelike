@@ -199,8 +199,7 @@ public:
 		if (amount > remainingSpace)
 			_buffer.Append(amount - remainingSpace);
 
-		if (_pointer == nullptr)
-			_pointer = &_buffer[_index];
+		_pointer = &_buffer[_index];
 	}
 
 	void Write_byte(byte value)

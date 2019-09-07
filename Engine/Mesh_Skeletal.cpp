@@ -86,6 +86,7 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 	{
 		jointBuffer[jointId++] = &*it;
 
+		//ParentID + name + Transform
 		jointDataSize += 4 + (it->name.GetLength() + 1) + (4 * (3 + 3 + 3));
 	}
 
@@ -94,7 +95,7 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 		1 +													//Version
 		1 +													//Bone indices/weights per vertex (2)
 		4 +													//Vert count
-		(4 * (3+3+2) + 4 * 2) * vertices.GetSize() +		//Vertices
+		(4 * (3+3+2) + 2 * (4 + 4)) * vertices.GetSize() +	//Vertices
 		4 +													//Element count
 		4 * elements.GetSize() +							//Elements
 		4 +													//Joint count

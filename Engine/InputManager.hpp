@@ -1,5 +1,5 @@
 #pragma once
-#include "Map.hpp"
+#include "Hashmap.hpp"
 #include <Windows.h>
 
 enum class Keycode
@@ -114,8 +114,8 @@ class InputManager
 private:
 	byte _keyStates[256];
 
-	Map<Keycode, KeyBind*> _keyBinds;
-	Map<AxisType, float*> _axisBinds;
+	Hashmap<Keycode, KeyBind*> _keyBinds;
+	Hashmap<AxisType, float*> _axisBinds;
 
 public:
 	InputManager() : _keyStates() {}

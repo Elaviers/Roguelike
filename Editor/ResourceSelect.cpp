@@ -16,7 +16,7 @@
 #include <Engine/Window.hpp>
 #include "resource.h"
 
-constexpr LPCTSTR viewportClassName = TEXT("RESSELECTVPCLASS");
+constexpr LPCTSTR viewportClassName = TEXT("RESSELECTCLASS");
 
 class RSDialog
 {

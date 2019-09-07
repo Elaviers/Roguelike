@@ -1,16 +1,16 @@
 #pragma once
 #include "Asset.hpp"
 #include "AnimationTrack.hpp"
-#include "Map.hpp"
+#include "Hashmap.hpp"
 #include "String.hpp"
 
 class Skeleton;
 
 class Animation : public Asset
 {
-	Map<String, AnimationTrack<Vector3>> _translationTracks;
-	Map<String, AnimationTrack<Quaternion>> _rotationTracks;
-	Map<String, AnimationTrack<Vector3>> _scalingTracks;
+	Hashmap<String, AnimationTrack<Vector3>> _translationTracks;
+	Hashmap<String, AnimationTrack<Quaternion>> _rotationTracks;
+	Hashmap<String, AnimationTrack<Vector3>> _scalingTracks;
 
 	virtual void _ReadData(BufferReader<byte>&) override;
 	virtual void _WriteData(BufferWriter<byte>&) const override;
@@ -23,7 +23,7 @@ public:
 
 	void Evaluate(Skeleton& outSkeleton, float time) const;
 
-	inline AnimationTrack<Vector3>* GetTranslationTrack(const String& joint) { return _translationTracks.Get(joint); }
-	inline AnimationTrack<Quaternion>* GetRotationTrack(const String& joint) { return _rotationTracks.Get(joint); }
-	inline AnimationTrack<Vector3>* GetScalingTrack(const String& joint) { return _scalingTracks.Get(joint); }
+	inline AnimationTrack<Vector3>& GetTranslationTrack(const String& joint) { return _translationTracks[joint]; }
+	inline AnimationTrack<Quaternion>& GetRotationTrack(const String& joint) { return _rotationTracks[joint]; }
+	inline AnimationTrack<Vector3>& GetScalingTrack(const String& joint) { return _scalingTracks[joint]; }
 };

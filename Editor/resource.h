@@ -16,11 +16,14 @@
 #define IDB_TOOLCONNECTOR               118
 #define IDB_                            119
 #define IDB_TOOLBRUSH                   119
+#define IDD_LIST_SELECT                 120
 #define IDC_TREE                        1001
 #define IDC_VIEWPORT                    1006
 #define IDC_INFO                        1010
 #define IDC_NAME                        1011
 #define IDC_CUSTOM1                     1013
+#define IDC_LIST1                       1014
+#define IDC_LIST                        1014
 #define ID_FILE_OPEN                    40001
 #define ID_FILE_SAVE                    40002
 #define ID_HELP_ABOUT                   40003
@@ -50,9 +53,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        120
+#define _APS_NEXT_RESOURCE_VALUE        122
 #define _APS_NEXT_COMMAND_VALUE         40025
-#define _APS_NEXT_CONTROL_VALUE         1014
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -12,7 +12,7 @@
 class FontTexture : public Font
 {
 	const Texture* _texture;
-	Map<byte, Glyph> _charMap;
+	Hashmap<byte, Glyph> _charMap;
 
 	int _size;
 	int _rowH;

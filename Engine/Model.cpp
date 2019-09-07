@@ -16,6 +16,10 @@ void Model::_CMD_model(const Buffer<String> &args)
 		else
 		{
 			Buffer<byte> meshData = IO::ReadFile(path.GetData());
+
+			if (meshData.GetSize() == 0)
+				return;
+
 			_mesh = Mesh::FromData(meshData);
 		}
 

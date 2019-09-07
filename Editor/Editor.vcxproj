@@ -198,6 +198,7 @@ EXIT 0</Command>
     <ClCompile Include="HierachyWindow.cpp" />
     <ClCompile Include="PropertyWindow.cpp" />
     <ClCompile Include="ResourceSelect.cpp" />
+    <ClCompile Include="StringSelect.cpp" />
     <ClCompile Include="ToolBrush2D.cpp" />
     <ClCompile Include="ToolBrush3D.cpp" />
     <ClCompile Include="ToolConnector.cpp" />
@@ -222,6 +223,7 @@ EXIT 0</Command>
     <ClInclude Include="PropertyWindow.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceSelect.hpp" />
+    <ClInclude Include="StringSelect.hpp" />
     <ClInclude Include="Tool.hpp" />
     <ClInclude Include="ToolBrush2D.hpp" />
     <ClInclude Include="ToolBrush3D.hpp" />

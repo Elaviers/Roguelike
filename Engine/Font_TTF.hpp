@@ -23,7 +23,7 @@ private:
 
 	int _descender;
 
-	Map<char, TTFGlyph> _charMap;
+	Hashmap<char, TTFGlyph> _charMap;
 
 	GLuint _vao, _vbo;
 

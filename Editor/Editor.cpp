@@ -10,6 +10,7 @@
 #include "EditorIO.hpp"
 #include "resource.h"
 #include "ResourceSelect.hpp"
+#include "StringSelect.hpp"
 
 constexpr int tbImageSize = 32;
 
@@ -20,6 +21,9 @@ const Buffer<Pair<const wchar_t*>> levelDialogFilter({ Pair<const wchar_t*>(L"Le
 const Buffer<Pair<const wchar_t*>> openAnimationFilter({Pair<const wchar_t*>(L"FBX Scene", L"*.fbx")});
 const Buffer<Pair<const wchar_t*>> openModelFilter({Pair<const wchar_t*>(L"FBX Scene", L"*.fbx"), Pair<const wchar_t*>(L"OBJ Model", L"*.obj")});
 const Buffer<Pair<const wchar_t*>> openTextureFilter({Pair<const wchar_t*>(L"PNG Image", L"*.png")});
+
+const Buffer<Pair<const wchar_t*>> saveAnimationFilter({ Pair<const wchar_t*>(L"Animation", L"*.anim") });
+const Buffer<Pair<const wchar_t*>> saveModelFilter({Pair<const wchar_t*>(L"Mesh", L"*.mesh")});
 
 Editor::~Editor()
 {
@@ -664,15 +668,27 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			case ID_IMPORT_ANIMATION:
 			{
 				String filename = EditorIO::OpenFileDialog(L"\\Data\\Animations", openAnimationFilter);
-
+				if (filename.GetLength() == 0)
+					break;
+				
 				Animation* animation = EditorIO::ReadFBXAnimation(editor->_fbxManager, filename.GetData());
 
-
+				if (animation)
+				{
+					String dest = EditorIO::SaveFileDialog(L"\\Data\\Animations", saveAnimationFilter);
+					if (dest.GetLength())
+						IO::WriteFile(dest.GetData(), animation->GetAsData());
+					else
+						Debug::Error("Okay, I guess you don't want to import an animation after all...");
+				}
 			}
+			break;
 
 			case ID_IMPORT_MODEL:
 			{
 				String filename = EditorIO::OpenFileDialog(L"\\Data\\Models", openModelFilter);
+				if (filename.GetLength() == 0)
+					break;
 
 				String ext = Utilities::GetExtension(filename).ToLower();
 
@@ -688,7 +704,16 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 				}
 
 				if (mesh && mesh->IsValid())
-					IO::WriteFile("Data/Models/debug.mesh", mesh->GetAsData());
+				{
+					String dest = EditorIO::SaveFileDialog(L"\\Data\\Models", saveModelFilter);
+
+					if (dest.GetLength())
+						IO::WriteFile(dest.GetData(), mesh->GetAsData());
+					else
+						Debug::Error("Umm.. I guess you don't want that model imported then.");
+				}
+				else
+					Debug::Error("Sorry, but that ain't a supported model");
 			}
 			break;
 

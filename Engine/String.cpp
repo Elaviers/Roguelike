@@ -15,6 +15,8 @@ String::String() : _length(0)
 
 String::String(char c, size_t length) : _length(length)
 {
+	if (c == '\0') c = '0'; //Null characters are not allowed
+
 	_data = new char[_length + 1];
 	_data[_length] = '\0';
 	
