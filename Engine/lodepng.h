@@ -1456,7 +1456,7 @@ namespace lodepng
 
   No libraries other than the current standard C library are needed to compile
   LodePNG. For the C++ version, only the standard C++ library is needed on top.
-  Add the files lodepng.c(pp) and lodepng.h to your project, include
+  AddCommand the files lodepng.c(pp) and lodepng.h to your project, include
   lodepng.h where needed, and your program can read/write PNG files.
 
   It is compatible with C90 and up, and C++03 and up.

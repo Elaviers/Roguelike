@@ -37,8 +37,6 @@ void Engine::Init(EngineCreateFlags flags)
 
 	if (pConsole)
 	{
-		pConsole->Initialise();
-
 		//Commands
 		pConsole->Cvars().CreateVar("play", CommandPtr(this->pAudioManager, &AudioManager::CMD_play));
 	}

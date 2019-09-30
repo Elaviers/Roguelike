@@ -2,7 +2,17 @@
 #include "Engine.hpp"
 #include "Debug.hpp"
 #include "Utilities.hpp"
+#include "MacroUtilities.hpp"
 #include "TextureManager.hpp"
+
+const PropertyCollection& MaterialSurface::GetProperties()
+{
+	static PropertyCollection properties;
+
+	DO_ONCE(properties.AddCommand("tex", MemberCommandPtr<MaterialSurface>(&MaterialSurface::_CMD_tex)));
+
+	return properties;
+}
 
 void MaterialSurface::_CMD_tex(const Buffer<String>& args)
 {

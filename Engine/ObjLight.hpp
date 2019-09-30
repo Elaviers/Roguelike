@@ -30,7 +30,7 @@ public:
 
 	void Render(EnumRenderChannel) const override;
 
-	virtual void GetCvars(CvarMap&) override;
+	virtual const PropertyCollection& GetProperties() override;
 
 	virtual Bounds GetBounds() const { return Bounds(_editorBoxExtent); }
 	virtual const Collider* GetCollider() const { return &_lightCollider; }

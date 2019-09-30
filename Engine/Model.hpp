@@ -2,7 +2,6 @@
 #include "Asset.hpp"
 #include "Bounds.hpp"
 #include "Collider.hpp"
-#include "CvarMap.hpp"
 #include "GLMeshRenderer.hpp"
 #include "Mesh.hpp"
 #include "String.hpp"
@@ -10,8 +9,6 @@
 class Model : public Asset
 {
 protected:
-	CvarMap _cvars;
-	
 	Mesh* _mesh;
 	GLMeshRenderer _meshRenderer;
 
@@ -21,20 +18,9 @@ protected:
 	void _CMD_model(const Buffer<String> &args);
 	void _CMD_collision(const Buffer<String> &args);
 
-	virtual void _ReadText(const String &string) override
-	{
-		Buffer<String> lines = string.ToLower().Split("\r\n");
-		for (size_t i = 0; i < lines.GetSize(); ++i)
-			String unused = _cvars.HandleCommand(lines[i]);
-	}
-
 public:
 	//This is stupid. The model is responsible for deletion of these pointers, so don't delete them after using this!
-	Model(Mesh *mesh = nullptr, Collider *collider = nullptr) : _mesh(mesh), _collider(collider) {
-		_cvars.CreateVar("model", CommandPtr(this, &Model::_CMD_model));
-		_cvars.CreateVar("collision", CommandPtr(this, &Model::_CMD_collision));
-		_cvars.Add("material", _defaultMaterialName);
-	}
+	Model(Mesh *mesh = nullptr, Collider *collider = nullptr) : _mesh(mesh), _collider(collider) {}
 
 	inline void Delete()
 	{
@@ -42,6 +28,8 @@ public:
 		delete _collider;
 		delete _mesh;
 	}
+
+	virtual const PropertyCollection& GetProperties();
 
 	inline GLMeshRenderer& MeshRenderer() { return _meshRenderer; }
 

@@ -2,6 +2,7 @@
 #include "Buffer.hpp"
 #include "BufferIterator.hpp"
 #include "String.hpp"
+#include "PropertyCollection.hpp"
 
 enum AssetID
 {
@@ -20,19 +21,30 @@ class Asset
 protected:
 	Asset() {}
 
-	virtual void _ReadText(const String&) {}
+	virtual void _ReadText(const String& string)
+	{
+		Buffer<String> lines = string.ToLower().Split("\r\n");
+		for (size_t i = 0; i < lines.GetSize(); ++i)
+			String unused = GetProperties().HandleCommand(this, lines[i]);
+	}
+
 	virtual void _ReadData(BufferReader<byte>&) {}
 
 	virtual String _WriteText() const { return ""; }
 	virtual void _WriteData(BufferWriter<byte>&) const {}
 public:
 	virtual ~Asset() {}
+
+	virtual const PropertyCollection& GetProperties() 
+	{ 
+		static PropertyCollection properties; 
+		return properties;
+	}
 	
 	//T Must be derived from Asset
 	template<typename T>
 	static T* FromText(const String &string)
 	{
-		
 		Asset* ass = new T();
 		ass->_ReadText(string);
 		return (T*)ass;

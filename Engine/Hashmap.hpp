@@ -62,16 +62,16 @@ class Hashmap
 			return nullptr;
 		}
 
-		HashNode* Find(H_TYPE h)
+		HashNode* FindVar(H_TYPE h)
 		{
 			if (h < hash)
 			{
-				if (left) return left->Find(h);
+				if (left) return left->FindVar(h);
 				return nullptr;
 			}
 			else if (h > hash)
 			{
-				if (right) return right->Find(h);
+				if (right) return right->FindVar(h);
 				return nullptr;
 			}
 
@@ -184,7 +184,7 @@ public:
 		{
 			H_TYPE hash = _Hash(key);
 
-			auto node = _data->Find(hash);
+			auto node = _data->FindVar(hash);
 			if (node) return node->GetValueForKey(key);
 		}
 

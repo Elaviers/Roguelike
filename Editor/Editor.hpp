@@ -1,8 +1,8 @@
 #pragma once
+#include <Engine/Font.hpp>
 #include <Engine/GLContext.hpp>
 #include <Engine/GLProgram.hpp>
 #include <Engine/LevelIO.hpp>
-#include <Engine/Registry.hpp>
 #include <Engine/Timer.hpp>
 #include <Engine/Window.hpp>
 #include "FbxSdk.hpp"
@@ -36,10 +36,15 @@ private:
 	float _deltaTime = 0.f;
 
 	//Engine
-	Registry _registry;
 	Timer _timer;
 
-	FbxManager *_fbxManager;
+	FbxManager* _fbxManager;
+
+	//Console
+	Window _consoleWindow;
+	ObjCamera _consoleCamera;
+	Font* _consoleFont = nullptr;
+	bool _consoleIsActive = false;
 
 	//Window stuff
 	Window _window;
@@ -82,6 +87,7 @@ private:
 	float _axisLookX = 0.f;
 	float _axisLookY = 0.f;
 
+	static LRESULT CALLBACK _ConsoleProc(HWND, UINT, WPARAM, LPARAM);
 	static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
 	static LRESULT CALLBACK _vpAreaProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -106,6 +112,7 @@ public:
 	void Run();
 	void Frame();
 	void Render();
+	void RenderConsole();
 	void RenderViewport(int index, Direction side);
 
 	void Zoom(float);
@@ -120,6 +127,7 @@ public:
 	void KeyCancel();
 	void KeyDelete();
 
+	void ToggleConsole();
 	void RefreshLevel();
 
 	void ResizeViews(uint16 w, uint16 h);

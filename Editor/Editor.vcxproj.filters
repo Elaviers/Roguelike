@@ -28,27 +28,21 @@
     <Filter Include="Header Files\Tools\Gizmo">
       <UniqueIdentifier>{bc679d0b-4ce7-4cd4-99e2-4bdef1835ce3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Windows">
+      <UniqueIdentifier>{b576abb2-f138-4ce7-baf0-33e7fe41c764}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Windows">
+      <UniqueIdentifier>{98c52bc2-45c7-4735-a7ba-86ed7ee41aef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Viewport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WinMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PropertyWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceSelect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EditorIO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ToolWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EditorUtil.cpp">
@@ -72,9 +66,6 @@
     <ClCompile Include="FbxReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HierachyWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GizmoAxis.cpp">
       <Filter>Source Files\Tools\Gizmo</Filter>
     </ClCompile>
@@ -84,27 +75,27 @@
     <ClCompile Include="GizmoRing.cpp">
       <Filter>Source Files\Tools\Gizmo</Filter>
     </ClCompile>
+    <ClCompile Include="PropertyWindow.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="HierachyWindow.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceSelect.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
     <ClCompile Include="StringSelect.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolWindow.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewport.cpp">
+      <Filter>Source Files\Windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Viewport.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PropertyWindow.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceSelect.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EditorIO.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ToolWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EditorUtil.hpp">
@@ -131,9 +122,6 @@
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="HierachyWindow.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MouseData.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -155,7 +143,25 @@
     <ClInclude Include="FbxSdk.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HierachyWindow.hpp">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertyWindow.hpp">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceSelect.hpp">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolWindow.hpp">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
     <ClInclude Include="StringSelect.hpp">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Viewport.hpp">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

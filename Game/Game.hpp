@@ -31,7 +31,7 @@ private:
 	void _InitGL();
 	void _Init();
 public:
-	Game() : _running(false), _deltaTime(0.f) {}
+	Game() : _consoleIsActive(false), _running(false), _deltaTime(0.f) {}
 	~Game() {}
 
 	void Run();

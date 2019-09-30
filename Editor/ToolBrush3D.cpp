@@ -1,18 +1,34 @@
 #include "ToolBrush3D.hpp"
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
+#include <Engine/MacroUtilities.hpp>
+
+const PropertyCollection& ToolBrush3D::_GetProperties()
+{
+	static PropertyCollection properties;
+
+	DO_ONCE(
+		properties.Add(
+		"Material",
+		MemberGetter<ObjBrush<3>, String>(&ObjBrush<3>::GetMaterialName),
+		MemberSetter<ObjBrush<3>, String>(&ObjBrush<3>::SetMaterial),
+		offsetof(ToolBrush3D, _object),
+		PropertyFlags::MATERIAL)
+	);
+
+	return properties;
+}
 
 void ToolBrush3D::Initialise()
 {
 	_object.SetRelativeScale(Vector3());
 	_object.SetMaterial("alt");
-	_cvars.Add("Material", Getter<String>((ObjBrush<3>*)&_object, &ObjBrush<3>::GetMaterialName), Setter<String>((ObjBrush<3>*)&_object, &ObjBrush<3>::SetMaterial), CvarFlags::MATERIAL);
 }
 
 void ToolBrush3D::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
 {
 	properties.SetObject(&_object, true);
-	toolProperties.SetCvars(_cvars);
+	toolProperties.SetCvars(_GetProperties(), this);
 }
 
 void ToolBrush3D::Cancel()

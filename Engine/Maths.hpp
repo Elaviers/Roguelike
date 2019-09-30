@@ -95,13 +95,6 @@ namespace Maths
 	inline double ArcSineDegreesD(double x) { return DEGS_PER_RAD * ArcSineD(x); }
 	inline double ArcCoineDegreesD(double x) { return DEGS_PER_RAD * ArcCosineD(x); }
 	inline double ArcTangentDegreesD(double x) { return DEGS_PER_RAD * ArcTangentD(x); }
-
-	inline double ArcTangentDegrees2D(double y, double x)
-	{
-		if (x) return ArcTangentDegreesD(y / x);
-		if (y < 0.f) return -90.0;
-		return 90.0;
-	}
 	
 	inline float SmallestAngularDiff(float to, float from)
 	{

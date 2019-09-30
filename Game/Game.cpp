@@ -194,7 +194,6 @@ void Game::Resize(uint16 w, uint16 h)
 	_ui.SetBounds(0, 0, w, h);
 	_uiCamera.SetViewport(w, h);
 	_uiCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
-	glViewport(0, 0, w, h);
 }
 
 void Game::MouseMove(unsigned short x, unsigned short y)

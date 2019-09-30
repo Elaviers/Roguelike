@@ -13,6 +13,16 @@ void Console::_CMD_echo(const Buffer<String>& tokens)
 		Print(CSTR(tokens[0], '\n'));
 }
 
+void Console::_CMD_help(const Buffer<String>& tokens)
+{
+	auto all = _cvars.GetAll();
+
+	for (int i = 0; i < all.GetSize(); ++i)
+	{
+		Print(CSTR(all[i]->GetName(), '\n'));
+	}
+}
+
 void Console::_SetNextChar(char c)
 {
 	if (_nextBufferIndex >= _charBuffer.GetSize())

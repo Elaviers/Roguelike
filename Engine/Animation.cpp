@@ -59,7 +59,7 @@ void Animation::_ReadData(BufferReader<byte> &iterator)
 		auto track = _translationTracks[iterator.Read_string()];
 
 		uint32 keyframeCount = iterator.Read_uint32();
-		for (uint32 i = 0; i < keyframeCount; ++i)
+		for (uint32 j = 0; j < keyframeCount; ++j)
 			track.AddKey(iterator.Read_float(), iterator.Read_vector3(), iterator.Read_byte());
 	}
 
@@ -69,7 +69,7 @@ void Animation::_ReadData(BufferReader<byte> &iterator)
 		auto track = _rotationTracks[iterator.Read_string()];
 
 		uint32 keyframeCount = iterator.Read_uint32();
-		for (uint32 i = 0; i < keyframeCount; ++i)
+		for (uint32 j = 0; j < keyframeCount; ++j)
 			track.AddKey(iterator.Read_float(), Quaternion(iterator.Read_vector3()), iterator.Read_byte());
 	}
 
@@ -79,7 +79,7 @@ void Animation::_ReadData(BufferReader<byte> &iterator)
 		auto track = _scalingTracks[iterator.Read_string()];
 		
 		uint32 keyframeCount = iterator.Read_uint32();
-		for (uint32 i = 0; i < keyframeCount; ++i)
+		for (uint32 j = 0; j < keyframeCount; ++j)
 			track.AddKey(iterator.Read_float(), iterator.Read_vector3(), iterator.Read_byte());
 	}
 }
@@ -100,11 +100,11 @@ void Animation::_WriteData(BufferWriter<byte> &iterator) const
 		auto keyframes = tTrackBuffer[i]->second.GetKeyframes();
 		
 		iterator.Write_uint32((uint32)keyframes.GetSize());
-		for (uint32 i = 0; i < keyframes.GetSize(); ++i)
+		for (uint32 j = 0; j < keyframes.GetSize(); ++j)
 		{
-			iterator.Write_float(keyframes[i].time);
-			iterator.Write_vector3(keyframes[i].value);
-			iterator.Write_byte(keyframes[i].interpolation);
+			iterator.Write_float(keyframes[j].time);
+			iterator.Write_vector3(keyframes[j].value);
+			iterator.Write_byte(keyframes[j].interpolation);
 		}
 	}
 
@@ -116,11 +116,11 @@ void Animation::_WriteData(BufferWriter<byte> &iterator) const
 		auto keyframes = rTrackBuffer[i]->second.GetKeyframes();
 
 		iterator.Write_uint32((uint32)keyframes.GetSize());
-		for (uint32 i = 0; i < keyframes.GetSize(); ++i)
+		for (uint32 j = 0; j < keyframes.GetSize(); ++j)
 		{
-			iterator.Write_float(keyframes[i].time);
-			iterator.Write_vector3(keyframes[i].value.ToEuler());
-			iterator.Write_byte(keyframes[i].interpolation);
+			iterator.Write_float(keyframes[j].time);
+			iterator.Write_vector3(keyframes[j].value.ToEuler());
+			iterator.Write_byte(keyframes[j].interpolation);
 		}
 	}
 
@@ -132,11 +132,11 @@ void Animation::_WriteData(BufferWriter<byte> &iterator) const
 		auto keyframes = sTrackBuffer[i]->second.GetKeyframes();
 
 		iterator.Write_uint32((uint32)keyframes.GetSize());
-		for (uint32 i = 0; i < keyframes.GetSize(); ++i)
+		for (uint32 j = 0; j < keyframes.GetSize(); ++j)
 		{
-			iterator.Write_float(keyframes[i].time);
-			iterator.Write_vector3(keyframes[i].value);
-			iterator.Write_byte(keyframes[i].interpolation);
+			iterator.Write_float(keyframes[j].time);
+			iterator.Write_vector3(keyframes[j].value);
+			iterator.Write_byte(keyframes[j].interpolation);
 		}
 	}
 }

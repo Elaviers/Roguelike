@@ -1,6 +1,5 @@
 #pragma once
 #include "Asset.hpp"
-#include "CvarMap.hpp"
 #include "Engine.hpp"
 #include "RenderChannel.hpp"
 #include "String.hpp"
@@ -11,25 +10,20 @@ struct RenderParam;
 class Material : public Asset
 {
 protected:
-	CvarMap _cvars;
-
 	byte _renderChannels;
 
-	Material(byte channels) : _renderChannels(channels) 
-	{ 
-		_cvars.CreateVar("mag", CommandPtr(Engine::Instance().pTextureManager, &TextureManager::CMD_mag));
-		_cvars.CreateVar("mips", CommandPtr(Engine::Instance().pTextureManager, &TextureManager::CMD_mips));
-	}
+	byte _mips;
+	uint16 _mag;
 
-	virtual void _ReadText(const String& string) override
-	{
-		Buffer<String> lines = string.ToLower().Split("\r\n");
-		for (size_t i = 0; i < lines.GetSize(); ++i)
-			String unused = _cvars.HandleCommand(lines[i]);
-	}
+	Material(byte channels) : _renderChannels(channels), _mips(0), _mag(GL_NEAREST) { }
+
+	String _GetMag() { return "{MATERIAL._MAG}"; }
+	void _SetMag(const String& name);
 
 public:
 	virtual ~Material() {}
+
+	virtual const PropertyCollection& GetProperties() override;
 
 	static Material* FromText(const String&);
 

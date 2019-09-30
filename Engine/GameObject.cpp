@@ -1,19 +1,49 @@
 #include "GameObject.hpp"
 #include "Collider.hpp"
-#include "CvarMap.hpp"
 #include "Engine.hpp"
 #include "GL.hpp"
 #include "GLProgram.hpp"
+#include "MacroUtilities.hpp"
 #include "ObjCamera.hpp"
 #include "RaycastResult.hpp"
 
-void GameObject::_AddBaseCvars(CvarMap &cvars)
+void GameObject::_AddBaseProperties(PropertyCollection &cvars)
 {
-	cvars.Add("Name",		Getter<const String&>(this, &GameObject::GetName), Setter<String>(this, &GameObject::SetName));
-	cvars.Add("UID",		const_cast<uint32&>(_uid), CvarFlags::READONLY);
-	cvars.Add("Position",	Getter<const Vector3&>(&_transform, &Transform::GetPosition), Setter<Vector3>(&_transform, &Transform::SetPosition));
-	cvars.Add("Rotation",	Getter<const Vector3&>(&_transform, &Transform::GetRotationEuler), Setter<Vector3>(&_transform, &Transform::SetRotationEuler));
-	cvars.Add("Scale",		Getter<const Vector3&>(&_transform, &Transform::GetScale), Setter<Vector3>(&_transform, &Transform::SetScale));
+	cvars.Add(
+		"Name",			
+		MemberGetter<GameObject, const String&>	(&GameObject::GetName), 
+		MemberSetter<GameObject, String>			(&GameObject::SetName));
+
+	cvars.Add<uint32>(
+		"UID",	
+		offsetof(GameObject, _uid), 
+		PropertyFlags::READONLY);
+
+	cvars.Add(
+		"Position",		
+		MemberGetter<Transform, const Vector3&>	(&Transform::GetPosition), 
+		MemberSetter<Transform, Vector3>			(&Transform::SetPosition),
+		offsetof(GameObject, _transform));
+
+
+	cvars.Add(
+		"Rotation",		
+		MemberGetter<Transform, const Vector3&>	(&Transform::GetRotationEuler),
+		MemberSetter<Transform, Vector3>			(&Transform::SetRotationEuler),
+		offsetof(GameObject, _transform));
+
+	cvars.Add(
+		"Scale",
+		MemberGetter<Transform, const Vector3&>	(&Transform::GetScale), 
+		MemberSetter<Transform, Vector3>			(&Transform::SetScale),
+		offsetof(GameObject, _transform));
+}
+
+const PropertyCollection& GameObject::GetProperties()
+{
+	static PropertyCollection cvars;
+	DO_ONCE(_AddBaseProperties(cvars));
+	return cvars;
 }
 
 //Public

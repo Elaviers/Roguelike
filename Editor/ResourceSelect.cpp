@@ -71,8 +71,6 @@ public:
 		WindowFunctions::SetDefaultPixelFormat(viewportDC);
 		glContext->Use(viewportDC);
 
-		glViewport(0, 0, vpW, vpH);
-
 		_camera.SetViewport(vpW, vpH);
 
 		_camera.SetParent(&_cameraRoot);

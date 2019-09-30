@@ -32,13 +32,11 @@ private:
 	void _CMD_LoadFont(const Buffer<String>& args);
 
 public:
-	FontTTF() : _face(nullptr), _vao(0), _vbo(0), _size(0), _descender(0)
-	{
-		_cvars.CreateVar("filename", CommandPtr(this, &FontTTF::_CMD_LoadFont));
-		_cvars.Add("rendersize", _size);
-	}
+	FontTTF() : _face(nullptr), _vao(0), _vbo(0), _size(0), _descender(0) {}
 
 	virtual ~FontTTF() {}
+
+	virtual const PropertyCollection& GetProperties() override;
 
 	virtual float CalculateStringWidth(const char* string, float scaleX) const override;
 

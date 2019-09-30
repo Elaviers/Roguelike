@@ -3,13 +3,35 @@
 #include "EditorUtil.hpp"
 #include <Engine/DrawUtils.hpp>
 #include <Engine/InputManager.hpp>
+#include <Engine/MacroUtilities.hpp>
 #include <Engine/RaycastResult.hpp>
+
+const PropertyCollection& ToolSelect::_GetProperties()
+{
+	static PropertyCollection properties;
+
+	DO_ONCE_BEGIN;
+	properties.Add<float>(
+		"Grid Snap",
+		offsetof(ToolSelect, _gridSnap));
+
+	properties.Add<bool>(
+		"Snap to world",
+		offsetof(ToolSelect, _snapToWorld));
+
+	properties.Add<bool>(
+		"Local-space Gizmo",
+		offsetof(ToolSelect, _gizmoLocal));
+	DO_ONCE_END;
+
+	return properties;
+}
 
 void ToolSelect::_GizmoMove(const Vector3& delta)
 {
 	Vector3 d(delta);
 
-	if (_snapToWorld == 0.f && _gridSnap)
+	if (!_snapToWorld && _gridSnap)
 	{
 		d[0] = Maths::Trunc(d[0], _gridSnap);
 		d[1] = Maths::Trunc(d[1], _gridSnap);
@@ -79,17 +101,14 @@ void ToolSelect::_SetHoverObject(GameObject* ho)
 
 void ToolSelect::Initialise()
 {
-	_cvars.Add("Grid Snap", _gridSnap);
-	_cvars.Add("Snap to world", _snapToWorld), CvarFlags::CHECKBOX;
-	_cvars.Add("Local-space Gizmo", _gizmoLocal, CvarFlags::CHECKBOX);
+	_gridSnap = .25f;
+	_snapToWorld = false;
+	_gizmoLocal = false;
 }
 
 void ToolSelect::Activate(PropertyWindow& properties, PropertyWindow& toolProperties)
 {
-	_gridSnap = .25f;
-	_snapToWorld = 0;
-
-	toolProperties.SetCvars(_cvars);
+	toolProperties.SetCvars(_GetProperties(), this);
 	_owner.PropertyWindowRef().Clear();
 }
 
@@ -131,11 +150,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 					_shouldCopy = false;
 					GameObject *newObject = _hoverObject->Clone();
 					
-					CvarMap propertiesOld, propertiesNew;
-					_hoverObject->GetCvars(propertiesOld);
-					newObject->GetCvars(propertiesNew);
-					
-					propertiesOld.TransferValuesTo(propertiesNew);
+					_GetProperties().Transfer(_hoverObject.Ptr(), newObject);
 
 					_hoverObject = Engine::Instance().pObjectTracker->Track(newObject);
 					_hoverObjectIsSelected = true;
@@ -147,7 +162,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 				float deltaX = mouseData.unitX - mouseData.heldUnitX;
 				float deltaY = mouseData.unitY - mouseData.heldUnitY;
 
-				if (_snapToWorld == 0 && _gridSnap)
+				if (!_snapToWorld && _gridSnap)
 				{
 					deltaX = Maths::Trunc(deltaX, _gridSnap);
 					deltaY = Maths::Trunc(deltaY, _gridSnap);

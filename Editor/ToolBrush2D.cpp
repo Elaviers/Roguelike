@@ -1,20 +1,38 @@
 #include "ToolBrush2D.hpp"
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
+#include <Engine/MacroUtilities.hpp>
+
+const PropertyCollection& ToolBrush2D::_GetProperties()
+{
+	static PropertyCollection properties;
+
+	DO_ONCE_BEGIN;
+	properties.Add(
+		"Material",
+		MemberGetter<ObjBrush<2>, String>(&ObjBrush<2>::GetMaterialName),
+		MemberSetter<ObjBrush<2>, String>(&ObjBrush<2>::SetMaterial),
+		offsetof(ToolBrush2D, _object),
+		PropertyFlags::MATERIAL);
+
+	properties.Add<float>(
+		"Level",
+		offsetof(ToolBrush2D, _object.level));
+	DO_ONCE_END;
+
+	return properties;
+}
 
 void ToolBrush2D::Initialise()
 {
 	_object.SetRelativeScale(Vector3());
 	_object.SetMaterial("bricks");
-
-	_cvars.Add("Material", Getter<String>((ObjBrush<2>*)&_object, &ObjBrush<2>::GetMaterialName), Setter<String>((ObjBrush<2>*)&_object, &ObjBrush<2>::SetMaterial), CvarFlags::MATERIAL);
-	_cvars.Add("Level", _object.level);
 }
 
 void ToolBrush2D::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
 {
 	properties.SetObject(&_object, true);
-	toolProperties.SetCvars(_cvars);
+	toolProperties.SetCvars(_GetProperties(), this);
 }
 
 void ToolBrush2D::Cancel()

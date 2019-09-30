@@ -2,7 +2,20 @@
 #include "Engine.hpp"
 #include "GLProgram.hpp"
 #include "FontManager.hpp"
+#include "MacroUtilities.hpp"
 #include "ModelManager.hpp"
+
+const PropertyCollection& FontTTF::GetProperties()
+{
+	static PropertyCollection properties;
+
+	DO_ONCE_BEGIN;
+	properties.AddCommand("filename", MemberCommandPtr<FontTTF>(&FontTTF::_CMD_LoadFont));
+	properties.Add<int>("rendersize", offsetof(FontTTF, _size));
+	DO_ONCE_END;
+
+	return properties;
+}
 
 void FontTTF::_CMD_LoadFont(const Buffer<String>& args)
 {

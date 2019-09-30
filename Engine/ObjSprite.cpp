@@ -1,5 +1,6 @@
 #include "ObjSprite.hpp"
 #include "GLProgram.hpp"
+#include "MacroUtilities.hpp"
 #include "ModelManager.hpp"
 #include "ObjCamera.hpp"
 
@@ -7,10 +8,23 @@ void ObjSprite::Render(EnumRenderChannel channels) const
 {
 	if (Engine::Instance().pModelManager && ObjCamera::Current() && _material && channels & _material->GetRenderChannels())
 	{
-		Vector3 position = Vector3() * GetTransformationMatrix();
+		Mat4 t;
 
-		Mat4 t = Matrix::Scale(Vector3(_size, _size, _size)) * ObjCamera::Current()->GetWorldTransform().GetRotation().GetQuat().ToMatrix() * Matrix::Translation(position);
+		if (_lookAtCamera)
+		{
+			t = Matrix::Transformation(GetWorldPosition(), ObjCamera::Current()->GetWorldRotation().GetQuat(), Vector3(_size, _size, _size));
+		}
+		else
+		{
+			Vector3 pos = GetWorldPosition();
+			Vector3 delta = pos - ObjCamera::Current()->GetWorldPosition();
+			delta.Normalise();
 
+			float y = Maths::ArcTangentDegrees2(delta[0], delta[2]);
+			Vector3 e = Vector3(0, y, 0);
+			t = Matrix::Transformation(pos, e, Vector3(_size, _size, _size));
+		}
+		
 		_material->Apply();
 
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t);
@@ -20,12 +34,30 @@ void ObjSprite::Render(EnumRenderChannel channels) const
 	}
 }
 
-void ObjSprite::GetCvars(CvarMap& cvars)
+const PropertyCollection& ObjSprite::GetProperties()
 {
-	_AddBaseCvars(cvars);
+	static PropertyCollection cvars;
 
-	cvars.Add("Material", Getter<String>(this, &ObjSprite::GetMaterialName), Setter<String>(this, &ObjSprite::SetMaterialName), CvarFlags::MATERIAL);
-	cvars.Add("Size", _size);
+	DO_ONCE_BEGIN;
+	_AddBaseProperties(cvars);
+
+	cvars.Add(
+		"Material",
+		MemberGetter<ObjSprite, String>(&ObjSprite::GetMaterialName),
+		MemberSetter<ObjSprite, String>(&ObjSprite::SetMaterialName),
+		0,
+		PropertyFlags::MATERIAL);
+
+	cvars.Add<float>(
+		"Size",
+		offsetof(ObjSprite, _size));
+
+	cvars.Add<bool>(
+		"Look at camera",
+		offsetof(ObjSprite, _lookAtCamera));
+	DO_ONCE_END;
+
+	return cvars;
 }
 
 void ObjSprite::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const

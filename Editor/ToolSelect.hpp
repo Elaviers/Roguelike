@@ -21,13 +21,13 @@ class ToolSelect : public Tool
 	float _origObjectX;
 	float _origObjectY;
 
-	CvarMap _cvars;
-
 	float _gridSnap;
-	int _snapToWorld;
-	int _gizmoLocal;
+	bool _snapToWorld;
+	bool _gizmoLocal;
 
 	Gizmo _gizmo;
+
+	const PropertyCollection& _GetProperties();
 
 	void _GizmoMove(const Vector3& delta);
 	float _GizmoRotate(const Vector3 &axis, float angle);

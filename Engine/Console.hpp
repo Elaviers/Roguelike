@@ -1,12 +1,12 @@
 #pragma once
 #include "Buffer.hpp"
-#include "CvarMap.hpp"
+#include "RigidPropertyCollection.hpp"
 #include "Font.hpp"
 #include <Windows.h>
 
 class Console
 {
-	CvarMap _cvars;
+	RigidPropertyCollection _cvars;
 
 	Buffer<char> _charBuffer;
 
@@ -24,19 +24,23 @@ class Console
 		_blinkTimer = 0.f;
 	}
 
-	void _CMD_echo(const Buffer<String>& tokens);
-
 	void _SetNextChar(char c);
 
 	void _ExpandBuffer();
 
+	void _CMD_echo(const Buffer<String>& tokens);
+	void _CMD_help(const Buffer<String>& tokens);
+
 public:
-	Console() : _nextBufferIndex(0), _prePrompt('>') {}
+	Console() : _nextBufferIndex(0), _prePrompt('>') 
+	{
+		_cvars.CreateVar("echo", CommandPtr(this, &Console::_CMD_echo));
+		_cvars.CreateVar("help", CommandPtr(this, &Console::_CMD_help));
+	}
+
 	~Console() {}
 
-	inline CvarMap& Cvars() { return _cvars; }
-
-	inline void Initialise() { _cvars.CreateVar("echo", CommandPtr(this, &Console::_CMD_echo)); }
+	inline RigidPropertyCollection& Cvars() { return _cvars; }
 
 	void Print(const char* string);
 

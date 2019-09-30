@@ -1,6 +1,22 @@
 #include "ToolConnector.hpp"
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
+#include <Engine/MacroUtilities.hpp>
+
+const PropertyCollection& ToolConnector::_GetProperties()
+{
+	static PropertyCollection properties;
+
+	DO_ONCE(
+		properties.Add(
+		"Direction",
+		MemberGetter<ToolConnector, String>(&ToolConnector::GetConnectorDirection),
+		MemberSetter<ToolConnector, String>(&ToolConnector::SetConnectorDirection),
+		PropertyFlags::DIRECTION)
+	);
+
+	return properties;
+}
 
 String ToolConnector::GetConnectorDirection() const
 {
@@ -31,15 +47,12 @@ void ToolConnector::SetConnectorDirection(const String &dir)
 
 void ToolConnector::Initialise()
 {
-	_cvars.Add("Direction", Getter<String>(this, &ToolConnector::GetConnectorDirection), Setter<String>(this, &ToolConnector::SetConnectorDirection), CvarFlags::DIRECTION);
-
 	_connector.SetRenderColour(Vector4(0.f, 1.f, 0.f, .5f));
 }
 
 void ToolConnector::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
 {
-	toolProperties.SetCvars(_cvars);
-
+	toolProperties.SetCvars(_GetProperties(), this);
 }
 
 void ToolConnector::Cancel()

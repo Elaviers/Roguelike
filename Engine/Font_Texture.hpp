@@ -1,6 +1,5 @@
 #pragma once
 #include "Font.hpp"
-#include "CvarMap.hpp"
 #include "Engine.hpp"
 #include "FunctionPointer.hpp"
 #include "Glyph.hpp"
@@ -18,6 +17,12 @@ class FontTexture : public Font
 	int _rowH;
 	int _yOffset;
 
+	byte _mips;
+	uint16 _mag;
+
+	String _GetMag() { return "{MATERIAL._MAG}"; }
+	void _SetMag(const String&);
+
 	void _CMD_texture(const Buffer<String>& args);
 	void _CMD_region(const Buffer<String>& args);
 
@@ -25,17 +30,11 @@ protected:
 	virtual void _ReadText(const String&) override;
 
 public:
-	FontTexture() : _texture(nullptr) {
-		_cvars.CreateVar("mag", CommandPtr(Engine::Instance().pTextureManager, &TextureManager::CMD_mag));
-		_cvars.CreateVar("mips", CommandPtr(Engine::Instance().pTextureManager, &TextureManager::CMD_mips));
-		_cvars.CreateVar("texture", CommandPtr(this, &FontTexture::_CMD_texture));
-		_cvars.CreateVar("region", CommandPtr(this, &FontTexture::_CMD_region));
-		_cvars.Add("size", _size);
-		_cvars.Add("row_h", _rowH);
-		_cvars.Add("y_offset", _yOffset);
-	}
+	FontTexture() : _texture(nullptr) {}
 
 	virtual ~FontTexture() {}
+
+	virtual const PropertyCollection& GetProperties() override;
 
 	virtual float CalculateStringWidth(const char* string, float scaleX) const override;
 

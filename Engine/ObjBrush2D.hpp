@@ -19,5 +19,5 @@ public:
 	virtual void WriteData(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;
 	virtual void ReadData(BufferReader<byte> &buffer, const NumberedSet<String> &strings) override;
 
-	virtual void GetCvars(CvarMap &) override;
+	virtual const PropertyCollection& GetProperties() override;
 };

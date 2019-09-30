@@ -60,6 +60,12 @@ void Window::Show()
 		::ShowWindow(_hwnd, SW_SHOW);
 }
 
+void Window::Hide()
+{
+	if (_hwnd)
+		::ShowWindow(_hwnd, SW_HIDE);
+}
+
 void Window::SwapBuffers()
 {
 	::SwapBuffers(_hdc);

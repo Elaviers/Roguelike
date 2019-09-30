@@ -2,8 +2,25 @@
 #include "Editor.hpp"
 #include <Engine/ObjBrush.hpp>
 #include <Engine/ObjRenderable.hpp>
+#include <Engine/MacroUtilities.hpp>
 #include <Engine/RaycastResult.hpp>
 #include <Engine/Registry.hpp>
+
+const PropertyCollection& ToolEntity::_GetProperties()
+{
+	static PropertyCollection properties;
+	
+	DO_ONCE(
+		properties.Add(
+		"Class",
+		MemberGetter<ToolEntity, byte>(&ToolEntity::_GetClassID),
+		MemberSetter<ToolEntity, byte>(&ToolEntity::_SetClassID),
+		0,
+		PropertyFlags::CLASSID)
+	);
+
+	return properties;
+}
 
 void ToolEntity::_SetClassID(const byte &id)
 {
@@ -20,13 +37,12 @@ void ToolEntity::_SetClassID(const byte &id)
 void ToolEntity::Initialise()
 {
 	_classID = 1;
-	_cvars.Add("Class", Getter<byte>(this, &ToolEntity::_GetClassID), Setter<byte>(this, &ToolEntity::_SetClassID), CvarFlags::CLASSID);
 }
 
 void ToolEntity::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
 {
 	properties.Clear();
-	toolProperties.SetCvars(_cvars);
+	toolProperties.SetCvars(_GetProperties(), this);
 
 	//Creates the placement object
 	_SetClassID(_classID);
@@ -73,9 +89,8 @@ void ToolEntity::MouseDown(const MouseData &mouseData)
 		GameObject* newObj = Engine::Instance().registry.GetNode(_classID)->New();
 		newObj->SetParent(&_owner.LevelRef());
 
-		CvarMap newObjCvars;
-		newObj->GetCvars(newObjCvars);
-		_owner.PropertyWindowRef().GetCvars().TransferValuesTo(newObjCvars);
+		const PropertyCollection& cvars = newObj->GetProperties();
+		_owner.PropertyWindowRef().GetProperties()->Transfer(_placement.Ptr(), newObj);
 	}
 }
 

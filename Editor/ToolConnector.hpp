@@ -1,6 +1,5 @@
 #pragma once
 #include "Tool.hpp"
-#include <Engine/CvarMap.hpp>
 #include <Engine/ObjConnector.hpp>
 
 class ToolConnector : public Tool
@@ -8,8 +7,8 @@ class ToolConnector : public Tool
 	bool _placing;
 
 	ObjConnector _connector;
-	CvarMap _cvars;
 
+	const PropertyCollection& _GetProperties();
 public:
 	ToolConnector(Editor &level) : Tool(level), _placing(false) {}
 	virtual ~ToolConnector() {}

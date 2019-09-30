@@ -1,10 +1,9 @@
 #pragma once
 #include <Engine/Window.hpp>
 #include <Engine/Buffer.hpp>
-#include <Engine/CvarMap.hpp>
+#include <Engine/GameObject.hpp>
 
 class Editor;
-class GameObject;
 
 struct PropertyHWND
 {
@@ -12,7 +11,7 @@ struct PropertyHWND
 	HWND box;
 	HWND button;
 	
-	Cvar *cvar;
+	Property *property;
 };
 
 class PropertyWindow : public Window
@@ -23,7 +22,8 @@ class PropertyWindow : public Window
 	static LRESULT _EditProc(HWND, UINT, WPARAM, LPARAM);
 	static WNDPROC _defaultEditProc;
 
-	CvarMap _cvars;
+	const PropertyCollection* _cvars;
+	void* _currentObject;
 
 	Buffer<PropertyHWND> _child_hwnds;
 
@@ -43,10 +43,10 @@ public:
 		Window::SetSize(256, 512);
 	}
 
-	inline CvarMap& GetCvars() { return _cvars; }
-	void SetCvars(const CvarMap&, bool readOnly = false);
+	inline const PropertyCollection* GetProperties() { return _cvars; }
+	void SetCvars(const PropertyCollection&, void* object, bool readOnly = false);
 
-	void SetObject(GameObject*, bool readOnly = false);
+	inline void SetObject(GameObject* object, bool readOnly = false) { SetCvars(object->GetProperties(), object, readOnly); }
 
 	void Refresh();
 

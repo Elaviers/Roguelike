@@ -43,6 +43,8 @@ public:
 	Registry registry;
 
 	Console			*pConsole = nullptr;
+	GameObject		*pWorld = nullptr;
+	
 	AudioManager	*pAudioManager = nullptr;
 	DebugManager	*pDebugManager = nullptr;
 	FontManager		*pFontManager = nullptr;

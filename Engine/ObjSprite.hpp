@@ -12,6 +12,8 @@ class ObjSprite : public GameObject
 
 	ColliderSphere _editorCollider;
 
+	bool _lookAtCamera;
+
 public:
 	GAMEOBJECT_FUNCS(ObjSprite, ObjectIDS::SPRITE)
 
@@ -19,7 +21,8 @@ public:
 		_material(material), 
 		_size(size),
 		_colour(1.f, 1.f, 1.f),
-		_editorCollider(COLL_EDITOR, size / 2.f) 
+		_editorCollider(COLL_EDITOR, size / 2.f),
+		_lookAtCamera(true)
 	{}
 	virtual ~ObjSprite() {}
 
@@ -34,7 +37,7 @@ public:
 	virtual Bounds GetBounds() const override { return Bounds(_size / 2.f); }
 	virtual const Collider* GetCollider() const override { return &_editorCollider; }
 
-	virtual void GetCvars(CvarMap& cvars) override;
+	virtual const PropertyCollection& GetProperties() override;
 
 	inline const MaterialSprite* GetMaterial() const { return _material; }
 

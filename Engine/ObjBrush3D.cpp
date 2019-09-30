@@ -1,5 +1,6 @@
 #include "ObjBrush3D.hpp"
 #include "GLProgram.hpp"
+#include "MacroUtilities.hpp"
 #include "Utilities.hpp"
 
 void ObjBrush3D::_OnTransformChanged()
@@ -104,11 +105,28 @@ void ObjBrush3D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> 
 	_point2[2] = GetRelativePosition()[2] + GetRelativeScale()[2] / 2.f;
 }
 
-void ObjBrush3D::GetCvars(CvarMap &cvar)
+const PropertyCollection& ObjBrush3D::GetProperties()
 {
-	_AddBaseCvars(cvar);
+	static PropertyCollection cvars;
 
-	cvar.Add("Material", Getter<String>((ObjBrush<3>*)this, &ObjBrush<3>::GetMaterialName), Setter<String>((ObjBrush<3>*)this, &ObjBrush<3>::SetMaterial), CvarFlags::MATERIAL);
-	cvar.Add("Point 1", _point1);
-	cvar.Add("Point 2", _point2);
+	DO_ONCE_BEGIN;
+	_AddBaseProperties(cvars);
+
+	cvars.Add(
+		"Material", 
+		MemberGetter<ObjBrush<3>, String>(&ObjBrush<3>::GetMaterialName), 
+		MemberSetter<ObjBrush<3>, String>(&ObjBrush<3>::SetMaterial), 
+		0,
+		PropertyFlags::MATERIAL);
+		
+	cvars.Add<Vector3>(
+		"Point 1", 
+		offsetof(ObjBrush3D, _point1));
+
+	cvars.Add<Vector3>(
+		"Point 2", 
+		offsetof(ObjBrush3D, _point2));
+	DO_ONCE_END;
+
+	return cvars;
 }

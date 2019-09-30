@@ -1,6 +1,5 @@
 #pragma once
 #include "Tool.hpp"
-#include <Engine/CvarMap.hpp>
 #include <Engine/ObjBrush2D.hpp>
 
 class ToolBrush2D : public Tool
@@ -8,8 +7,9 @@ class ToolBrush2D : public Tool
 	bool _placing;
 
 	ObjBrush2D _object;
-	CvarMap _cvars;
+	const PropertyCollection* _properties;
 
+	const PropertyCollection& _GetProperties();
 public:
 	ToolBrush2D(Editor &owner) : Tool(owner), _placing(false) {}
 	virtual ~ToolBrush2D() {}

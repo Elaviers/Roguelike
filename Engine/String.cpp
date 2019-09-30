@@ -343,6 +343,16 @@ String String::ToLower() const
 
 #include <stdlib.h>
 
+bool String::ToBool() const
+{
+	String lower = ToLower();
+
+	if (lower == "t" || lower == "true" || ToInt() != 0)
+		return true;
+
+	return false;
+}
+
 int String::ToInt() const
 {
 	return atoi(_data);

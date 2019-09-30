@@ -1,7 +1,30 @@
 #include "Font_Texture.hpp"
 #include "Engine.hpp"
 #include "GLProgram.hpp"
+#include "MacroUtilities.hpp"
 #include "ModelManager.hpp"
+
+const PropertyCollection& FontTexture::GetProperties()
+{
+	static PropertyCollection properties;
+
+	DO_ONCE_BEGIN;
+	properties.Add("mag", MemberGetter<FontTexture, String>(&FontTexture::_GetMag), MemberSetter<FontTexture, String>(&FontTexture::_SetMag));
+	properties.AddCommand("texture", MemberCommandPtr<FontTexture>(&FontTexture::_CMD_texture));
+	properties.AddCommand("region", MemberCommandPtr<FontTexture>(&FontTexture::_CMD_region));
+	properties.Add<int>("size", offsetof(FontTexture, _size));
+	properties.Add<int>("row_h", offsetof(FontTexture, _rowH));
+	properties.Add<int>("y_offset", offsetof(FontTexture, _yOffset));
+	properties.Add<byte>("mips", offsetof(FontTexture, _mips));
+	DO_ONCE_END;
+
+	return properties;
+}
+
+void FontTexture::_SetMag(const String& mag)
+{
+	
+}
 
 void FontTexture::_CMD_texture(const Buffer<String>& args)
 {
@@ -75,7 +98,7 @@ void FontTexture::_ReadText(const String & string)
 			break;
 		}
 
-		String unused = _cvars.HandleCommand(loweredLine);
+		String unused = GetProperties().HandleCommand(this, loweredLine);
 	}
 }
 

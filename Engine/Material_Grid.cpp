@@ -1,8 +1,22 @@
 #include "Material_Grid.hpp"
 #include "GLProgram.hpp"
 #include "Engine.hpp"
+#include "MacroUtilities.hpp"
 #include "RenderParam.hpp"
 #include "TextureManager.hpp"
+
+const PropertyCollection& MaterialGrid::GetProperties()
+{
+	static PropertyCollection properties;
+
+	DO_ONCE_BEGIN;
+	properties.AddCommand("texture", MemberCommandPtr<MaterialGrid>(&MaterialGrid::_CMD_texture));
+	properties.AddCommand("rows", MemberCommandPtr<MaterialGrid>(&MaterialGrid::_CMD_rows));
+	properties.AddCommand("columns", MemberCommandPtr<MaterialGrid>(&MaterialGrid::_CMD_columns));
+	DO_ONCE_END;
+
+	return properties;
+}
 
 void MaterialGrid::_CMD_texture(const Buffer<String> &args)
 {

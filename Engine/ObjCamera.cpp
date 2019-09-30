@@ -7,13 +7,9 @@ const ObjCamera* ObjCamera::_currentCamera = nullptr;
 void ObjCamera::Use()
 {
 	_currentCamera = this;
+	glViewport(0, 0, _viewport[0], _viewport[1]);
 	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Projection, _projection);
 	GLProgram::Current().SetMat4(DefaultUniformVars::mat4View, GetInverseTransformationMatrix());
-}
-
-void ObjCamera::GetCvars(CvarMap &properties)
-{
-	_AddBaseCvars(properties);
 }
 
 void ObjCamera::UpdateProjectionMatrix()

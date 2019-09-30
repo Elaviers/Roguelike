@@ -13,6 +13,42 @@ public:
 	inline bool operator==(const _PtrData& other) const { return ptr == other.ptr && obj == other.obj; }
 };
 
+template<typename T, typename RETURNTYPE, typename ...Args>
+class MemberFunctionPointer
+{
+private:
+	union
+	{
+		RETURNTYPE(T::* _function)(Args...);
+		RETURNTYPE(T::* _constFunction)(Args...) const;
+
+		void* _voidPtr;
+	};
+
+	bool _isConstFunction;
+
+public:
+	MemberFunctionPointer() : _isConstFunction(false), _function(nullptr) {}
+	MemberFunctionPointer(RETURNTYPE(T::* function)(Args...)) :			_isConstFunction(false), _function(function)		{}
+	MemberFunctionPointer(RETURNTYPE(T::* function)(Args...) const) :	_isConstFunction(true), _constFunction(function)	{}
+
+	inline RETURNTYPE Call(T& obj, Args ...args) const
+	{
+		if (_isConstFunction)
+			return (obj.*_constFunction)(args...);
+		
+		return (obj.*_function)(args...);
+	}
+
+	inline RETURNTYPE Call(const T& obj, Args ...args) const
+	{
+		//todo: not this
+		return (obj.*_constFunction)(args...);
+	}
+
+	inline void* GetRawPointer() const { return _voidPtr; }
+};
+
 /*
 	FunctionPointer
 
@@ -22,25 +58,23 @@ public:
 template <typename RETURNTYPE, typename ...Args>
 class FunctionPointer
 {
-	class FunctionPointerBase
+	class FunctionCaller
 	{
 	protected:
 		virtual _PtrData _GetPtrData() const = 0;
 
 	public:
-		virtual ~FunctionPointerBase() {}
+		virtual ~FunctionCaller() {}
 
-		virtual RETURNTYPE Call(Args...) = 0;
 		virtual RETURNTYPE Call(Args...) const = 0;
 		virtual bool IsCallable() const = 0;
 
-		inline void TryCall(Args... args)		{ if (IsCallable()) Call(args...); }
 		inline void TryCall(Args... args) const	{ if (IsCallable()) Call(args...); }
 
-		inline bool operator==(const FunctionPointerBase& other) const { return _GetPtrData() == other._GetPtrData(); }
+		inline bool operator==(const FunctionCaller& other) const { return _GetPtrData() == other._GetPtrData(); }
 	};
 
-	class FunctionPointerStatic : public FunctionPointerBase
+	class FunctionCallerStatic : public FunctionCaller
 	{
 		RETURNTYPE(*_function)(Args...);
 
@@ -48,64 +82,45 @@ class FunctionPointer
 		virtual _PtrData _GetPtrData() const override { return _PtrData(nullptr, _function); }
 
 	public:
-		FunctionPointerStatic(RETURNTYPE(*function)(Args...)) : _function(function) {}
-		virtual ~FunctionPointerStatic() {}
+		FunctionCallerStatic(RETURNTYPE(*function)(Args...)) : _function(function) {}
+		virtual ~FunctionCallerStatic() {}
 
-		virtual RETURNTYPE Call(Args ...args) override			{ return _function(args...); }
-		virtual RETURNTYPE Call(Args ...args) const override	{ return _function(args...); }
+		virtual RETURNTYPE Call(Args... args) const override	{ return _function(args...); }
 		virtual bool IsCallable() const							{ return _function != nullptr; }
 	};
 
 	template<typename T>
-	class FunctionPointerMember : public FunctionPointerBase
+	class FunctionCallerMember : public FunctionCaller
 	{
 		T* _object;
-
-		union
-		{
-			RETURNTYPE(T::* _function)(Args...);
-			RETURNTYPE(T::* _constFunction)(Args...) const;
-
-			void* _voidPtr;
-		};
-
-		bool _isConstFunction;
+		MemberFunctionPointer<T, RETURNTYPE, Args...> _fp;
 
 	protected:
-		virtual _PtrData _GetPtrData() const override { return _PtrData(_object, _voidPtr); }
+		virtual _PtrData _GetPtrData() const override { return _PtrData(_object, _fp.GetRawPointer()); }
 		
 	public:
-		FunctionPointerMember() : _object(nullptr), _function(nullptr), _isConstFunction(false) {}
+		FunctionCallerMember() : _object(nullptr), _fp() {}
+		FunctionCallerMember(T* object, RETURNTYPE(T::* function)(Args...)) : _object(object), _fp(function) {}
+		FunctionCallerMember(T* object, RETURNTYPE(T::* function)(Args...) const) : _object(object), _fp(function) {}
 
-		FunctionPointerMember(T* object, RETURNTYPE(T::* function)(Args...)) : 
-			_object(object), 
-			_function(function), 
-			_isConstFunction(false) 
-		{}
+		virtual ~FunctionCallerMember() {}
 
-		FunctionPointerMember(T* object, RETURNTYPE(T::* function)(Args...) const) : 
-			_object(object), 
-			_constFunction(function), 
-			_isConstFunction(true)
-		{}
-
-		virtual ~FunctionPointerMember() {}
-
-		virtual RETURNTYPE Call(Args... args) override			{ return _isConstFunction ? (_object->*_constFunction)(args...) : (_object->*_function)(args...); }
-		virtual RETURNTYPE Call(Args... args) const override	{ return _isConstFunction ? (_object->*_constFunction)(args...) : (_object->*_function)(args...); }
-		virtual bool IsCallable() const							{ return _function != nullptr; }
+		virtual RETURNTYPE Call(Args... args) const override	{ return _fp.Call(*_object, args...); }
+		virtual bool IsCallable() const							{ return _object != nullptr; }
 	};
 
 	/////
 	union Union
 	{
-		FunctionPointerStatic					fptrStatic;
-		FunctionPointerMember<FunctionPointer>	fptrMember;
+		FunctionCallerStatic				fptrStatic;
 
-		Union(const FunctionPointerStatic& _static) : fptrStatic(_static) {}
+		//_PtrData is a placeholder...
+		FunctionCallerMember<_PtrData>		fptrMember;
+
+		Union(const FunctionCallerStatic& _static) : fptrStatic(_static) {}
 
 		template<typename T>
-		Union(const FunctionPointerMember<T>& _member) : fptrMember() 
+		Union(const FunctionCallerMember<T>& _member) : fptrMember()
 		{
 			//This is disgostan
 			Utilities::CopyBytes(&_member, this, sizeof(_member));
@@ -114,17 +129,17 @@ class FunctionPointer
 		~Union() {}
 	} _u;
 
-	inline FunctionPointerBase& _Fptr()				{ return reinterpret_cast<FunctionPointerBase&>(_u); }
-	inline const FunctionPointerBase& _Fptr() const	{ return reinterpret_cast<const FunctionPointerBase&>(_u); }
+	inline FunctionCaller& _Fptr()				{ return reinterpret_cast<FunctionCaller&>(_u); }
+	inline const FunctionCaller& _Fptr() const	{ return reinterpret_cast<const FunctionCaller&>(_u); }
 
 public:
 	FunctionPointer(RETURNTYPE(*function)(Args...) = nullptr) : _u(function) {}
 
 	template<typename T>
-	FunctionPointer(T* object, RETURNTYPE(T::* function)(Args...)) : _u(FunctionPointerMember<T>(object, function)) {}
+	FunctionPointer(T* object, RETURNTYPE(T::* function)(Args...)) : _u(FunctionCallerMember<T>(object, function)) {}
 
 	template<typename T>
-	FunctionPointer(T* object, RETURNTYPE(T::* function)(Args...) const) : _u(FunctionPointerMember<T>(object, function)) {}
+	FunctionPointer(T* object, RETURNTYPE(T::* function)(Args...) const) : _u(FunctionCallerMember<T>(object, function)) {}
 
 	FunctionPointer(const FunctionPointer& other) : _u(nullptr) { operator=(other); }
 
@@ -141,7 +156,7 @@ public:
 	inline FunctionPointer& operator=(FunctionPointer&& other)
 	{
 		Utilities::CopyBytes(&other._u, &_u, sizeof(_u));
-		other._Fptr() = FunctionPointerStatic(nullptr);
+		other._Fptr() = FunctionCallerStatic(nullptr);
 		return *this;
 	}
 
@@ -151,16 +166,24 @@ public:
 	inline void TryCall(Args ...args)					{ _Fptr().TryCall(args...); }
 	inline void TryCall(Args ...args) const				{ _Fptr().TryCall(args...); }
 
-	inline bool operator==(const FunctionPointer& other) const { return (FunctionPointerBase&)_u == (FunctionPointerBase&)other._u; }
+	inline bool operator==(const FunctionPointer& other) const { return (FunctionCaller&)_u == (FunctionCaller&)other._u; }
 };
 
 typedef FunctionPointer<void> Callback;
 
-typedef void (Command)(const Buffer<String>& args);
 typedef FunctionPointer<void, const Buffer<String>&> CommandPtr;
+
+template<typename T>
+using MemberCommandPtr = MemberFunctionPointer<T, void, const Buffer<String>&>;
 
 template<typename T>
 using Getter = FunctionPointer<T>;
 
+template<typename T, typename RETURNTYPE>
+using MemberGetter = MemberFunctionPointer<T, RETURNTYPE>;
+
 template<typename T>
 using Setter = FunctionPointer<void, const T&>;
+
+template<typename T, typename V>
+using MemberSetter = MemberFunctionPointer<T, void, const V&>;

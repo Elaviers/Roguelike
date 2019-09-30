@@ -31,16 +31,16 @@ class Map
 			return amount;
 		}
 
-		Node* Find(const K& k)
+		Node* FindVar(const K& k)
 		{
 			if (k < key)
 			{
-				if (left) return left->Find(k);
+				if (left) return left->FindVar(k);
 				return nullptr;
 			}
 			else if (k > key)
 			{
-				if (right) return right->Find(k);
+				if (right) return right->FindVar(k);
 				return nullptr;
 			}
 
@@ -153,7 +153,7 @@ public:
 	{
 		if (_data)
 		{
-			auto node = _data->Find(key);
+			auto node = _data->FindVar(key);
 			if (node) return &node->value;
 		}
 

@@ -172,6 +172,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="PropertyTests.cpp" />
     <ClCompile Include="GameObjectTests.cpp" />
     <ClCompile Include="ContainerTests.cpp" />
     <ClCompile Include="MathsTests.cpp" />

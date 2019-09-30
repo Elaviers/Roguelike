@@ -51,7 +51,7 @@ public:
 
 	virtual void Render(EnumRenderChannel) const override;
 
-	virtual void GetCvars(CvarMap&) override;
+	virtual const PropertyCollection& GetProperties() override;
 
 	//These are for properties really
 	String GetModelName() const;

@@ -1,5 +1,6 @@
 #include "ObjBrush2D.hpp"
 #include "GLProgram.hpp"
+#include "MacroUtilities.hpp"
 #include "MaterialManager.hpp"
 #include "ModelManager.hpp"
 #include "Utilities.hpp"
@@ -55,12 +56,32 @@ void ObjBrush2D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> 
 	_point2[1] = GetRelativePosition()[2] + GetRelativeScale()[1] / 2.f;
 }
 
-void ObjBrush2D::GetCvars(CvarMap &cvars)
+const PropertyCollection& ObjBrush2D::GetProperties()
 {
-	_AddBaseCvars(cvars);
+	static PropertyCollection cvars;
 	
-	cvars.Add("Material", Getter<String>((ObjBrush<2>*)this, &ObjBrush<2>::GetMaterialName), Setter<String>((ObjBrush<2>*)this, &ObjBrush<2>::SetMaterial), CvarFlags::MATERIAL);
-	cvars.Add("Point 1", _point1);
-	cvars.Add("Point 2", _point2);
-	cvars.Add("Level", level);
+	DO_ONCE_BEGIN;
+	_AddBaseProperties(cvars);
+
+	cvars.Add(
+		"Material",
+		MemberGetter<ObjBrush<2>, String>(&ObjBrush<2>::GetMaterialName),
+		MemberSetter<ObjBrush<2>, String>(&ObjBrush<2>::SetMaterial),
+		0,
+		PropertyFlags::MATERIAL);
+
+	cvars.Add<Vector3>(
+		"Point 1",
+		offsetof(ObjBrush2D, _point1));
+
+	cvars.Add<Vector3>(
+		"Point 2",
+		offsetof(ObjBrush2D, _point2));
+
+	cvars.Add<float>(
+		"Level",
+		offsetof(ObjBrush2D, level));
+	DO_ONCE_END;
+
+	return cvars;
 }

@@ -33,6 +33,7 @@ public:
 
 	void Create(LPCTSTR className, LPCTSTR title, LPVOID param, DWORD flags = WS_OVERLAPPEDWINDOW, HWND parent = NULL);
 	void Show();
+	void Hide();
 	void SwapBuffers();
 
 	inline void SetTitle(const char *title) { ::SetWindowTextA(_hwnd, title); }

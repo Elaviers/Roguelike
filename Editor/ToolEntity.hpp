@@ -1,16 +1,15 @@
 #pragma once
 #include "Tool.hpp"
-#include <Engine/CvarMap.hpp>
 #include <Engine/SharedPointer.hpp>
 
 class ToolEntity : public Tool
 {
 	byte _classID;
 
-	CvarMap _cvars;
-
 	GameObjectPointer _placement;
 	bool _readyToPlace;
+
+	const PropertyCollection& _GetProperties();
 
 	void _SetClassID(const byte &id);
 	byte _GetClassID() const { return _classID; }

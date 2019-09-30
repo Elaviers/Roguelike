@@ -2,7 +2,21 @@
 #include "ColliderBox.hpp"
 #include "ColliderSphere.hpp"
 #include "Engine.hpp"
+#include "MacroUtilities.hpp"
 #include "ModelManager.hpp"
+
+const PropertyCollection& Model::GetProperties()
+{
+	static PropertyCollection properties;
+
+	DO_ONCE_BEGIN
+	properties.AddCommand("model", MemberCommandPtr<Model>(&Model::_CMD_model));
+	properties.AddCommand("collision", MemberCommandPtr<Model>(&Model::_CMD_collision));
+	properties.Add<String>("material", offsetof(Model, _defaultMaterialName));
+	DO_ONCE_END
+
+	return properties;
+}
 
 void Model::_CMD_model(const Buffer<String> &args)
 {

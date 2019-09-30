@@ -1,8 +1,8 @@
 #include "ObjLight.hpp"
-#include "CvarMap.hpp"
 #include "Engine.hpp"
 #include "GL.hpp"
 #include "GLProgram.hpp"
+#include "MacroUtilities.hpp"
 #include "ModelManager.hpp"
 #include "String.hpp"
 #include "TextureManager.hpp"
@@ -12,12 +12,23 @@ const ColliderBox ObjLight::_lightCollider(COLL_EDITOR, ObjLight::_editorBoxExte
 
 bool ObjLight::drawLightSources = true;
 
-void ObjLight::GetCvars(CvarMap &cvars)
+const PropertyCollection& ObjLight::GetProperties()
 {
-	_AddBaseCvars(cvars);
+	static PropertyCollection cvars;
 
-	cvars.Add("Colour", _colour);
-	cvars.Add("Attenuation Radius", _radius);
+	DO_ONCE_BEGIN;
+	_AddBaseProperties(cvars);
+
+	cvars.Add<Vector4>(
+		"Colour", 
+		offsetof(ObjLight, _colour));
+
+	cvars.Add<float>(
+		"Attenuation Radius", 
+		offsetof(ObjLight, _radius));
+	DO_ONCE_END;
+
+	return cvars;
 }
 
 void ObjLight::ToShader(int glArrayIndex)

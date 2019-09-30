@@ -64,6 +64,7 @@ public:
 
 	String ToLower() const;
 
+	bool ToBool() const;
 	int ToInt() const;
 	float ToFloat() const;
 	Vector2 ToVector2() const;
@@ -84,11 +85,13 @@ public:
 	static String From(const Vector3&,	unsigned int minimumDigits = 0,	unsigned int maxDecimalDigits = 3, byte base = 10);
 	static String From(const wchar_t *string);
 
+	inline static String From(bool b) { return b ? String("true") : String("false"); }
 	inline static String From(const String& string) { return string; }
 	inline static String From(char c) { return String(c); }
 	inline static String From(unsigned char c) { return String(c); }
 	
 #define LINKFROM(FROMTYPE, TOTYPE) inline static String From(FROMTYPE x) { return From((TOTYPE)x);}
+	LINKFROM(const char*, String);
 	LINKFROM(short, int64);
 	LINKFROM(int, int64);
 	LINKFROM(long, int64);

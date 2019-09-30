@@ -6,6 +6,7 @@
 #include "NumberedSet.hpp"
 #include "ObjectIDS.hpp"
 #include "RenderChannel.hpp"
+#include "PropertyCollection.hpp"
 #include "Transform.hpp"
 #include <cstdlib>
 
@@ -19,7 +20,6 @@ public:																						\
 
 class Collider;
 class ObjCamera; //!!! todo - make this forward declaration unnecessary
-class CvarMap;
 struct Ray;
 struct RaycastResult;
 
@@ -50,7 +50,7 @@ protected:
 	GameObject *_parent;
 	Buffer<GameObject*> _children;
 
-	void _AddBaseCvars(CvarMap&);
+	void _AddBaseProperties(PropertyCollection&);
 
 public:
 	Event<> onNameChanged;
@@ -244,7 +244,7 @@ public:
 	virtual void Render(EnumRenderChannel channels) const {}
 	void Render(const ObjCamera &camera, EnumRenderChannel channels) const;
 
-	virtual void GetCvars(CvarMap &properties) { _AddBaseCvars(properties); }
+	virtual const PropertyCollection& GetProperties();
 
 	inline uint32 GetUID() const { return _uid; }
 

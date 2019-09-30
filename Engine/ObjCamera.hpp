@@ -57,7 +57,8 @@ public:
 
 	Vector2 GetZPlaneDimensions() const;
 
-	virtual void GetCvars(CvarMap&) override;
+	//todo : implement this xd
+	//virtual const PropertyCollection& GetProperties() override;
 
 	//File IO
 	virtual void WriteData(BufferWriter<byte>&, NumberedSet<String>& strings) const override;

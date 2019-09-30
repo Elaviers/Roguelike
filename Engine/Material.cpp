@@ -2,6 +2,24 @@
 #include "Material_Grid.hpp"
 #include "Material_Surface.hpp"
 #include "Material_Sprite.hpp"
+#include "MacroUtilities.hpp"
+
+const PropertyCollection& Material::GetProperties()
+{
+	static PropertyCollection properties;
+
+	DO_ONCE_BEGIN;
+	properties.Add("mag", MemberGetter<Material, String>(&Material::_GetMag), MemberSetter<Material, String>(&Material::_SetMag));
+	properties.Add<byte>("mips", offsetof(Material, _mag));
+	DO_ONCE_END;
+
+	return properties;
+}
+
+void Material::_SetMag(const String& name)
+{
+
+}
 
 Material* Material::FromText(const String& text)
 {

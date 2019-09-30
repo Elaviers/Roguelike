@@ -1,7 +1,9 @@
 #include "Editor.hpp"
+#include <Engine/Console.hpp>
 #include <Engine/DebugFrustum.hpp>
 #include <Engine/DebugManager.hpp>
 #include <Engine/DrawUtils.hpp>
+#include <Engine/FontManager.hpp>
 #include <Engine/InputManager.hpp>
 #include <Engine/IO.hpp>
 #include <Engine/ObjLight.hpp>
@@ -38,6 +40,7 @@ void Editor::_Init()
 	HBRUSH _windowBrush = ::CreateSolidBrush(RGB(32, 32, 32));
 
 	LPCTSTR classNameDummy = TEXT("DUMMY");
+	LPCTSTR classNameConsole = TEXT("CONSOLE");
 	LPCTSTR classNameWindow = TEXT("MAINWINDOWCLASS");
 	LPCTSTR classNameVPArea = TEXT("VPAREACLASS");
 
@@ -47,29 +50,34 @@ void Editor::_Init()
 		WNDCLASSEX windowClass = {};
 		windowClass.cbSize = sizeof(WNDCLASSEX);
 
+		windowClass.lpszClassName = classNameDummy;
 		windowClass.lpfnWndProc = ::DefWindowProc;
 		windowClass.hInstance = ::GetModuleHandle(NULL);
-		windowClass.lpszClassName = classNameDummy;
 		::RegisterClassEx(&windowClass);
 
-		windowClass.lpfnWndProc = _WindowProc;
-		windowClass.hInstance = ::GetModuleHandle(NULL);
-		windowClass.hbrBackground = _windowBrush;
+		windowClass.lpszClassName = classNameConsole;
+		windowClass.lpfnWndProc = _ConsoleProc;
 		windowClass.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
 		windowClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 		windowClass.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+		::RegisterClassEx(&windowClass);
+
 		windowClass.lpszClassName = classNameWindow;
+		windowClass.lpfnWndProc = _WindowProc;
+		windowClass.hbrBackground = _windowBrush;
 		windowClass.lpszMenuName = MAKEINTRESOURCE(IDR_MENU);
 		::RegisterClassEx(&windowClass);
 
-		windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		windowClass.lpszClassName = classNameVPArea;
+		windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		windowClass.lpfnWndProc = _vpAreaProc;
 		::RegisterClassEx(&windowClass);
 
 		dummy.CreateDummyAndUse(classNameDummy);
 		GL::LoadDummyExtensions();
 
+		_consoleWindow.Create(classNameConsole, "Console", this);
+		_consoleWindow.SetSize(256, 256);
 		_window.Create(classNameWindow, "Window", this);
 		_vpArea.Create(classNameVPArea, NULL, this, WS_CHILD | WS_VISIBLE, _window.GetHwnd());
 	}
@@ -97,6 +105,9 @@ void Editor::_Init()
 	_uiCam.SetZBounds(-10, 10);
 	_uiCam.SetScale(1.f);
 
+	_consoleCamera.SetProjectionType(ProjectionType::ORTHOGRAPHIC);
+	_consoleCamera.SetZBounds(-100, 100);
+
 	CameraRef(0).SetProjectionType(ProjectionType::PERSPECTIVE);
 	CameraRef(0).SetRelativePosition(Vector3(-5.f, 5.f, -5.f));
 	CameraRef(0).SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
@@ -119,6 +130,8 @@ void Editor::_Init()
 	_fbxManager = FbxManager::Create();
 	Engine::Instance().Init(ENG_ALL);
 
+	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
+
 	InputManager* inputManager = Engine::Instance().pInputManager;
 
 	inputManager->BindKeyAxis(Keycode::W, &_axisMoveY, 1.f);
@@ -133,14 +146,14 @@ void Editor::_Init()
 	inputManager->BindKeyAxis(Keycode::RIGHT, &_axisLookX, 1.f);
 	inputManager->BindKeyAxis(Keycode::LEFT, &_axisLookX, -1.f);
 
-	inputManager->BindKey(Keycode::ENTER, *this, &Editor::KeySubmit);
-	inputManager->BindKey(Keycode::ESCAPE, *this, &Editor::KeyCancel);
-	inputManager->BindKey(Keycode::DEL, *this, &Editor::KeyDelete);
+	inputManager->BindKey(Keycode::ENTER, Callback(this, &Editor::KeySubmit));
+	inputManager->BindKey(Keycode::ESCAPE, Callback(this, &Editor::KeyCancel));
+	inputManager->BindKey(Keycode::DEL, Callback(this, &Editor::KeyDelete));
 
-	inputManager->BindKey(Keycode::TILDE, *this, &Editor::RefreshLevel);
+	inputManager->BindKey(Keycode::TILDE, Callback(this, &Editor::ToggleConsole));
 
-	_level.onNameChanged += Callback(this, &Editor::RefreshLevel);
-	_level.onChildChanged += Callback(this, &Editor::RefreshLevel);
+	_level.onNameChanged +=		Callback(this, &Editor::RefreshLevel);
+	_level.onChildChanged +=	Callback(this, &Editor::RefreshLevel);
 
 	//Tool data init
 	tools.brush2D.Initialise();
@@ -179,6 +192,8 @@ void Editor::Run()
 {
 	_Init();
 	_window.Show();
+
+	_consoleFont = Engine::Instance().pFontManager->Get("consolas");
 
 	//Preload materials
 	Buffer<String> filenames = IO::FindFilesInDirectory("Data/Materials/*.txt");
@@ -255,17 +270,31 @@ void Editor::Frame()
 
 void Editor::Render()
 {
-	if (!_glContext.IsValid())
-		return;
-
 	RenderViewport(0, Direction::UP);
 	RenderViewport(1, Direction::UP);
 	RenderViewport(2, Direction::FORWARD);
 	RenderViewport(3, Direction::RIGHT);
 
+	RenderConsole();
+}
+
+void Editor::RenderConsole()
+{
+	_glContext.Use(_consoleWindow);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDepthFunc(GL_LESS);
+
 	_shaderUnlit.Use();
-	_uiCam.Use();
-	Engine::Instance().pDebugManager->RenderScreen();
+	_consoleCamera.Use();
+
+	Engine::Instance().pConsole->Render(*_consoleFont, _deltaTime);
+
+	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+	_shaderUnlit.SetMat4(DefaultUniformVars::mat4Model, Transform(Vector3(100, 100, 0), Rotation(), Vector3(32, 32, 1)).GetTransformationMatrix());
+	Engine::Instance().pTextureManager->White()->Bind(0);
+	Engine::Instance().pModelManager->Plane().Render();
+
+	_consoleWindow.SwapBuffers();
 }
 
 void Editor::RenderViewport(int index, Direction dir)
@@ -356,9 +385,8 @@ void Editor::ResizeViews(uint16 w, uint16 h)
 	_viewports[2].SetSizeAndPos(0, vpH + border, vpW, vpH);
 	_viewports[3].SetSizeAndPos(vpW + border, vpH + border, vpW, vpH);
 
-	glViewport(0, 0, vpW, vpH);
-
-	Render();
+	if (_running)
+		Render();
 }
 
 String Editor::SelectMaterialDialog()
@@ -540,6 +568,16 @@ void Editor::KeyDelete()
 		_currentTool->KeyDelete();
 }
 
+void Editor::ToggleConsole()
+{
+	_consoleIsActive = !_consoleIsActive;
+
+	if (_consoleIsActive)
+		_consoleWindow.Show();
+	else
+		_consoleWindow.Hide();
+}
+
 void Editor::RefreshLevel()
 {
 	_hierachyWindow.Refresh(_level);
@@ -582,6 +620,48 @@ LRESULT CALLBACK AboutProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	default:
 		return ::DefWindowProc(hwnd, msg, wparam, lparam);
 	}
+
+	return 0;
+}
+
+LRESULT CALLBACK Editor::_ConsoleProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	Editor* editor = (Editor*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+
+	switch (msg)
+	{
+	case WM_CREATE:
+	{
+		LPCREATESTRUCT create = (LPCREATESTRUCT)lparam;
+		editor = (Editor*)create->lpCreateParams;
+		::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)editor);
+	}
+		break;
+
+	case WM_CLOSE:
+		editor->_consoleIsActive = false;
+		::ShowWindow(hwnd, SW_HIDE);
+		break;
+
+	case WM_SIZE:
+	{
+		uint16 w = LOWORD(lparam);
+		uint16 h = HIWORD(lparam);
+
+		editor->_consoleCamera.SetViewport(w, h);
+		editor->_consoleCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
+	}
+		break;
+
+	case WM_CHAR:
+		Engine::Instance().pConsole->InputChar((char)wparam);
+
+		break;
+
+	default:
+		return ::DefWindowProc(hwnd, msg, wparam, lparam);
+	}
+
 
 	return 0;
 }

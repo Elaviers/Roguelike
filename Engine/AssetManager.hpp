@@ -108,7 +108,7 @@ public:
 		return nullptr;
 	}
 
-	inline T* Find(const String& name)
+	inline T* FindVar(const String& name)
 	{
 		auto found = _map.Get(name.ToLower());
 

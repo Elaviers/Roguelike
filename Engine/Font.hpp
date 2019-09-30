@@ -1,6 +1,5 @@
 #pragma once
 #include "Asset.hpp"
-#include "CvarMap.hpp"
 #include "Engine.hpp"
 #include "GLTexture.hpp"
 #include "Glyph.hpp"
@@ -16,16 +15,8 @@
 class Font : public Asset
 {
 protected:
-	CvarMap _cvars;
-
 	Font() {}
 
-	virtual void _ReadText(const String& string) override
-	{
-		Buffer<String> lines = string.Split("\r\n");
-		for (size_t i = 0; i < lines.GetSize(); ++i)
-			String unused = _cvars.HandleCommand(lines[i].ToLower());
-	}
 public:
 	virtual ~Font() {}
 

@@ -106,7 +106,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		uint16 w = LOWORD(lParam);
 		uint16 h = HIWORD(lParam);
 
-		glViewport(0, 0, w, h);
 		camera.SetViewport(w, h);
 		cameraMatrix = Matrix::Ortho(0, w, 0, h, -100.f, 100.f, 1.f);
 

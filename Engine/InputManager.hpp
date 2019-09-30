@@ -1,4 +1,5 @@
 #pragma once
+#include "FunctionPointer.hpp"
 #include "Hashmap.hpp"
 #include <Windows.h>
 
@@ -81,31 +82,15 @@ public:
 
 class KeyBind_Callback : public KeyBind
 {
-	void (*_callback)();
+	Callback _callback;
 
 public:
-	KeyBind_Callback(void(*callback)()) : _callback(callback) {}
+	KeyBind_Callback(const Callback &callback) : _callback(callback) {}
 	virtual ~KeyBind_Callback() {}
 
 	virtual void KeyDown()
 	{
-		_callback();
-	}
-};
-
-template <typename T>
-class KeyBind_MemberCallback : public KeyBind
-{
-	T* _base;
-	void (T::*_callback)();
-
-public:
-	KeyBind_MemberCallback(T &base, void (T::*callback)()) : _base(&base), _callback(callback) {}
-	virtual ~KeyBind_MemberCallback() {}
-
-	virtual void KeyDown()
-	{
-		(_base->*_callback)();
+		_callback.TryCall();
 	}
 };
 
@@ -123,10 +108,7 @@ public:
 
 	inline void BindAxis(AxisType axis, float *axisPtr) { _axisBinds.Set(axis, axisPtr); }
 
-	template <typename T>
-	inline void BindKey(Keycode key, T &base, void (T::*callback)()) { _keyBinds.Set(key, new KeyBind_MemberCallback<T>(base, callback)); }
-
-	inline void BindKey(Keycode key, void(*callback)()) { _keyBinds.Set(key, new KeyBind_Callback(callback)); }
+	inline void BindKey(Keycode key, const Callback &callback) { _keyBinds.Set(key, new KeyBind_Callback(callback)); }
 	inline void BindKeyAxis(Keycode key, float *axisPtr, float axisDisplacement) { _keyBinds.Set(key, new KeyBind_Axis(axisPtr, axisDisplacement)); }
 
 	inline bool IsKeyDown(Keycode key) const { return _keyStates[(byte)key] == 1; }

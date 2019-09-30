@@ -1,13 +1,30 @@
 #include "ObjRenderable.hpp"
 #include "Collider.hpp"
-#include "CvarMap.hpp"
 #include "GLProgram.hpp"
+#include "MacroUtilities.hpp"
 
-void ObjRenderable::GetCvars(CvarMap &cvars)
+const PropertyCollection& ObjRenderable::GetProperties()
 {
-	_AddBaseCvars(cvars);
-	cvars.Add("Model", Getter<String>(this, &ObjRenderable::GetModelName), Setter<String>(this, &ObjRenderable::SetModel), CvarFlags::MODEL);
-	cvars.Add("Material", Getter<String>(this, &ObjRenderable::GetMaterialName), Setter<String>(this, &ObjRenderable::SetMaterial), CvarFlags::MATERIAL);
+	static PropertyCollection cvars;
+
+	DO_ONCE_BEGIN;
+	_AddBaseProperties(cvars);
+	cvars.Add(
+		"Model", 
+		MemberGetter<ObjRenderable, String>(&ObjRenderable::GetModelName), 
+		MemberSetter<ObjRenderable, String>(&ObjRenderable::SetModel), 
+		0,
+		PropertyFlags::MODEL);
+
+	cvars.Add(
+		"Material", 
+		MemberGetter<ObjRenderable, String>(&ObjRenderable::GetMaterialName), 
+		MemberSetter<ObjRenderable, String>(&ObjRenderable::SetMaterial), 
+		0,
+		PropertyFlags::MATERIAL);
+	DO_ONCE_END;
+
+	return cvars;
 }
 
 void ObjRenderable::Render(EnumRenderChannel channels) const

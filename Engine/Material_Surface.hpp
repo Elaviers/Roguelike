@@ -14,11 +14,11 @@ private:
 public:
 	MaterialSurface(const Texture*diffuse = nullptr, const Texture*normal = nullptr, const Texture*specular = nullptr, const Texture*reflection = nullptr)
 		: Material(RenderChannel::SURFACE), _diffuse(diffuse), _normal(normal), _specular(specular), _reflection(reflection)
-	{
-		_cvars.CreateVar("tex", CommandPtr(this, &MaterialSurface::_CMD_tex));
-	}
+	{}
 	
 	virtual ~MaterialSurface() {}
+
+	virtual const PropertyCollection& GetProperties();
 
 	inline void SetDiffuse(const Texture* texture) { _diffuse = texture; }
 	inline void SetNormal(const Texture* texture) { _normal = texture; }
