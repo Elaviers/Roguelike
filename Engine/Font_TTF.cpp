@@ -1,4 +1,5 @@
 #include "Font_TTF.hpp"
+#include "Colour.hpp"
 #include "Engine.hpp"
 #include "GLProgram.hpp"
 #include "FontManager.hpp"
@@ -91,9 +92,20 @@ float FontTTF::CalculateStringWidth(const char* string, float scaleX) const
 
 	for (const char* c = string; *c != '\0'; ++c)
 	{
-		const TTFGlyph* glyph = _charMap.Get(*c);
-		if (glyph)
-			width += (glyph->advance >> 6) * scale;
+		if (*c == '\t')
+		{
+			const TTFGlyph* space = _charMap.Get(' ');
+			float stopWidth = (space->advance >> 6) * scale * 5.f;
+			float nextStop = Maths::Trunc(width, stopWidth) + stopWidth;
+
+			width = nextStop;
+		}
+		else
+		{
+			const TTFGlyph* glyph = _charMap.Get(*c);
+			if (glyph)
+				width += (glyph->advance >> 6) * scale;
+		}
 	}
 
 	return width;
@@ -111,10 +123,13 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 	float scale = (transform.GetScale()[0] / (float)_size);
 
 	float line = 0.f;
+	float currentLineW = 0.f;
 
 	float yOffset = (float)_descender;
 
 	t.Move(downDirection * yOffset);
+
+	glActiveTexture(GL_TEXTURE0);
 
 	GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, Vector2(0.f, 0.f));
 	GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
@@ -123,12 +138,28 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 
 	for (const char* c = string; *c != '\0'; ++c)
 	{
-		if (*c == '\n' && lineHeight)
+		if (*c == 0x01)
+		{
+			//Colour code
+			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour::FromColourCode(c).GetData());
+			c += 4;
+		}
+		else if (*c == '\n' && lineHeight)
 		{
 			++line;
+			currentLineW = 0.f;
 
 			t = transform;
 			t.Move(downDirection * (yOffset + lineHeight * line));
+		}
+		else if (*c == '\t')
+		{
+			const TTFGlyph* space = _charMap.Get(' ');
+			float stopWidth = (space->advance >> 6) * scale * 5.f;
+			float nextStop = Maths::Trunc(currentLineW, stopWidth) + stopWidth;
+
+			t.Move(advanceDirection * (nextStop - currentLineW));
+			currentLineW = nextStop;
 		}
 		else
 		{
@@ -147,6 +178,7 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 				Engine::Instance().pModelManager->Plane().Render();
 
 				t.Move(advanceDirection * (float)(glyph->advance >> 6) * scale);
+				currentLineW += (float)(glyph->advance >> 6) * scale;
 			}
 		}
 	}

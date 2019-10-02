@@ -11,7 +11,7 @@ class GizmoRing : public GizmoComponent
 
 public:
 	//The function takes an axis and an angle(degrees) and returns the angle consumed
-	GizmoRing(const Vector4& colour, const FunctionPointer<float, const Vector3&, float>& rotate) :
+	GizmoRing(const Colour& colour, const FunctionPointer<float, const Vector3&, float>& rotate) :
 		GizmoComponent(colour),
 		_firstAngle(0.f),
 		_rotate(rotate) {}

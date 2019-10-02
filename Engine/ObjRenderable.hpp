@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.hpp"
+#include "Colour.hpp"
 #include "Engine.hpp"
 #include "MaterialManager.hpp"
 #include "ModelManager.hpp"
@@ -10,7 +11,7 @@ private:
 	const Model *_model;
 	const Material *_material;
 
-	Vector4 _colour;
+	Colour _colour;
 
 	bool _materialIsDefault;
 
@@ -26,12 +27,12 @@ public:
 	{}
 	virtual ~ObjRenderable() {}
 
-	inline const Vector4& GetColour() const { return _colour; }
+	inline const Colour& GetColour() const { return _colour; }
 
 	inline const Material* GetMaterial() const { return _material; }
 	inline const Model* GetModel() const { return _model; }
 
-	inline void SetColour(const Vector4& colour) { _colour = colour; }
+	inline void SetColour(const Colour& colour) { _colour = colour; }
 	
 	inline void SetMaterial(const String &name) { if (Engine::Instance().pMaterialManager) SetMaterial(Engine::Instance().pMaterialManager->Get(name)); }
 	inline void SetMaterial(const Material *material) { _material = material; _materialIsDefault = false; }

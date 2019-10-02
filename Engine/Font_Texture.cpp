@@ -1,4 +1,5 @@
 #include "Font_Texture.hpp"
+#include "Colour.hpp"
 #include "Engine.hpp"
 #include "GLProgram.hpp"
 #include "MacroUtilities.hpp"
@@ -110,9 +111,20 @@ float FontTexture::CalculateStringWidth(const char* string, float scaleX) const
 
 	for (const char* c = string; *c != '\0'; ++c)
 	{
-		const Glyph* glyph = _charMap.Get(*c);
-		if (glyph)
-			width += (glyph->width + glyph->advance) * scale;
+		if (*c == '\t')
+		{
+			const Glyph* space = _charMap.Get(' ');
+			float stopWidth = space->width * scale * 5.f;
+			float nextStop = Maths::Trunc(width, stopWidth) + stopWidth;
+
+			width = nextStop;
+		}
+		else
+		{
+			const Glyph* glyph = _charMap.Get(*c);
+			if (glyph)
+				width += (glyph->width + glyph->advance) * scale;
+		}
 	}
 
 	return width;
@@ -131,34 +143,55 @@ void FontTexture::RenderString(const char* string, const Transform & transform, 
 	float scale = (transform.GetScale()[0] / (float)_size);
 
 	float line = 0.f;
+	float currentLineW = 0.f;
+
+	const Vector2 halfTexel(.5f / ((float)_texture->GetWidth() * scale), .5f / ((float)_texture->GetHeight() * scale));
+	const Vector2 texel(1.f / ((float)_texture->GetWidth() * scale), 1.f / ((float)_texture->GetHeight() * scale));
 
 	for (const char* c = string; *c != '\0'; ++c)
 	{
-		const Vector2 halfTexel(.5f / ((float)_texture->GetWidth() * scale), .5f / ((float)_texture->GetHeight() * scale));
-		const Vector2 texel(1.f / ((float)_texture->GetWidth() * scale), 1.f / ((float)_texture->GetHeight() * scale));
-
-		const Glyph * glyph = _charMap.Get(*c);
-		if (glyph)
+		if (*c == 0x01)
 		{
-			float halfCharW = (glyph->width * scale / 2.f);
-			charTransform.Move(advanceDirection * halfCharW);
-			charTransform.SetScale(Vector3(glyph->width * scale, (float)transform.GetScale()[1], 1.f));
-
-			GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, glyph->uvOffset + halfTexel);
-			GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, glyph->uvSize - texel);
-			GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, charTransform.MakeTransformationMatrix());
-			Engine::Instance().pModelManager->Plane().Render();
-
-			float secondHalfWPlusAdvance = (((glyph->width / 2.f) + glyph->advance) * scale);
-			charTransform.Move(advanceDirection * secondHalfWPlusAdvance);
+			//Colour code
+			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour::FromColourCode(c).GetData());
+			c += 4;
 		}
-
-		if (*c == '\n' && lineHeight)
+		else if (*c == '\n' && lineHeight)
 		{
 			++line;
+			currentLineW = 0.f;
 
 			charTransform = transform;
 			charTransform.Move(downDirection * lineHeight * line);
+		}
+		else if (*c == '\t')
+		{
+			const Glyph* space = _charMap.Get(' ');
+			float stopWidth = space->width * scale * 5.f;
+			float nextStop = Maths::Trunc(currentLineW, stopWidth) + stopWidth;
+
+			charTransform.Move(advanceDirection * (nextStop - currentLineW));
+			currentLineW = nextStop;
+		}
+		else
+		{
+			const Glyph* glyph = _charMap.Get(*c);
+			if (glyph)
+			{
+				float halfCharW = (glyph->width * scale / 2.f);
+				charTransform.Move(advanceDirection * halfCharW);
+				charTransform.SetScale(Vector3(glyph->width * scale, (float)transform.GetScale()[1], 1.f));
+
+				GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, glyph->uvOffset + halfTexel);
+				GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, glyph->uvSize - texel);
+				GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, charTransform.MakeTransformationMatrix());
+				Engine::Instance().pModelManager->Plane().Render();
+
+				float secondHalfWPlusAdvance = (((glyph->width / 2.f) + glyph->advance) * scale);
+				charTransform.Move(advanceDirection * secondHalfWPlusAdvance);
+
+				currentLineW += (glyph->width + glyph->advance) * scale;
+			}
 		}
 	}
 }

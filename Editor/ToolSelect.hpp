@@ -23,7 +23,7 @@ class ToolSelect : public Tool
 
 	float _gridSnap;
 	bool _snapToWorld;
-	bool _gizmoLocal;
+	bool _gizmoIsLocal;
 
 	Gizmo _gizmo;
 
@@ -45,7 +45,7 @@ public:
 		_origObjectY(0.f),
 		_gridSnap(1.f),
 		_snapToWorld(0),
-		_gizmoLocal(0),
+		_gizmoIsLocal(0),
 		_gizmo(
 			Setter<const Vector3&>(this, &ToolSelect::_GizmoMove), 
 			FunctionPointer<float, const Vector3 &, float>(this, &ToolSelect::_GizmoRotate)) 

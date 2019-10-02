@@ -14,16 +14,17 @@ public:
 			delete _cvars[i];
 	}
 
-	const Buffer<RigidProperty*> GetAll() const { return _cvars; }
+	const Buffer<RigidProperty*>& GetAll() const { return _cvars; }
 
 	inline void Clear() { _cvars.Clear(); }
 
-	String HandleCommand(const String& command) const;
+	String HandleCommand(const Buffer<String>& tokens) const;
+	inline String HandleCommand(const String& command) const { return HandleCommand(command.Split(" ")); }
 
 	inline RigidProperty* Find(const String& name) const
 	{
 		for (size_t i = 0; i < _cvars.GetSize(); ++i)
-			if (_cvars[i]->GetName() == name)
+			if (_cvars[i]->GetName().Equals(name, true))
 				return _cvars[i];
 
 		return nullptr;

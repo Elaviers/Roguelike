@@ -71,11 +71,11 @@ const PropertyCollection& ObjBrush2D::GetProperties()
 		PropertyFlags::MATERIAL);
 
 	cvars.Add<Vector3>(
-		"Point 1",
+		"Point1",
 		offsetof(ObjBrush2D, _point1));
 
 	cvars.Add<Vector3>(
-		"Point 2",
+		"Point2",
 		offsetof(ObjBrush2D, _point2));
 
 	cvars.Add<float>(

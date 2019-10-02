@@ -4,8 +4,8 @@
 #include <Engine/MaterialManager.hpp>
 #include "MenuStartLevel.hpp"
 
-const Vector4 inactiveBtnColour(.8f, .8f, .2f, 1.f);
-const Vector4 activeBtnColour(.6f, .6f, .3f, 1.f);
+const Colour inactiveBtnColour(.8f, .8f, .2f, 1.f);
+const Colour activeBtnColour(.6f, .6f, .3f, 1.f);
 
 void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelChosen, const Callback &onQuit)
 {

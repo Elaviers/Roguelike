@@ -11,7 +11,7 @@ protected:
 	virtual void _OnTransformChanged() override;
 
 public:
-	GizmoPlane(const Vector4& colour, Setter<const Vector3&> move) :
+	GizmoPlane(const Colour& colour, Setter<const Vector3&> move) :
 		GizmoComponent(colour),
 		_move(move)
 	{}

@@ -98,7 +98,7 @@ void ToolEntity::Render(EnumRenderChannel channels) const
 {
 	if (_placement && _readyToPlace)
 	{
-		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 0.5f));
+		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(1.f, 1.f, 1.f, 0.5f));
 		_placement->Render(channels);
 	}
 }

@@ -6,7 +6,24 @@ template<typename T>
 class Buffer;
 
 bool StringsEqual(const char *a, const char *b);
+bool StringsEqual_CaseInsensitive(const char *a, const char *b);
 bool StringsInequal(const char *a, const char *b);
+bool StringContains(const char* string, const char* phrase);
+
+inline char LowerChar(char c)
+{
+	if (c <= 'Z' && c >= 'A')
+		return c + ('a' - 'A');
+
+	return c;
+}
+
+inline size_t StringLength(const char* string) {
+	size_t length = 0;
+	while (string[length] != '\0') length++;
+	return length;
+}
+
 
 class String {
 private:
@@ -57,9 +74,15 @@ public:
 	inline bool operator<(const String &other) const	{ return Compare(other) < 0;	}
 	inline bool operator>(const String &other) const	{ return Compare(other) > 0;	}
 
-	inline bool operator==(const String &other) const { return StringsEqual(_data, other._data); }
+	inline bool Equals(const String& other, bool ignoreCase = false) const 
+	{ 
+		return _length == other._length && 
+			(ignoreCase ? StringsEqual_CaseInsensitive(_data, other._data) : StringsEqual(_data, other._data)); 
+	}
+
+	inline bool operator==(const String &other) const { return _length == other._length && StringsEqual(_data, other._data); }
 	inline bool operator==(const char *other) const { return StringsEqual(_data, other); }
-	inline bool operator!=(const String &other) const { return StringsInequal(_data, other._data); }
+	inline bool operator!=(const String &other) const { return _length == other._length && StringsInequal(_data, other._data); }
 	inline bool operator!=(const char *other) const { return StringsInequal(_data, other); }
 
 	String ToLower() const;
@@ -104,12 +127,3 @@ public:
 
 //Concatenates args and returns a char pointer (which is deleted before the next statement)
 #define CSTR(...) (String::Concat(__VA_ARGS__)).GetData()
-
-inline size_t StringLength(const char *string) {
-	size_t length = 0;
-	while (string[length] != '\0') length++;
-	return length;
-}
-
-bool StringContains(const char *string, const char *phrase);
- 

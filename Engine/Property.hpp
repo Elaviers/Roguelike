@@ -51,6 +51,7 @@ template<> inline PropertyType TypenameToEnum<String>() { return PropertyType::S
 class Property
 {
 	String _name;
+	String _description;
 	
 	PropertyType _type;
 	byte _flags;
@@ -64,8 +65,12 @@ public:
 	inline byte GetFlags() const { return _flags; }
 	inline PropertyType GetType() const { return _type; }
 	inline const String& GetName() const { return _name; }
+	inline const String& GetDescription() const { return _description; }
+
+	const String& GetTypeString() const;
 
 	inline void SetName(const String& name) { _name = name; }
+	inline void SetDescription(const String& description) { _description = description; }
 
 	String GetAsString(const void* obj) const;
 	void SetAsString(void* obj, const String& value) const;

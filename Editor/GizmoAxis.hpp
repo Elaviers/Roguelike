@@ -24,7 +24,7 @@ protected:
 	virtual void _OnTransformChanged() override;
 
 public:
-	GizmoAxis(Vector4 colour, const Setter<const Vector3&>& move) : 
+	GizmoAxis(const Colour& colour, const Setter<const Vector3&>& move) : 
 		GizmoComponent(colour),
 		_length(1.f), 
 		_collider(COLL_EDITOR, Vector3(0.1f, 1.f, 0.1f), Transform(Vector3(0.f, 0.5f, 0.f))),

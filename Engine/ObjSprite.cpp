@@ -10,11 +10,7 @@ void ObjSprite::Render(EnumRenderChannel channels) const
 	{
 		Mat4 t;
 
-		if (_lookAtCamera)
-		{
-			t = Matrix::Transformation(GetWorldPosition(), ObjCamera::Current()->GetWorldRotation().GetQuat(), Vector3(_size, _size, _size));
-		}
-		else
+		if (_fixedYaw)
 		{
 			Vector3 pos = GetWorldPosition();
 			Vector3 delta = pos - ObjCamera::Current()->GetWorldPosition();
@@ -24,6 +20,8 @@ void ObjSprite::Render(EnumRenderChannel channels) const
 			Vector3 e = Vector3(0, y, 0);
 			t = Matrix::Transformation(pos, e, Vector3(_size, _size, _size));
 		}
+		else
+			t = Matrix::Transformation(GetWorldPosition(), ObjCamera::Current()->GetWorldRotation().GetQuat(), Vector3(_size, _size, _size));
 		
 		_material->Apply();
 
@@ -53,8 +51,8 @@ const PropertyCollection& ObjSprite::GetProperties()
 		offsetof(ObjSprite, _size));
 
 	cvars.Add<bool>(
-		"Look at camera",
-		offsetof(ObjSprite, _lookAtCamera));
+		"FixedYaw",
+		offsetof(ObjSprite, _fixedYaw));
 	DO_ONCE_END;
 
 	return cvars;

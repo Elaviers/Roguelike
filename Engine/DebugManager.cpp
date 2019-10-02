@@ -52,7 +52,7 @@ void DebugManager::AddString(const String &string)
 {
 	if (_font)
 	{
-		DebugString *obj = new DebugString(*_font, Vector3(0, 0, 0), 32, string, 20.f, Vector4(1.f, 0, 0));
+		DebugString *obj = new DebugString(*_font, Vector3(0, 0, 0), 32, string, 20.f, Colour::Red);
 		_screenObjects.Add(obj);
 	}
 }

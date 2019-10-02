@@ -57,5 +57,5 @@ public:
 
 	inline FT_Library GetFTLibrary() { return _ftLib; }
 
-	void Init(EngineCreateFlags);
+	void Init(EngineCreateFlags, GameObject* world);
 };

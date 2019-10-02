@@ -17,8 +17,10 @@ Engine::~Engine()
 
 #define CREATE(CONDITION, PTR) (CONDITION) ? (PTR) : nullptr 
 
-void Engine::Init(EngineCreateFlags flags)
+void Engine::Init(EngineCreateFlags flags, GameObject *world)
 {
+	pWorld = world;
+
 	FT_Error error = FT_Init_FreeType(&_ftLib);
 	if (error) { Debug::Error("Freetype init error"); }
 	
@@ -38,7 +40,14 @@ void Engine::Init(EngineCreateFlags flags)
 	if (pConsole)
 	{
 		//Commands
-		pConsole->Cvars().CreateVar("play", CommandPtr(this->pAudioManager, &AudioManager::CMD_play));
+		pConsole->Cvars().CreateVar("Play", CommandPtr(pAudioManager, &AudioManager::CMD_play));
+
+		if (pWorld)
+		{
+			pConsole->Cvars().CreateVar("Ents", CommandPtr(pWorld, &GameObject::CMD_List));
+			pConsole->Cvars().CreateVar("Ent", CommandPtr(pWorld, &GameObject::CMD_Ent));
+			pConsole->Cvars().CreateVar("EntProperties", CommandPtr(pWorld, &GameObject::CMD_ListProperties));
+		}
 	}
 
 	if (pAudioManager)

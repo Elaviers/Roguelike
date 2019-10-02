@@ -47,7 +47,7 @@ void ToolConnector::SetConnectorDirection(const String &dir)
 
 void ToolConnector::Initialise()
 {
-	_connector.SetRenderColour(Vector4(0.f, 1.f, 0.f, .5f));
+	_connector.SetRenderColour(Colour(0.f, 1.f, 0.f, .5f));
 }
 
 void ToolConnector::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
@@ -108,7 +108,7 @@ void ToolConnector::KeySubmit()
 	_placing = false;
 
 	ObjConnector *clone = _connector.TypedClone();
-	clone->SetRenderColour(Vector4(0.f, 1.f, 0.f, 1.f));
+	clone->SetRenderColour(Colour(0.f, 1.f, 0.f));
 	clone->SetParent(&_owner.LevelRef());
 
 	_connector.SetMin(Vector3());

@@ -193,8 +193,8 @@
     <ClInclude Include="AudioUtilities.hpp" />
     <ClInclude Include="Box.hpp" />
     <ClInclude Include="CollisionChannel.hpp" />
+    <ClInclude Include="Colour.hpp" />
     <ClInclude Include="Console.hpp" />
-    <ClInclude Include="EngineCommands.hpp" />
     <ClInclude Include="Event.hpp" />
     <ClInclude Include="Hashing.hpp" />
     <ClInclude Include="Hashmap.hpp" />
@@ -306,6 +306,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimationManager.cpp" />
     <ClCompile Include="AudioUtilities.cpp" />
+    <ClCompile Include="Colour.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="PropertyCollection.cpp" />
     <ClCompile Include="Engine.cpp" />

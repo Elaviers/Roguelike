@@ -46,8 +46,6 @@ const PropertyCollection& GameObject::GetProperties()
 	return cvars;
 }
 
-//Public
-
 Mat4 GameObject::GetTransformationMatrix() const
 {
 	if (_parent)
@@ -89,6 +87,53 @@ void GameObject::Delete()
 		delete this;
 		return;
 	}
+}
+
+//Hierachy
+
+void GameObject::SetParent(GameObject* parent)
+{
+	if (_parent)
+	{
+		_parent->_children.Remove(this);
+		_parent->_OnChildChanged();
+	}
+
+	_parent = parent;
+
+	if (_parent)
+	{
+		_parent->_children.Add(this);
+		_parent->_OnChildChanged();
+	}
+}
+
+GameObject* GameObject::FindByName(const String& name)
+{
+	if (_name == name)
+		return this;
+
+	for (size_t i = 0; i < _children.GetSize(); ++i)
+	{
+		GameObject* result = _children[i]->FindByName(name);
+		if (result) return result;
+	}
+
+	return nullptr;
+}
+
+GameObject* GameObject::FindByUID(uint32 uid)
+{
+	if (_uid == uid)
+		return this;
+
+	for (size_t i = 0; i < _children.GetSize(); ++i)
+	{
+		GameObject* result = _children[i]->FindByUID(uid);
+		if (result) return result;
+	}
+
+	return nullptr;
 }
 
 //File IO
@@ -183,4 +228,89 @@ Buffer<GameObject*> GameObject::FindOverlaps(const Collider &collider, const Tra
 			results.Add(_children[i]);
 
 	return results;
+}
+
+GameObject& GameObject::operator=(GameObject&& other) noexcept
+{
+	SetParent(other._parent);
+	other.SetParent(nullptr);
+
+	for (uint32 i = 0; i < other._children.GetSize(); ++i)
+		other._children[i]->SetParent(this);
+
+	_transform = other._transform;
+	_transform.SetCallback(Callback(this, &GameObject::_OnTransformChanged));
+
+	return *this;
+}
+
+Bounds GameObject::GetWorldBounds(bool noTranslation) const
+{
+	Bounds b = GetBounds();
+	Mat4 wt = GetWorldTransform().GetTransformationMatrix();
+	if (noTranslation) wt[3][0] = wt[3][1] = wt[3][2] = 0.f;
+
+	//Yeah, this is not optimised at all...
+	Vector3 testPoints[8] = {
+		b.min * wt,
+		b.max * wt,
+		Vector3(b.min[0], b.min[1], b.max[2]) * wt,
+		Vector3(b.min[0], b.max[1], b.min[2]) * wt,
+		Vector3(b.min[0], b.max[1], b.max[2]) * wt,
+		Vector3(b.max[0], b.min[1], b.min[2]) * wt,
+		Vector3(b.max[0], b.min[1], b.max[2]) * wt,
+		Vector3(b.max[0], b.max[1], b.min[2]) * wt
+	};
+
+	Vector3 min = testPoints[0];
+	Vector3 max = min;
+
+	for (int i = 0; i < 8; ++i)
+	{
+		min = Vector3(Utilities::Min(min[0], testPoints[i][0]), Utilities::Min(min[1], testPoints[i][1]), Utilities::Min(min[2], testPoints[i][2]));
+		max = Vector3(Utilities::Max(max[0], testPoints[i][0]), Utilities::Max(max[1], testPoints[i][1]), Utilities::Max(max[2], testPoints[i][2]));
+	}
+
+	return Bounds(min, max);
+}
+
+//
+#include "Console.hpp"
+
+void GameObject::CMD_List(const Buffer<String>& tokens)
+{
+	Engine::Instance().pConsole->Print(CSTR(GetClassString(), "\t\t\"", _name, "\"\t\t0x", String::From((int64)_uid, 0, 16), '\n'));
+
+	for (size_t i = 0; i < _children.GetSize(); ++i)
+		_children[i]->CMD_List(tokens);
+}
+
+void GameObject::CMD_Ent(const Buffer<String>& tokens)
+{
+	if (tokens.GetSize() >= 2)
+	{
+		GameObject* obj = FindByName(tokens[0]);
+
+		if (obj)
+		{
+			Buffer<String> objTokens(&tokens[1], tokens.GetSize() - 1);
+			Engine::Instance().pConsole->Print(obj->GetProperties().HandleCommand(obj, objTokens).GetData());
+		}
+	}
+}
+
+void GameObject::CMD_ListProperties(const Buffer<String>& tokens)
+{
+	if (tokens.GetSize() >= 1)
+	{
+		GameObject* obj = FindByName(tokens[0]);
+
+		if (obj)
+		{
+			const Buffer<Property*> properties = obj->GetProperties().GetAll();
+
+			for (size_t i = 0; i < properties.GetSize(); ++i)
+				Engine::Instance().pConsole->Print(CSTR(properties[i]->GetName(), "\t\t", properties[i]->GetTypeString(), "\t\t<", properties[i]->GetAsString(obj), ">\n"));
+		}
+	}
 }

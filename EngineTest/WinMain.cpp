@@ -213,7 +213,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	window.SetTitle("Manager Init");
 
 	//
-	Engine::Instance().Init(ENG_ALL);
+	Engine::Instance().Init(ENG_ALL, nullptr);
 	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	ModelManager& modelManager = *Engine::Instance().pModelManager;
@@ -428,13 +428,13 @@ void Frame()
 
 			glDisable(GL_CULL_FACE);
 			
-			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 0.f, 0.f, 1.f));
+			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::Red);
 			DrawUtils::DrawGrid(modelManager, camera, Direction::FORWARD, w, 1.f, vpScale);
 
-			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f, 1.f));
+			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::Green);
 			DrawUtils::DrawGrid(modelManager, camera, Direction::UP, w, 1.f, vpScale);
 
-			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 0.f, 1.f, 1.f));
+			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::Blue);
 			DrawUtils::DrawGrid(modelManager, camera, Direction::RIGHT, w, 1.f, vpScale);
 
 			glEnable(GL_CULL_FACE);
@@ -444,7 +444,7 @@ void Frame()
 			glDepthFunc(GL_ALWAYS);
 			program_Unlit.SetMat4(DefaultUniformVars::mat4Projection, cameraMatrix);
 			program_Unlit.SetMat4(DefaultUniformVars::mat4View, Matrix::Identity());
-			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
 			static StackAllocator ftAllocator(1024);
 			static String fpsString;

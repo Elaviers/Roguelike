@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.hpp"
 #include "ColliderSphere.hpp"
+#include "Colour.hpp"
 #include "MaterialManager.hpp"
 #include "Material_Sprite.hpp"
 
@@ -8,11 +9,11 @@ class ObjSprite : public GameObject
 {
 	const MaterialSprite* _material;
 	float _size;
-	Vector4 _colour;
+	Colour _colour;
 
 	ColliderSphere _editorCollider;
 
-	bool _lookAtCamera;
+	bool _fixedYaw;
 
 public:
 	GAMEOBJECT_FUNCS(ObjSprite, ObjectIDS::SPRITE)
@@ -22,15 +23,15 @@ public:
 		_size(size),
 		_colour(1.f, 1.f, 1.f),
 		_editorCollider(COLL_EDITOR, size / 2.f),
-		_lookAtCamera(true)
+		_fixedYaw(true)
 	{}
 	virtual ~ObjSprite() {}
 
 	inline float GetSize() const { return _size; }
-	inline const Vector4& GetColour() const { return _colour; }
+	inline const Colour& GetColour() const { return _colour; }
 
 	inline void SetSize(float size) { _size = size; _editorCollider.SetRadius(size / 2.f); }
-	inline void SetColour(const Vector4& colour) { _colour = colour; }
+	inline void SetColour(const Colour& colour) { _colour = colour; }
 
 	virtual void Render(EnumRenderChannel) const override;
 

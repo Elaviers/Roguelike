@@ -14,11 +14,12 @@ public:
 			delete _cvars[i];
 	}
 
-	const Buffer<Property*> GetAll() const { return _cvars; }
+	const Buffer<Property*>& GetAll() const { return _cvars; }
 
 	inline void Clear() { _cvars.Clear(); }
 
-	String HandleCommand(void* obj, const String& command) const;
+	String HandleCommand(void* obj, const Buffer<String>& tokens) const;
+	inline String HandleCommand(void* obj, const String& command) const { return HandleCommand(obj, command.Split(" ")); }
 
 	void Transfer(const void* from, void* to) const
 	{
@@ -29,7 +30,7 @@ public:
 	inline Property* Find(const String& name) const
 	{
 		for (size_t i = 0; i < _cvars.GetSize(); ++i)
-			if (_cvars[i]->GetName() == name)
+			if (_cvars[i]->GetName().Equals(name, true))
 				return _cvars[i];
 
 		return nullptr;

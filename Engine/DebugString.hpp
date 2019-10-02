@@ -12,7 +12,15 @@ class DebugString : public DebugObject
 	String _string;
 
 public:
-	DebugString(const Font &font, const Vector3 &position, float size, const String &string, float time, Vector4 colour) : DebugObject(time, colour), _font(&font), _string(string) { _transform.SetPosition(position); _transform.SetScale(Vector3(size, size, 1.f)); }
+	DebugString(const Font &font, const Vector3 &position, float size, const String &string, float time, const Colour& colour) : 
+		DebugObject(time, colour), 
+		_font(&font), 
+		_string(string) 
+	{ 
+		_transform.SetPosition(position); 
+		_transform.SetScale(Vector3(size, size, 1.f)); 
+	}
+	
 	~DebugString() {}
 
 	virtual void Render() const override;

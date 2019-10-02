@@ -111,7 +111,7 @@ void Game::_InitGL()
 
 void Game::_Init()
 {
-	Engine::Instance().Init(ENG_ALL);
+	Engine::Instance().Init(ENG_ALL, nullptr);
 	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	_consoleIsActive = false;
@@ -182,7 +182,7 @@ void Game::Render()
 
 	if (_consoleIsActive)
 	{
-		_shader.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+		_shader.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 		Engine::Instance().pConsole->Render(*Engine::Instance().pFontManager->Get("consolas"), _deltaTime);
 	}
 

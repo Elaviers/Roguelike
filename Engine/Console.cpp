@@ -1,16 +1,17 @@
 #include "Console.hpp"
+#include "Colour.hpp"
 #include "GLProgram.hpp"
 #include "Transform.hpp"
 
 const int maxAllocSize = 2048;
 const int allocUnitSize = 128;
 
-const int linesToDraw = 15;
+const int linesToDraw = 128;
 
 void Console::_CMD_echo(const Buffer<String>& tokens)
 {
 	if (tokens.GetSize() > 0)
-		Print(CSTR(tokens[0], '\n'));
+		Print(CSTR(Colour::Cyan.ToColourCode(), tokens[0], '\n'));
 }
 
 void Console::_CMD_help(const Buffer<String>& tokens)
@@ -19,7 +20,9 @@ void Console::_CMD_help(const Buffer<String>& tokens)
 
 	for (int i = 0; i < all.GetSize(); ++i)
 	{
-		Print(CSTR(all[i]->GetName(), '\n'));
+		Print(CSTR(
+			Colour::Green.ToColourCode(), all[i]->GetName(), "\t\t", 
+			Colour::Yellow.ToColourCode(), all[i]->GetTypeString(), '\n'));
 	}
 }
 
@@ -54,6 +57,38 @@ void Console::Print(const char *string)
 	_SetNextChar('\0');
 }
 
+void Console::InputChar(char key)
+{
+	if (key == '\b')
+		Backspace();
+	else if (key == '\r')
+		SubmitPrompt();
+	else
+	{
+		_prompt += key;
+		_ResetBlink();
+	}
+}
+
+
+void Console::Backspace()
+{
+	if (_prompt.GetLength())
+	{
+		_prompt.Shrink(1);
+		_ResetBlink();
+	}
+}
+
+void Console::SubmitPrompt()
+{
+	Print(CSTR(Colour::Grey.ToColourCode(), _prePrompt, _prompt, '\n', Colour::Cyan.ToColourCode()));
+	Print(_cvars.HandleCommand(_prompt).GetData());
+
+	_prompt.Clear();
+	_ResetBlink();
+}
+
 void Console::Render(const Font &font, float deltaTime)
 {
 	static const float timerTarget = .5f;
@@ -79,11 +114,11 @@ void Console::Render(const Font &font, float deltaTime)
 
 		{
 			size_t i = _nextBufferIndex - 1;
-			size_t lc = 0;
+			size_t lc = 1;
 
 			while (true)
 			{
-				if (_charBuffer[i] == '\n')
+				if (_charBuffer[i] == '\n' && _charBuffer[i + 1] != '\0')
 					++lc;
 
 				if (lc >= linesToDraw)

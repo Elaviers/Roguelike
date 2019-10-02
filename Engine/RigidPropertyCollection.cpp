@@ -1,9 +1,7 @@
 #include "RigidPropertyCollection.hpp"
 
-String RigidPropertyCollection::HandleCommand(const String& command) const
+String RigidPropertyCollection::HandleCommand(const Buffer<String>& tokens) const
 {
-	Buffer<String> tokens = command.Split(" ");
-
 	if (tokens.GetSize() > 0)
 	{
 		String name = tokens[0].ToLower();
@@ -14,11 +12,9 @@ String RigidPropertyCollection::HandleCommand(const String& command) const
 		{
 			if (property->GetType() == PropertyType::FUNCTION)
 			{
-				tokens.RemoveIndex(0);
+				Buffer<String> newTokens(&tokens[1], tokens.GetSize() - 1);
 
-				auto func = dynamic_cast<const RigidFunctionPropertyBase*>(property);
-				if (func)	func->Call(tokens);
-				else		((RigidVariableProperty<CommandPtr>*)property)->Get()(tokens);
+				((RigidVariableProperty<CommandPtr>*)property)->Get()(newTokens);
 				return "";
 			}
 

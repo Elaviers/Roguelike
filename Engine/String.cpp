@@ -331,10 +331,7 @@ String String::ToLower() const
 	string._SetLength(_length);
 
 	for (size_t i = 0; i < _length; ++i)
-		if (_data[i] >= 'A' && _data[i] <= 'Z')
-			string._data[i] += _data[i] + ('a' - 'A');
-		else
-			string._data[i] = _data[i];
+		string._data[i] = LowerChar(_data[i]);
 
 	return string;
 }
@@ -393,6 +390,8 @@ Vector3 String::ToVector3() const
 
 ////Conversion
 
+const char* ALPHA = "0123456789ABCDEFGHIJKLMNOP";
+
 String String::From(int64 number, unsigned int minimum, byte base)
 {
 	size_t digit_count = 1;
@@ -414,7 +413,7 @@ String String::From(int64 number, unsigned int minimum, byte base)
 	string._SetLength(digit_count + (neg ? 1 : 0));
 
 	for (size_t i = 0; i < digit_count; ++i) {
-		string[digit_count - 1 - i + (neg ? 1 : 0)] = '0' + (number % base);
+		string[digit_count - 1 - i + (neg ? 1 : 0)] = ALPHA[number % base];
 		number /= base;
 	}
 
@@ -457,15 +456,15 @@ String String::From(double number, unsigned int minimum, unsigned int maxDecimal
 
 	String fraction_string;
 	fraction_string._SetLength(fraction_digit_count);
-	int digit;
+	byte digit;
 
 	if (fraction < 0.0) fraction *= -1.0;
 
 	for (size_t i = 0; i < fraction_digit_count; ++i) {
 		fraction *= base;
 
-		digit = (int)fraction;
-		fraction_string[i] = '0' + digit;
+		digit = (byte)fraction;
+		fraction_string[i] = ALPHA[digit];
 		fraction -= digit;
 	}
 
@@ -525,14 +524,25 @@ bool StringsInequal(const char *a, const char *b)
 
 bool StringsEqual(const char *a, const char *b)
 {
-	size_t i = 0;
-	while (1)
+	for (; ; ++a, ++b)
 	{
-		if (a[i] != b[i])
+		if (*a != *b)
 			return false;
-		if (a[i] == '\0')
+
+		if (*a == '\0')
 			return true;
-		i++;
+	}
+}
+
+bool StringsEqual_CaseInsensitive(const char* a, const char* b)
+{
+	for (; ; ++a, ++b)
+	{
+		if (LowerChar(*a) != LowerChar(*b))
+			return false;
+		
+		if (*a == '\0')
+			return true;
 	}
 }
 

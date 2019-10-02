@@ -2,6 +2,7 @@
 #include "UIElement.hpp"
 #include "UILabel.hpp"
 #include "UIPanel.hpp"
+#include "Colour.hpp"
 #include "FunctionPointer.hpp"
 
 class UIButton : public UIElement
@@ -11,8 +12,8 @@ protected:
 
 	FunctionPointer<void, UIButton&> _callback;
 
-	Vector4 _colourInactive;
-	Vector4 _colourActive;
+	Colour _colourInactive;
+	Colour _colourActive;
 
 	UIPanel _panel;
 	UILabel _label;
@@ -23,21 +24,21 @@ public:
 	virtual ~UIButton() {}
 
 	inline float GetBorderSize() const { return _panel.GetBorderSize(); }
-	inline const Vector4 &GetColourInactive() const { return _colourInactive; }
-	inline const Vector4 &GetColourActive() const { return _colourActive; }
+	inline const Colour& GetColourInactive() const { return _colourInactive; }
+	inline const Colour& GetColourActive() const { return _colourActive; }
 	inline const Font* GetFont() const { return _label.GetFont(); }
 	inline const Material* GetMaterial() const { return _panel.GetMaterial(); }
 	inline const String& GetString() const { return _label.GetString(); }
 
 	inline void SetBorderSize(float borderSize) { _panel.SetBorderSize(borderSize); }
 	inline void SetCallback(const FunctionPointer<void, UIButton&> &callback) { _callback = callback; }
-	inline void SetColourInactive(const Vector4 &colour) 
+	inline void SetColourInactive(const Colour &colour) 
 	{ 
 		_colourInactive = colour; 
 		if (!_active) 
 			_panel.SetColour(colour); 
 	}
-	inline void SetColourActive(const Vector4 &colour) 
+	inline void SetColourActive(const Colour &colour)
 	{ 
 		_colourActive = colour; 
 		if (_active) 

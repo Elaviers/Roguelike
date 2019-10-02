@@ -13,6 +13,7 @@
 #define GAMEOBJECT_FUNCS(CLASSNAME, ID)														\
 public:																						\
 	virtual ObjectIDS::ObjectID GetTypeID() const { return ID; }							\
+	virtual const char* GetClassString() const { return #CLASSNAME;}						\
 	virtual size_t SizeOf() const { return sizeof(*this); }									\
 	virtual GameObject* Clone() const { return GameObject::_CreateCopy<CLASSNAME>(*this); } \
 	inline CLASSNAME* TypedClone() const { return (CLASSNAME*)Clone(); }					\
@@ -52,6 +53,12 @@ protected:
 
 	void _AddBaseProperties(PropertyCollection&);
 
+	static uint32 _TakeNextUID()
+	{
+		static uint32 counter = 1;
+		return counter++;
+	}
+
 public:
 	Event<> onNameChanged;
 	Event<> onChildChanged;
@@ -67,7 +74,7 @@ public:
 
 	GameObject(byte flags = 0, const String &name = String()) : 
 		_name(name), 
-		_uid(GetNextUID()), 
+		_uid(_TakeNextUID()), 
 		_flags(flags), 
 		_dynamic(false), 
 		_parent(nullptr), 
@@ -75,7 +82,7 @@ public:
 	{}
 
 	GameObject(const GameObject &other) : 
-		_uid(GetNextUID()), 
+		_uid(_TakeNextUID()), 
 		_flags(other._flags), 
 		_dynamic(false), 
 		_parent(other._parent), 
@@ -96,14 +103,9 @@ public:
 	virtual ~GameObject() {}
 
 	void Delete();
-
-	inline void DeleteChildren()
-	{
-		while (_children.GetSize())
-			_children[0]->Delete();
-	}
 	
-	//Transform
+	#pragma region Transform
+
 	inline const Transform& GetRelativeTransform() const			{ return _transform; }
 	inline const Vector3& GetRelativePosition() const				{ return GetRelativeTransform().GetPosition(); }
 	inline const Rotation& GetRelativeRotation() const				{ return GetRelativeTransform().GetRotation(); }
@@ -165,26 +167,20 @@ public:
 	Mat4 GetTransformationMatrix() const;
 	Mat4 GetInverseTransformationMatrix() const;
 
-	//Hierachy
+	#pragma endregion
+
+	#pragma region Hierachy
+
 	inline GameObject* GetParent() const { return _parent; }
 	inline const Buffer<GameObject*>& Children() const { return _children; }
 
-	GameObject* FindByUID(uint32 uid)
-	{
-		if (_uid == uid)
-			return this;
+	void SetParent(GameObject* parent);
 
-		for (size_t i = 0; i < _children.GetSize(); ++i)
-		{
-			GameObject* result = _children[i]->FindByUID(uid);
-			if (result) return result;
-		}
-
-		return nullptr;
-	}
+	GameObject* FindByName(const String& name);
+	GameObject* FindByUID(uint32 uid);
 
 	template<typename T>
-	void FindChildrenOfType(Buffer<T*> &out, bool searchChildren)
+	void FindChildrenOfType(Buffer<T*>& out, bool searchChildren)
 	{
 		for (size_t i = 0; i < _children.GetSize(); ++i)
 		{
@@ -197,29 +193,33 @@ public:
 	}
 
 	template<typename T>
-	inline Buffer<T*> FindChildrenOfType(bool searchChildren) { Buffer<T*> buffer; FindChildrenOfType<T>(buffer, searchChildren); return buffer; }
-
-	void SetParent(GameObject *parent)
+	inline Buffer<T*> FindChildrenOfType(bool searchChildren) 
 	{ 
-		if (_parent)
-		{
-			_parent->_children.Remove(this);
-			_parent->_OnChildChanged();
-		}
+		Buffer<T*> buffer; 
+		FindChildrenOfType<T>(buffer, searchChildren); 
+		return buffer; 
+	}
 
-		_parent = parent;
 
-		if (_parent)
-		{
-			_parent->_children.Add(this);
-			_parent->_OnChildChanged();
-		}
+	template <typename T>
+	inline T* NewChild()
+	{
+		GameObject* object = new T();
+		object->_dynamic = true;
+		object->SetParent(this);
+		return dynamic_cast<T*>(object);
 	}
 
 	inline void CloneChildrenFrom(const GameObject &src)
 	{
 		for (uint32 i = 0; i < src._children.GetSize(); ++i)
 			src._children[i]->Clone()->SetParent(this);
+	}
+
+	inline void DeleteChildren()
+	{
+		while (_children.GetSize())
+			_children[0]->Delete();
 	}
 
 	inline bool IsChildOf(const GameObject* parent) const
@@ -232,6 +232,8 @@ public:
 
 		return _parent->IsChildOf(parent);
 	}
+
+	#pragma endregion
 
 	//General
 	inline const String& GetName() const { return _name; }
@@ -248,7 +250,7 @@ public:
 
 	inline uint32 GetUID() const { return _uid; }
 
-	//File IO
+	//IO
 	void WriteAllToFile(BufferWriter<byte>&, NumberedSet<String> &strings) const;
 	static GameObject* CreateFromData(BufferReader<byte>&, const NumberedSet<String>& strings);
 
@@ -267,73 +269,22 @@ public:
 	//Operators
 	GameObject& operator=(const GameObject&) = delete;
 
-	inline GameObject& operator=(GameObject &&other) noexcept
-	{
-		SetParent(other._parent);
-		other.SetParent(nullptr);
-
-		for (uint32 i = 0; i < other._children.GetSize(); ++i)
-			other._children[i]->SetParent(this);
-
-		_transform = other._transform;
-		_transform.SetCallback(Callback(this, &GameObject::_OnTransformChanged));
-
-		return *this;
-	}
+	GameObject& operator=(GameObject&& other) noexcept;
 
 	inline bool operator==(const GameObject &other) const { return _uid == other._uid; }
 
 	//Other
 	virtual Bounds GetBounds() const { return Bounds(); }
 
-	inline Bounds GetWorldBounds(bool noTranslation = false) const 
-	{
-		Bounds b = GetBounds();
-		Mat4 wt = GetWorldTransform().GetTransformationMatrix();
-		if (noTranslation) wt[3][0] = wt[3][1] = wt[3][2] = 0.f;
-
-		//Yeah, this is not optimised at all...
-		Vector3 testPoints[8] = {
-			b.min * wt,
-			b.max * wt,
-			Vector3(b.min[0], b.min[1], b.max[2]) * wt,
-			Vector3(b.min[0], b.max[1], b.min[2]) * wt,
-			Vector3(b.min[0], b.max[1], b.max[2]) * wt,
-			Vector3(b.max[0], b.min[1], b.min[2]) * wt,
-			Vector3(b.max[0], b.min[1], b.max[2]) * wt,
-			Vector3(b.max[0], b.max[1], b.min[2]) * wt
-		};
-
-		Vector3 min = testPoints[0];
-		Vector3 max = min;
-
-		for (int i = 0; i < 8; ++i)
-		{
-			min = Vector3(Utilities::Min(min[0], testPoints[i][0]), Utilities::Min(min[1], testPoints[i][1]), Utilities::Min(min[2], testPoints[i][2]));
-			max = Vector3(Utilities::Max(max[0], testPoints[i][0]), Utilities::Max(max[1], testPoints[i][1]), Utilities::Max(max[2], testPoints[i][2]));
-		}
-
-		return Bounds(min, max);
-	}
+	Bounds GetWorldBounds(bool noTranslation = false) const;
 
 	template<typename T>
 	inline bool IsType() { return dynamic_cast<T*>(this) != nullptr; }
 
-	template <typename T>
-	inline T* NewChild()
-	{
-		GameObject* object = new T();
-		object->_dynamic = true;
-		object->SetParent(this);
-		return dynamic_cast<T*>(object);
-	}
-
-	//Static
-	static uint32 GetNextUID() 
-	{
-		static uint32 counter = 1;
-		return counter++;
-	}
+	//Commands
+	void CMD_List(const Buffer<String>& args);
+	void CMD_Ent(const Buffer<String>& args);
+	void CMD_ListProperties(const Buffer<String>& args);
 
 protected:
 	template<typename T>

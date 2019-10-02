@@ -22,8 +22,12 @@ public:
 	inline byte GetFlags() const { return _baseProperty.GetFlags(); }
 	inline PropertyType GetType() const { return _baseProperty.GetType(); }
 	inline const String& GetName() const { return _baseProperty.GetName(); }
+	inline const String& GetDescription() const { return _baseProperty.GetDescription(); }
+
+	inline const String& GetTypeString() const { return _baseProperty.GetTypeString(); }
 
 	inline void SetName(const String& name) { return _baseProperty.SetName(name); }
+	inline void SetDescription(const String& description) { return _baseProperty.SetDescription(description); }
 
 	inline String GetAsString() const { return _baseProperty.GetAsString(_object); }
 	inline void SetAsString(const String& string) const { _baseProperty.SetAsString(_object, string); }
@@ -42,30 +46,6 @@ public:
 
 	virtual T Get() const { return _Property().Get(_object); }
 	virtual void Set(const T& value) const { return _Property().Set(_object, value); }
-};
-
-class RigidFunctionPropertyBase : public RigidProperty
-{
-	inline const FunctionPropertyBase& _Property() const { return (const FunctionPropertyBase&)_baseProperty; }
-
-	RigidFunctionPropertyBase(void *object, FunctionPropertyBase& property) : RigidProperty(object, property) {}
-public:
-	virtual ~RigidFunctionPropertyBase() {}
-
-	inline void Call(const Buffer<String>& tokens) const
-	{
-		_Property().Call(_object, tokens);
-	}
-};
-
-template<typename T>
-class RigidFunctionProperty : public RigidFunctionPropertyBase
-{
-	FunctionProperty<T> _property;
-
-public:
-	RigidFunctionProperty(void *obj, const FunctionProperty<T> &property) : RigidFunctionPropertyBase(obj, property) {}
-	virtual ~RigidFunctionProperty() {}
 };
 
 template<typename T>

@@ -1,6 +1,29 @@
 #include "Property.hpp"
 #include "Buffer.hpp"
 
+#define TYPESTRINGCASE(ENUM, STRING) case ENUM: { static String str = STRING; return str; }
+const String& Property::GetTypeString() const
+{
+	switch (GetType())
+	{
+		TYPESTRINGCASE(PropertyType::FUNCTION,	"Command");
+		TYPESTRINGCASE(PropertyType::UINT16,	"uint16");
+		TYPESTRINGCASE(PropertyType::UINT32,	"uint32");
+		TYPESTRINGCASE(PropertyType::UINT64,	"uint64");
+		TYPESTRINGCASE(PropertyType::INT16,		"int16");
+		TYPESTRINGCASE(PropertyType::INT32,		"int32");
+		TYPESTRINGCASE(PropertyType::INT64,		"int64");
+		TYPESTRINGCASE(PropertyType::BYTE,		"byte");
+		TYPESTRINGCASE(PropertyType::FLOAT,		"float");
+		TYPESTRINGCASE(PropertyType::VECTOR2,	"Vector2");
+		TYPESTRINGCASE(PropertyType::VECTOR3,	"Vector3");
+		TYPESTRINGCASE(PropertyType::STRING,	"String");
+	}
+
+	static String unknown = "???";
+	return unknown;
+}
+
 #define SETSTRINGCASE(ENUM, TYPE, VALUE) case ENUM: ((VariableProperty<TYPE>*)this)->Set(obj, VALUE); break
 void Property::SetAsString(void* obj, const String& value) const
 {

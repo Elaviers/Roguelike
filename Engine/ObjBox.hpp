@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.hpp"
+#include "Colour.hpp"
 #include "Types.hpp"
 #include "Vector.hpp"
 
@@ -13,7 +14,7 @@ class ObjBox : public GameObject
 protected:
 	Vector3 _min, _max;
 
-	Vector4 _colour;
+	Colour _colour;
 
 public:
 	GAMEOBJECT_FUNCS(ObjBox, ObjectIDS::BOX)
@@ -40,7 +41,7 @@ public:
 	inline void SetMin(const Vector3 &min) { _min = min; }
 	inline void SetMax(const Vector3 &max) { _max = max; }
 
-	inline void SetRenderColour(const Vector4 &colour) { _colour = colour; }
+	inline void SetRenderColour(const Colour &colour) { _colour = colour; }
 
 	inline const Vector3& GetPoint1() const { return _p1; }
 	inline const Vector3& GetPoint2() const { return _p2; }

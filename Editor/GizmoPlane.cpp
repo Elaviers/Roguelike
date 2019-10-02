@@ -16,7 +16,7 @@ void GizmoPlane::Draw() const
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, transform.GetTransformationMatrix());
 		
 		if (_canDrag)
-			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f - _colour[0], 1.f - _colour[1], 1.f - _colour[2]));
+			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(1.f - _colour.r, 1.f - _colour.g, 1.f - _colour.b));
 		else
 			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
 

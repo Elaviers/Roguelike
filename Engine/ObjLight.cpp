@@ -24,7 +24,7 @@ const PropertyCollection& ObjLight::GetProperties()
 		offsetof(ObjLight, _colour));
 
 	cvars.Add<float>(
-		"Attenuation Radius", 
+		"Radius", 
 		offsetof(ObjLight, _radius));
 	DO_ONCE_END;
 

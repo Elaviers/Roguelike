@@ -25,7 +25,7 @@ namespace EngineTests
 	{
 		TEST_CLASS_INITIALIZE(ClassInit)
 		{
-			Engine::Instance().Init(EngineCreateFlags(0)); //Registry only
+			Engine::Instance().Init(EngineCreateFlags(0), nullptr); //Registry only
 			Engine::Instance().pMaterialManager = new MaterialManager();
 			Engine::Instance().pModelManager = new ModelManager();
 
@@ -153,7 +153,7 @@ namespace EngineTests
 		{
 			Transform t(Vector3(1.f, 2.f, 3.f), Vector3(4.f, 5.f, 6.f), Vector3(7.f, 8.f, 9.f));
 			const char* name = "TEST";
-			const Vector4 colour(1.f, 2.f, 3.f, 4.f);
+			const Colour colour(1.f, 2.f, 3.f, 4.f);
 
 			{
 				SRC(GameObject);

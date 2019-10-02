@@ -432,9 +432,6 @@
     <ClInclude Include="ObjSkeletal.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="EngineCommands.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Property.hpp">
       <Filter>Header Files\Console</Filter>
     </ClInclude>
@@ -449,6 +446,9 @@
     </ClInclude>
     <ClInclude Include="MacroUtilities.hpp">
       <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Colour.hpp">
+      <Filter>Header Files\Classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -709,6 +709,9 @@
     </ClCompile>
     <ClCompile Include="RigidPropertyCollection.cpp">
       <Filter>Source Files\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="Colour.cpp">
+      <Filter>Source Files\Classes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

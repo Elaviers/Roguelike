@@ -14,8 +14,8 @@ protected:
 	FunctionPointer<void, const String&> _onLevelChosen;
 
 	float _buttonBorderSize;
-	Vector4 _buttonColourInactive;
-	Vector4 _buttonColourActive;
+	Colour _buttonColourInactive;
+	Colour _buttonColourActive;
 	const Font *_buttonFont;
 	const Material *_buttonMaterial;
 
@@ -31,8 +31,8 @@ public:
 
 	inline void SetBounds(float x, float y, float w, float h, float xOffset = 0.f, float yOffset = 0.f) { UIContainer::SetBounds(x, y, w, h, xOffset, yOffset); }
 	inline void SetButtonBorderSize(float size) { _buttonBorderSize = size; }
-	inline void SetButtonColourInactive(const Vector4& colour) { _buttonColourInactive = colour; }
-	inline void SetButtonColourActive(const Vector4& colour) { _buttonColourActive = colour; }
+	inline void SetButtonColourInactive(const Colour& colour) { _buttonColourInactive = colour; }
+	inline void SetButtonColourActive(const Colour& colour) { _buttonColourActive = colour; }
 	inline void SetButtonFont(const Font *font) { _buttonFont = font; }
 	inline void SetButtonMaterial(const Material *material) { _buttonMaterial = material; }
 	inline void SetParent(UIElement *parent) { UIContainer::SetParent(parent); }

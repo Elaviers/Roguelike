@@ -1,18 +1,19 @@
 #pragma once
+#include <Engine/Colour.hpp>
 #include <Engine/Ray.hpp>
 #include <Engine/Transform.hpp>
 
 class GizmoComponent
 {
 protected:
-	Vector4 _colour;
+	Colour _colour;
 
 	bool _canDrag;
 	bool _isDragging;
 	
 	virtual void _OnTransformChanged() {}
 
-	GizmoComponent(Vector4 colour) : 
+	GizmoComponent(const Colour& colour) : 
 		_colour(colour), 
 		_canDrag(false),
 		_isDragging(false),

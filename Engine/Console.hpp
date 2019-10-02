@@ -34,8 +34,8 @@ class Console
 public:
 	Console() : _nextBufferIndex(0), _prePrompt('>') 
 	{
-		_cvars.CreateVar("echo", CommandPtr(this, &Console::_CMD_echo));
-		_cvars.CreateVar("help", CommandPtr(this, &Console::_CMD_help));
+		_cvars.CreateVar("Echo", CommandPtr(this, &Console::_CMD_echo));
+		_cvars.CreateVar("Help", CommandPtr(this, &Console::_CMD_help));
 	}
 
 	~Console() {}
@@ -43,37 +43,8 @@ public:
 	inline RigidPropertyCollection& Cvars() { return _cvars; }
 
 	void Print(const char* string);
-
-	inline void InputChar(char key) 
-	{
-		if (key == '\b')
-			Backspace();
-		else if (key == '\r')
-			SubmitPrompt();
-		else
-		{
-			_prompt += key;
-			_ResetBlink();
-		}
-	}
-
-
-	inline void Backspace()
-	{
-		if (_prompt.GetLength())
-		{
-			_prompt.Shrink(1);
-			_ResetBlink();
-		}
-	}
-
-	inline void SubmitPrompt() 
-	{ 
-		Print((_prePrompt + _prompt + '\n').GetData());
-		Print(_cvars.HandleCommand(_prompt).GetData());
-		_prompt.Clear(); 
-		_ResetBlink();
-	}
-
+	void InputChar(char key);
+	void Backspace();
+	void SubmitPrompt();
 	void Render(const Font &font, float deltaTime);
 };

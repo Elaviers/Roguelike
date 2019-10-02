@@ -1,5 +1,6 @@
 #include "ResourceSelect.hpp"
 #include <CommCtrl.h>
+#include <Engine/Colour.hpp>
 #include <Engine/Debug.hpp>
 #include <Engine/DrawUtils.hpp>
 #include <Engine/GL.hpp>
@@ -120,7 +121,7 @@ public:
 		{
 			programLit->Use();
 			_camera.Use();
-			programLit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+			programLit->SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
 			programLit->SetInt(DefaultUniformVars::intTextureDiffuse, 0);
 			programLit->SetInt(DefaultUniformVars::intTextureNormal, 1);
@@ -140,16 +141,16 @@ public:
 
 		Engine::Instance().pTextureManager->White()->Bind(0);
 
-		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 0.f, 0.f));
+		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Colour::Red);
 		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(-1.f, 0.f, 0.f), Vector3(1.f, 0.f, 0.f));
 
-		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 0.f));
+		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Colour::Green);
 		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(0.f, -1.f, 0.f), Vector3(0.f, 1.f, 0.f));
 
-		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 0.f, 1.f));
+		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Colour::Blue);
 		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(0.f, 0.f, -1.f), Vector3(0.f, 0.f, 1.f));
 
-		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f));
+		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 		_sprite.Render(RenderChannel::SPRITE);
 
 		::SwapBuffers(viewportDC);

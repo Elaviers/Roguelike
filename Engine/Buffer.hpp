@@ -22,7 +22,7 @@ public:
 			_data[i] = array.begin()[i];
 	}
 
-	Buffer(T* data, size_t size) : _data(Utilities::CopyOfArray(data, size)), _size(size) {}
+	Buffer(const T* data, size_t size) : _data(Utilities::CopyOfArray(data, size)), _size(size) {}
 
 	~Buffer() { delete[] _data; }
 

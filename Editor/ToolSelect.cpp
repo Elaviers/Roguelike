@@ -12,16 +12,16 @@ const PropertyCollection& ToolSelect::_GetProperties()
 
 	DO_ONCE_BEGIN;
 	properties.Add<float>(
-		"Grid Snap",
+		"GridSnap",
 		offsetof(ToolSelect, _gridSnap));
 
 	properties.Add<bool>(
-		"Snap to world",
+		"SnapToWorld",
 		offsetof(ToolSelect, _snapToWorld));
 
 	properties.Add<bool>(
-		"Local-space Gizmo",
-		offsetof(ToolSelect, _gizmoLocal));
+		"GizmoIsLocal",
+		offsetof(ToolSelect, _gizmoIsLocal));
 	DO_ONCE_END;
 
 	return properties;
@@ -65,12 +65,12 @@ float ToolSelect::_GizmoRotate(const Vector3 &axis, float angle)
 		_selectedObjects[i]->SetWorldRotation(_selectedObjects[i]->GetWorldRotation() * rotation);
 	}
 
-	return _gizmoLocal ? 0.f : angle;
+	return _gizmoIsLocal ? 0.f : angle;
 }
 
 void ToolSelect::_UpdateGizmoPos()
 {
-	if (_gizmoLocal && _selectedObjects.GetSize() == 1)
+	if (_gizmoIsLocal && _selectedObjects.GetSize() == 1)
 		_gizmo.SetTransform(Transform(_selectedObjects[0]->GetWorldPosition(), _selectedObjects[0]->GetWorldRotation()));
 	else
 	{
@@ -103,7 +103,7 @@ void ToolSelect::Initialise()
 {
 	_gridSnap = .25f;
 	_snapToWorld = false;
-	_gizmoLocal = false;
+	_gizmoIsLocal = false;
 }
 
 void ToolSelect::Activate(PropertyWindow& properties, PropertyWindow& toolProperties)
@@ -314,7 +314,7 @@ void ToolSelect::Render(EnumRenderChannel channels) const
 	if (_placing)
 	{
 		glDepthFunc(GL_ALWAYS);
-		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.f, 1.f, 1.f, 1.f));
+		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour::Cyan);
 		_box.Render(channels);
 		glDepthFunc(GL_LESS);
 	}
@@ -327,7 +327,7 @@ void ToolSelect::Render(EnumRenderChannel channels) const
 	}
 	
 
-	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 0.f, 1.f));
+	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour::Yellow);
 	for (uint32 i = 0; i < _selectedObjects.GetSize(); ++i)
 	{
 		Bounds bounds = _selectedObjects[i]->GetWorldBounds();

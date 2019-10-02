@@ -1,4 +1,5 @@
 #include "Editor.hpp"
+#include <Engine/Colour.hpp>
 #include <Engine/Console.hpp>
 #include <Engine/DebugFrustum.hpp>
 #include <Engine/DebugManager.hpp>
@@ -128,8 +129,7 @@ void Editor::_Init()
 	CameraRef(3).SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
 
 	_fbxManager = FbxManager::Create();
-	Engine::Instance().Init(ENG_ALL);
-
+	Engine::Instance().Init(ENG_ALL, &_level);
 	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	InputManager* inputManager = Engine::Instance().pInputManager;
@@ -289,11 +289,6 @@ void Editor::RenderConsole()
 
 	Engine::Instance().pConsole->Render(*_consoleFont, _deltaTime);
 
-	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
-	_shaderUnlit.SetMat4(DefaultUniformVars::mat4Model, Transform(Vector3(100, 100, 0), Rotation(), Vector3(32, 32, 1)).GetTransformationMatrix());
-	Engine::Instance().pTextureManager->White()->Bind(0);
-	Engine::Instance().pModelManager->Plane().Render();
-
 	_consoleWindow.SwapBuffers();
 }
 
@@ -310,7 +305,7 @@ void Editor::RenderViewport(int index, Direction dir)
 	{	//LIT PASS
 		_shaderLit.Use();
 		camera.Use();
-		_shaderLit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+		_shaderLit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
 		_shaderLit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureNormal, 1);
@@ -339,7 +334,7 @@ void Editor::RenderViewport(int index, Direction dir)
 	//UNLIT PASS
 	_shaderUnlit.Use();
 	camera.Use();
-	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
 	_level.Render(CameraRef(0), EnumRenderChannel(_unlitRenderChannels | (_drawEditorFeatures ? RenderChannel::EDITOR : 0)));
 	
@@ -350,22 +345,22 @@ void Editor::RenderViewport(int index, Direction dir)
 		glLineWidth(lineW);
 
 		Engine::Instance().pTextureManager->White()->Bind(0);
-		_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.75f, .75f, .75f, 1.f));
+		_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour(.75f, .75f, .75f));
 		DrawUtils::DrawGrid(*Engine::Instance().pModelManager, camera, dir, 1.f, 1.f, gridLimit);
 
 		if (persp) glDepthFunc(GL_LEQUAL);
-		_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(.5f, .5f, 1.f, 1.f));
+		_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour(.5f, .5f, 1.f));
 		DrawUtils::DrawGrid(*Engine::Instance().pModelManager, camera, dir, 1.f, 10.f, gridLimit);
 
 		Engine::Instance().pDebugManager->RenderWorld();
 	}
 
 	Engine::Instance().pTextureManager->White()->Bind(0);
-	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 	if (_currentTool) _currentTool->Render(RenderChannel::ALL);
 
 	glDepthFunc(GL_ALWAYS);
-	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, 1.f, 1.f, 1.f));
+	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 	_level.Render(CameraRef(0), RenderChannel::SPRITE);
 	glDepthFunc(GL_LEQUAL);
 

@@ -9,7 +9,7 @@ class DebugFrustum : public DebugObject
 	Vector3 _far[4];
 
 public:
-	DebugFrustum(float time = 0.f, Vector4 colour = Vector4(1.f, 0.f, 0.f)) : DebugObject(time, colour) {}
+	DebugFrustum(float time = 0.f, Colour colour = Colour::Red) : DebugObject(time, colour) {}
 	virtual ~DebugFrustum() {}
 
 	virtual void Render() const override;
