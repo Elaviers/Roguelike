@@ -1,9 +1,9 @@
-#include "ObjBox.hpp"
+#include "EntBox.hpp"
 #include "DrawUtils.hpp"
 #include "Engine.hpp"
 #include "GLProgram.hpp"
 
-void ObjBox::Render(EnumRenderChannel channels) const
+void EntBox::Render(EnumRenderChannel channels) const
 {
 	if (Engine::Instance().pModelManager && channels & RenderChannel::UNLIT)
 	{
@@ -12,7 +12,7 @@ void ObjBox::Render(EnumRenderChannel channels) const
 	}
 }
 
-void ObjBox::_UpdateMinMax()
+void EntBox::_UpdateMinMax()
 {
 	if (_p1[0] < _p2[0])
 	{

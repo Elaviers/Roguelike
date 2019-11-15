@@ -1,10 +1,10 @@
 #pragma once
-#include "GameObject.hpp"
+#include "Entity.hpp"
 #include "Colour.hpp"
 #include "Types.hpp"
 #include "Vector.hpp"
 
-class ObjBox : public GameObject
+class EntBox : public Entity
 {
 	Vector3 _p1, _p2;
 
@@ -17,10 +17,10 @@ protected:
 	Colour _colour;
 
 public:
-	GAMEOBJECT_FUNCS(ObjBox, ObjectIDS::BOX)
+	Entity_FUNCS(EntBox, EntityIDS::BOX)
 
-	ObjBox(byte flags = 0) : GameObject(flags), _colour(1.f, 1.f, 1.f, 1.f) {}
-	virtual ~ObjBox() {}
+	EntBox(byte flags = 0) : Entity(flags), _colour(1.f, 1.f, 1.f, 1.f) {}
+	virtual ~EntBox() {}
 
 	virtual void Render(EnumRenderChannel) const override;
 

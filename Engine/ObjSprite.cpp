@@ -1,19 +1,19 @@
-#include "ObjSprite.hpp"
+#include "EntSprite.hpp"
 #include "GLProgram.hpp"
 #include "MacroUtilities.hpp"
 #include "ModelManager.hpp"
-#include "ObjCamera.hpp"
+#include "EntCamera.hpp"
 
-void ObjSprite::Render(EnumRenderChannel channels) const
+void EntSprite::Render(EnumRenderChannel channels) const
 {
-	if (Engine::Instance().pModelManager && ObjCamera::Current() && _material && channels & _material->GetRenderChannels())
+	if (Engine::Instance().pModelManager && EntCamera::Current() && _material && channels & _material->GetRenderChannels())
 	{
 		Mat4 t;
 
 		if (_fixedYaw)
 		{
 			Vector3 pos = GetWorldPosition();
-			Vector3 delta = pos - ObjCamera::Current()->GetWorldPosition();
+			Vector3 delta = pos - EntCamera::Current()->GetWorldPosition();
 			delta.Normalise();
 
 			float y = Maths::ArcTangentDegrees2(delta[0], delta[2]);
@@ -21,7 +21,7 @@ void ObjSprite::Render(EnumRenderChannel channels) const
 			t = Matrix::Transformation(pos, e, Vector3(_size, _size, _size));
 		}
 		else
-			t = Matrix::Transformation(GetWorldPosition(), ObjCamera::Current()->GetWorldRotation().GetQuat(), Vector3(_size, _size, _size));
+			t = Matrix::Transformation(GetWorldPosition(), EntCamera::Current()->GetWorldRotation().GetQuat(), Vector3(_size, _size, _size));
 		
 		_material->Apply();
 
@@ -32,7 +32,7 @@ void ObjSprite::Render(EnumRenderChannel channels) const
 	}
 }
 
-const PropertyCollection& ObjSprite::GetProperties()
+const PropertyCollection& EntSprite::GetProperties()
 {
 	static PropertyCollection cvars;
 
@@ -41,26 +41,26 @@ const PropertyCollection& ObjSprite::GetProperties()
 
 	cvars.Add(
 		"Material",
-		MemberGetter<ObjSprite, String>(&ObjSprite::GetMaterialName),
-		MemberSetter<ObjSprite, String>(&ObjSprite::SetMaterialName),
+		MemberGetter<EntSprite, String>(&EntSprite::GetMaterialName),
+		MemberSetter<EntSprite, String>(&EntSprite::SetMaterialName),
 		0,
 		PropertyFlags::MATERIAL);
 
 	cvars.Add<float>(
 		"Size",
-		offsetof(ObjSprite, _size));
+		offsetof(EntSprite, _size));
 
 	cvars.Add<bool>(
 		"FixedYaw",
-		offsetof(ObjSprite, _fixedYaw));
+		offsetof(EntSprite, _fixedYaw));
 	DO_ONCE_END;
 
 	return cvars;
 }
 
-void ObjSprite::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
+void EntSprite::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
 {
-	GameObject::WriteData(writer, strings);
+	Entity::WriteData(writer, strings);
 
 	writer.Write_float(_size);
 	writer.Write_vector4(_colour);
@@ -73,9 +73,9 @@ void ObjSprite::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strin
 	else writer.Write_uint16(0);
 }
 
-void ObjSprite::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+void EntSprite::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
 {
-	GameObject::ReadData(reader, strings);
+	Entity::ReadData(reader, strings);
 
 	_size = reader.Read_float();
 	_colour = reader.Read_vector4();

@@ -1,12 +1,12 @@
 #pragma once
-#include "GameObject.hpp"
+#include "Entity.hpp"
 #include "ColliderBox.hpp"
 #include "Engine.hpp"
 #include "MaterialManager.hpp"
 #include "Vector.hpp"
 
 template <int SIZE>
-class ObjBrush : public GameObject
+class EntBrush : public Entity
 {
 protected:
 	//todo: add dimensions
@@ -20,8 +20,8 @@ protected:
 
 	virtual void _OnTransformChanged() = 0;
 
-	ObjBrush() : GameObject(FLAG_SAVEABLE), _material(nullptr) { }
-	virtual ~ObjBrush() {}
+	EntBrush() : Entity(FLAG_SAVEABLE), _material(nullptr) { }
+	virtual ~EntBrush() {}
 
 public:
 	inline void SetPoint1(const Vector<float, SIZE> &position) { _point1 = position; _OnTransformChanged(); }

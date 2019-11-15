@@ -1,9 +1,9 @@
 #pragma once
 #include "Tool.hpp"
 #include "Gizmo.hpp"
-#include <Engine/ObjBox.hpp>
+#include <Engine/EntBox.hpp>
 #include <Engine/Buffer.hpp>
-#include <Engine/GameObject.hpp>
+#include <Engine/Entity.hpp>
 #include <Engine/SharedPointer.hpp>
 
 class ToolSelect : public Tool
@@ -11,12 +11,12 @@ class ToolSelect : public Tool
 	bool _placing;
 	bool _shouldCopy;
 
-	ObjBox _box;
+	EntBox _box;
 
-	GameObjectPointer _hoverObject;
+	EntityPointer _hoverObject;
 	bool _hoverObjectIsSelected;
 
-	Buffer<GameObjectPointer> _selectedObjects;
+	Buffer<EntityPointer> _selectedObjects;
 
 	float _origObjectX;
 	float _origObjectY;
@@ -33,7 +33,7 @@ class ToolSelect : public Tool
 	float _GizmoRotate(const Vector3 &axis, float angle);
 	void _UpdateGizmoPos();
 
-	void _SetHoverObject(GameObject*);
+	void _SetHoverObject(Entity*);
 
 public:
 	ToolSelect(Editor& level) : Tool(level),
@@ -66,7 +66,7 @@ public:
 
 	virtual void Render(EnumRenderChannel) const override;
 
-	void Select(GameObject* object);
+	void Select(Entity* object);
 	void ClearSelection();
 };
 

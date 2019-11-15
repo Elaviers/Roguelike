@@ -1,6 +1,6 @@
 #include "ColliderSphere.hpp"
 #include "ColliderBox.hpp"
-#include "GameObject.hpp"
+#include "Entity.hpp"
 #include "RaycastResult.hpp"
 
 bool ColliderSphere::IntersectsRay(const Ray &ray, RaycastResult &result, const Transform &transform) const

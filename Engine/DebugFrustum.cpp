@@ -29,7 +29,7 @@ void DebugFrustum::Render() const
 
 //static
 
-DebugFrustum DebugFrustum::FromCamera(const ObjCamera &camera)
+DebugFrustum DebugFrustum::FromCamera(const EntCamera &camera)
 {
 	DebugFrustum frustum;
 

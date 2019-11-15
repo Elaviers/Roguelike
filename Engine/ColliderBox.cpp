@@ -1,7 +1,7 @@
 #include "ColliderBox.hpp"
 #include "ColliderSphere.hpp"
 #include "Collision.hpp"
-#include "GameObject.hpp"
+#include "Entity.hpp"
 #include "Maths.hpp"
 #include "RaycastResult.hpp"
 #include "Utilities.hpp"

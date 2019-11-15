@@ -9,10 +9,10 @@
 #include <Engine/IO.hpp>
 #include <Engine/MaterialManager.hpp>
 #include <Engine/ModelManager.hpp>
-#include <Engine/ObjCamera.hpp>
-#include <Engine/ObjLight.hpp>
-#include <Engine/ObjRenderable.hpp>
-#include <Engine/ObjSprite.hpp>
+#include <Engine/EntCamera.hpp>
+#include <Engine/EntLight.hpp>
+#include <Engine/EntRenderable.hpp>
+#include <Engine/EntSprite.hpp>
 #include <Engine/Utilities.hpp>
 #include <Engine/Window.hpp>
 #include "resource.h"
@@ -28,11 +28,11 @@ private:
 	MaterialManager* const materialManager;
 	ModelManager* const modelManager;
 
-	GameObject _cameraRoot;
-	ObjCamera _camera;
-	ObjRenderable _object;
-	ObjSprite _sprite;
-	ObjLight _light;
+	Entity _cameraRoot;
+	EntCamera _camera;
+	EntRenderable _object;
+	EntSprite _sprite;
+	EntLight _light;
 
 	bool _moving;
 	bool _sizing;

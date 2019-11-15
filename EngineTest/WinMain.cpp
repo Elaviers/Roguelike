@@ -6,9 +6,9 @@
 #include <Engine\GLContext.hpp>
 #include <Engine\GLProgram.hpp>
 #include <Engine\InputManager.hpp>
-#include <Engine\ObjCamera.hpp>
-#include <Engine\ObjLight.hpp>
-#include <Engine\ObjRenderable.hpp>
+#include <Engine\EntCamera.hpp>
+#include <Engine\EntLight.hpp>
+#include <Engine\EntRenderable.hpp>
 #include <Engine\ModelManager.hpp>
 #include <Engine\Skybox.hpp>
 #include <Engine\StackAllocator.hpp>
@@ -31,23 +31,23 @@ const char *skyFaces[6] = { "SkyLeft.png", "SkyRight.png", "SkyUp.png", "SkyDown
 bool running = false;
 
 //
-GameObject lightParent1;
+Entity lightParent1;
 Vector3 rotationOffset1(0.f, 45, 0.f);
-GameObject lightParent2;
+Entity lightParent2;
 Vector3 rotationOffset2(-11, -30, 0.f);
-GameObject lightParent3;
+Entity lightParent3;
 Vector3 rotationOffset3(33, -2, 0.f);
-GameObject lightParent4;
+Entity lightParent4;
 Vector3 rotationOffset4(15, 12.88f, 0);
-ObjLight light1;
-ObjLight light2;
-ObjLight light3;
-ObjLight light4;
+EntLight light1;
+EntLight light2;
+EntLight light3;
+EntLight light4;
 
-ObjRenderable renderable;
-ObjCamera camera;
-ObjRenderable cube;
-GameObject cubeParent;
+EntRenderable renderable;
+EntCamera camera;
+EntRenderable cube;
+Entity cubeParent;
 Vector3 cubeParentRotationOffset(2.f, 11.7f, 0.f);
 Vector3 cubeRotationOffset(9.f, 23.f, 0.f);
 

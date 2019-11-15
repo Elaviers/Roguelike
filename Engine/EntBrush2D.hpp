@@ -1,19 +1,19 @@
 #pragma once
-#include "ObjBrush.hpp"
+#include "EntBrush.hpp"
 
-//TODO - Optimise EVERYTHING to do with this class
-
-class ObjBrush3D : public ObjBrush<3>
+class EntBrush2D : public EntBrush<2>
 {
 protected:
 	virtual void _OnTransformChanged() override;
 
 public:
-	GAMEOBJECT_FUNCS(ObjBrush3D, ObjectIDS::BRUSH)
+	Entity_FUNCS(EntBrush2D, EntityIDS::PLANE)
 
-	ObjBrush3D() {}
-	virtual ~ObjBrush3D() {}
+	float level;
 
+	EntBrush2D() : level(0.f) { SetRelativeRotation(Vector3(-90.f, 0.f, 0.f)); }
+	virtual ~EntBrush2D() {}
+	
 	virtual void Render(EnumRenderChannel) const override;
 
 	virtual void WriteData(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;

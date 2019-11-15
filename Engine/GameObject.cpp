@@ -1,52 +1,52 @@
-#include "GameObject.hpp"
+#include "Entity.hpp"
 #include "Collider.hpp"
 #include "Engine.hpp"
 #include "GL.hpp"
 #include "GLProgram.hpp"
 #include "MacroUtilities.hpp"
-#include "ObjCamera.hpp"
+#include "EntCamera.hpp"
 #include "RaycastResult.hpp"
 
-void GameObject::_AddBaseProperties(PropertyCollection &cvars)
+void Entity::_AddBaseProperties(PropertyCollection &cvars)
 {
 	cvars.Add(
 		"Name",			
-		MemberGetter<GameObject, const String&>	(&GameObject::GetName), 
-		MemberSetter<GameObject, String>			(&GameObject::SetName));
+		MemberGetter<Entity, const String&>	(&Entity::GetName), 
+		MemberSetter<Entity, String>			(&Entity::SetName));
 
 	cvars.Add<uint32>(
 		"UID",	
-		offsetof(GameObject, _uid), 
+		offsetof(Entity, _uid), 
 		PropertyFlags::READONLY);
 
 	cvars.Add(
 		"Position",		
 		MemberGetter<Transform, const Vector3&>	(&Transform::GetPosition), 
 		MemberSetter<Transform, Vector3>			(&Transform::SetPosition),
-		offsetof(GameObject, _transform));
+		offsetof(Entity, _transform));
 
 
 	cvars.Add(
 		"Rotation",		
 		MemberGetter<Transform, const Vector3&>	(&Transform::GetRotationEuler),
 		MemberSetter<Transform, Vector3>			(&Transform::SetRotationEuler),
-		offsetof(GameObject, _transform));
+		offsetof(Entity, _transform));
 
 	cvars.Add(
 		"Scale",
 		MemberGetter<Transform, const Vector3&>	(&Transform::GetScale), 
 		MemberSetter<Transform, Vector3>			(&Transform::SetScale),
-		offsetof(GameObject, _transform));
+		offsetof(Entity, _transform));
 }
 
-const PropertyCollection& GameObject::GetProperties()
+const PropertyCollection& Entity::GetProperties()
 {
 	static PropertyCollection cvars;
 	DO_ONCE(_AddBaseProperties(cvars));
 	return cvars;
 }
 
-Mat4 GameObject::GetTransformationMatrix() const
+Mat4 Entity::GetTransformationMatrix() const
 {
 	if (_parent)
 		return Mat4(_transform.GetTransformationMatrix()) * _parent->GetTransformationMatrix();
@@ -54,7 +54,7 @@ Mat4 GameObject::GetTransformationMatrix() const
 	return Mat4(_transform.GetTransformationMatrix());
 }
 
-Mat4 GameObject::GetInverseTransformationMatrix() const
+Mat4 Entity::GetInverseTransformationMatrix() const
 {
 	if (_parent)
 		return _parent->GetInverseTransformationMatrix() * _transform.GetInverseTransformationMatrix();
@@ -62,7 +62,7 @@ Mat4 GameObject::GetInverseTransformationMatrix() const
 	return _transform.GetInverseTransformationMatrix();
 }
 
-void GameObject::Render(const ObjCamera &camera, EnumRenderChannel channels) const
+void Entity::Render(const EntCamera &camera, EnumRenderChannel channels) const
 {
 	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags & FLAG_DBG_ALWAYS_DRAW)
 		Render(channels);
@@ -71,7 +71,7 @@ void GameObject::Render(const ObjCamera &camera, EnumRenderChannel channels) con
 		_children[i]->Render(camera, channels);
 }
 
-void GameObject::Delete()
+void Entity::Delete()
 {
 	if (Engine::Instance().pObjectTracker)
 	{
@@ -91,7 +91,7 @@ void GameObject::Delete()
 
 //Hierachy
 
-void GameObject::SetParent(GameObject* parent)
+void Entity::SetParent(Entity* parent)
 {
 	if (_parent)
 	{
@@ -108,28 +108,28 @@ void GameObject::SetParent(GameObject* parent)
 	}
 }
 
-GameObject* GameObject::FindByName(const String& name)
+Entity* Entity::FindByName(const String& name)
 {
 	if (_name == name)
 		return this;
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
 	{
-		GameObject* result = _children[i]->FindByName(name);
+		Entity* result = _children[i]->FindByName(name);
 		if (result) return result;
 	}
 
 	return nullptr;
 }
 
-GameObject* GameObject::FindByUID(uint32 uid)
+Entity* Entity::FindByUID(uint32 uid)
 {
 	if (_uid == uid)
 		return this;
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
 	{
-		GameObject* result = _children[i]->FindByUID(uid);
+		Entity* result = _children[i]->FindByUID(uid);
 		if (result) return result;
 	}
 
@@ -138,7 +138,7 @@ GameObject* GameObject::FindByUID(uint32 uid)
 
 //File IO
 
-void GameObject::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const
+void Entity::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const
 {
 	if (_flags & FLAG_SAVEABLE)
 	{
@@ -155,25 +155,25 @@ void GameObject::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> 
 }
 
 //static
-GameObject* GameObject::CreateFromData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+Entity* Entity::CreateFromData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
 {
 	byte id = reader.Read_byte();
-	GameObject* obj = Engine::Instance().registry.GetNode(id)->New();
+	Entity* obj = Engine::Instance().registry.GetNode(id)->New();
 	if (obj)
 		obj->ReadData(reader, strings);
 	else 
-		Debug::Error(CSTR("Cannot create gameobject with ID ", (int)id));
+		Debug::Error(CSTR("Cannot create Entity with ID ", (int)id));
 
 	return obj;
 }
 
-void GameObject::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
+void Entity::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
 {
 	_transform.WriteToBuffer(writer);
 	writer.Write_string(_name.GetData());
 }
 
-void GameObject::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+void Entity::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
 {
 	_transform.ReadFromBuffer(reader);
 	_name = reader.Read_string();
@@ -181,7 +181,7 @@ void GameObject::ReadData(BufferReader<byte>& reader, const NumberedSet<String>&
 
 //Collision
 
-bool GameObject::OverlapsRay(const Ray &ray, RaycastResult &result) const
+bool Entity::OverlapsRay(const Ray &ray, RaycastResult &result) const
 {
 	if (this->GetCollider())
 		return this->GetCollider()->IntersectsRay(ray, result, GetWorldTransform());
@@ -189,7 +189,7 @@ bool GameObject::OverlapsRay(const Ray &ray, RaycastResult &result) const
 	return false;
 }
 
-bool GameObject::OverlapsCollider(const Collider &other, const Transform &otherTransform) const
+bool Entity::OverlapsCollider(const Collider &other, const Transform &otherTransform) const
 {
 	if (this->GetCollider())
 		return this->GetCollider()->Overlaps(other, otherTransform, GetWorldTransform());
@@ -197,7 +197,7 @@ bool GameObject::OverlapsCollider(const Collider &other, const Transform &otherT
 	return false;
 }
 
-Buffer<RaycastResult> GameObject::Raycast(const Ray &ray)
+Buffer<RaycastResult> Entity::Raycast(const Ray &ray)
 {
 	RaycastResult result;
 	Buffer<RaycastResult> results;
@@ -219,9 +219,9 @@ Buffer<RaycastResult> GameObject::Raycast(const Ray &ray)
 	return results;
 }
 
-Buffer<GameObject*> GameObject::FindOverlaps(const Collider &collider, const Transform &_transform)
+Buffer<Entity*> Entity::FindOverlaps(const Collider &collider, const Transform &_transform)
 {
-	Buffer<GameObject*> results;
+	Buffer<Entity*> results;
 
 	for (uint32 i = 0; i < _children.GetSize(); ++i)
 		if (_children[i]->OverlapsCollider(collider, _transform))
@@ -230,7 +230,7 @@ Buffer<GameObject*> GameObject::FindOverlaps(const Collider &collider, const Tra
 	return results;
 }
 
-GameObject& GameObject::operator=(GameObject&& other) noexcept
+Entity& Entity::operator=(Entity&& other) noexcept
 {
 	SetParent(other._parent);
 	other.SetParent(nullptr);
@@ -239,12 +239,12 @@ GameObject& GameObject::operator=(GameObject&& other) noexcept
 		other._children[i]->SetParent(this);
 
 	_transform = other._transform;
-	_transform.SetCallback(Callback(this, &GameObject::_OnTransformChanged));
+	_transform.SetCallback(Callback(this, &Entity::_OnTransformChanged));
 
 	return *this;
 }
 
-Bounds GameObject::GetWorldBounds(bool noTranslation) const
+Bounds Entity::GetWorldBounds(bool noTranslation) const
 {
 	Bounds b = GetBounds();
 	Mat4 wt = GetWorldTransform().GetTransformationMatrix();
@@ -277,7 +277,7 @@ Bounds GameObject::GetWorldBounds(bool noTranslation) const
 //
 #include "Console.hpp"
 
-void GameObject::CMD_List(const Buffer<String>& tokens)
+void Entity::CMD_List(const Buffer<String>& tokens)
 {
 	Engine::Instance().pConsole->Print(CSTR(GetClassString(), "\t\t\"", _name, "\"\t\t0x", String::From((int64)_uid, 0, 16), '\n'));
 
@@ -285,11 +285,11 @@ void GameObject::CMD_List(const Buffer<String>& tokens)
 		_children[i]->CMD_List(tokens);
 }
 
-void GameObject::CMD_Ent(const Buffer<String>& tokens)
+void Entity::CMD_Ent(const Buffer<String>& tokens)
 {
 	if (tokens.GetSize() >= 2)
 	{
-		GameObject* obj = FindByName(tokens[0]);
+		Entity* obj = FindByName(tokens[0]);
 
 		if (obj)
 		{
@@ -299,11 +299,11 @@ void GameObject::CMD_Ent(const Buffer<String>& tokens)
 	}
 }
 
-void GameObject::CMD_ListProperties(const Buffer<String>& tokens)
+void Entity::CMD_ListProperties(const Buffer<String>& tokens)
 {
 	if (tokens.GetSize() >= 1)
 	{
-		GameObject* obj = FindByName(tokens[0]);
+		Entity* obj = FindByName(tokens[0]);
 
 		if (obj)
 		{

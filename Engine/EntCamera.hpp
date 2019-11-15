@@ -1,5 +1,5 @@
 #pragma once
-#include "GameObject.hpp"
+#include "Entity.hpp"
 #include "Collision.hpp"
 #include "Types.hpp"
 
@@ -9,10 +9,10 @@ enum class ProjectionType
 	ORTHOGRAPHIC
 };
 
-class ObjCamera : public GameObject
+class EntCamera : public Entity
 {
 private:
-	static const ObjCamera* _currentCamera;
+	static const EntCamera* _currentCamera;
 
 	Mat4 _projection;
 
@@ -26,13 +26,13 @@ private:
 
 	void UpdateProjectionMatrix();
 public:
-	GAMEOBJECT_FUNCS(ObjCamera, ObjectIDS::CAMERA)
+	Entity_FUNCS(EntCamera, EntityIDS::CAMERA)
 
-	ObjCamera() : _type(ProjectionType::PERSPECTIVE), _fov(90.f), _scale(1.f), _near(.001f), _far(100.f) { }
-	~ObjCamera() {}
+	EntCamera() : _type(ProjectionType::PERSPECTIVE), _fov(90.f), _scale(1.f), _near(.001f), _far(100.f) { }
+	~EntCamera() {}
 
 	void Use();
-	inline static const ObjCamera* Current() { return _currentCamera; }
+	inline static const EntCamera* Current() { return _currentCamera; }
 
 	inline void SetProjectionType(ProjectionType type)	{ _type = type; UpdateProjectionMatrix(); }
 	inline void SetFOV(float fieldOfView)				{ _fov = fieldOfView; UpdateProjectionMatrix(); }

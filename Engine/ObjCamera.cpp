@@ -1,10 +1,10 @@
-#include "ObjCamera.hpp"
+#include "EntCamera.hpp"
 #include "GLProgram.hpp"
 #include "Ray.hpp"
 
-const ObjCamera* ObjCamera::_currentCamera = nullptr;
+const EntCamera* EntCamera::_currentCamera = nullptr;
 
-void ObjCamera::Use()
+void EntCamera::Use()
 {
 	_currentCamera = this;
 	glViewport(0, 0, _viewport[0], _viewport[1]);
@@ -12,7 +12,7 @@ void ObjCamera::Use()
 	GLProgram::Current().SetMat4(DefaultUniformVars::mat4View, GetInverseTransformationMatrix());
 }
 
-void ObjCamera::UpdateProjectionMatrix()
+void EntCamera::UpdateProjectionMatrix()
 {
 	switch (_type)
 	{
@@ -25,7 +25,7 @@ void ObjCamera::UpdateProjectionMatrix()
 	}
 }
 
-Vector2 ObjCamera::GetZPlaneDimensions() const
+Vector2 EntCamera::GetZPlaneDimensions() const
 {
 	float planeHeightAtZ = 2.f / Maths::TangentDegrees(90.f - _fov / 2.f);
 
@@ -33,7 +33,7 @@ Vector2 ObjCamera::GetZPlaneDimensions() const
 }
 
 
-Ray ObjCamera::ScreenCoordsToRay(const Vector2 &coords) const
+Ray EntCamera::ScreenCoordsToRay(const Vector2 &coords) const
 {
 	if (_type == ProjectionType::PERSPECTIVE)
 	{
@@ -53,7 +53,7 @@ Ray ObjCamera::ScreenCoordsToRay(const Vector2 &coords) const
 	}
 }
 
-bool ObjCamera::FrustumOverlaps(const Bounds &b) const
+bool EntCamera::FrustumOverlaps(const Bounds &b) const
 {
 	//World to View
 	Vector4 v = Vector4(b.centre) * GetInverseTransformationMatrix();
@@ -85,9 +85,9 @@ bool ObjCamera::FrustumOverlaps(const Bounds &b) const
 	return Collision::SphereOverlapsAABB(v3, clipRadius, Vector3(-1, -1, -1), Vector3(1, 1, 1));
 }
 
-void ObjCamera::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
+void EntCamera::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
 {
-	GameObject::WriteData(writer, strings);
+	Entity::WriteData(writer, strings);
 
 	writer.Write_byte((byte)_type);
 	writer.Write_float(_fov);
@@ -98,9 +98,9 @@ void ObjCamera::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strin
 	writer.Write_uint16(_viewport[1]);
 }
 
-void ObjCamera::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+void EntCamera::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
 {
-	GameObject::ReadData(reader, strings);
+	Entity::ReadData(reader, strings);
 
 	_type = ProjectionType(reader.Read_byte());
 	_fov = reader.Read_float();

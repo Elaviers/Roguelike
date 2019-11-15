@@ -1,11 +1,11 @@
-#include "ObjConnector.hpp"
+#include "EntConnector.hpp"
 #include "DrawUtils.hpp"
 #include "Engine.hpp"
 #include "GLProgram.hpp"
 #include "ModelManager.hpp"
 #include "TextureManager.hpp"
 
-void ObjConnector::Render(EnumRenderChannel channels) const {
+void EntConnector::Render(EnumRenderChannel channels) const {
 	if (Engine::Instance().pModelManager && channels & RenderChannel::UNLIT)
 	{
 		Engine::Instance().pTextureManager->White()->Bind(0);
@@ -52,18 +52,18 @@ void ObjConnector::Render(EnumRenderChannel channels) const {
 	}
 }
 
-void ObjConnector::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
+void EntConnector::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
 {
-	GameObject::WriteData(writer, strings);
+	Entity::WriteData(writer, strings);
 
 	writer.Write_byte((byte)direction);
 	writer.Write_vector3(_min);
 	writer.Write_vector3(_max);
 }
 
-void ObjConnector::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
+void EntConnector::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
 {
-	GameObject::ReadData(reader, strings);
+	Entity::ReadData(reader, strings);
 
 	direction = (Direction2D)reader.Read_byte();
 	_min = reader.Read_vector3();

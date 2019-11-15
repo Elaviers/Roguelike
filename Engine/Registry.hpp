@@ -1,7 +1,7 @@
 #pragma once
 #include "Debug.hpp"
 #include "Map.hpp"
-#include "GameObject.hpp"
+#include "Entity.hpp"
 #include "String.hpp"
 #include "Utilities.hpp"
 #include <typeinfo>
@@ -15,7 +15,7 @@ public:
 
 	virtual ~RegistryNodeBase() {}
 
-	virtual GameObject* New() = 0;
+	virtual Entity* New() = 0;
 };
 
 template <typename T>
@@ -25,7 +25,7 @@ public:
 	RegistryNode(const String &name) : RegistryNodeBase(name) {}
 	virtual ~RegistryNode() {}
 
-	virtual GameObject* New() override { return T::Create(); }
+	virtual Entity* New() override { return T::Create(); }
 };
 
 class Registry

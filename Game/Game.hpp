@@ -1,7 +1,7 @@
 #pragma once
 #include <Engine/GLContext.hpp>
 #include <Engine/GLProgram.hpp>
-#include <Engine/ObjCamera.hpp>
+#include <Engine/EntCamera.hpp>
 #include <Engine/InputManager.hpp> //For keycode
 #include <Engine/Timer.hpp>
 #include <Engine/UIContainer.hpp>
@@ -23,7 +23,7 @@ private:
 	bool _consoleIsActive;
 
 	UIContainer _ui;
-	ObjCamera _uiCamera;
+	EntCamera _uiCamera;
 
 	static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
 

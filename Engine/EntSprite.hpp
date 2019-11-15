@@ -1,5 +1,5 @@
 #pragma once
-#include "GameObject.hpp"
+#include "Entity.hpp"
 #include "ColliderSphere.hpp"
 #include "Colour.hpp"
 #include "MaterialManager.hpp"
@@ -16,7 +16,7 @@ class EntSprite : public Entity
 	bool _fixedYaw;
 
 public:
-	GAMEOBJECT_FUNCS(EntSprite, EntityIDS::SPRITE)
+	Entity_FUNCS(EntSprite, EntityIDS::SPRITE)
 
 	EntSprite(const MaterialSprite *material = nullptr, float size = 1.f) : 
 		_material(material), 

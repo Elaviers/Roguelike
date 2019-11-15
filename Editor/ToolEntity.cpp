@@ -1,7 +1,7 @@
 #include "ToolEntity.hpp"
 #include "Editor.hpp"
-#include <Engine/ObjBrush.hpp>
-#include <Engine/ObjRenderable.hpp>
+#include <Engine/EntBrush.hpp>
+#include <Engine/EntRenderable.hpp>
 #include <Engine/MacroUtilities.hpp>
 #include <Engine/RaycastResult.hpp>
 #include <Engine/Registry.hpp>
@@ -62,7 +62,7 @@ void ToolEntity::MouseMove(const MouseData& mouseData)
 {
 	if (_placement && _owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::PERSPECTIVE)
 	{
-		ObjCamera& camera = _owner.CameraRef(mouseData.viewport);
+		EntCamera& camera = _owner.CameraRef(mouseData.viewport);
 		RECT windowDims;
 		::GetClientRect(_owner.ViewportRef(mouseData.viewport).GetHwnd(), &windowDims);
 		Ray r = camera.ScreenCoordsToRay(Vector2((float)mouseData.x / (float)windowDims.right, (float)mouseData.y / (float)windowDims.bottom));
@@ -86,7 +86,7 @@ void ToolEntity::MouseDown(const MouseData &mouseData)
 {
 	if (_placement && _readyToPlace)
 	{
-		GameObject* newObj = Engine::Instance().registry.GetNode(_classID)->New();
+		Entity* newObj = Engine::Instance().registry.GetNode(_classID)->New();
 		newObj->SetParent(&_owner.LevelRef());
 
 		const PropertyCollection& cvars = newObj->GetProperties();

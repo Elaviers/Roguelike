@@ -42,7 +42,7 @@ private:
 
 	//Console
 	Window _consoleWindow;
-	ObjCamera _consoleCamera;
+	EntCamera _consoleCamera;
 	Font* _consoleFont = nullptr;
 	bool _consoleIsActive = false;
 
@@ -57,7 +57,7 @@ private:
 	HWND _toolbar = NULL;
 	HIMAGELIST _tbImages = NULL;
 
-	ObjCamera _uiCam;
+	EntCamera _uiCam;
 
 	Viewport _viewports[VIEWPORTCOUNT];
 
@@ -72,7 +72,7 @@ private:
 	EnumRenderChannel _litRenderChannels = RenderChannel::NONE;
 	EnumRenderChannel _unlitRenderChannels = EnumRenderChannel(RenderChannel::SURFACE | RenderChannel::UNLIT);
 
-	GameObject _level;
+	Entity _level;
 
 	Tool *_currentTool = nullptr;
 
@@ -138,8 +138,8 @@ public:
 	void SetTool(ToolEnum tool, bool changeToolbarSelection = true);
 
 	//For Tools
-	inline GameObject& LevelRef() { return _level; }
+	inline Entity& LevelRef() { return _level; }
 	inline Viewport& ViewportRef(int id) { return _viewports[id]; }
-	inline ObjCamera& CameraRef(int id) { return _viewports[id].CameraRef(); }
+	inline EntCamera& CameraRef(int id) { return _viewports[id].CameraRef(); }
 	inline PropertyWindow& PropertyWindowRef() { return _propertyWindow; }
 };

@@ -1,12 +1,12 @@
 #pragma once
 #include "Tool.hpp"
-#include <Engine/ObjConnector.hpp>
+#include <Engine/EntConnector.hpp>
 
 class ToolConnector : public Tool
 {
 	bool _placing;
 
-	ObjConnector _connector;
+	EntConnector _connector;
 
 	const PropertyCollection& _GetProperties();
 public:

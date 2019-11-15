@@ -1,7 +1,7 @@
 #pragma once
 #include <Engine/Window.hpp>
 #include <Engine/Buffer.hpp>
-#include <Engine/GameObject.hpp>
+#include <Engine/Entity.hpp>
 
 class Editor;
 
@@ -46,7 +46,7 @@ public:
 	inline const PropertyCollection* GetProperties() { return _cvars; }
 	void SetCvars(const PropertyCollection&, void* object, bool readOnly = false);
 
-	inline void SetObject(GameObject* object, bool readOnly = false) { SetCvars(object->GetProperties(), object, readOnly); }
+	inline void SetObject(Entity* object, bool readOnly = false) { SetCvars(object->GetProperties(), object, readOnly); }
 
 	void Refresh();
 

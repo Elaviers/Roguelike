@@ -1,11 +1,11 @@
 #pragma once
-#include "GameObject.hpp"
+#include "Entity.hpp"
 #include "ColliderBox.hpp"
 #include "Vector.hpp"
 
 class ModelManager;
 
-class ObjLight : public GameObject
+class EntLight : public Entity
 {
 	Vector3 _colour;
 	float _radius;
@@ -13,10 +13,10 @@ class ObjLight : public GameObject
 	const static Vector3 _editorBoxExtent;
 	const static ColliderBox _lightCollider;
 public:
-	GAMEOBJECT_FUNCS(ObjLight, ObjectIDS::LIGHT)
+	Entity_FUNCS(EntLight, EntityIDS::LIGHT)
 
-	ObjLight() : GameObject(FLAG_SAVEABLE), _radius(-1.f), _colour(1.f, 1.f, 1.f) { }
-	virtual ~ObjLight() {}
+	EntLight() : Entity(FLAG_SAVEABLE), _radius(-1.f), _colour(1.f, 1.f, 1.f) { }
+	virtual ~EntLight() {}
 
 	static bool drawLightSources;
 

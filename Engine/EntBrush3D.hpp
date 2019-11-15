@@ -1,19 +1,17 @@
 #pragma once
-#include "ObjBrush.hpp"
+#include "EntBrush.hpp"
 
-class ObjBrush2D : public ObjBrush<2>
+class EntBrush3D : public EntBrush<3>
 {
 protected:
 	virtual void _OnTransformChanged() override;
 
 public:
-	GAMEOBJECT_FUNCS(ObjBrush2D, ObjectIDS::PLANE)
+	Entity_FUNCS(EntBrush3D, EntityIDS::BRUSH)
 
-	float level;
+	EntBrush3D() {}
+	virtual ~EntBrush3D() {}
 
-	ObjBrush2D() : level(0.f) { SetRelativeRotation(Vector3(-90.f, 0.f, 0.f)); }
-	virtual ~ObjBrush2D() {}
-	
 	virtual void Render(EnumRenderChannel) const override;
 
 	virtual void WriteData(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;

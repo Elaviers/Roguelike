@@ -10,21 +10,21 @@
 #include "Transform.hpp"
 #include <cstdlib>
 
-#define GAMEOBJECT_FUNCS(CLASSNAME, ID)														\
+#define Entity_FUNCS(CLASSNAME, ID)														\
 public:																						\
-	virtual ObjectIDS::ObjectID GetTypeID() const { return ID; }							\
+	virtual EntityIDS::ObjectID GetTypeID() const { return ID; }							\
 	virtual const char* GetClassString() const { return #CLASSNAME;}						\
 	virtual size_t SizeOf() const { return sizeof(*this); }									\
-	virtual GameObject* Clone() const { return GameObject::_CreateCopy<CLASSNAME>(*this); } \
+	virtual Entity* Clone() const { return Entity::_CreateCopy<CLASSNAME>(*this); } \
 	inline CLASSNAME* TypedClone() const { return (CLASSNAME*)Clone(); }					\
 	static CLASSNAME* Create() { CLASSNAME* obj = new CLASSNAME(); const_cast<bool&>(obj->_dynamic) = true; return obj; }
 
 class Collider;
-class ObjCamera; //!!! todo - make this forward declaration unnecessary
+class EntCamera; //!!! todo - make this forward declaration unnecessary
 struct Ray;
 struct RaycastResult;
 
-class GameObject
+class Entity
 {
 	Transform _transform;
 
@@ -48,8 +48,8 @@ protected:
 	byte _flags;
 	const bool _dynamic;
 
-	GameObject *_parent;
-	Buffer<GameObject*> _children;
+	Entity *_parent;
+	Buffer<Entity*> _children;
 
 	void _AddBaseProperties(PropertyCollection&);
 
@@ -70,29 +70,29 @@ public:
 		FLAG_DBG_ALWAYS_DRAW = 0x2
 	};
 
-	GAMEOBJECT_FUNCS(GameObject, ObjectIDS::GAMEOBJECT)
+	Entity_FUNCS(Entity, EntityIDS::Entity)
 
-	GameObject(byte flags = 0, const String &name = String()) : 
+	Entity(byte flags = 0, const String &name = String()) : 
 		_name(name), 
 		_uid(_TakeNextUID()), 
 		_flags(flags), 
 		_dynamic(false), 
 		_parent(nullptr), 
-		_transform(Callback(this, &GameObject::_OnTransformChanged)) 
+		_transform(Callback(this, &Entity::_OnTransformChanged)) 
 	{}
 
-	GameObject(const GameObject &other) : 
+	Entity(const Entity &other) : 
 		_uid(_TakeNextUID()), 
 		_flags(other._flags), 
 		_dynamic(false), 
 		_parent(other._parent), 
 		_transform(other._transform)
 	{
-		_transform.SetCallback(Callback(this, &GameObject::_OnTransformChanged));
+		_transform.SetCallback(Callback(this, &Entity::_OnTransformChanged));
 		CloneChildrenFrom(other);
 	}
 
-	GameObject(GameObject &&other) noexcept : _parent(nullptr), _uid(other._uid), _flags(other._flags), _dynamic(false) 
+	Entity(Entity &&other) noexcept : _parent(nullptr), _uid(other._uid), _flags(other._flags), _dynamic(false) 
 	{ 
 		operator=(std::move(other)); 
 		
@@ -100,7 +100,7 @@ public:
 			delete &other;
 	}
 
-	virtual ~GameObject() {}
+	virtual ~Entity() {}
 
 	void Delete();
 	
@@ -171,13 +171,13 @@ public:
 
 	#pragma region Hierachy
 
-	inline GameObject* GetParent() const { return _parent; }
-	inline const Buffer<GameObject*>& Children() const { return _children; }
+	inline Entity* GetParent() const { return _parent; }
+	inline const Buffer<Entity*>& Children() const { return _children; }
 
-	void SetParent(GameObject* parent);
+	void SetParent(Entity* parent);
 
-	GameObject* FindByName(const String& name);
-	GameObject* FindByUID(uint32 uid);
+	Entity* FindByName(const String& name);
+	Entity* FindByUID(uint32 uid);
 
 	template<typename T>
 	void FindChildrenOfType(Buffer<T*>& out, bool searchChildren)
@@ -204,13 +204,13 @@ public:
 	template <typename T>
 	inline T* NewChild()
 	{
-		GameObject* object = new T();
+		Entity* object = new T();
 		object->_dynamic = true;
 		object->SetParent(this);
 		return dynamic_cast<T*>(object);
 	}
 
-	inline void CloneChildrenFrom(const GameObject &src)
+	inline void CloneChildrenFrom(const Entity &src)
 	{
 		for (uint32 i = 0; i < src._children.GetSize(); ++i)
 			src._children[i]->Clone()->SetParent(this);
@@ -222,7 +222,7 @@ public:
 			_children[0]->Delete();
 	}
 
-	inline bool IsChildOf(const GameObject* parent) const
+	inline bool IsChildOf(const Entity* parent) const
 	{
 		if (_parent == nullptr)
 			return false;
@@ -244,7 +244,7 @@ public:
 
 	virtual void Update() {}
 	virtual void Render(EnumRenderChannel channels) const {}
-	void Render(const ObjCamera &camera, EnumRenderChannel channels) const;
+	void Render(const EntCamera &camera, EnumRenderChannel channels) const;
 
 	virtual const PropertyCollection& GetProperties();
 
@@ -252,7 +252,7 @@ public:
 
 	//IO
 	void WriteAllToFile(BufferWriter<byte>&, NumberedSet<String> &strings) const;
-	static GameObject* CreateFromData(BufferReader<byte>&, const NumberedSet<String>& strings);
+	static Entity* CreateFromData(BufferReader<byte>&, const NumberedSet<String>& strings);
 
 	virtual void WriteData(BufferWriter<byte>&, NumberedSet<String>& strings) const;
 	virtual void ReadData(BufferReader<byte>&, const NumberedSet<String>& strings);
@@ -264,14 +264,14 @@ public:
 	virtual bool OverlapsRay(const Ray&, RaycastResult&) const;
 
 	Buffer<RaycastResult> Raycast(const Ray&);
-	Buffer<GameObject*> FindOverlaps(const Collider&, const Transform& = Transform());
+	Buffer<Entity*> FindOverlaps(const Collider&, const Transform& = Transform());
 
 	//Operators
-	GameObject& operator=(const GameObject&) = delete;
+	Entity& operator=(const Entity&) = delete;
 
-	GameObject& operator=(GameObject&& other) noexcept;
+	Entity& operator=(Entity&& other) noexcept;
 
-	inline bool operator==(const GameObject &other) const { return _uid == other._uid; }
+	inline bool operator==(const Entity &other) const { return _uid == other._uid; }
 
 	//Other
 	virtual Bounds GetBounds() const { return Bounds(); }
@@ -290,7 +290,7 @@ protected:
 	template<typename T>
 	static T* _CreateCopy(const T& other)
 	{
-		GameObject *go = new T(other);
+		Entity *go = new T(other);
 		const_cast<bool&>(go->_dynamic) = true;
 		go->SetParent(other._parent);
 		const_cast<byte&>(go->_flags) = other._flags;

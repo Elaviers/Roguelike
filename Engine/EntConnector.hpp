@@ -1,18 +1,18 @@
 #pragma once
-#include "ObjBox.hpp"
+#include "EntBox.hpp"
 #include "BufferIterator.hpp"
 #include "Direction2D.hpp"
 
-class ObjConnector : public ObjBox
+class EntConnector : public EntBox
 {
 public:
-	GAMEOBJECT_FUNCS(ObjConnector, ObjectIDS::LEVEL_CONNECTOR)
+	Entity_FUNCS(EntConnector, EntityIDS::LEVEL_CONNECTOR)
 
 	Direction2D direction;
 	bool connected;
 
-	ObjConnector() : ObjBox(FLAG_SAVEABLE), direction(Direction2D::NORTH), connected(false) { }
-	virtual ~ObjConnector() {}
+	EntConnector() : EntBox(FLAG_SAVEABLE), direction(Direction2D::NORTH), connected(false) { }
+	virtual ~EntConnector() {}
 
 	virtual void Render(EnumRenderChannel) const;
 
@@ -25,5 +25,5 @@ public:
 
 	}
 
-	bool IsCompatibleWith(const ObjConnector &other) const;
+	bool IsCompatibleWith(const EntConnector &other) const;
 };

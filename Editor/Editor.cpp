@@ -7,8 +7,8 @@
 #include <Engine/FontManager.hpp>
 #include <Engine/InputManager.hpp>
 #include <Engine/IO.hpp>
-#include <Engine/ObjLight.hpp>
-#include <Engine/ObjRenderable.hpp>
+#include <Engine/EntLight.hpp>
+#include <Engine/EntRenderable.hpp>
 #include <Engine/Ray.hpp>
 #include "EditorIO.hpp"
 #include "resource.h"
@@ -252,7 +252,7 @@ void Editor::Frame()
 
 	_timer.Start();
 
-	ObjCamera &perspCam = CameraRef(_activeVP);
+	EntCamera &perspCam = CameraRef(_activeVP);
 	perspCam.RelativeMove(
 		perspCam.GetRelativeTransform().GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed
 		+ perspCam.GetRelativeTransform().GetRightVector() * _deltaTime * _axisMoveX * moveSpeed
@@ -315,7 +315,7 @@ void Editor::RenderViewport(int index, Direction dir)
 		_shaderLit.SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
 		_shaderLit.SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1, 1));
 
-		Buffer<ObjLight*> lights = _level.FindChildrenOfType<ObjLight>(true);
+		Buffer<EntLight*> lights = _level.FindChildrenOfType<EntLight>(true);
 
 		for (size_t i = 0; i < 8; ++i)
 		{
@@ -454,7 +454,7 @@ void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y
 			RightMouseUp();
 	}
 
-	ObjCamera& camera = CameraRef(vpIndex);
+	EntCamera& camera = CameraRef(vpIndex);
 	Vector3 right = camera.GetRelativeTransform().GetRightVector();
 	Vector3 up = camera.GetRelativeTransform().GetUpVector();
 
@@ -580,7 +580,7 @@ void Editor::RefreshLevel()
 
 void Editor::Zoom(float amount)
 {
-	ObjCamera& camera = CameraRef(_mouseData.viewport);
+	EntCamera& camera = CameraRef(_mouseData.viewport);
 
 	if (camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
 	{

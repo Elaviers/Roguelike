@@ -1,9 +1,9 @@
-#include "ObjBrush3D.hpp"
+#include "EntBrush3D.hpp"
 #include "GLProgram.hpp"
 #include "MacroUtilities.hpp"
 #include "Utilities.hpp"
 
-void ObjBrush3D::_OnTransformChanged()
+void EntBrush3D::_OnTransformChanged()
 {
 	float x = (_point1[0] + _point2[0]) / 2.f;
 	float y = (_point1[1] + _point2[1]) / 2.f;
@@ -18,7 +18,7 @@ void ObjBrush3D::_OnTransformChanged()
 
 #include "DrawUtils.hpp"
 
-void ObjBrush3D::Render(EnumRenderChannel channels) const
+void EntBrush3D::Render(EnumRenderChannel channels) const
 {
 	ModelManager* modelManager = Engine::Instance().pModelManager;
 
@@ -77,9 +77,9 @@ void ObjBrush3D::Render(EnumRenderChannel channels) const
 	}
 }
 
-void ObjBrush3D::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
+void EntBrush3D::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
 {
-	GameObject::WriteData(writer, strings);
+	Entity::WriteData(writer, strings);
 
 	if (Engine::Instance().pMaterialManager && _material)
 	{																	//todo: const cast removal
@@ -89,9 +89,9 @@ void ObjBrush3D::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &stri
 	else writer.Write_uint16(0);
 }
 
-void ObjBrush3D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
+void EntBrush3D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
 {
-	GameObject::ReadData(reader, strings);
+	Entity::ReadData(reader, strings);
 
 	const String *materialName = strings.Get(reader.Read_uint16());
 	if (materialName)
@@ -105,7 +105,7 @@ void ObjBrush3D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> 
 	_point2[2] = GetRelativePosition()[2] + GetRelativeScale()[2] / 2.f;
 }
 
-const PropertyCollection& ObjBrush3D::GetProperties()
+const PropertyCollection& EntBrush3D::GetProperties()
 {
 	static PropertyCollection cvars;
 
@@ -114,18 +114,18 @@ const PropertyCollection& ObjBrush3D::GetProperties()
 
 	cvars.Add(
 		"Material", 
-		MemberGetter<ObjBrush<3>, String>(&ObjBrush<3>::GetMaterialName), 
-		MemberSetter<ObjBrush<3>, String>(&ObjBrush<3>::SetMaterial), 
+		MemberGetter<EntBrush<3>, String>(&EntBrush<3>::GetMaterialName), 
+		MemberSetter<EntBrush<3>, String>(&EntBrush<3>::SetMaterial), 
 		0,
 		PropertyFlags::MATERIAL);
 		
 	cvars.Add<Vector3>(
 		"Point1", 
-		offsetof(ObjBrush3D, _point1));
+		offsetof(EntBrush3D, _point1));
 
 	cvars.Add<Vector3>(
 		"Point2", 
-		offsetof(ObjBrush3D, _point2));
+		offsetof(EntBrush3D, _point2));
 	DO_ONCE_END;
 
 	return cvars;

@@ -1,12 +1,12 @@
 #pragma once
 #include "Tool.hpp"
-#include <Engine/ObjBrush2D.hpp>
+#include <Engine/EntBrush2D.hpp>
 
 class ToolBrush2D : public Tool
 {
 	bool _placing;
 
-	ObjBrush2D _object;
+	EntBrush2D _object;
 	const PropertyCollection* _properties;
 
 	const PropertyCollection& _GetProperties();

@@ -1,11 +1,11 @@
 #pragma once
-#include "GameObject.hpp"
+#include "Entity.hpp"
 #include "Colour.hpp"
 #include "Engine.hpp"
 #include "MaterialManager.hpp"
 #include "ModelManager.hpp"
 
-class ObjRenderable : public GameObject
+class EntRenderable : public Entity
 {
 private:
 	const Model *_model;
@@ -16,16 +16,16 @@ private:
 	bool _materialIsDefault;
 
 public:
-	GAMEOBJECT_FUNCS(ObjRenderable, ObjectIDS::RENDERABLE)
+	Entity_FUNCS(EntRenderable, EntityIDS::RENDERABLE)
 	
-	ObjRenderable() : 
-		GameObject(FLAG_SAVEABLE), 
+	EntRenderable() : 
+		Entity(FLAG_SAVEABLE), 
 		_model(nullptr), 
 		_material(nullptr), 
 		_colour(1.f, 1.f, 1.f),
 		_materialIsDefault(false) 
 	{}
-	virtual ~ObjRenderable() {}
+	virtual ~EntRenderable() {}
 
 	inline const Colour& GetColour() const { return _colour; }
 

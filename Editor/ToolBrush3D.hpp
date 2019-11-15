@@ -1,12 +1,12 @@
 #pragma once
 #include "Tool.hpp"
-#include <Engine/ObjBrush3D.hpp>
+#include <Engine/EntBrush3D.hpp>
 
 class ToolBrush3D : public Tool
 {
 	bool _placing;
 
-	ObjBrush3D _object;
+	EntBrush3D _object;
 
 	const PropertyCollection& _GetProperties();
 public:

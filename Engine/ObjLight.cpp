@@ -1,4 +1,4 @@
-#include "ObjLight.hpp"
+#include "EntLight.hpp"
 #include "Engine.hpp"
 #include "GL.hpp"
 #include "GLProgram.hpp"
@@ -7,12 +7,12 @@
 #include "String.hpp"
 #include "TextureManager.hpp"
 
-const Vector3 ObjLight::_editorBoxExtent(.1f, .1f, .1f);
-const ColliderBox ObjLight::_lightCollider(COLL_EDITOR, ObjLight::_editorBoxExtent);
+const Vector3 EntLight::_editorBoxExtent(.1f, .1f, .1f);
+const ColliderBox EntLight::_lightCollider(COLL_EDITOR, EntLight::_editorBoxExtent);
 
-bool ObjLight::drawLightSources = true;
+bool EntLight::drawLightSources = true;
 
-const PropertyCollection& ObjLight::GetProperties()
+const PropertyCollection& EntLight::GetProperties()
 {
 	static PropertyCollection cvars;
 
@@ -21,17 +21,17 @@ const PropertyCollection& ObjLight::GetProperties()
 
 	cvars.Add<Vector4>(
 		"Colour", 
-		offsetof(ObjLight, _colour));
+		offsetof(EntLight, _colour));
 
 	cvars.Add<float>(
 		"Radius", 
-		offsetof(ObjLight, _radius));
+		offsetof(EntLight, _radius));
 	DO_ONCE_END;
 
 	return cvars;
 }
 
-void ObjLight::ToShader(int glArrayIndex)
+void EntLight::ToShader(int glArrayIndex)
 {
 	Mat4 worldTransform = GetWorldTransform().GetTransformationMatrix();
 
@@ -41,7 +41,7 @@ void ObjLight::ToShader(int glArrayIndex)
 	glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Radius")),			1, &_radius);
 }
 
-void ObjLight::Render(EnumRenderChannel channels) const
+void EntLight::Render(EnumRenderChannel channels) const
 {
 	const float colour[4] = {_colour[0], _colour[1], _colour[2], 1.f};
 
@@ -54,17 +54,17 @@ void ObjLight::Render(EnumRenderChannel channels) const
 	}
 }
 
-void ObjLight::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
+void EntLight::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
 {
-	GameObject::WriteData(writer, strings);
+	Entity::WriteData(writer, strings);
 
 	writer.Write_float(_radius);
 	writer.Write_vector3(_colour);
 }
 
-void ObjLight::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+void EntLight::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
 {
-	GameObject::ReadData(reader, strings);
+	Entity::ReadData(reader, strings);
 
 	_radius = reader.Read_float();
 	_colour = reader.Read_vector3();

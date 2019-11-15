@@ -107,7 +107,7 @@ void ToolConnector::KeySubmit()
 {
 	_placing = false;
 
-	ObjConnector *clone = _connector.TypedClone();
+	EntConnector *clone = _connector.TypedClone();
 	clone->SetRenderColour(Colour(0.f, 1.f, 0.f));
 	clone->SetParent(&_owner.LevelRef());
 

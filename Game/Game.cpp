@@ -153,7 +153,7 @@ void Game::StartLevel(const String &level)
 	_running = false;
 	
 	String fileString = IO::ReadFileString(level.GetData());
-	GameObject world = LevelGeneration::GenerateLevel(fileString);
+	Entity world = LevelGeneration::GenerateLevel(fileString);
 
 }
 

@@ -1,11 +1,11 @@
-#include "ObjSkeletal.hpp"
+#include "EntSkeletal.hpp"
 
-void ObjSkeletal::Render()
+void EntSkeletal::Render()
 {
 
 }
 
-void ObjSkeletal::PlayAnimation(const Animation& anim)
+void EntSkeletal::PlayAnimation(const Animation& anim)
 {
 	
 }

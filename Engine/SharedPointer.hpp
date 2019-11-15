@@ -122,5 +122,5 @@ public:
 	SharedPointer(T *addr = nullptr) : SharedPointer(addr, _pDeletePointer, 1) {}
 };
 
-class GameObject;
-typedef SharedPointerC<GameObject> GameObjectPointer;
+class Entity;
+typedef SharedPointerC<Entity> EntityPointer;

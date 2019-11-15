@@ -3,7 +3,7 @@
 #include <Engine/SharedPointer.hpp>
 #include <CommCtrl.h>
 
-class GameObject;
+class Entity;
 class Editor;
 
 class HierachyWindow : public Window
@@ -11,15 +11,15 @@ class HierachyWindow : public Window
 	static const TCHAR* _className;
 	static LRESULT _WindowProc(HWND, UINT, WPARAM, LPARAM);
 
-	GameObjectPointer _currentRoot;
-	GameObjectPointer _dragObj;
+	EntityPointer _currentRoot;
+	EntityPointer _dragObj;
 
 	HWND _treeView;
 	HIMAGELIST _imageList;
 
 	Editor* _owner;
 
-	HTREEITEM _AddObject(GameObject&, HTREEITEM parent, HTREEITEM after);
+	HTREEITEM _AddObject(Entity&, HTREEITEM parent, HTREEITEM after);
 
 public:
 	HierachyWindow(Editor *owner) : 
@@ -40,7 +40,7 @@ public:
 		Window::SetSize(256, 512);
 	}
 
-	void Refresh(GameObject& root);
+	void Refresh(Entity& root);
 
 	void BeginDrag(LPNMTREEVIEW);
 	void MouseMove(int x, int y);

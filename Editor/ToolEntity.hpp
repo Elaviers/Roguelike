@@ -6,7 +6,7 @@ class ToolEntity : public Tool
 {
 	byte _classID;
 
-	GameObjectPointer _placement;
+	EntityPointer _placement;
 	bool _readyToPlace;
 
 	const PropertyCollection& _GetProperties();

@@ -1,11 +1,11 @@
-#include "ObjBrush2D.hpp"
+#include "EntBrush2D.hpp"
 #include "GLProgram.hpp"
 #include "MacroUtilities.hpp"
 #include "MaterialManager.hpp"
 #include "ModelManager.hpp"
 #include "Utilities.hpp"
 
-void ObjBrush2D::_OnTransformChanged()
+void EntBrush2D::_OnTransformChanged()
 {
 	float x = (_point1[0] + _point2[0]) / 2.f;
 	float z = (_point1[1] + _point2[1]) / 2.f;
@@ -16,7 +16,7 @@ void ObjBrush2D::_OnTransformChanged()
 	SetRelativeScale(Vector3(w, h, 1));
 }
 
-void ObjBrush2D::Render(EnumRenderChannel channels) const
+void EntBrush2D::Render(EnumRenderChannel channels) const
 {
 	if (Engine::Instance().pModelManager && _material && channels & _material->GetRenderChannels())
 	{
@@ -29,9 +29,9 @@ void ObjBrush2D::Render(EnumRenderChannel channels) const
 }
 
 
-void ObjBrush2D::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
+void EntBrush2D::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
 {
-	GameObject::WriteData(writer, strings);
+	Entity::WriteData(writer, strings);
 
 	if (Engine::Instance().pMaterialManager && _material)
 	{
@@ -41,9 +41,9 @@ void ObjBrush2D::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &stri
 	else writer.Write_uint16(0);
 }
 
-void ObjBrush2D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
+void EntBrush2D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
 {
-	GameObject::ReadData(reader, strings);
+	Entity::ReadData(reader, strings);
 
 	const String *materialName = strings.Get(reader.Read_uint16());
 	if (materialName)
@@ -56,7 +56,7 @@ void ObjBrush2D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> 
 	_point2[1] = GetRelativePosition()[2] + GetRelativeScale()[1] / 2.f;
 }
 
-const PropertyCollection& ObjBrush2D::GetProperties()
+const PropertyCollection& EntBrush2D::GetProperties()
 {
 	static PropertyCollection cvars;
 	
@@ -65,22 +65,22 @@ const PropertyCollection& ObjBrush2D::GetProperties()
 
 	cvars.Add(
 		"Material",
-		MemberGetter<ObjBrush<2>, String>(&ObjBrush<2>::GetMaterialName),
-		MemberSetter<ObjBrush<2>, String>(&ObjBrush<2>::SetMaterial),
+		MemberGetter<EntBrush<2>, String>(&EntBrush<2>::GetMaterialName),
+		MemberSetter<EntBrush<2>, String>(&EntBrush<2>::SetMaterial),
 		0,
 		PropertyFlags::MATERIAL);
 
 	cvars.Add<Vector3>(
 		"Point1",
-		offsetof(ObjBrush2D, _point1));
+		offsetof(EntBrush2D, _point1));
 
 	cvars.Add<Vector3>(
 		"Point2",
-		offsetof(ObjBrush2D, _point2));
+		offsetof(EntBrush2D, _point2));
 
 	cvars.Add<float>(
 		"Level",
-		offsetof(ObjBrush2D, level));
+		offsetof(EntBrush2D, level));
 	DO_ONCE_END;
 
 	return cvars;

@@ -1,17 +1,17 @@
 #pragma once
 #include "Types.hpp"
 
-namespace ObjectIDS
+namespace EntityIDS
 {
 	/*
-		GameObject IDs for Engine objects
+		Entity IDs for Engine objects
 
 	*/
 
 	enum ObjectID : byte
 	{
 		//Saveable objects
-		GAMEOBJECT = 0xFF,
+		Entity = 0xFF,
 		RENDERABLE = 1,
 		SKELETAL = 2,
 		BRUSH = 3,

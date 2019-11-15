@@ -10,8 +10,8 @@ const PropertyCollection& ToolBrush3D::_GetProperties()
 	DO_ONCE(
 		properties.Add(
 		"Material",
-		MemberGetter<ObjBrush<3>, String>(&ObjBrush<3>::GetMaterialName),
-		MemberSetter<ObjBrush<3>, String>(&ObjBrush<3>::SetMaterial),
+		MemberGetter<EntBrush<3>, String>(&EntBrush<3>::GetMaterialName),
+		MemberSetter<EntBrush<3>, String>(&EntBrush<3>::SetMaterial),
 		offsetof(ToolBrush3D, _object),
 		PropertyFlags::MATERIAL)
 	);

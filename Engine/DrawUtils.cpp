@@ -54,7 +54,7 @@ namespace DrawUtils
 		}
 	}
 
-	void DrawGrid(const ModelManager &modelManager, const ObjCamera &camera, Direction dir, float width, float gap, float limit, float offset)
+	void DrawGrid(const ModelManager &modelManager, const EntCamera &camera, Direction dir, float width, float gap, float limit, float offset)
 	{
 		Mat4 transformX;
 		Mat4 transformY;

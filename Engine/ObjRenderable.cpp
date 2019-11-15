@@ -1,9 +1,9 @@
-#include "ObjRenderable.hpp"
+#include "EntRenderable.hpp"
 #include "Collider.hpp"
 #include "GLProgram.hpp"
 #include "MacroUtilities.hpp"
 
-const PropertyCollection& ObjRenderable::GetProperties()
+const PropertyCollection& EntRenderable::GetProperties()
 {
 	static PropertyCollection cvars;
 
@@ -11,15 +11,15 @@ const PropertyCollection& ObjRenderable::GetProperties()
 	_AddBaseProperties(cvars);
 	cvars.Add(
 		"Model", 
-		MemberGetter<ObjRenderable, String>(&ObjRenderable::GetModelName), 
-		MemberSetter<ObjRenderable, String>(&ObjRenderable::SetModel), 
+		MemberGetter<EntRenderable, String>(&EntRenderable::GetModelName), 
+		MemberSetter<EntRenderable, String>(&EntRenderable::SetModel), 
 		0,
 		PropertyFlags::MODEL);
 
 	cvars.Add(
 		"Material", 
-		MemberGetter<ObjRenderable, String>(&ObjRenderable::GetMaterialName), 
-		MemberSetter<ObjRenderable, String>(&ObjRenderable::SetMaterial), 
+		MemberGetter<EntRenderable, String>(&EntRenderable::GetMaterialName), 
+		MemberSetter<EntRenderable, String>(&EntRenderable::SetMaterial), 
 		0,
 		PropertyFlags::MATERIAL);
 	DO_ONCE_END;
@@ -27,7 +27,7 @@ const PropertyCollection& ObjRenderable::GetProperties()
 	return cvars;
 }
 
-void ObjRenderable::Render(EnumRenderChannel channels) const
+void EntRenderable::Render(EnumRenderChannel channels) const
 {
 	if (_model)
 	{
@@ -45,7 +45,7 @@ void ObjRenderable::Render(EnumRenderChannel channels) const
 	}
 }
 
-const Collider* ObjRenderable::GetCollider() const
+const Collider* EntRenderable::GetCollider() const
 {
 	if (_model)
 		return _model->GetCollider();
@@ -53,21 +53,21 @@ const Collider* ObjRenderable::GetCollider() const
 	return nullptr;
 }
 
-String ObjRenderable::GetModelName() const
+String EntRenderable::GetModelName() const
 {
 	if (Engine::Instance().pModelManager && _model) return Engine::Instance().pModelManager->FindNameOf(_model);
 	return "Unknown";
 }
 
-String ObjRenderable::GetMaterialName() const
+String EntRenderable::GetMaterialName() const
 {																						//todo: remove Smelly const cast
 	if (Engine::Instance().pMaterialManager && _material) return Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material));
 	return "Unknown";
 }
 
-void ObjRenderable::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
+void EntRenderable::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
 {
-	GameObject::WriteData(writer, strings);
+	Entity::WriteData(writer, strings);
 
 	if (Engine::Instance().pModelManager && _model)
 	{
@@ -86,9 +86,9 @@ void ObjRenderable::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &s
 	writer.Write_vector4(_colour);
 }
 
-void ObjRenderable::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
+void EntRenderable::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
 {
-	GameObject::ReadData(reader, strings);
+	Entity::ReadData(reader, strings);
 
 	const String *string;
 

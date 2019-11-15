@@ -5,9 +5,9 @@
 #include "Map.hpp"
 #include "Registry.hpp"
 
-#include "ObjBrush2D.hpp"
-#include "ObjBrush3D.hpp"
-#include "ObjRenderable.hpp"
+#include "EntBrush2D.hpp"
+#include "EntBrush3D.hpp"
+#include "EntRenderable.hpp"
 
 constexpr const char *levelPrefix = "POO";
 constexpr const byte currentVersion = LevelVersions::VERSION_2;
@@ -29,7 +29,7 @@ inline void WriteStringMessage(BufferWriter<byte> &buffer, const String &string,
 	buffer.Write_string(string.GetData());
 }
 
-bool LevelIO::Write(const GameObject &world, const char *filename)
+bool LevelIO::Write(const Entity &world, const char *filename)
 {
 	Buffer<byte> buffer1, buffer2;
 	BufferWriter<byte> writer1(buffer1), writer2(buffer2);
@@ -48,7 +48,7 @@ bool LevelIO::Write(const GameObject &world, const char *filename)
 	return IO::WriteFile(filename, finalBuffer.Data(), (uint32)finalBuffer.GetSize());
 }
 
-bool LevelIO::Read(GameObject &world, const char *filename)
+bool LevelIO::Read(Entity &world, const char *filename)
 {
 	Buffer<byte> buffer = IO::ReadFile(filename);
 
@@ -87,7 +87,7 @@ bool LevelIO::Read(GameObject &world, const char *filename)
 			}
 			else
 			{
-				GameObject *obj = Engine::Instance().registry.GetNode(id)->New();
+				Entity *obj = Engine::Instance().registry.GetNode(id)->New();
 				if (obj)
 				{
 					obj->SetParent(&world);

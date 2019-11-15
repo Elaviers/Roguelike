@@ -1,14 +1,14 @@
 #include "CppUnitTest.h"
 
 #include <Engine/Engine.hpp>
-#include <Engine/GameObject.hpp>
-#include <Engine/ObjBrush2D.hpp>
-#include <Engine/ObjBrush3D.hpp>
-#include <Engine/ObjCamera.hpp>
-#include <Engine/ObjConnector.hpp>
-#include <Engine/ObjLight.hpp>
-#include <Engine/ObjRenderable.hpp>
-#include <Engine/ObjSprite.hpp>
+#include <Engine/Entity.hpp>
+#include <Engine/EntBrush2D.hpp>
+#include <Engine/EntBrush3D.hpp>
+#include <Engine/EntCamera.hpp>
+#include <Engine/EntConnector.hpp>
+#include <Engine/EntLight.hpp>
+#include <Engine/EntRenderable.hpp>
+#include <Engine/EntSprite.hpp>
 
 #include <Engine/Material_Surface.hpp>
 #include <Engine/Model.hpp>
@@ -21,7 +21,7 @@ namespace EngineTests
 	MaterialSprite* materialSprite;
 	Model* model;
 
-	TEST_CLASS(GameObjectTests)
+	TEST_CLASS(EntityTests)
 	{
 		TEST_CLASS_INITIALIZE(ClassInit)
 		{
@@ -42,8 +42,8 @@ namespace EngineTests
 
 		TEST_METHOD(TestHierachy)
 		{
-			GameObject go1, go2, go3;
-			GameObject* a = &go1, * b = &go2, * c = &go3;
+			Entity go1, go2, go3;
+			Entity* a = &go1, * b = &go2, * c = &go3;
 
 			c->SetParent(b);
 			b->SetParent(a);
@@ -54,7 +54,7 @@ namespace EngineTests
 		template<typename T> void AssertEqual(const T& a, const T& b) {}
 
 		template<>
-		void AssertEqual(const GameObject& a, const GameObject& b)
+		void AssertEqual(const Entity& a, const Entity& b)
 		{
 			Assert::IsTrue(a.GetName() == b.GetName(), L"Names are not equal");
 			Assert::IsTrue(a.GetRelativePosition() == b.GetRelativePosition(), L"Positions are not equal");
@@ -65,25 +65,25 @@ namespace EngineTests
 		}
 
 		template<>
-		void AssertEqual(const ObjBrush2D& a, const ObjBrush2D& b)
+		void AssertEqual(const EntBrush2D& a, const EntBrush2D& b)
 		{
-			AssertEqual<GameObject>(a, b);
+			AssertEqual<Entity>(a, b);
 
 			Assert::IsTrue(a.GetMaterial() == b.GetMaterial(), L"Materials are not equal");
 		}
 
 		template<>
-		void AssertEqual(const ObjBrush3D& a, const ObjBrush3D& b)
+		void AssertEqual(const EntBrush3D& a, const EntBrush3D& b)
 		{
-			AssertEqual<GameObject>(a, b);
+			AssertEqual<Entity>(a, b);
 
 			Assert::IsTrue(a.GetMaterial() == b.GetMaterial(), L"Materials are not equal");
 		}
 
 		template<>
-		void AssertEqual(const ObjCamera& a, const ObjCamera& b)
+		void AssertEqual(const EntCamera& a, const EntCamera& b)
 		{
-			AssertEqual<GameObject>(a, b);
+			AssertEqual<Entity>(a, b);
 
 			Assert::IsTrue(a.GetProjectionType() == b.GetProjectionType(), L"Projection types are not equal");
 			Assert::IsTrue(a.GetFOV() == b.GetFOV(), L"Fields of view are not equal");
@@ -94,26 +94,26 @@ namespace EngineTests
 		}
 
 		template<>
-		void AssertEqual(const ObjConnector& a, const ObjConnector& b)
+		void AssertEqual(const EntConnector& a, const EntConnector& b)
 		{
-			AssertEqual<GameObject>(a, b);
+			AssertEqual<Entity>(a, b);
 
 			Assert::IsTrue(a.direction == b.direction, L"Directions are not equal");
 		}
 
 		template<>
-		void AssertEqual(const ObjLight& a, const ObjLight& b)
+		void AssertEqual(const EntLight& a, const EntLight& b)
 		{
-			AssertEqual<GameObject>(a, b);
+			AssertEqual<Entity>(a, b);
 
 			Assert::IsTrue(a.GetColour() == b.GetColour(), L"Colours are not equal");
 			Assert::IsTrue(a.GetRadius() == b.GetRadius(), L"Radii are not equal");
 		}
 
 		template<>
-		void AssertEqual(const ObjRenderable& a, const ObjRenderable& b)
+		void AssertEqual(const EntRenderable& a, const EntRenderable& b)
 		{
-			AssertEqual<GameObject>(a, b);
+			AssertEqual<Entity>(a, b);
 
 			Assert::IsTrue(a.GetMaterial() == b.GetMaterial(), L"Materials are not equal");
 			Assert::IsTrue(a.GetModel() == b.GetModel(), L"Models are not equal");
@@ -121,9 +121,9 @@ namespace EngineTests
 		}
 
 		template<>
-		void AssertEqual(const ObjSprite& a, const ObjSprite& b)
+		void AssertEqual(const EntSprite& a, const EntSprite& b)
 		{
-			AssertEqual<GameObject>(a, b);
+			AssertEqual<Entity>(a, b);
 
 			Assert::IsTrue(a.GetMaterial() == b.GetMaterial(), L"Materials are not equal");
 			Assert::IsTrue(a.GetSize() == b.GetSize(), L"Sizes are not equal");
@@ -139,14 +139,14 @@ namespace EngineTests
 			src.WriteAllToFile(writer, strings);
 
 			BufferReader<byte> reader(buffer);
-			GameObject* dest = GameObject::CreateFromData(reader, strings);
+			Entity* dest = Entity::CreateFromData(reader, strings);
 			AssertEqual<T>((T&)src, (T&)*dest);
 			dest->Delete();
 		}
 
 #define SRC(TYPE) \
 		TYPE src;									\
-		src.SetFlags(GameObject::FLAG_SAVEABLE);	\
+		src.SetFlags(Entity::FLAG_SAVEABLE);	\
 		src.SetRelativeTransform(t);				\
 		src.SetName(name);
 		TEST_METHOD(TestReadWrite)
@@ -156,25 +156,25 @@ namespace EngineTests
 			const Colour colour(1.f, 2.f, 3.f, 4.f);
 
 			{
-				SRC(GameObject);
+				SRC(Entity);
 				CheckRW(src);
 			}
 
 			{
-				SRC(ObjBrush2D);
+				SRC(EntBrush2D);
 				src.SetMaterial(material);
 				src.level = 69.f;
 				CheckRW(src);
 			}
 
 			{
-				SRC(ObjBrush3D);
+				SRC(EntBrush3D);
 				src.SetMaterial(material);
 				CheckRW(src);
 			}
 
 			{
-				SRC(ObjCamera);
+				SRC(EntCamera);
 				src.SetProjectionType(ProjectionType::PERSPECTIVE);
 				src.SetFOV(110.f);
 				src.SetScale(69.f);
@@ -184,21 +184,21 @@ namespace EngineTests
 			}
 
 			{
-				SRC(ObjConnector);
+				SRC(EntConnector);
 				src.direction = Direction2D::SOUTH;
 				src.connected = true;
 				CheckRW(src);
 			}
 
 			{
-				SRC(ObjLight);
+				SRC(EntLight);
 				src.SetColour(Vector3(1,2,3));
 				src.SetRadius(420.f);
 				CheckRW(src);
 			}
 
 			{
-				SRC(ObjRenderable);
+				SRC(EntRenderable);
 				src.SetColour(colour);
 				src.SetMaterial(material);
 				src.SetModel(model);
@@ -206,7 +206,7 @@ namespace EngineTests
 			}
 
 			{
-				SRC(ObjSprite);
+				SRC(EntSprite);
 				src.SetColour(colour);
 				src.SetMaterial(materialSprite);
 				src.SetSize(200.f);

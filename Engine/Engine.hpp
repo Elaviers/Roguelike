@@ -5,7 +5,7 @@
 #include "Tracker.hpp"
 
 class Console;
-class GameObject;
+class Entity;
 class AudioManager;
 class DebugManager;
 class FontManager;
@@ -43,7 +43,7 @@ public:
 	Registry registry;
 
 	Console			*pConsole = nullptr;
-	GameObject		*pWorld = nullptr;
+	Entity		*pWorld = nullptr;
 	
 	AudioManager	*pAudioManager = nullptr;
 	DebugManager	*pDebugManager = nullptr;
@@ -53,9 +53,9 @@ public:
 	ModelManager	*pModelManager = nullptr;
 	TextureManager	*pTextureManager = nullptr;
 
-	Tracker<GameObject> *pObjectTracker = nullptr;
+	Tracker<Entity> *pObjectTracker = nullptr;
 
 	inline FT_Library GetFTLibrary() { return _ftLib; }
 
-	void Init(EngineCreateFlags, GameObject* world);
+	void Init(EngineCreateFlags, Entity* world);
 };

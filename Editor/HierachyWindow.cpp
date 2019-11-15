@@ -2,7 +2,7 @@
 #include "Editor.hpp"
 #include "resource.h"
 #include <Engine/Engine.hpp>
-#include <Engine/GameObject.hpp>
+#include <Engine/Entity.hpp>
 #include <CommCtrl.h>
 #include <windowsx.h>
 
@@ -115,7 +115,7 @@ void HierachyWindow::Initialise(HBRUSH brush)
 	::RegisterClassEx(&windowClass);
 }
 
-HTREEITEM HierachyWindow::_AddObject(GameObject& obj, HTREEITEM parent, HTREEITEM after)
+HTREEITEM HierachyWindow::_AddObject(Entity& obj, HTREEITEM parent, HTREEITEM after)
 {
 	auto regNode = Engine::Instance().registry.GetNode(obj.GetTypeID());
 	String name = regNode ? regNode->name : "???";
@@ -145,7 +145,7 @@ HTREEITEM HierachyWindow::_AddObject(GameObject& obj, HTREEITEM parent, HTREEITE
 	return item;
 }
 
-void HierachyWindow::Refresh(GameObject& root)
+void HierachyWindow::Refresh(Entity& root)
 {
 	_currentRoot = Engine::Instance().pObjectTracker->Track(&root);
 
@@ -221,7 +221,7 @@ void HierachyWindow::MouseUp()
 			
 			TreeView_GetItem(_treeView, &item);
 
-			GameObject* go = _currentRoot->FindByUID((uint32)item.lParam);
+			Entity* go = _currentRoot->FindByUID((uint32)item.lParam);
 
 			if (go != _dragObj.Ptr() && !go->IsChildOf(_dragObj.Ptr()))
 			{

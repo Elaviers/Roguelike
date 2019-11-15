@@ -1,13 +1,13 @@
 #include "LevelBag.hpp"
 #include <Engine/Random.hpp>
 
-void LevelBag::AddLevel(GameObject &level, int dominance)
+void LevelBag::AddLevel(Entity &level, int dominance)
 {
-	_levels.Add(Pair<GameObject*, int>(&level, dominance));
+	_levels.Add(Pair<Entity*, int>(&level, dominance));
 	_totalSize += dominance;
 }
 
-const GameObject& LevelBag::GetNextLevel(Random &random) const
+const Entity& LevelBag::GetNextLevel(Random &random) const
 {
 	int slot = (int)random.Next(_totalSize);
 	int index = 0;

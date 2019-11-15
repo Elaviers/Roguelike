@@ -1,11 +1,11 @@
 #pragma once
 #include "Vector.hpp"
 
-class GameObject;
+class Entity;
 
 struct RaycastResult
 {
-	GameObject *object;
+	Entity *object;
 
 	float entryTime;
 };

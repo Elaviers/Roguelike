@@ -1,28 +1,28 @@
 #include "LevelGeneration.hpp"
 #include "LevelBag.hpp"
-#include <Engine/GameObject.hpp>
+#include <Engine/Entity.hpp>
 #include <Engine/LevelIO.hpp>
 #include <Engine/Random.hpp>
 #include <Engine/String.hpp>
 
-ObjConnector* GetRandomConnector(const Buffer<GameObject*> &objects, Random &random)
+EntConnector* GetRandomConnector(const Buffer<Entity*> &objects, Random &random)
 {
 	Buffer<uint32> indices;
 
 	for (uint32 i = 0; i < objects.GetSize(); ++i)
-		if (objects[i]->IsType<ObjConnector>())
+		if (objects[i]->IsType<EntConnector>())
 			indices.Add(i);
 
 	if (indices.GetSize() == 0)
 		return nullptr;
 
-	return dynamic_cast<ObjConnector*>(objects[indices[random.Next((uint32)indices.GetSize())]]);
+	return dynamic_cast<EntConnector*>(objects[indices[random.Next((uint32)indices.GetSize())]]);
 }
 
-GameObject* CreateConnectedSegment(const ObjConnector &connector, const LevelBag &bag, Random &random, int depth)
+Entity* CreateConnectedSegment(const EntConnector &connector, const LevelBag &bag, Random &random, int depth)
 {
-	const GameObject &level = bag.GetNextLevel(random);
-	const ObjConnector *otherConnector = GetRandomConnector(level.Children(), random);
+	const Entity &level = bag.GetNextLevel(random);
+	const EntConnector *otherConnector = GetRandomConnector(level.Children(), random);
 
 	if (!otherConnector)
 		return nullptr;
@@ -43,22 +43,22 @@ GameObject* CreateConnectedSegment(const ObjConnector &connector, const LevelBag
 
 	Vector3 centre = levelMax - levelMin;
 
-	GameObject *newSegment = GameObject::Create();
+	Entity *newSegment = Entity::Create();
 	newSegment->SetRelativePosition(centre);
 	newSegment->CloneChildrenFrom(level);
 	return newSegment;
 }
 
-void GenerateConnectedSegments(GameObject &world, const GameObject &src, const LevelBag &bag, Random &random, int depth)
+void GenerateConnectedSegments(Entity &world, const Entity &src, const LevelBag &bag, Random &random, int depth)
 {
 	for (uint32 i = 0; i < src.Children().GetSize(); ++i)
 	{
-		if (src.Children()[i]->IsType<ObjConnector>())
+		if (src.Children()[i]->IsType<EntConnector>())
 		{
-			const ObjConnector *connector = reinterpret_cast<const ObjConnector*>(src.Children()[i]);
+			const EntConnector *connector = reinterpret_cast<const EntConnector*>(src.Children()[i]);
 			if (!connector->connected)
 			{
-				GameObject *newSeg = CreateConnectedSegment(*connector, bag, random, depth - 1);
+				Entity *newSeg = CreateConnectedSegment(*connector, bag, random, depth - 1);
 				if (newSeg)
 					newSeg->SetParent(&world);
 			}
@@ -66,7 +66,7 @@ void GenerateConnectedSegments(GameObject &world, const GameObject &src, const L
 	}
 }
 
-GameObject LevelGeneration::GenerateLevel(const String &string)
+Entity LevelGeneration::GenerateLevel(const String &string)
 {
 	Random random;
 
@@ -89,7 +89,7 @@ GameObject LevelGeneration::GenerateLevel(const String &string)
 				if (tokens.GetSize() > 1)
 					if (tokens[0] == "segment")
 					{
-						GameObject *level = GameObject::Create();
+						Entity *level = Entity::Create();
 						if (LevelIO::Read(*level, CSTR(root, tokens[1])))
 							bag.AddLevel(*level, 1);
 						else
@@ -99,10 +99,10 @@ GameObject LevelGeneration::GenerateLevel(const String &string)
 		}
 	}
 
-	GameObject world;
+	Entity world;
 
-	const GameObject &lvl = bag.GetNextLevel(random);
-	GameObject *root = GameObject::Create();
+	const Entity &lvl = bag.GetNextLevel(random);
+	Entity *root = Entity::Create();
 	root->CloneChildrenFrom(lvl);
 	
 	GenerateConnectedSegments(world, *root, bag, random, depth);

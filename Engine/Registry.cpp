@@ -1,23 +1,23 @@
 #include "Registry.hpp"
 #include "ObjectIDS.hpp"
-#include "ObjBox.hpp"
-#include "ObjBrush2D.hpp"
-#include "ObjBrush3D.hpp"
-#include "ObjConnector.hpp"
-#include "ObjCamera.hpp"
-#include "ObjLight.hpp"
-#include "ObjRenderable.hpp"
-#include "ObjSprite.hpp"
+#include "EntBox.hpp"
+#include "EntBrush2D.hpp"
+#include "EntBrush3D.hpp"
+#include "EntConnector.hpp"
+#include "EntCamera.hpp"
+#include "EntLight.hpp"
+#include "EntRenderable.hpp"
+#include "EntSprite.hpp"
 
 void Registry::RegisterEngineObjects()
 {
-	RegisterObjectClass<GameObject>		(ObjectIDS::GAMEOBJECT,		"Gameobject");
-	RegisterObjectClass<ObjRenderable>  (ObjectIDS::RENDERABLE,		"Renderable");
-	RegisterObjectClass<ObjBrush3D>		(ObjectIDS::BRUSH,			"Brush");
-	RegisterObjectClass<ObjBrush2D>		(ObjectIDS::PLANE,			"Plane");
-	RegisterObjectClass<ObjLight>		(ObjectIDS::LIGHT,			"Light");
-	RegisterObjectClass<ObjSprite>		(ObjectIDS::SPRITE,			"Sprite");
-	RegisterObjectClass<ObjConnector>	(ObjectIDS::LEVEL_CONNECTOR,"Level Connector");
-	RegisterObjectClass<ObjBox>			(ObjectIDS::BOX,			"Box");
-	RegisterObjectClass<ObjCamera>		(ObjectIDS::CAMERA,			"Camera");
+	RegisterObjectClass<Entity>		(EntityIDS::Entity,		"Entity");
+	RegisterObjectClass<EntRenderable>  (EntityIDS::RENDERABLE,		"Renderable");
+	RegisterObjectClass<EntBrush3D>		(EntityIDS::BRUSH,			"Brush");
+	RegisterObjectClass<EntBrush2D>		(EntityIDS::PLANE,			"Plane");
+	RegisterObjectClass<EntLight>		(EntityIDS::LIGHT,			"Light");
+	RegisterObjectClass<EntSprite>		(EntityIDS::SPRITE,			"Sprite");
+	RegisterObjectClass<EntConnector>	(EntityIDS::LEVEL_CONNECTOR,"Level Connector");
+	RegisterObjectClass<EntBox>			(EntityIDS::BOX,			"Box");
+	RegisterObjectClass<EntCamera>		(EntityIDS::CAMERA,			"Camera");
 }

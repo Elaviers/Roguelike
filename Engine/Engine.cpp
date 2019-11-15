@@ -17,7 +17,7 @@ Engine::~Engine()
 
 #define CREATE(CONDITION, PTR) (CONDITION) ? (PTR) : nullptr 
 
-void Engine::Init(EngineCreateFlags flags, GameObject *world)
+void Engine::Init(EngineCreateFlags flags, Entity *world)
 {
 	pWorld = world;
 
@@ -35,7 +35,7 @@ void Engine::Init(EngineCreateFlags flags, GameObject *world)
 	pModelManager =		CREATE(flags & ENG_MODELMGR,	new ModelManager());
 	pTextureManager =	CREATE(flags & ENG_TEXTUREMGR,	new TextureManager());
 	pInputManager =		CREATE(flags & ENG_INPUTMGR,	new InputManager());
-	pObjectTracker =	CREATE(flags & ENG_OBJTRACKER,	new Tracker<GameObject>());
+	pObjectTracker =	CREATE(flags & ENG_OBJTRACKER,	new Tracker<Entity>());
 
 	if (pConsole)
 	{
@@ -44,9 +44,9 @@ void Engine::Init(EngineCreateFlags flags, GameObject *world)
 
 		if (pWorld)
 		{
-			pConsole->Cvars().CreateVar("Ents", CommandPtr(pWorld, &GameObject::CMD_List));
-			pConsole->Cvars().CreateVar("Ent", CommandPtr(pWorld, &GameObject::CMD_Ent));
-			pConsole->Cvars().CreateVar("EntProperties", CommandPtr(pWorld, &GameObject::CMD_ListProperties));
+			pConsole->Cvars().CreateVar("Ents", CommandPtr(pWorld, &Entity::CMD_List));
+			pConsole->Cvars().CreateVar("Ent", CommandPtr(pWorld, &Entity::CMD_Ent));
+			pConsole->Cvars().CreateVar("EntProperties", CommandPtr(pWorld, &Entity::CMD_ListProperties));
 		}
 	}
 

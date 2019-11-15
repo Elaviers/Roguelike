@@ -85,7 +85,7 @@ void ToolSelect::_UpdateGizmoPos()
 	}
 }
 
-void ToolSelect::_SetHoverObject(GameObject* ho)
+void ToolSelect::_SetHoverObject(Entity* ho)
 {
 	_hoverObject = Engine::Instance().pObjectTracker->Track(ho);
 
@@ -148,7 +148,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 				if (_shouldCopy)
 				{
 					_shouldCopy = false;
-					GameObject *newObject = _hoverObject->Clone();
+					Entity *newObject = _hoverObject->Clone();
 					
 					_GetProperties().Transfer(_hoverObject.Ptr(), newObject);
 
@@ -219,7 +219,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 
 	if (!_placing)
 	{
-		ObjCamera& camera = _owner.CameraRef(mouseData.viewport);
+		EntCamera& camera = _owner.CameraRef(mouseData.viewport);
 
 		if (camera.GetProjectionType() == ProjectionType::PERSPECTIVE)
 		{
@@ -291,7 +291,7 @@ void ToolSelect::KeySubmit()
 	_placing = false;
 	ClearSelection();
 
-	Buffer<GameObject*> result = _owner.LevelRef().FindOverlaps(ColliderBox(COLL_ALL_CHANNELS, Box::FromMinMax(_box.GetMin(), _box.GetMax())));
+	Buffer<Entity*> result = _owner.LevelRef().FindOverlaps(ColliderBox(COLL_ALL_CHANNELS, Box::FromMinMax(_box.GetMin(), _box.GetMax())));
 
 	_selectedObjects.SetSize(result.GetSize());
 
@@ -319,7 +319,7 @@ void ToolSelect::Render(EnumRenderChannel channels) const
 		glDepthFunc(GL_LESS);
 	}
 	
-	if (_selectedObjects.GetSize() > 0 && ObjCamera::Current()->GetProjectionType() == ProjectionType::PERSPECTIVE)
+	if (_selectedObjects.GetSize() > 0 && EntCamera::Current()->GetProjectionType() == ProjectionType::PERSPECTIVE)
 	{
 		glDepthFunc(GL_ALWAYS);
 		_gizmo.Draw();
@@ -336,7 +336,7 @@ void ToolSelect::Render(EnumRenderChannel channels) const
 	}
 }
 
-void ToolSelect::Select(GameObject* object)
+void ToolSelect::Select(Entity* object)
 {
 	if (Engine::Instance().pInputManager->IsKeyDown(Keycode::CTRL))
 		_selectedObjects.Add(Engine::Instance().pObjectTracker->Track(object));

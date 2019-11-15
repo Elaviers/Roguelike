@@ -18,9 +18,6 @@
     <Filter Include="Source Files\Objects">
       <UniqueIdentifier>{b493a4d8-6b89-4099-915d-f6b1e24dba32}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Objects">
-      <UniqueIdentifier>{c60b00f4-374f-4db6-9c75-a51fa3273a7f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Managers">
       <UniqueIdentifier>{7bb587e0-f989-40e0-b70c-3d55c2dcf9d9}</UniqueIdentifier>
     </Filter>
@@ -103,6 +100,9 @@
     <Filter Include="Source Files\Asset">
       <UniqueIdentifier>{9c4a75bf-886d-4c88-8dca-80f82330cc9d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Entities">
+      <UniqueIdentifier>{c60b00f4-374f-4db6-9c75-a51fa3273a7f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Types.hpp">
@@ -113,9 +113,6 @@
     </ClInclude>
     <ClInclude Include="GLProgram.hpp">
       <Filter>Header Files\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.hpp">
-      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="ModelManager.hpp">
       <Filter>Header Files\Managers</Filter>
@@ -242,30 +239,6 @@
     </ClInclude>
     <ClInclude Include="DebugString.hpp">
       <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjBrush.hpp">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjBrush2D.hpp">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjBrush3D.hpp">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjCamera.hpp">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjConnector.hpp">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjLight.hpp">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjRenderable.hpp">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjBox.hpp">
-      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="LevelIO.hpp">
       <Filter>Header Files\Utility</Filter>
@@ -405,9 +378,6 @@
     <ClInclude Include="RenderChannel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ObjSprite.hpp">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Material_Sprite.hpp">
       <Filter>Header Files\Asset</Filter>
     </ClInclude>
@@ -429,9 +399,6 @@
     <ClInclude Include="Time.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="ObjSkeletal.hpp">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Property.hpp">
       <Filter>Header Files\Console</Filter>
     </ClInclude>
@@ -449,6 +416,39 @@
     </ClInclude>
     <ClInclude Include="Colour.hpp">
       <Filter>Header Files\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="EntSprite.hpp">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.hpp">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntBox.hpp">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntBrush.hpp">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntBrush2D.hpp">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntBrush3D.hpp">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntCamera.hpp">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntConnector.hpp">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntLight.hpp">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntRenderable.hpp">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntSkeletal.hpp">
+      <Filter>Header Files\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
