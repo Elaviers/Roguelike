@@ -17,6 +17,7 @@ private:
 	struct
 	{
 		int mipLevels = 8;
+		GLint minFilter = GL_NEAREST;
 		GLint magFilter = GL_LINEAR;
 
 	} _nextTextureInfo;

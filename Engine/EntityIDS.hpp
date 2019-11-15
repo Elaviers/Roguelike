@@ -8,7 +8,7 @@ namespace EntityIDS
 
 	*/
 
-	enum ObjectID : byte
+	enum EntityID : byte
 	{
 		//Saveable objects
 		Entity = 0xFF,

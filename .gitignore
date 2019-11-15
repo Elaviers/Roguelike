@@ -352,3 +352,5 @@ Libraries/Debug/x64/libfbxsdk-md.lib
 Libraries/Debug/Win32/zlib-md.lib
 Libraries/Debug/Win32/libxml2-md.lib
 Libraries/Debug/Win32/libfbxsdk-md.lib
+Editor/Data
+Game/Data

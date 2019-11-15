@@ -4,7 +4,7 @@
 #include "Event.hpp"
 #include "Map.hpp"
 #include "NumberedSet.hpp"
-#include "ObjectIDS.hpp"
+#include "EntityIDS.hpp"
 #include "RenderChannel.hpp"
 #include "PropertyCollection.hpp"
 #include "Transform.hpp"
@@ -12,7 +12,7 @@
 
 #define Entity_FUNCS(CLASSNAME, ID)														\
 public:																						\
-	virtual EntityIDS::ObjectID GetTypeID() const { return ID; }							\
+	virtual EntityIDS::EntityID GetTypeID() const { return ID; }							\
 	virtual const char* GetClassString() const { return #CLASSNAME;}						\
 	virtual size_t SizeOf() const { return sizeof(*this); }									\
 	virtual Entity* Clone() const { return Entity::_CreateCopy<CLASSNAME>(*this); } \

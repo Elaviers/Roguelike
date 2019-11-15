@@ -203,7 +203,7 @@
     <ClInclude Include="Mesh.hpp" />
     <ClInclude Include="Font_TTF.hpp" />
     <ClInclude Include="Font_Texture.hpp" />
-    <ClInclude Include="ObjectIDS.hpp" />
+    <ClInclude Include="EntityIDS.hpp" />
     <ClInclude Include="EntSkeletal.hpp" />
     <ClInclude Include="EntSprite.hpp" />
     <ClInclude Include="Random.hpp" />
@@ -314,8 +314,8 @@
     <ClCompile Include="Font_TTF.cpp" />
     <ClCompile Include="Font_Texture.cpp" />
     <ClCompile Include="Material_Sprite.cpp" />
-    <ClCompile Include="ObjSkeletal.cpp" />
-    <ClCompile Include="ObjSprite.cpp" />
+    <ClCompile Include="EntSkeletal.cpp" />
+    <ClCompile Include="EntSprite.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="RigidPropertyCollection.cpp" />
     <ClCompile Include="SharedPointer.cpp" />
@@ -333,13 +333,13 @@
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Bounds.cpp" />
     <ClCompile Include="Property.cpp" />
-    <ClCompile Include="ObjBox.cpp" />
-    <ClCompile Include="ObjBrush2D.cpp" />
-    <ClCompile Include="ObjBrush3D.cpp" />
-    <ClCompile Include="ObjCamera.cpp" />
+    <ClCompile Include="EntBox.cpp" />
+    <ClCompile Include="EntBrush2D.cpp" />
+    <ClCompile Include="EntBrush3D.cpp" />
+    <ClCompile Include="EntCamera.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="ObjConnector.cpp" />
+    <ClCompile Include="EntConnector.cpp" />
     <ClCompile Include="ColliderBox.cpp" />
     <ClCompile Include="DebugFrustum.cpp" />
     <ClCompile Include="DebugManager.cpp" />
@@ -348,7 +348,7 @@
     <ClCompile Include="Direction2D.cpp" />
     <ClCompile Include="DrawUtils.cpp" />
     <ClCompile Include="FontManager.cpp" />
-    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GL.cpp" />
     <ClCompile Include="GLContext.cpp" />
     <ClCompile Include="GLCubemap.cpp" />
@@ -360,7 +360,7 @@
     <ClCompile Include="GLProgram.cpp" />
     <ClCompile Include="GLTexture.cpp" />
     <ClCompile Include="IO.cpp" />
-    <ClCompile Include="ObjLight.cpp" />
+    <ClCompile Include="EntLight.cpp" />
     <ClCompile Include="Material_Grid.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="Material_Surface.cpp" />
@@ -369,7 +369,7 @@
     <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="ObjReader.cpp" />
     <ClCompile Include="Registry.cpp" />
-    <ClCompile Include="ObjRenderable.cpp" />
+    <ClCompile Include="EntRenderable.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="ColliderSphere.cpp" />

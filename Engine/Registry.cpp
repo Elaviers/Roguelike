@@ -1,5 +1,5 @@
 #include "Registry.hpp"
-#include "ObjectIDS.hpp"
+#include "EntityIDS.hpp"
 #include "EntBox.hpp"
 #include "EntBrush2D.hpp"
 #include "EntBrush3D.hpp"
