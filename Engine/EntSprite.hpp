@@ -7,7 +7,7 @@
 
 class EntSprite : public Entity
 {
-	const MaterialSprite* _material;
+	SharedPointer<const MaterialSprite> _material;
 	float _size;
 	Colour _colour;
 
@@ -27,11 +27,11 @@ public:
 	{}
 	virtual ~EntSprite() {}
 
-	inline float GetSize() const { return _size; }
-	inline const Colour& GetColour() const { return _colour; }
+	float GetSize() const { return _size; }
+	const Colour& GetColour() const { return _colour; }
 
-	inline void SetSize(float size) { _size = size; _editorCollider.SetRadius(size / 2.f); }
-	inline void SetColour(const Colour& colour) { _colour = colour; }
+	void SetSize(float size) { _size = size; _editorCollider.SetRadius(size / 2.f); }
+	void SetColour(const Colour& colour) { _colour = colour; }
 
 	virtual void Render(EnumRenderChannel) const override;
 
@@ -40,19 +40,19 @@ public:
 
 	virtual const PropertyCollection& GetProperties() override;
 
-	inline const MaterialSprite* GetMaterial() const { return _material; }
+	SharedPointer<const MaterialSprite> GetMaterial() const { return _material; }
 
 	String GetMaterialName() const
 	{
-		return Engine::Instance().pMaterialManager->FindNameOf(_material);
+		return Engine::Instance().pMaterialManager->FindNameOf(_material.Ptr());
 	}
 
 	void SetMaterialName(const String& name)
 	{
-		_material = dynamic_cast<MaterialSprite*>(Engine::Instance().pMaterialManager->Get(name));
+		_material = Engine::Instance().pMaterialManager->Get(name).Cast<const MaterialSprite>();
 	}
 
-	inline void SetMaterial(const MaterialSprite* material)
+	void SetMaterial(const SharedPointer<const MaterialSprite>& material)
 	{
 		_material = material;
 	}

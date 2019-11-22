@@ -18,8 +18,8 @@ public:
 	void Use(HDC) const;
 	void Delete();
 	
-	inline void Create(const Window &window) { Create(window.GetHDC()); }
-	inline void Use(const Window &window) const { Use(window.GetHDC()); }
+	void Create(const Window &window) { Create(window.GetHDC()); }
+	void Use(const Window &window) const { Use(window.GetHDC()); }
 
-	inline bool IsValid() { return _id != 0; }
+	bool IsValid() { return _id != 0; }
 };

@@ -23,7 +23,7 @@ public:
 
 	virtual void Render() const = 0;
 
-	inline bool ShouldBeRemoved() const { return _timeRemaining < 0.f; }
+	bool ShouldBeRemoved() const { return _timeRemaining < 0.f; }
 
 	virtual size_t SizeOf() const = 0;
 };

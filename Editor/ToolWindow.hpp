@@ -17,13 +17,13 @@ public:
 
 	static void Initialise(HBRUSH);
 
-	inline void Create(const Window &parent)
+	void Create(const Window &parent)
 	{
 		Window::Create(_className, TEXT("Tool"), this, WS_CHILD, parent.GetHwnd());
 		_propertyWindow.Create(*this);
 		_propertyWindow.SetSizeAndPos(12,24,224,248);
 	}
 
-	inline PropertyWindow& PropertyWindow() { return _propertyWindow; }
+	PropertyWindow& PropertyWindow() { return _propertyWindow; }
 };
 

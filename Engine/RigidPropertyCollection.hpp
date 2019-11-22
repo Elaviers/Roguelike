@@ -16,12 +16,12 @@ public:
 
 	const Buffer<RigidProperty*>& GetAll() const { return _cvars; }
 
-	inline void Clear() { _cvars.Clear(); }
+	void Clear() { _cvars.Clear(); }
 
-	String HandleCommand(const Buffer<String>& tokens) const;
-	inline String HandleCommand(const String& command) const { return HandleCommand(command.Split(" ")); }
+	void HandleCommand(const Buffer<String>& tokens) const;
+	void HandleCommand(const String& command) const { return HandleCommand(command.Split(" ")); }
 
-	inline RigidProperty* Find(const String& name) const
+	RigidProperty* Find(const String& name) const
 	{
 		for (size_t i = 0; i < _cvars.GetSize(); ++i)
 			if (_cvars[i]->GetName().Equals(name, true))
@@ -60,25 +60,25 @@ public:
 	//////////
 
 	template <typename T>
-	inline void CreateVar(const String& name, const T& value, byte flags = 0)
+	void CreateVar(const String& name, const T& value, byte flags = 0)
 	{
 		_cvars.Add(new RigidValueProperty<T>(name, value, flags));
 	}
 
 	template <typename T>
-	inline void Add(const String &name, T& value, byte flags = 0)
+	void Add(const String &name, T& value, byte flags = 0)
 	{
 		_cvars.Add(new RigidReferenceProperty<T>(name, value, flags));
 	}
 
 	template <typename T>
-	inline void Add(const String &name, const Getter<T> &getter, const Setter<T> &setter, byte flags = 0)
+	void Add(const String &name, const Getter<T> &getter, const Setter<T> &setter, byte flags = 0)
 	{
 		_cvars.Add(new RigidFptrProperty<T>(getter, setter, flags));
 	}
 
 	template <typename T>
-	inline void Add(const String& name, const Getter<const T&>& getter, const Setter<T>& setter, byte flags = 0)
+	void Add(const String& name, const Getter<const T&>& getter, const Setter<T>& setter, byte flags = 0)
 	{
 		_cvars.Add(new RigidFptrProperty<T>(getter, setter, flags));
 	}

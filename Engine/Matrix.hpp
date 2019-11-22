@@ -13,7 +13,7 @@ class SquareMatrix
 private:
 	T _data[SIZE][SIZE];
 
-	inline T Dot(const SquareMatrix &other, int r, int c) const
+	T Dot(const SquareMatrix &other, int r, int c) const
 	{
 		T result = 0;
 
@@ -54,7 +54,7 @@ public:
 	}
 	
 	inline			T* operator[](int index)		{ return _data[index]; }
-	inline const	T* operator[](int index) const	{ return _data[index]; }
+	const	T* operator[](int index) const	{ return _data[index]; }
 
 	friend SquareMatrix operator*(const SquareMatrix &a, const SquareMatrix &b);
 

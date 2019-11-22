@@ -11,7 +11,7 @@ class Tracker
 	SharedPointerData<T>* _Find(T* addr)
 	{
 		for (auto it = _list.First(); it; ++it)
-			if (it->ptr == addr)
+			if (it->GetPtr() == addr)
 				return &*it;
 
 		return nullptr;
@@ -19,8 +19,11 @@ class Tracker
 
 	void _Remove(SharedPointerData<T> &pd)
 	{
+		if (pd.GetPtr())
+			return;
+
 		for (auto it = _list.First(); it; ++it)
-			if (it->ptr == pd.ptr)
+			if (it->GetPtr() == pd.GetPtr())
 			{
 				_list.Remove(it);
 				return;
@@ -31,15 +34,13 @@ public:
 	Tracker() {}
 	~Tracker() {}
 
-	SharedPointerC<T> Track(T* addr)
+	SharedPointer<T> Track(T* addr)
 	{
-		SharedPointerData<T>* existing = _Find(addr);
-		if (existing == nullptr)
-			existing = &*_list.Add(SharedPointerData<T>(addr, 1, FunctionPointer<void, SharedPointerData<T>&>(this, &Tracker::_Remove)));
-		else
-			++existing->referenceCount;
-
-		return SharedPointerC<T>(*existing);
+		SharedPointerData<T>* pointerData = _Find(addr);
+		if (pointerData == nullptr)
+			pointerData = &*_list.Add(SharedPointerData<T>(addr, 0, FunctionPointer<void, SharedPointerData<T>&>(this, &Tracker::_Remove)));
+		
+		return SharedPointer<T>(*pointerData);
 	}
 	
 	void Null(T* addr)
@@ -47,6 +48,11 @@ public:
 		SharedPointerData<T>* existing = _Find(addr);
 
 		if (existing)
-			existing->ptr = nullptr;
+		{
+			existing->SetPtr(nullptr);
+		
+			if (existing->GetReferenceCount() == 0)
+				_Remove(*existing);
+		}
 	}
 };

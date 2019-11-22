@@ -17,8 +17,8 @@ public:
 	UIRect(UIElement *parent = nullptr) : UIElement(parent), _texture(nullptr), _colour(1.f, 1.f, 1.f, 1.f) {}
 	virtual ~UIRect() {}
 
-	inline void SetTexture(const GLTexture *texture) { _texture = texture; }
-	inline void SetColour(const Colour &colour) { _colour = colour; }
+	void SetTexture(const GLTexture *texture) { _texture = texture; }
+	void SetColour(const Colour &colour) { _colour = colour; }
 
 	virtual void Render() const override;
 

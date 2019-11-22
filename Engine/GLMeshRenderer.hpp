@@ -31,12 +31,12 @@ public:
 	void Create(const Vertex17F *data, GLsizei vertexCount, const uint32 *elements, GLsizei elementCount);
 	void Create(const Vertex19F2I *data, GLsizei vertexCount, const uint32 *elements, GLsizei elementCount);
 
-	inline void Create(const Vertex17F* data, GLsizei vertexCount) { Create(data, vertexCount, nullptr, 0); }
-	inline void Create(const Vertex19F2I* data, GLsizei vertexCount) { Create(data, vertexCount, nullptr, 0); }
+	void Create(const Vertex17F* data, GLsizei vertexCount) { Create(data, vertexCount, nullptr, 0); }
+	void Create(const Vertex19F2I* data, GLsizei vertexCount) { Create(data, vertexCount, nullptr, 0); }
 
 	void Create(const Vector3 *basicData, GLsizei vertexCount, const uint32 *elements, GLsizei elementCount);
 
-	inline void SetDrawMode(GLenum drawMode) { _drawMode = drawMode; }
+	void SetDrawMode(GLenum drawMode) { _drawMode = drawMode; }
 
 	virtual void Render() const
 	{
@@ -49,7 +49,7 @@ public:
 
 	void Delete();
 
-	inline bool IsValid() { return _vao != 0; }
+	bool IsValid() { return _vao != 0; }
 
-	inline bool operator==(const GLMeshRenderer &other) const { return _vao == other._vao; }
+	bool operator==(const GLMeshRenderer &other) const { return _vao == other._vao; }
 };

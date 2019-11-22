@@ -12,8 +12,8 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	_onLevelChosen = onLevelChosen;
 	_onQuit = onQuit;
 
-	const Material *material = Engine::Instance().pMaterialManager->Get("panel");
-	const Font *arial = Engine::Instance().pFontManager->Get("arial32");
+	SharedPointer<const Material> material = Engine::Instance().pMaterialManager->Get("panel");
+	SharedPointer<const Font> arial = Engine::Instance().pFontManager->Get("arial32");
 
 	_buttonStart.SetFont(arial);
 	_buttonQuit.SetFont(arial);

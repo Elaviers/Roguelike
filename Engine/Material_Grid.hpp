@@ -6,7 +6,7 @@
 
 class MaterialGrid : public Material
 {
-	const Texture *_texture;
+	SharedPointer<const Texture> _texture;
 
 	Buffer<int> _rowHeights;
 	Buffer<int> _columnWidths;
@@ -24,9 +24,9 @@ public:
 
 	virtual ~MaterialGrid() {}
 
-	virtual const PropertyCollection& GetProperties();
+	virtual const PropertyCollection& GetProperties() override;
 
 	virtual void Apply(const RenderParam *param) const override;
 
-	inline const UVRect& GetElement(int r, int c) const { return _elements[r * _columnWidths.GetSize() + c]; }
+	const UVRect& GetElement(int r, int c) const { return _elements[r * _columnWidths.GetSize() + c]; }
 };

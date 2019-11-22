@@ -44,7 +44,7 @@ public:
 
 	~Gizmo() {}
 
-	inline const Vector3& GetPosition() const { return _ringX.transform.GetPosition(); }
+	const Vector3& GetPosition() const { return _ringX.transform.GetPosition(); }
 
 	void SetTransform(const Transform& t)
 	{
@@ -69,7 +69,7 @@ public:
 		_planeYZ.transform.SetScale(Vector3(.5f, .5f, .5f));
 	}
 
-	inline void Update(const MouseData &data, const Ray& mouseRay, float &maxT)
+	void Update(const MouseData &data, const Ray& mouseRay, float &maxT)
 	{
 		for (int i = 0; i < _componentCount; ++i)
 		{
@@ -77,7 +77,7 @@ public:
 		}
 	}
 
-	inline bool MouseDown()
+	bool MouseDown()
 	{
 		for (int i = 0; i < _componentCount; ++i)
 			if (_all[i]->MouseDown())
@@ -86,13 +86,13 @@ public:
 		return false;
 	}
 
-	inline void MouseUp()
+	void MouseUp()
 	{
 		for (int i = 0; i < _componentCount; ++i)
 			_all[i]->MouseUp();
 	}
 
-	inline void Draw() const
+	void Draw() const
 	{
 		for (int i = 0; i < _componentCount; ++i)
 			_all[i]->Draw();

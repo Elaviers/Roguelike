@@ -38,7 +38,7 @@ private:
 	FT_Library _ftLib;
 
 public:
-	inline static Engine& Instance() { static Engine _instance;  return _instance; }
+	static Engine& Instance() { static Engine _instance;  return _instance; }
 
 	Registry registry;
 
@@ -55,7 +55,7 @@ public:
 
 	Tracker<Entity> *pObjectTracker = nullptr;
 
-	inline FT_Library GetFTLibrary() { return _ftLib; }
+	FT_Library GetFTLibrary() { return _ftLib; }
 
 	void Init(EngineCreateFlags, Entity* world);
 };

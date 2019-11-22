@@ -6,7 +6,7 @@
 #include "Utilities.hpp"
 #include "Vector.hpp"
 
-ModelManager::ModelManager() : AssetManager("")
+ModelManager::ModelManager() : AssetManager()
 {
 }
 
@@ -95,9 +95,9 @@ void ModelManager::Initialise()
 	planeMesh->bounds = Bounds(Vector3(.5f, .5f, 0.f));
 	cubeMesh->bounds = Bounds(Vector3(.5f, .5f, .5f));
 
-	_MapValue("line") = _line = new Model(lineMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(lineMesh->bounds.min, lineMesh->bounds.max)));
-	_MapValue("plane") = _plane = new Model(planeMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(planeMesh->bounds.min, planeMesh->bounds.max)));
-	_MapValue("cube") = _cube = new Model(cubeMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(cubeMesh->bounds.min, cubeMesh->bounds.max)));
+	_line = new Model(lineMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(lineMesh->bounds.min, lineMesh->bounds.max)));
+	_plane = new Model(planeMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(planeMesh->bounds.min, planeMesh->bounds.max)));
+	_cube = new Model(cubeMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(cubeMesh->bounds.min, cubeMesh->bounds.max)));
 
 	_line->MeshRenderer().SetDrawMode(GL_LINES);
 	lineMesh->CreateGLMeshRenderer(_line->MeshRenderer());
@@ -117,6 +117,18 @@ void ModelManager::Initialise()
 		Vertex17F::CalculateTangents(invCubeMesh->vertices[i], invCubeMesh->vertices[i + 1], invCubeMesh->vertices[i + 2]);
 	}
 
-	_MapValue("invcube") = _invCube = new Model(invCubeMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(invCubeMesh->bounds.min, invCubeMesh->bounds.max)));
+	_invCube = new Model(invCubeMesh, new ColliderBox(COLL_SURFACE, Box::FromMinMax(invCubeMesh->bounds.min, invCubeMesh->bounds.max)));
 	invCubeMesh->CreateGLMeshRenderer(_invCube->MeshRenderer());
+
+	SharedPointerData<Model> &dLine = _MapValue("line"), &dPlane = _MapValue("plane"), &dCube = _MapValue("cube"), &dInvCube = _MapValue("invcube");
+
+	dLine.SetPtr(_line);
+	dPlane.SetPtr(_plane);
+	dCube.SetPtr(_cube);
+	dInvCube.SetPtr(_invCube);
+
+	_tLine = SharedPointer<Model>(dLine);
+	_tPlane = SharedPointer<Model>(dPlane);
+	_tCube = SharedPointer<Model>(dCube);
+	_tInvCube = SharedPointer<Model>(dInvCube);
 }

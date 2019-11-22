@@ -1,0 +1,2 @@
+mag nearest
+img UI/panel.png

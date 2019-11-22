@@ -5,27 +5,28 @@
 class MaterialSurface : public Material
 {
 private:
-	const Texture *_diffuse;
-	const Texture*_normal;
-	const Texture*_specular;
-	const Texture*_reflection;
-
+	SharedPointer<const Texture> _diffuse, _normal, _specular, _reflection;
+	
 	void _CMD_tex(const Buffer<String>& args);
 public:
-	MaterialSurface(const Texture*diffuse = nullptr, const Texture*normal = nullptr, const Texture*specular = nullptr, const Texture*reflection = nullptr)
+	MaterialSurface(
+		const SharedPointer<const Texture>& diffuse = SharedPointer<const Texture>(), 
+		const SharedPointer<const Texture>& normal = SharedPointer<const Texture>(), 
+		const SharedPointer<const Texture>& specular = SharedPointer<const Texture>(), 
+		const SharedPointer<const Texture>& reflection = SharedPointer<const Texture>())
 		: Material(RenderChannel::SURFACE), _diffuse(diffuse), _normal(normal), _specular(specular), _reflection(reflection)
 	{}
 	
 	virtual ~MaterialSurface() {}
 
-	virtual const PropertyCollection& GetProperties();
+	virtual const PropertyCollection& GetProperties() override;
 
-	inline void SetDiffuse(const Texture* texture) { _diffuse = texture; }
-	inline void SetNormal(const Texture* texture) { _normal = texture; }
-	inline void SetSpecular(const Texture* texture) { _specular = texture; }
-	inline void SetReflection(const Texture* texture) { _reflection = texture; }
+	void SetDiffuse(const SharedPointer<const Texture>& texture) { _diffuse = texture; }
+	void SetNormal(const SharedPointer<const Texture>& texture) { _normal = texture; }
+	void SetSpecular(const SharedPointer<const Texture>& texture) { _specular = texture; }
+	void SetReflection(const SharedPointer<const Texture>& texture) { _reflection = texture; }
 
 	virtual void Apply(const RenderParam* param = nullptr) const override;
 	
-	inline bool operator==(const MaterialSurface &other) { return _diffuse == other._diffuse && _normal == other._normal && _specular == other._specular; }
+	bool operator==(const MaterialSurface &other) { return _diffuse == other._diffuse && _normal == other._normal && _specular == other._specular; }
 };

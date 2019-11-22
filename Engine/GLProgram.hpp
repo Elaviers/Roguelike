@@ -39,24 +39,24 @@ public:
 	GLProgram(GLProgram&& other) noexcept : _id(other._id) { other._id = 0; }
 	~GLProgram() {}
 
-	inline static const GLProgram& Current() { return *_currentProgram; }
+	static const GLProgram& Current() { return *_currentProgram; }
 
-	inline GLuint GetID() const { return _id; }
+	GLuint GetID() const { return _id; }
 
 	void Create(const char *vertSource, const char *fragSource);
 	void Load(const char *vertFile, const char *fragFile);
 
-	inline void Use() const { glUseProgram(_id); _currentProgram = this; }
+	void Use() const { glUseProgram(_id); _currentProgram = this; }
 	GLint GetUniformLocation(const char *name) const;
 
-	inline GLProgram& operator=(GLProgram&& other) noexcept { _id = other._id; other._id = 0; }
+	GLProgram& operator=(GLProgram&& other) noexcept { _id = other._id; other._id = 0; }
 
 	//Setter inlines
 
-	inline void SetBool(const char* name, GLboolean x) const { glUniform1i(GetUniformLocation(name), x ? 1 : 0); }
-	inline void SetInt(const char *name, GLint x) const { glUniform1i(GetUniformLocation(name), x); }
-	inline void SetMat4(const char *name, const Mat4 &x) const { glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &x[0][0]); }
-	inline void SetVec2(const char *name, const Vector2 &x) const { glUniform2fv(GetUniformLocation(name), 1, &x[0]); }
-	inline void SetVec3(const char *name, const Vector3 &x) const { glUniform3fv(GetUniformLocation(name), 1, &x[0]); }
-	inline void SetVec4(const char *name, const Vector4 &x) const { glUniform4fv(GetUniformLocation(name), 1, &x[0]); }
+	void SetBool(const char* name, GLboolean x) const { glUniform1i(GetUniformLocation(name), x ? 1 : 0); }
+	void SetInt(const char *name, GLint x) const { glUniform1i(GetUniformLocation(name), x); }
+	void SetMat4(const char *name, const Mat4 &x) const { glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &x[0][0]); }
+	void SetVec2(const char *name, const Vector2 &x) const { glUniform2fv(GetUniformLocation(name), 1, &x[0]); }
+	void SetVec3(const char *name, const Vector3 &x) const { glUniform3fv(GetUniformLocation(name), 1, &x[0]); }
+	void SetVec4(const char *name, const Vector4 &x) const { glUniform4fv(GetUniformLocation(name), 1, &x[0]); }
 };

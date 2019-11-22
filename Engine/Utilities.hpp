@@ -110,7 +110,7 @@ namespace Utilities
 	String GetSystemFontDir();
 
 	template <typename T>
-	void TransferLE(T from, byte *to)
+	inline void TransferLE(T from, byte *to)
 	{
 		auto sz = sizeof(T);
 		T mask = 0xFF;
@@ -122,7 +122,7 @@ namespace Utilities
 	}
 
 	template <typename T>
-	void TransferBE(T from, byte *to)
+	inline void TransferBE(T from, byte *to)
 	{
 		auto sz = sizeof(T);
 		T mask = 0xFF;
@@ -134,7 +134,7 @@ namespace Utilities
 	}
 
 	template <typename T>
-	T TransferLE(byte* from)
+	inline T TransferLE(byte* from)
 	{
 		T result = 0;
 		byte shift = 8 * (sizeof(T) - 1);
@@ -147,7 +147,7 @@ namespace Utilities
 	}
 
 	template <typename T>
-	T TransferBE(byte *from)
+	inline T TransferBE(byte *from)
 	{
 		T result = 0;
 		byte shift = 0;

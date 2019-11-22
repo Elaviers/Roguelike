@@ -47,7 +47,7 @@ void EntConnector::Render(EnumRenderChannel channels) const {
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
 
 		glDisable(GL_CULL_FACE);
-		Engine::Instance().pModelManager->Plane().Render();
+		Engine::Instance().pModelManager->Plane()->Render();
 		glEnable(GL_CULL_FACE);
 	}
 }

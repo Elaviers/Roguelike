@@ -19,7 +19,7 @@ struct Keyframe
 	Keyframe() : time(-1.f), interpolation(INTERP_NONE) {}
 	Keyframe(float time, const T& value, byte interp = INTERP_LINEAR) : time(time), value(value), interpolation(interp) {}
 
-	inline T Interpolate(const Keyframe& to, float t) const
+	T Interpolate(const Keyframe& to, float t) const
 	{
 		if (interpolation == INTERP_LINEAR)
 			return Maths::Lerp(value, to.value, (t - time) / (to.time - time));

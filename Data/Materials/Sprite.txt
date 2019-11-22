@@ -1,2 +1,2 @@
 sprite
-tex gradient.png
+tex gradient

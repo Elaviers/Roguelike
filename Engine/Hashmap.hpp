@@ -53,7 +53,7 @@ class Hashmap
 			return amount;
 		}
 
-		inline V* GetValueForKey(const K &key)
+		V* GetValueForKey(const K &key)
 		{
 			for (auto it = keys.First(); it; ++it)
 				if (it->first == key)
@@ -62,16 +62,16 @@ class Hashmap
 			return nullptr;
 		}
 
-		HashNode* FindVar(H_TYPE h)
+		HashNode* Find(H_TYPE h)
 		{
 			if (h < hash)
 			{
-				if (left) return left->FindVar(h);
+				if (left) return left->Find(h);
 				return nullptr;
 			}
 			else if (h > hash)
 			{
-				if (right) return right->FindVar(h);
+				if (right) return right->Find(h);
 				return nullptr;
 			}
 
@@ -163,9 +163,9 @@ public:
 	Hashmap(const Hashmap& other) : _data(nullptr) { if (other._data) _data = other._data->Copy(); }
 	~Hashmap() { delete _data; }
 
-	inline void Clear() { delete _data; _data = nullptr; }
-	inline uint32 GetSize() const { return _data ? _data->Count() : 0; }
-	inline bool IsEmpty() const { return _data == nullptr; }
+	void Clear() { delete _data; _data = nullptr; }
+	uint32 GetSize() const { return _data ? _data->Count() : 0; }
+	bool IsEmpty() const { return _data == nullptr; }
 
 	const K* const FindFirstKey(const V& value) const
 	{
@@ -184,7 +184,7 @@ public:
 		{
 			H_TYPE hash = _Hash(key);
 
-			auto node = _data->FindVar(hash);
+			auto node = _data->Find(hash);
 			if (node) return node->GetValueForKey(key);
 		}
 
@@ -224,16 +224,16 @@ public:
 		return _data->keys.Add(KVPair(key, value))->second;
 	}
 
-	inline V* Get(const K& key) { return const_cast<V*>(((const Hashmap*)this)->Get(key)); }
+	V* Get(const K& key) { return const_cast<V*>(((const Hashmap*)this)->Get(key)); }
 
-	inline Hashmap& operator=(const Hashmap& other)
+	Hashmap& operator=(const Hashmap& other)
 	{
 		Clear();
 		if (other._data) _data = other._data->Copy();
 		return *this;
 	}
 
-	inline Buffer<const K*> ToKBuffer() const
+	Buffer<const K*> ToKBuffer() const
 	{
 		Buffer<const K*> buffer;
 		if (_data) _data->AddToK(buffer);
@@ -254,7 +254,7 @@ public:
 		return buffer;
 	}
 
-	inline void ForEach(void (*function)(const K&, V&))
+	void ForEach(void (*function)(const K&, V&))
 	{
 		if (_data) _data->ForEach(function);
 	}

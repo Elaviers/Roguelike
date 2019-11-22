@@ -10,21 +10,14 @@ const PropertyCollection& FontTexture::GetProperties()
 	static PropertyCollection properties;
 
 	DO_ONCE_BEGIN;
-	properties.Add("mag", MemberGetter<FontTexture, String>(&FontTexture::_GetMag), MemberSetter<FontTexture, String>(&FontTexture::_SetMag));
 	properties.AddCommand("texture", MemberCommandPtr<FontTexture>(&FontTexture::_CMD_texture));
 	properties.AddCommand("region", MemberCommandPtr<FontTexture>(&FontTexture::_CMD_region));
 	properties.Add<int>("size", offsetof(FontTexture, _size));
 	properties.Add<int>("row_h", offsetof(FontTexture, _rowH));
 	properties.Add<int>("y_offset", offsetof(FontTexture, _yOffset));
-	properties.Add<byte>("mips", offsetof(FontTexture, _mips));
 	DO_ONCE_END;
 
 	return properties;
-}
-
-void FontTexture::_SetMag(const String& mag)
-{
-	
 }
 
 void FontTexture::_CMD_texture(const Buffer<String>& args)
@@ -185,7 +178,7 @@ void FontTexture::RenderString(const char* string, const Transform & transform, 
 				GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, glyph->uvOffset + halfTexel);
 				GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, glyph->uvSize - texel);
 				GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, charTransform.MakeTransformationMatrix());
-				Engine::Instance().pModelManager->Plane().Render();
+				Engine::Instance().pModelManager->Plane()->Render();
 
 				float secondHalfWPlusAdvance = (((glyph->width / 2.f) + glyph->advance) * scale);
 				charTransform.Move(advanceDirection * secondHalfWPlusAdvance);

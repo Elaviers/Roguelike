@@ -32,21 +32,21 @@ class PropertyWindow : public Window
 	void _CreateHWNDs(bool readOnly);
 
 public:
-	PropertyWindow(Editor* owner) : _owner(owner) {}
+	PropertyWindow(Editor* owner) : _owner(owner), _cvars(nullptr), _currentObject(nullptr) {}
 	virtual ~PropertyWindow() {}
 
 	static void Initialise(HBRUSH);
 
-	inline void Create(const Window &parent)
+	void Create(const Window &parent)
 	{
 		Window::Create(_className, TEXT("Properties"), this, WS_CHILD, parent.GetHwnd());
 		Window::SetSize(256, 512);
 	}
 
-	inline const PropertyCollection* GetProperties() { return _cvars; }
+	const PropertyCollection* GetProperties() { return _cvars; }
 	void SetCvars(const PropertyCollection&, void* object, bool readOnly = false);
 
-	inline void SetObject(Entity* object, bool readOnly = false) { SetCvars(object->GetProperties(), object, readOnly); }
+	void SetObject(Entity* object, bool readOnly = false) { SetCvars(object->GetProperties(), object, readOnly); }
 
 	void Refresh();
 

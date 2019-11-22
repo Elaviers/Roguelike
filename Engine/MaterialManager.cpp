@@ -23,8 +23,6 @@ void MaterialManager::Initialise()
 
 	if (tm)
 	{
-		_MapValue("white") = new MaterialSurface(tm->White(), tm->NormalDefault(), tm->White());
-
-		_MapValue("temp") = new MaterialSprite(tm->White());
+		_MapValue("white").SetPtr(new MaterialSurface(tm->White(), tm->NormalDefault(), tm->White()));
 	}
 }

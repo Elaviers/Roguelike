@@ -23,7 +23,7 @@ void EntBrush2D::Render(EnumRenderChannel channels) const
 		_material->Apply();
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
 		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale()[0], GetRelativeScale()[1]));
-		Engine::Instance().pModelManager->Plane().Render();
+		Engine::Instance().pModelManager->Plane()->Render();
 		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
 	}
 }
@@ -35,7 +35,7 @@ void EntBrush2D::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &stri
 
 	if (Engine::Instance().pMaterialManager && _material)
 	{
-		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(_material));
+		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(_material.Ptr()));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);

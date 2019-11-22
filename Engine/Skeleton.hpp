@@ -41,7 +41,7 @@ public:
 
 	~Skeleton() {}
 
-	inline Skeleton& operator=(Skeleton&& other) noexcept
+	Skeleton& operator=(Skeleton&& other) noexcept
 	{
 		_nextJointID = other._nextJointID;
 		other._nextJointID = 0;
@@ -51,12 +51,12 @@ public:
 		return *this;
 	}
 
-	inline void Clear() { _joints.Clear(); }
+	void Clear() { _joints.Clear(); }
 
-	inline size_t GetJointCount() const { return _joints.GetSize(); }
+	size_t GetJointCount() const { return _joints.GetSize(); }
 
-	inline List<Joint>::Iterator FirstListElement() { return _joints.First(); }
-	inline const List<Joint>::Iterator FirstListElement() const { return _joints.First(); }
+	List<Joint>::Iterator FirstListElement() { return _joints.First(); }
+	const List<Joint>::Iterator FirstListElement() const { return _joints.First(); }
 
 	Joint* CreateJoint(Joint *parent)
 	{
@@ -69,7 +69,7 @@ public:
 		return nullptr;
 	}
 
-	inline Joint* GetJointWithID(int id)
+	Joint* GetJointWithID(int id)
 	{
 		auto it = _joints.Get(id);
 

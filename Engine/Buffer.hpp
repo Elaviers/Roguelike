@@ -14,6 +14,12 @@ private:
 public:
 	Buffer() : _data(nullptr), _size(0) {}
 
+	Buffer(const T& v) : _size(1)
+	{
+		_data = new T[1];
+		_data[0] = v;
+	}
+
 	Buffer(std::initializer_list<T> array) : _size(array.size())
 	{
 		_data = new T[_size];
@@ -34,14 +40,14 @@ public:
 
 	Buffer(Buffer&& buffer) noexcept : _data(buffer._data), _size(buffer._size) { buffer._data = nullptr; }
 
-	inline size_t GetSize() const	{ return _size; }
-	inline		 T* Data()			{ return _data; }
-	inline const T* Data() const	{ return _data; }
-	inline		 T& Last()			{ return _data[_size - 1]; }
-	inline const T& Last() const	{ return _data[_size - 1]; }
+	size_t GetSize() const	{ return _size; }
+	T* Data()				{ return _data; }
+	const T* Data() const	{ return _data; }
+	T& Last()				{ return _data[_size - 1]; }
+	const T& Last() const	{ return _data[_size - 1]; }
 
-	inline		 T& operator[](size_t index)		{ return _data[index]; }
-	inline const T& operator[](size_t index) const	{ return _data[index]; }
+	T& operator[](size_t index)				{ return _data[index]; }
+	const T& operator[](size_t index) const	{ return _data[index]; }
 
 	void SetSize(size_t size)
 	{
@@ -55,27 +61,27 @@ public:
 		_size = size;
 	}
 
-	inline T& Add(const T& item)
+	T& Add(const T& item)
 	{
 		SetSize(_size + 1);
 		return _data[_size - 1] = item;
 	}
 
-	inline T& Add(T&& item)
+	T& Add(T&& item)
 	{
 		SetSize(_size + 1);
 		return _data[_size - 1] = std::move(item);
 	}
 
-	inline Buffer& operator+=(const T& item)
+	Buffer& operator+=(const T& item)
 	{
 		Add(item);
 		return *this;
 	}
 
-	inline void Clear() { SetSize(0); }
+	void Clear() { SetSize(0); }
 
-	inline void Append(size_t elements) { SetSize(_size + elements); }
+	void Append(size_t elements) { SetSize(_size + elements); }
 
 	T* Insert(const T &item, size_t pos)
 	{
@@ -95,6 +101,15 @@ public:
 		_size++;
 
 		return &newData[pos];
+	}
+
+	T& OrderedAdd(const T &item)
+	{
+		for (size_t i = 0; i < _size; ++i)
+			if (_data[i] > item)
+				return *Insert(item, i);
+
+		return Add(item);
 	}
 
 	void RemoveIndex(size_t index)
@@ -151,7 +166,7 @@ public:
 		return *this;
 	}
 
-	inline Buffer& operator=(Buffer&& other) noexcept
+	Buffer& operator=(Buffer&& other) noexcept
 	{
 		_data = other._data;
 		_size = other._size;
@@ -184,6 +199,15 @@ public:
 				return false;
 
 		return true;
+	}
+
+	int IndexOf(const T& item)
+	{
+		for (size_t i = 0; i < _size; ++i)
+			if (_data[i] == item)
+				return (int)i;
+
+		return -1;
 	}
 
 	void Shuffle()

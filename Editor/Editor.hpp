@@ -43,7 +43,7 @@ private:
 	//Console
 	Window _consoleWindow;
 	EntCamera _consoleCamera;
-	Font* _consoleFont = nullptr;
+	SharedPointer<const Font> _consoleFont;
 	bool _consoleIsActive = false;
 
 	//Window stuff
@@ -138,8 +138,8 @@ public:
 	void SetTool(ToolEnum tool, bool changeToolbarSelection = true);
 
 	//For Tools
-	inline Entity& LevelRef() { return _level; }
-	inline Viewport& ViewportRef(int id) { return _viewports[id]; }
-	inline EntCamera& CameraRef(int id) { return _viewports[id].CameraRef(); }
-	inline PropertyWindow& PropertyWindowRef() { return _propertyWindow; }
+	Entity& LevelRef() { return _level; }
+	Viewport& ViewportRef(int id) { return _viewports[id]; }
+	EntCamera& CameraRef(int id) { return _viewports[id].CameraRef(); }
+	PropertyWindow& PropertyWindowRef() { return _propertyWindow; }
 };

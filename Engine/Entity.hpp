@@ -16,7 +16,7 @@ public:																						\
 	virtual const char* GetClassString() const { return #CLASSNAME;}						\
 	virtual size_t SizeOf() const { return sizeof(*this); }									\
 	virtual Entity* Clone() const { return Entity::_CreateCopy<CLASSNAME>(*this); } \
-	inline CLASSNAME* TypedClone() const { return (CLASSNAME*)Clone(); }					\
+	CLASSNAME* TypedClone() const { return (CLASSNAME*)Clone(); }					\
 	static CLASSNAME* Create() { CLASSNAME* obj = new CLASSNAME(); const_cast<bool&>(obj->_dynamic) = true; return obj; }
 
 class Collider;
@@ -32,7 +32,7 @@ class Entity
 
 	void _OnTransformChanged() { onTransformChanged(); }
 
-	inline void _OnChildChanged()
+	void _OnChildChanged()
 	{
 		onChildChanged();
 
@@ -106,22 +106,22 @@ public:
 	
 	#pragma region Transform
 
-	inline const Transform& GetRelativeTransform() const			{ return _transform; }
-	inline const Vector3& GetRelativePosition() const				{ return GetRelativeTransform().GetPosition(); }
-	inline const Rotation& GetRelativeRotation() const				{ return GetRelativeTransform().GetRotation(); }
-	inline const Vector3& GetRelativeScale() const					{ return GetRelativeTransform().GetScale(); }
+	const Transform& GetRelativeTransform() const			{ return _transform; }
+	const Vector3& GetRelativePosition() const				{ return GetRelativeTransform().GetPosition(); }
+	const Rotation& GetRelativeRotation() const				{ return GetRelativeTransform().GetRotation(); }
+	const Vector3& GetRelativeScale() const					{ return GetRelativeTransform().GetScale(); }
 
-	inline void AddRelativeRotation(const Vector3& euler)			{ _transform.AddRotation(euler); }
+	void AddRelativeRotation(const Vector3& euler)			{ _transform.AddRotation(euler); }
 
-	inline void SetRelativeTransform(const Transform& transform)	{ _transform = transform; }
-	inline void SetRelativePosition(const Vector3 &v)				{ _transform.SetPosition(v); }
-	inline void SetRelativeRotation(const Rotation &r)				{ _transform.SetRotation(r); }
-	inline void SetRelativeScale(const Vector3 &v)					{ _transform.SetScale(v); }
+	void SetRelativeTransform(const Transform& transform)	{ _transform = transform; }
+	void SetRelativePosition(const Vector3 &v)				{ _transform.SetPosition(v); }
+	void SetRelativeRotation(const Rotation &r)				{ _transform.SetRotation(r); }
+	void SetRelativeScale(const Vector3 &v)					{ _transform.SetScale(v); }
 
-	inline void RelativeMove(const Vector3& v)						{ _transform.Move(v); }
-	inline void RelativeRotate(const Rotation& q)					{ _transform.Rotate(q); }
+	void RelativeMove(const Vector3& v)						{ _transform.Move(v); }
+	void RelativeRotate(const Rotation& q)					{ _transform.Rotate(q); }
 
-	inline Transform GetWorldTransform() const
+	Transform GetWorldTransform() const
 	{
 		if (_parent)
 			return _transform * _parent->GetWorldTransform();
@@ -129,11 +129,11 @@ public:
 		return _transform;
 	}
 
-	inline Vector3 GetWorldPosition() const							{ return GetWorldTransform().GetPosition(); }
-	inline Rotation GetWorldRotation() const						{ return GetWorldTransform().GetRotation(); }
-	inline Vector3 GetWorldScale() const							{ return GetWorldTransform().GetScale(); }
+	Vector3 GetWorldPosition() const							{ return GetWorldTransform().GetPosition(); }
+	Rotation GetWorldRotation() const						{ return GetWorldTransform().GetRotation(); }
+	Vector3 GetWorldScale() const							{ return GetWorldTransform().GetScale(); }
 
-	inline void SetWorldTransform(const Transform &t)
+	void SetWorldTransform(const Transform &t)
 	{
 		if (_parent)
 			SetRelativeTransform(t * _parent->GetWorldTransform().Inverse());
@@ -141,7 +141,7 @@ public:
 			SetRelativeTransform(t);
 	}
 
-	inline void SetWorldPosition(const Vector3 &v) 
+	void SetWorldPosition(const Vector3 &v) 
 	{ 
 		if (_parent)
 			SetRelativePosition(v * _parent->GetInverseTransformationMatrix());
@@ -149,14 +149,14 @@ public:
 			SetRelativePosition(v);
 	}
 
-	inline void SetWorldRotation(const Rotation &rotation) {
+	void SetWorldRotation(const Rotation &rotation) {
 		if (_parent)
 			SetRelativeRotation(rotation * _parent->GetWorldTransform().GetRotation().Inverse());
 		else
 			SetRelativeRotation(rotation);
 	}
 
-	inline void SetWorldScale(const Vector3& v)
+	void SetWorldScale(const Vector3& v)
 	{
 		if (_parent)
 			SetRelativeScale(v / _parent->GetWorldTransform().GetScale());
@@ -171,8 +171,8 @@ public:
 
 	#pragma region Hierachy
 
-	inline Entity* GetParent() const { return _parent; }
-	inline const Buffer<Entity*>& Children() const { return _children; }
+	Entity* GetParent() const { return _parent; }
+	const Buffer<Entity*>& Children() const { return _children; }
 
 	void SetParent(Entity* parent);
 
@@ -193,7 +193,7 @@ public:
 	}
 
 	template<typename T>
-	inline Buffer<T*> FindChildrenOfType(bool searchChildren) 
+	Buffer<T*> FindChildrenOfType(bool searchChildren) 
 	{ 
 		Buffer<T*> buffer; 
 		FindChildrenOfType<T>(buffer, searchChildren); 
@@ -202,7 +202,7 @@ public:
 
 
 	template <typename T>
-	inline T* NewChild()
+	T* NewChild()
 	{
 		Entity* object = new T();
 		object->_dynamic = true;
@@ -210,19 +210,19 @@ public:
 		return dynamic_cast<T*>(object);
 	}
 
-	inline void CloneChildrenFrom(const Entity &src)
+	void CloneChildrenFrom(const Entity &src)
 	{
 		for (uint32 i = 0; i < src._children.GetSize(); ++i)
 			src._children[i]->Clone()->SetParent(this);
 	}
 
-	inline void DeleteChildren()
+	void DeleteChildren()
 	{
 		while (_children.GetSize())
 			_children[0]->Delete();
 	}
 
-	inline bool IsChildOf(const Entity* parent) const
+	bool IsChildOf(const Entity* parent) const
 	{
 		if (_parent == nullptr)
 			return false;
@@ -236,11 +236,11 @@ public:
 	#pragma endregion
 
 	//General
-	inline const String& GetName() const { return _name; }
-	inline void SetName(const String& name) { _name = name; onNameChanged(); if (_parent) _parent->_OnChildChanged(); }
+	const String& GetName() const { return _name; }
+	void SetName(const String& name) { _name = name; onNameChanged(); if (_parent) _parent->_OnChildChanged(); }
 
-	inline byte GetFlags() const { return _flags; }
-	inline void SetFlags(byte flags) { _flags = flags; }
+	byte GetFlags() const { return _flags; }
+	void SetFlags(byte flags) { _flags = flags; }
 
 	virtual void Update() {}
 	virtual void Render(EnumRenderChannel channels) const {}
@@ -248,7 +248,7 @@ public:
 
 	virtual const PropertyCollection& GetProperties();
 
-	inline uint32 GetUID() const { return _uid; }
+	uint32 GetUID() const { return _uid; }
 
 	//IO
 	void WriteAllToFile(BufferWriter<byte>&, NumberedSet<String> &strings) const;
@@ -271,7 +271,7 @@ public:
 
 	Entity& operator=(Entity&& other) noexcept;
 
-	inline bool operator==(const Entity &other) const { return _uid == other._uid; }
+	bool operator==(const Entity &other) const { return _uid == other._uid; }
 
 	//Other
 	virtual Bounds GetBounds() const { return Bounds(); }
@@ -279,7 +279,7 @@ public:
 	Bounds GetWorldBounds(bool noTranslation = false) const;
 
 	template<typename T>
-	inline bool IsType() { return dynamic_cast<T*>(this) != nullptr; }
+	bool IsType() { return dynamic_cast<T*>(this) != nullptr; }
 
 	//Commands
 	void CMD_List(const Buffer<String>& args);

@@ -106,12 +106,12 @@ public:
 	InputManager() : _keyStates() {}
 	~InputManager();
 
-	inline void BindAxis(AxisType axis, float *axisPtr) { _axisBinds.Set(axis, axisPtr); }
+	void BindAxis(AxisType axis, float *axisPtr) { _axisBinds.Set(axis, axisPtr); }
 
-	inline void BindKey(Keycode key, const Callback &callback) { _keyBinds.Set(key, new KeyBind_Callback(callback)); }
-	inline void BindKeyAxis(Keycode key, float *axisPtr, float axisDisplacement) { _keyBinds.Set(key, new KeyBind_Axis(axisPtr, axisDisplacement)); }
+	void BindKey(Keycode key, const Callback &callback) { _keyBinds.Set(key, new KeyBind_Callback(callback)); }
+	void BindKeyAxis(Keycode key, float *axisPtr, float axisDisplacement) { _keyBinds.Set(key, new KeyBind_Axis(axisPtr, axisDisplacement)); }
 
-	inline bool IsKeyDown(Keycode key) const { return _keyStates[(byte)key] == 1; }
+	bool IsKeyDown(Keycode key) const { return _keyStates[(byte)key] == 1; }
 
 	void KeyDown(Keycode);
 	void KeyUp(Keycode);

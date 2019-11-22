@@ -3,6 +3,7 @@
 #include "ColliderBox.hpp"
 #include "Engine.hpp"
 #include "MaterialManager.hpp"
+#include "SharedPointer.hpp"
 #include "Vector.hpp"
 
 template <int SIZE>
@@ -16,7 +17,7 @@ protected:
 	Vector<float, SIZE> _point1;
 	Vector<float, SIZE> _point2;
 	
-	const Material *_material;
+	SharedPointer<const Material> _material;
 
 	virtual void _OnTransformChanged() = 0;
 
@@ -24,17 +25,17 @@ protected:
 	virtual ~EntBrush() {}
 
 public:
-	inline void SetPoint1(const Vector<float, SIZE> &position) { _point1 = position; _OnTransformChanged(); }
-	inline void SetPoint2(const Vector<float, SIZE> &position) { _point2 = position; _OnTransformChanged(); }
-	inline void SetMaterial(const Material *material) { _material = material; }
+	void SetPoint1(const Vector<float, SIZE> &position) { _point1 = position; _OnTransformChanged(); }
+	void SetPoint2(const Vector<float, SIZE> &position) { _point2 = position; _OnTransformChanged(); }
+	void SetMaterial(const SharedPointer<const Material>& material) { _material = material; }
 	void SetMaterial(const String &name) { if (Engine::Instance().pMaterialManager) _material = Engine::Instance().pMaterialManager->Get(name); }
 	
-	inline const Vector<float, SIZE>& GetPoint1() const { return _point1; }
-	inline const Vector<float, SIZE>& GetPoint2() const { return _point2; }
-	inline const Material* GetMaterial() const { return _material; }
+	const Vector<float, SIZE>& GetPoint1() const { return _point1; }
+	const Vector<float, SIZE>& GetPoint2() const { return _point2; }
+	const SharedPointer<const Material>& GetMaterial() const { return _material; }
 	String GetMaterialName() const
-	{																						//todo: const cast removal
-		if (Engine::Instance().pMaterialManager && _material) return Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material));
+	{
+		if (Engine::Instance().pMaterialManager && _material) return Engine::Instance().pMaterialManager->FindNameOf(_material.Ptr());
 		return "Unknown";
 	}
 

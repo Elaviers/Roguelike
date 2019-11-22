@@ -32,9 +32,9 @@ public:
 	AnimationTrack() {}
 	~AnimationTrack() {}
 
-	inline const Buffer<Keyframe<T>>& GetKeyframes() const { return _keyframes; }
+	const Buffer<Keyframe<T>>& GetKeyframes() const { return _keyframes; }
 
-	inline void AddKey(float time, const T& value, byte interp = INTERP_LINEAR)
+	void AddKey(float time, const T& value, byte interp = INTERP_LINEAR)
 	{
 		if (_keyframes.GetSize() != 0 || time > _keyframes.Last().time)
 			_keyframes.Add(Keyframe<T>(time, value, interp));
@@ -43,7 +43,7 @@ public:
 
 	}
 
-	inline const Keyframe<T>* GetKey(float time) const
+	const Keyframe<T>* GetKey(float time) const
 	{
 		int index = GetKeyIndex(time);
 

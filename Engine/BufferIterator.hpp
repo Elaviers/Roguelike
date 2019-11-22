@@ -20,10 +20,10 @@ class BufferReader
 public:
 	BufferReader(const Buffer<T>& buffer, size_t index = 0) : _buffer(buffer), _pointer(nullptr) { if (!SetIndex(index)) _index = 0; }
 
-	inline const T* Ptr() const { return _pointer; }
-	inline bool Valid() const { return _index < _buffer.GetSize(); }
+	const T* Ptr() const { return _pointer; }
+	bool Valid() const { return _index < _buffer.GetSize(); }
 
-	inline bool SetIndex(size_t index)
+	bool SetIndex(size_t index)
 	{
 		_index = index;
 
@@ -37,12 +37,12 @@ public:
 		return false;
 	}
 
-	inline bool IncrementIndex(size_t amount)
+	bool IncrementIndex(size_t amount)
 	{
 		return SetIndex(_index + amount);
 	}
 
-	inline size_t GetRemainingSpace()
+	size_t GetRemainingSpace()
 	{
 		return _buffer.GetSize() == 0 ? 0 : (_buffer.GetSize() - _index);
 	}
@@ -61,7 +61,7 @@ public:
 		return amount;
 	}
 
-	inline byte Read_byte()
+	byte Read_byte()
 	{
 		byte value = *_pointer;
 		IncrementIndex(1);
@@ -126,7 +126,7 @@ public:
 		return string;
 	}
 
-	inline Vector2 Read_vector2()
+	Vector2 Read_vector2()
 	{
 		Vector2 v;
 		v[0] = Read_float();
@@ -134,7 +134,7 @@ public:
 		return v;
 	}
 
-	inline Vector3 Read_vector3()
+	Vector3 Read_vector3()
 	{
 		Vector3 v;
 		v[0] = Read_float();
@@ -143,7 +143,7 @@ public:
 		return v;
 	}
 
-	inline Vector4 Read_vector4()
+	Vector4 Read_vector4()
 	{
 		Vector4 v;
 		v[0] = Read_float();
@@ -164,11 +164,11 @@ class BufferWriter
 public:
 	BufferWriter(Buffer<T> &buffer, size_t index = 0) : _buffer(buffer), _pointer(nullptr) { if (!SetIndex(index)) _index = 0; }
 
-	inline T* Ptr() { return _pointer; }
+	T* Ptr() { return _pointer; }
 
-	inline bool Valid() const { return _index < _buffer.GetSize(); }
+	bool Valid() const { return _index < _buffer.GetSize(); }
 
-	inline bool SetIndex(size_t index)
+	bool SetIndex(size_t index)
 	{
 		_index = index;
 		
@@ -182,12 +182,12 @@ public:
 		return false;
 	}
 
-	inline bool IncrementIndex(size_t amount)
+	bool IncrementIndex(size_t amount)
 	{
 		return SetIndex(_index + amount);
 	}
 
-	inline size_t GetRemainingSpace()
+	size_t GetRemainingSpace()
 	{
 		return _buffer.GetSize() == 0 ? 0 : (_buffer.GetSize() - _index);
 	}
@@ -286,20 +286,20 @@ public:
 		IncrementIndex(len + 1);
 	}
 
-	inline void Write_vector2(const Vector2& v)
+	void Write_vector2(const Vector2& v)
 	{
 		Write_float(v[0]);
 		Write_float(v[1]);
 	}
 
-	inline void Write_vector3(const Vector3& v)
+	void Write_vector3(const Vector3& v)
 	{
 		Write_float(v[0]);
 		Write_float(v[1]);
 		Write_float(v[2]);
 	}
 
-	inline void Write_vector4(const Vector4& v)
+	void Write_vector4(const Vector4& v)
 	{
 		Write_float(v[0]);
 		Write_float(v[1]);

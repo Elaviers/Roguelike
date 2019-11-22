@@ -48,7 +48,7 @@ public:
 		_registry[id] = newNode;
 	}
 
-	inline RegistryNodeBase* GetNode(byte id)
+	RegistryNodeBase* GetNode(byte id)
 	{
 		auto regNode = _registry.Get(id);
 		if (regNode)
@@ -57,7 +57,7 @@ public:
 		return nullptr;
 	}
 
-	inline Buffer<Pair<const byte*, RegistryNodeBase* const *>> GetRegisteredTypes() const { return _registry.ToKVBuffer(); }
+	Buffer<Pair<const byte*, RegistryNodeBase* const *>> GetRegisteredTypes() const { return _registry.ToKVBuffer(); }
 
 	void RegisterEngineObjects();
 };

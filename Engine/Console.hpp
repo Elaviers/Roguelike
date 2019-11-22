@@ -18,7 +18,7 @@ class Console
 	bool _showCursor = true;
 	float _blinkTimer = 0.f;
 
-	inline void _ResetBlink()
+	void _ResetBlink()
 	{
 		_showCursor = true;
 		_blinkTimer = 0.f;
@@ -40,7 +40,7 @@ public:
 
 	~Console() {}
 
-	inline RigidPropertyCollection& Cvars() { return _cvars; }
+	RigidPropertyCollection& Cvars() { return _cvars; }
 
 	void Print(const char* string);
 	void InputChar(char key);

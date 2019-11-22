@@ -21,7 +21,7 @@ void GizmoPlane::Draw() const
 			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
 
 		glDisable(GL_CULL_FACE);
-		Engine::Instance().pModelManager->Plane().Render();
+		Engine::Instance().pModelManager->Plane()->Render();
 		glEnable(GL_CULL_FACE);
 	}
 }

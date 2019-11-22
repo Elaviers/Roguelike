@@ -8,8 +8,8 @@
 class EntRenderable : public Entity
 {
 private:
-	const Model *_model;
-	const Material *_material;
+	SharedPointer<const Model> _model;
+	SharedPointer<const Material> _material;
 
 	Colour _colour;
 
@@ -27,18 +27,18 @@ public:
 	{}
 	virtual ~EntRenderable() {}
 
-	inline const Colour& GetColour() const { return _colour; }
+	const Colour& GetColour() const { return _colour; }
 
-	inline const Material* GetMaterial() const { return _material; }
-	inline const Model* GetModel() const { return _model; }
+	const SharedPointer<const Material>& GetMaterial() const { return _material; }
+	const SharedPointer<const Model>& GetModel() const { return _model; }
 
-	inline void SetColour(const Colour& colour) { _colour = colour; }
+	void SetColour(const Colour& colour) { _colour = colour; }
 	
-	inline void SetMaterial(const String &name) { if (Engine::Instance().pMaterialManager) SetMaterial(Engine::Instance().pMaterialManager->Get(name)); }
-	inline void SetMaterial(const Material *material) { _material = material; _materialIsDefault = false; }
+	void SetMaterial(const String &name) { if (Engine::Instance().pMaterialManager) SetMaterial(Engine::Instance().pMaterialManager->Get(name)); }
+	void SetMaterial(const SharedPointer<const Material>& material) { _material = material; _materialIsDefault = false; }
 
-	inline void SetModel(const String& name) { if (Engine::Instance().pModelManager) SetModel(Engine::Instance().pModelManager->Get(name)); }
-	inline void SetModel(const Model* model)
+	void SetModel(const String& name) { if (Engine::Instance().pModelManager) SetModel(Engine::Instance().pModelManager->Get(name)); }
+	void SetModel(const SharedPointer<const Model>& model)
 	{
 		_model = model;
 		if (_model && model->GetDefaultMaterialName().GetLength() != 0)
@@ -48,7 +48,7 @@ public:
 		}
 	}
 
-	inline bool MaterialIsDefault() const { return _materialIsDefault; }
+	bool MaterialIsDefault() const { return _materialIsDefault; }
 
 	virtual void Render(EnumRenderChannel) const override;
 

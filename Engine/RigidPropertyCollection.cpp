@@ -1,6 +1,9 @@
 #include "RigidPropertyCollection.hpp"
+#include "Colour.hpp"
+#include "Console.hpp"
+#include "Engine.hpp"
 
-String RigidPropertyCollection::HandleCommand(const Buffer<String>& tokens) const
+void RigidPropertyCollection::HandleCommand(const Buffer<String>& tokens) const
 {
 	if (tokens.GetSize() > 0)
 	{
@@ -15,15 +18,13 @@ String RigidPropertyCollection::HandleCommand(const Buffer<String>& tokens) cons
 				Buffer<String> newTokens(&tokens[1], tokens.GetSize() - 1);
 
 				((RigidVariableProperty<CommandPtr>*)property)->Get()(newTokens);
-				return "";
+				return;
 			}
 
 			if (tokens.GetSize() >= 2)
 				property->SetAsString(tokens[1]);
 
-			return name + " : " + property->GetAsString();
+			Engine::Instance().pConsole->Print(CSTR(name, " : ", property->GetAsString()));
 		}
 	}
-
-	return "";
 }

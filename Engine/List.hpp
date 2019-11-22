@@ -72,19 +72,19 @@ public:
 		Iterator(_Node* node) : _node(node) {}
 		~Iterator() {}
 
-		inline Iterator Next() const { return _node->next; }
+		Iterator Next() const { return _node->next; }
 
-		inline Iterator& operator++() 
+		Iterator& operator++() 
 		{ 
 			_node = _node->next;
 			return *this;
 		}
 
-		inline T* operator->() const	{ return &_node->obj; }
-		inline T& operator*() const		{ return _node->obj; }
+		T* operator->() const	{ return &_node->obj; }
+		T& operator*() const		{ return _node->obj; }
 
-		inline operator bool() const	{ return _node != nullptr; }
-		inline bool IsValid() const		{ return _node != nullptr; }
+		operator bool() const	{ return _node != nullptr; }
+		bool IsValid() const		{ return _node != nullptr; }
 	};
 
 	List() : _first(nullptr) {}
@@ -93,14 +93,14 @@ public:
 	
 	~List() { if (_first) _first->DeleteAll(); }
 
-	inline List& operator=(const List& other)
+	List& operator=(const List& other)
 	{
 		Clear();
 		_first = _Node::CopyOf(other._first);
 		return *this;
 	}
 
-	inline List& operator=(List&& other) noexcept
+	List& operator=(List&& other) noexcept
 	{
 		_first = other._first;
 		other._first = nullptr;
@@ -108,13 +108,13 @@ public:
 		return *this;
 	}
 
-	inline List& operator+=(const T& element)
+	List& operator+=(const T& element)
 	{
 		Add(element);
 		return *this;
 	}
 
-	inline void Clear() 
+	void Clear() 
 	{ 
 		if (_first)
 		{
@@ -123,15 +123,15 @@ public:
 		}
 	}
 
-	inline size_t GetSize() const { return _first ? _first->Count() : 0; }
-	inline bool IsEmpty() const { return _first == nullptr; }
+	size_t GetSize() const { return _first ? _first->Count() : 0; }
+	bool IsEmpty() const { return _first == nullptr; }
 
-	inline Iterator First() { return _first; }
-	inline Iterator First() const { return _first; }
-	inline Iterator Last() { return _first ? _first->Last() : nullptr; }
-	inline Iterator Last() const { return _first ? _first->Last() : nullptr; }
+	Iterator First() { return _first; }
+	Iterator First() const { return _first; }
+	Iterator Last() { return _first ? _first->Last() : nullptr; }
+	Iterator Last() const { return _first ? _first->Last() : nullptr; }
 
-	inline Iterator Get(int index)
+	Iterator Get(int index)
 	{
 		auto node = _first;
 		for (int i = 0; node; node = node->next)

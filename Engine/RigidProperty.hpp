@@ -19,24 +19,24 @@ protected:
 public:
 	virtual ~RigidProperty() {}
 
-	inline byte GetFlags() const { return _baseProperty.GetFlags(); }
-	inline PropertyType GetType() const { return _baseProperty.GetType(); }
-	inline const String& GetName() const { return _baseProperty.GetName(); }
-	inline const String& GetDescription() const { return _baseProperty.GetDescription(); }
+	byte GetFlags() const { return _baseProperty.GetFlags(); }
+	PropertyType GetType() const { return _baseProperty.GetType(); }
+	const String& GetName() const { return _baseProperty.GetName(); }
+	const String& GetDescription() const { return _baseProperty.GetDescription(); }
 
-	inline const String& GetTypeString() const { return _baseProperty.GetTypeString(); }
+	const String& GetTypeString() const { return _baseProperty.GetTypeString(); }
 
-	inline void SetName(const String& name) { return _baseProperty.SetName(name); }
-	inline void SetDescription(const String& description) { return _baseProperty.SetDescription(description); }
+	void SetName(const String& name) { return _baseProperty.SetName(name); }
+	void SetDescription(const String& description) { return _baseProperty.SetDescription(description); }
 
-	inline String GetAsString() const { return _baseProperty.GetAsString(_object); }
-	inline void SetAsString(const String& string) const { _baseProperty.SetAsString(_object, string); }
+	String GetAsString() const { return _baseProperty.GetAsString(_object); }
+	void SetAsString(const String& string) const { _baseProperty.SetAsString(_object, string); }
 };
 
 template<typename T>
 class RigidVariableProperty : public RigidProperty
 {
-	inline const VariableProperty<T>& _Property() const { return (const VariableProperty<T>&)_baseProperty; }
+	const VariableProperty<T>& _Property() const { return (const VariableProperty<T>&)_baseProperty; }
 
 protected:
 	RigidVariableProperty(void* object, VariableProperty<T>& property) : RigidProperty(object, property) {}

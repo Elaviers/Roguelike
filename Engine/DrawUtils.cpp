@@ -191,14 +191,14 @@ namespace DrawUtils
 		{
 			transformX[3][axisX] = pos;
 			GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, transformX);
-			modelManager.Line().Render();
+			modelManager.Line()->Render();
 		}
 
 		for (float pos = startY; pos < maxY; pos += gap)
 		{
 			transformY[3][axisY] = pos;
 			GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, transformY);
-			modelManager.Line().Render();
+			modelManager.Line()->Render();
 		}
 	}
 
@@ -213,7 +213,7 @@ namespace DrawUtils
 		t.SetRotation(Vector3(90 + Maths::ArcSineDegrees(dir[1]), Maths::ArcTangentDegrees2(dir[0], dir[2]), 0.f));
 
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
-		modelManager.Line().Render();
+		modelManager.Line()->Render();
 	}
 
 	void DrawBox(const ModelManager &modelManager, const Vector3 &p1, const Vector3 &p2)

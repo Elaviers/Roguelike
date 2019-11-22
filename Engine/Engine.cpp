@@ -40,6 +40,7 @@ void Engine::Init(EngineCreateFlags flags, Entity *world)
 	if (pConsole)
 	{
 		//Commands
+		pConsole->Cvars().CreateVar("TexMgr", CommandPtr(pTextureManager, &TextureManager::CMD_config));
 		pConsole->Cvars().CreateVar("Play", CommandPtr(pAudioManager, &AudioManager::CMD_play));
 
 		if (pWorld)

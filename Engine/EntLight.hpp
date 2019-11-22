@@ -20,11 +20,11 @@ public:
 
 	static bool drawLightSources;
 
-	inline const Vector3& GetColour() const { return _colour; }
-	inline float GetRadius() const { return _radius; }
+	const Vector3& GetColour() const { return _colour; }
+	float GetRadius() const { return _radius; }
 
-	inline void SetColour(const Vector3 &colour) { _colour = colour; }
-	inline void SetRadius(float radius) { _radius = radius; }
+	void SetColour(const Vector3 &colour) { _colour = colour; }
+	void SetRadius(float radius) { _radius = radius; }
 
 	void ToShader(int glArrayIndex);
 

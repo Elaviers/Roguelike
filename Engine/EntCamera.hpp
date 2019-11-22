@@ -32,23 +32,23 @@ public:
 	~EntCamera() {}
 
 	void Use();
-	inline static const EntCamera* Current() { return _currentCamera; }
+	static const EntCamera* Current() { return _currentCamera; }
 
-	inline void SetProjectionType(ProjectionType type)	{ _type = type; UpdateProjectionMatrix(); }
-	inline void SetFOV(float fieldOfView)				{ _fov = fieldOfView; UpdateProjectionMatrix(); }
-	inline void SetScale(float scale)					{ _scale = scale; UpdateProjectionMatrix(); }
-	inline void SetZBounds(float n, float f)			{ _near = n; _far = f; UpdateProjectionMatrix(); }
-	inline void SetViewport(uint16 width, uint16 height){ _viewport[0] = width; _viewport[1] = height;	UpdateProjectionMatrix(); }
+	void SetProjectionType(ProjectionType type)	{ _type = type; UpdateProjectionMatrix(); }
+	void SetFOV(float fieldOfView)				{ _fov = fieldOfView; UpdateProjectionMatrix(); }
+	void SetScale(float scale)					{ _scale = scale; UpdateProjectionMatrix(); }
+	void SetZBounds(float n, float f)			{ _near = n; _far = f; UpdateProjectionMatrix(); }
+	void SetViewport(uint16 width, uint16 height){ _viewport[0] = width; _viewport[1] = height;	UpdateProjectionMatrix(); }
 
-	inline ProjectionType GetProjectionType() const		{ return _type; }
-	inline float GetFOV() const							{ return _fov; }
-	inline float GetFOVHorizontal() const				{ return _fov * (float)_viewport[0] / (float)_viewport[1]; }
-	inline float GetScale() const						{ return _scale; }
-	inline const Vector<uint16, 2>& GetViewport() const	{ return _viewport; }
-	inline float GetNear() const						{ return _near; }
-	inline float GetFar() const							{ return _far; }
+	ProjectionType GetProjectionType() const		{ return _type; }
+	float GetFOV() const							{ return _fov; }
+	float GetFOVHorizontal() const				{ return _fov * (float)_viewport[0] / (float)_viewport[1]; }
+	float GetScale() const						{ return _scale; }
+	const Vector<uint16, 2>& GetViewport() const	{ return _viewport; }
+	float GetNear() const						{ return _near; }
+	float GetFar() const							{ return _far; }
 
-	inline const Mat4& GetProjectionMatrix() const		{ return _projection; }
+	const Mat4& GetProjectionMatrix() const		{ return _projection; }
 
 	bool FrustumOverlaps(const Bounds &b) const;
 

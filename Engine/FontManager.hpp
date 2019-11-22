@@ -10,9 +10,9 @@ class FontManager : public AssetManager<Font>
 	String _systemPath;
 
 public:
-	FontManager() : AssetManager("") {}
+	FontManager() : AssetManager() {}
 	virtual ~FontManager() {}
 
-	inline void SetSystemPath(const String& path) { _systemPath = path; }
+	void SetSystemPath(const String& path) { _systemPath = path; }
 };
 

@@ -28,7 +28,7 @@ void EntSprite::Render(EnumRenderChannel channels) const
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t);
 		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
 
-		Engine::Instance().pModelManager->Plane().Render();
+		Engine::Instance().pModelManager->Plane()->Render();
 	}
 }
 
@@ -67,7 +67,7 @@ void EntSprite::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strin
 
 	if (Engine::Instance().pMaterialManager && _material)
 	{
-		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(_material));
+		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(_material.Ptr()));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);
@@ -83,5 +83,5 @@ void EntSprite::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& 
 	const String* materialName = strings.Get(reader.Read_uint16());
 
 	if (Engine::Instance().pMaterialManager && materialName)
-		_material = (MaterialSprite*)Engine::Instance().pMaterialManager->Get(*materialName);
+		_material = Engine::Instance().pMaterialManager->Get(*materialName).Cast<const MaterialSprite>();
 }

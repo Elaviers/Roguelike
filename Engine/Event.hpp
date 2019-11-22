@@ -27,13 +27,13 @@ public:
 	}
 
 
-	inline Event& operator-=(const FunctionPointer<void, Args...>& function) 
+	Event& operator-=(const FunctionPointer<void, Args...>& function) 
 	{ 
 		_list.Remove(function);
 		return *this;
 	}
 
-	inline void operator()(Args... args) const 
+	void operator()(Args... args) const 
 	{
 		for (auto it = _list.First(); it; ++it)
 			it->TryCall();

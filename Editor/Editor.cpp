@@ -77,8 +77,11 @@ void Editor::_Init()
 		dummy.CreateDummyAndUse(classNameDummy);
 		GL::LoadDummyExtensions();
 
+		int screenY = ::GetSystemMetrics(SM_CYSCREEN);
+		int cW = 512, cH = 256;
+
 		_consoleWindow.Create(classNameConsole, "Console", this);
-		_consoleWindow.SetSize(256, 256);
+		_consoleWindow.SetSizeAndPos(0, screenY - cH - 33, cW, cH);
 		_window.Create(classNameWindow, "Window", this);
 		_vpArea.Create(classNameVPArea, NULL, this, WS_CHILD | WS_VISIBLE, _window.GetHwnd());
 	}
@@ -194,26 +197,6 @@ void Editor::Run()
 	_window.Show();
 
 	_consoleFont = Engine::Instance().pFontManager->Get("consolas");
-
-	//Preload materials
-	Buffer<String> filenames = IO::FindFilesInDirectory("Data/Materials/*.txt");
-	for (uint32 i = 0; i < filenames.GetSize(); ++i)
-	{
-		Utilities::StripExtension(filenames[i]);
-
-		_window.SetTitle(CSTR("Loading material \"", filenames[i], "\"..."));
-		Engine::Instance().pMaterialManager->Get(filenames[i]);
-	}
-
-	//Preload models
-	filenames = IO::FindFilesInDirectory("Data/Models/*.txt");
-	for (uint32 i = 0; i < filenames.GetSize(); ++i)
-	{
-		Utilities::StripExtension(filenames[i]);
-
-		_window.SetTitle(CSTR("Loading model \"", filenames[i], "\"..."));
-		Engine::Instance().pModelManager->Get(filenames[i]);
-	}
 
 	_window.SetTitle("Editor");
 

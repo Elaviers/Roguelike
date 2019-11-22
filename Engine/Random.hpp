@@ -17,11 +17,11 @@ public:
 
 	float NextFloat();
 
-	inline double NextDouble()		{ return (double)Next() /	_mEx; }
+	double NextDouble()		{ return (double)Next() /	_mEx; }
 
 	//Exclusive of max (i.e. 0 <= x < max)
-	inline uint32 Next(uint32 max)	{ return (uint32)(NextFloat() * max); }
+	uint32 Next(uint32 max)	{ return (uint32)(NextFloat() * max); }
 
 	//min <= x < max
-	inline uint32 Next(uint32 min, uint32 max) { return Next(max - min) + min; }
+	uint32 Next(uint32 min, uint32 max) { return Next(max - min) + min; }
 };

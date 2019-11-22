@@ -5,23 +5,15 @@
 #include "Glyph.hpp"
 #include "String.hpp"
 #include "Texture.hpp"
-#include "TextureManager.hpp"
-
 
 class FontTexture : public Font
 {
-	const Texture* _texture;
+	SharedPointer<const Texture> _texture;
 	Hashmap<byte, Glyph> _charMap;
 
-	int _size;
-	int _rowH;
-	int _yOffset;
-
-	byte _mips;
-	uint16 _mag;
-
-	String _GetMag() { return "{MATERIAL._MAG}"; }
-	void _SetMag(const String&);
+	int _size = 0;
+	int _rowH = 0;
+	int _yOffset = 0;
 
 	void _CMD_texture(const Buffer<String>& args);
 	void _CMD_region(const Buffer<String>& args);
@@ -40,8 +32,8 @@ public:
 
 	virtual void RenderString(const char* string, const Transform & transform, float lineHeight) const override;
 
-	inline void RenderString(const char* string, const Transform& transform) const { RenderString(string, transform, -transform.GetScale()[1]); }
+	void RenderString(const char* string, const Transform& transform) const { RenderString(string, transform, -transform.GetScale()[1]); }
 
-	inline void BindTexture() const { if (_texture) _texture->Bind(0); }
+	void BindTexture() const { if (_texture) _texture->Bind(0); }
 };
 

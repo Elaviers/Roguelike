@@ -28,12 +28,12 @@ public:
 		return lengthSq;
 	}
 
-	inline float Length() const { return Maths::SquareRoot(LengthSquared()); }
-	inline Vector Normalised() { return *this / Length(); }
-	inline Vector& Normalise() { *this /= Length(); return *this; }
+	float Length() const { return Maths::SquareRoot(LengthSquared()); }
+	Vector Normalised() { return *this / Length(); }
+	Vector& Normalise() { *this /= Length(); return *this; }
 
-	inline T&		operator[](int index) { return _data[index]; }
-	inline const T& operator[](int index) const { return _data[index]; }
+	T&		operator[](int index) { return _data[index]; }
+	const T& operator[](int index) const { return _data[index]; }
 
 	template <typename CAST>
 	operator Vector<CAST, SIZE>()
@@ -117,7 +117,7 @@ public:
 		return true;
 	}
 
-	inline bool AlmostEqual(const Vector& other, float tolerance) const
+	bool AlmostEqual(const Vector& other, float tolerance) const
 	{
 		return ((*this - other).LengthSquared() <= tolerance * tolerance);
 	}
@@ -138,7 +138,7 @@ public:
 		return result;
 	}
 
-	inline Vector Abs() const
+	Vector Abs() const
 	{
 		Vector v;
 		for (int i = 0; i < SIZE; ++i)
@@ -149,7 +149,7 @@ public:
 };
 
 template<typename T, int SIZE>
-inline Vector<T, SIZE> operator*(T x, const Vector<T, SIZE> &vec)
+Vector<T, SIZE> operator*(T x, const Vector<T, SIZE> &vec)
 {
 	return vec * x;
 }

@@ -13,11 +13,11 @@ class MenuStartLevel : protected UIContainer
 protected:
 	FunctionPointer<void, const String&> _onLevelChosen;
 
-	float _buttonBorderSize;
+	float _buttonBorderSize = 1.f;
 	Colour _buttonColourInactive;
 	Colour _buttonColourActive;
-	const Font *_buttonFont;
-	const Material *_buttonMaterial;
+	SharedPointer<const Font> _buttonFont;
+	SharedPointer<const Material> _buttonMaterial;
 
 	UIPanel _panel;
 
@@ -29,11 +29,11 @@ public:
 
 	void Initialise(const FunctionPointer<void, const String&> &onLevelChosen);
 
-	inline void SetBounds(float x, float y, float w, float h, float xOffset = 0.f, float yOffset = 0.f) { UIContainer::SetBounds(x, y, w, h, xOffset, yOffset); }
-	inline void SetButtonBorderSize(float size) { _buttonBorderSize = size; }
-	inline void SetButtonColourInactive(const Colour& colour) { _buttonColourInactive = colour; }
-	inline void SetButtonColourActive(const Colour& colour) { _buttonColourActive = colour; }
-	inline void SetButtonFont(const Font *font) { _buttonFont = font; }
-	inline void SetButtonMaterial(const Material *material) { _buttonMaterial = material; }
-	inline void SetParent(UIElement *parent) { UIContainer::SetParent(parent); }
+	void SetBounds(float x, float y, float w, float h, float xOffset = 0.f, float yOffset = 0.f) { UIContainer::SetBounds(x, y, w, h, xOffset, yOffset); }
+	void SetButtonBorderSize(float size) { _buttonBorderSize = size; }
+	void SetButtonColourInactive(const Colour& colour) { _buttonColourInactive = colour; }
+	void SetButtonColourActive(const Colour& colour) { _buttonColourActive = colour; }
+	void SetButtonFont(const SharedPointer<const Font>& font) { _buttonFont = font; }
+	void SetButtonMaterial(const SharedPointer<const Material>& material) { _buttonMaterial = material; }
+	void SetParent(UIElement *parent) { UIContainer::SetParent(parent); }
 };

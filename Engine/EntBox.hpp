@@ -26,25 +26,25 @@ public:
 
 	virtual Bounds GetBounds() const override { return Bounds(_min, _max); }
 
-	inline void SetPoint1(const Vector3 &point1) 
+	void SetPoint1(const Vector3 &point1) 
 	{
 		_p1 = point1;
 		_UpdateMinMax();
 	}
 
-	inline void SetPoint2(const Vector3 &point2)
+	void SetPoint2(const Vector3 &point2)
 	{
 		_p2 = point2;
 		_UpdateMinMax();
 	}
 
-	inline void SetMin(const Vector3 &min) { _min = min; }
-	inline void SetMax(const Vector3 &max) { _max = max; }
+	void SetMin(const Vector3 &min) { _min = min; }
+	void SetMax(const Vector3 &max) { _max = max; }
 
-	inline void SetRenderColour(const Colour &colour) { _colour = colour; }
+	void SetRenderColour(const Colour &colour) { _colour = colour; }
 
-	inline const Vector3& GetPoint1() const { return _p1; }
-	inline const Vector3& GetPoint2() const { return _p2; }
-	inline const Vector3& GetMin() const { return _min; }
-	inline const Vector3& GetMax() const { return _max; }
+	const Vector3& GetPoint1() const { return _p1; }
+	const Vector3& GetPoint2() const { return _p2; }
+	const Vector3& GetMin() const { return _min; }
+	const Vector3& GetMax() const { return _max; }
 };

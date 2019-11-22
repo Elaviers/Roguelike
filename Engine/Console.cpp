@@ -82,8 +82,8 @@ void Console::Backspace()
 
 void Console::SubmitPrompt()
 {
-	Print(CSTR(Colour::Grey.ToColourCode(), _prePrompt, _prompt, '\n', Colour::Cyan.ToColourCode()));
-	Print(_cvars.HandleCommand(_prompt).GetData());
+	Print(CSTR(Colour::Grey.ToColourCode(), _prePrompt, _prompt, Colour::Cyan.ToColourCode(), '\n'));
+	_cvars.HandleCommand(_prompt);
 
 	_prompt.Clear();
 	_ResetBlink();
@@ -103,10 +103,10 @@ void Console::Render(const Font &font, float deltaTime)
 
 	int linesNeeded = 0;
 
-	float yOffset = 10;
+	float yOffset = 0;
 
 	Transform transform;
-	transform.SetScale(Vector3(32, 32, 1));
+	transform.SetScale(Vector3(16, 16, 1));
 
 	if (_charBuffer.GetSize())
 	{

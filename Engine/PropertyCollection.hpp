@@ -16,10 +16,10 @@ public:
 
 	const Buffer<Property*>& GetAll() const { return _cvars; }
 
-	inline void Clear() { _cvars.Clear(); }
+	void Clear() { _cvars.Clear(); }
 
 	String HandleCommand(void* obj, const Buffer<String>& tokens) const;
-	inline String HandleCommand(void* obj, const String& command) const { return HandleCommand(obj, command.Split(" ")); }
+	String HandleCommand(void* obj, const String& command) const { return HandleCommand(obj, command.Split(" ")); }
 
 	void Transfer(const void* from, void* to) const
 	{
@@ -27,7 +27,7 @@ public:
 			_cvars[i]->TransferTo(from, to);
 	}
 
-	inline Property* Find(const String& name) const
+	Property* Find(const String& name) const
 	{
 		for (size_t i = 0; i < _cvars.GetSize(); ++i)
 			if (_cvars[i]->GetName().Equals(name, true))
@@ -76,25 +76,25 @@ public:
 	//////////
 
 	template <typename V>
-	inline void Add(const String& name, size_t offset, byte flags = 0)
+	void Add(const String& name, size_t offset, byte flags = 0)
 	{
 		_cvars.Add(new OffsetProperty<V>(name, offset, flags));
 	}
 	
 	template <typename T, typename V>
-	inline void Add(const String& name, const MemberGetter<T, V>& getter, const MemberSetter<T, V>& setter, size_t offset = 0, byte flags = 0)
+	void Add(const String& name, const MemberGetter<T, V>& getter, const MemberSetter<T, V>& setter, size_t offset = 0, byte flags = 0)
 	{
 		_cvars.Add(new FptrProperty<T, V>(name, getter, setter, offset, flags));
 	}
 
 	template <typename T, typename V>
-	inline void Add(const String& name, const MemberGetter<T, const V&>& getter, const MemberSetter<T, V>& setter, size_t offset = 0, byte flags = 0)
+	void Add(const String& name, const MemberGetter<T, const V&>& getter, const MemberSetter<T, V>& setter, size_t offset = 0, byte flags = 0)
 	{
 		_cvars.Add(new FptrProperty<T, V>(name, getter, setter, offset, flags));
 	}
 
 	template <typename T>
-	inline void AddCommand(const String& name, const MemberCommandPtr<T>& function, size_t offset = 0, byte flags = 0)
+	void AddCommand(const String& name, const MemberCommandPtr<T>& function, size_t offset = 0, byte flags = 0)
 	{
 		_cvars.Add(new FunctionProperty<T>(name, function, offset));
 	}

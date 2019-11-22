@@ -175,7 +175,7 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 				GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model,
 					Matrix::Transformation(v, t.GetRotation().GetQuat(), t.GetScale()));
 
-				Engine::Instance().pModelManager->Plane().Render();
+				Engine::Instance().pModelManager->Plane()->Render();
 
 				t.Move(advanceDirection * (float)(glyph->advance >> 6) * scale);
 				currentLineW += (float)(glyph->advance >> 6) * scale;

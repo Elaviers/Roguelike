@@ -78,6 +78,7 @@ inline bool IsPartOfToken(char c, const char *delimiters, size_t delimiterCount)
 }
 
 Buffer<String> String::Split(const char *delimiters) const
+
 {
 	size_t delimiterCount = StringLength(delimiters);
 
@@ -140,21 +141,21 @@ String String::SubString(size_t start, size_t end) const
 	return string;
 }
 
-size_t String::IndexOf(char c) const
+int String::IndexOf(char c) const
 {
 	for (size_t i = 0; i < _length; ++i)
 		if (_data[i] == c)
-			return i;
+			return (int)i;
 
 	return -1;
 }
 
-size_t String::IndexOfAny(const char* chars) const
+int String::IndexOfAny(const char* chars) const
 {
 	for (size_t i = 0; i < _length; ++i)
 		for (const char* c = chars; *c != '\0'; ++c)
 			if (_data[i] == *c)
-				return i;
+				return (int)i;
 
 	return -1;
 }
@@ -197,6 +198,14 @@ char& String::Insert(char c, size_t index)
 	_data[_length] = '\0';
 
 	return _data[index];
+}
+
+////
+
+void String::Lower()
+{
+	for (int i = 0; i < _length; ++i)
+		_data[i] = LowerChar(_data[i]);
 }
 
 ////
@@ -309,9 +318,9 @@ String String::operator+(const String& other) const
 
 ////
 
-size_t String::Compare(const String &other) const
+int String::Compare(const String &other) const
 {
-	auto minLength = _length < other._length ? _length : other._length;
+	size_t minLength = _length < other._length ? _length : other._length;
 
 	for (size_t i = 0; i < minLength; ++i)
 		if (_data[i] != other[i])
@@ -327,12 +336,8 @@ size_t String::Compare(const String &other) const
 
 String String::ToLower() const
 {
-	String string;
-	string._SetLength(_length);
-
-	for (size_t i = 0; i < _length; ++i)
-		string._data[i] = LowerChar(_data[i]);
-
+	String string(*this);
+	string.Lower();
 	return string;
 }
 
@@ -511,27 +516,19 @@ String String::From(const wchar_t *string)
 
 bool StringsInequal(const char *a, const char *b)
 {
-	size_t i = 0;
-	while (1)
+	for (;; ++a, ++b)
 	{
-		if (a[i] != b[i])
+		if (*a != *b)
 			return true;
-		if (a[i] == '\0')
+
+		if (*a == '\0')
 			return false;
-		i++;
 	}
 }
 
 bool StringsEqual(const char *a, const char *b)
 {
-	for (; ; ++a, ++b)
-	{
-		if (*a != *b)
-			return false;
-
-		if (*a == '\0')
-			return true;
-	}
+	return !StringsInequal(a, b);
 }
 
 bool StringsEqual_CaseInsensitive(const char* a, const char* b)

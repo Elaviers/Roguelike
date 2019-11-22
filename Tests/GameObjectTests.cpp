@@ -17,25 +17,21 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace EngineTests
 {
-	Material* material;
-	MaterialSprite* materialSprite;
-	Model* model;
+	SharedPointer<Material> material;
+	SharedPointer<MaterialSprite> materialSprite;
+	SharedPointer<Model> model;
 
 	TEST_CLASS(EntityTests)
 	{
 		TEST_CLASS_INITIALIZE(ClassInit)
 		{
 			Engine::Instance().Init(EngineCreateFlags(0), nullptr); //Registry only
-			Engine::Instance().pMaterialManager = new MaterialManager();
-			Engine::Instance().pModelManager = new ModelManager();
+			auto materialManager = Engine::Instance().pMaterialManager = new MaterialManager();
+			auto modelManager = Engine::Instance().pModelManager = new ModelManager();
 
-			material = new MaterialSurface();
-			materialSprite = new MaterialSprite();
-			model = new Model();
-
-			Engine::Instance().pMaterialManager->Add("dummy", material);
-			Engine::Instance().pMaterialManager->Add("dummy_sprite", materialSprite);
-			Engine::Instance().pModelManager->Add("dummy", model);
+			material = materialManager->Add("dummy", new MaterialSurface());
+			materialSprite = materialManager->Add("dummy_sprite", new MaterialSprite()).Cast<MaterialSprite>();
+			model = modelManager->Add("dummy", new Model());
 		}
 
 	public:

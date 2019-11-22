@@ -23,14 +23,14 @@ protected:
 public:
 	virtual ~Collider() {}
 
-	inline const ColliderType& GetType() const { return _type; }
-	inline const CollisionChannel& GetChannels() const { return _channels; }
+	const ColliderType& GetType() const { return _type; }
+	const CollisionChannel& GetChannels() const { return _channels; }
 
-	inline void SetChannels(CollisionChannel channels) { _channels = channels; }
-	inline void AddChannels(CollisionChannel channels) { _channels = (CollisionChannel)(_channels | channels); }
-	inline void RemoveChannels(CollisionChannel channels) { _channels = (CollisionChannel)(_channels & (~channels)); }
-	inline bool CanCollideWithChannels(CollisionChannel channels) const { return (_channels & channels) != 0; }
-	inline bool CanCollideWith(const Collider& other) const { return CanCollideWithChannels(other._channels); }
+	void SetChannels(CollisionChannel channels) { _channels = channels; }
+	void AddChannels(CollisionChannel channels) { _channels = (CollisionChannel)(_channels | channels); }
+	void RemoveChannels(CollisionChannel channels) { _channels = (CollisionChannel)(_channels & (~channels)); }
+	bool CanCollideWithChannels(CollisionChannel channels) const { return (_channels & channels) != 0; }
+	bool CanCollideWith(const Collider& other) const { return CanCollideWithChannels(other._channels); }
 
 	virtual bool IntersectsRay(const Ray&, RaycastResult&, const Transform& _transform) const = 0;
 

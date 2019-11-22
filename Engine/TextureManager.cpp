@@ -1,46 +1,87 @@
 #include "TextureManager.hpp"
+#include "Console.hpp"
 #include "Debug.hpp"
 #include "GL.hpp"
 #include "IO.hpp"
+#include "MaterialManager.hpp"
 #include <vector>
 
-void TextureManager::CMD_mag(const Buffer<String>& args)
-{
-	if (args.GetSize() > 0)
-	{
-		if (args[0] == "nearest")
-			_nextTextureInfo.magFilter = GL_NEAREST;
-	}
-}
+constexpr const char* MAXANISOTROPY = "max_aniso";
+constexpr const char* MAXMIPS = "max_mip_levels";
 
-void TextureManager::CMD_mips(const Buffer<String>& args)
+void TextureManager::CMD_config(const Buffer<String>& args)
 {
-	if (args.GetSize() > 0)
-		_nextTextureInfo.mipLevels = args[0].ToInt();
+	if (args.GetSize() >= 2)
+	{
+		String var = args[0].ToLower();
+
+		if (var == MAXANISOTROPY)	
+		{ 
+			_maxAnisotropy = args[1].ToInt(); 
+			UnloadAssets();
+			Engine::Instance().pMaterialManager->UnloadAssets();
+			return; 
+		}
+		
+		if (var == MAXMIPS)	
+		{ 
+			_maxMipLevels = args[1].ToInt(); 
+			UnloadAssets();
+			Engine::Instance().pMaterialManager->UnloadAssets();
+			return; 
+		}
+	}
+	
+	Engine::Instance().pConsole->Print(CSTR(MAXANISOTROPY, '=', (int)_maxAnisotropy, '\n'));
+	Engine::Instance().pConsole->Print(CSTR(MAXMIPS, '=', (int)_maxMipLevels, '\n'));
 }
 
 Texture* TextureManager::_CreateResource(const String& name, const Buffer<byte> &data)
 {
-	Texture* tex = IO::ReadPNGTexture(data);
+	Texture* tex = IO::ReadPNGFile(data);
 
 	if (tex && tex->IsValid())
-	{
-		tex->Create(_nextTextureInfo.mipLevels, _nextTextureInfo.magFilter);
-	}
+		tex->Create(_maxMipLevels, _maxAnisotropy);
+	
+	return tex;
+}
 
-	_nextTextureInfo.mipLevels = 8;
-	_nextTextureInfo.magFilter = GL_LINEAR;
+Texture* TextureManager::_CreateResource(const String& name, const String& text)
+{
+	Texture* tex = Asset::FromText<Texture>(text);
+
+	if (tex == nullptr)
+		Debug::Error(CSTR("Could not load texture \"", name, '\"'));
 
 	return tex;
 }
 
 void TextureManager::Initialise()
 {
-	_MapValue("white") = _colours.white = new Texture(Buffer<byte>({ 255, 255, 255, 255 }), 1, 1);
-	_MapValue("gray") = _colours.grey = new Texture(Buffer<byte>({ 127, 127, 127, 255 }), 1, 1);
-	_MapValue("normal_default") = _colours.normalDefault = new Texture(Buffer<byte>({ 127, 127, 255, 255 }), 1, 1);
+	_colours.white = new Texture(Buffer<byte>({ 255, 255, 255, 255 }), 1, 1);
+	_colours.grey = new Texture(Buffer<byte>({ 127, 127, 127, 255 }), 1, 1);
+	_colours.normalDefault = new Texture(Buffer<byte>({ 127, 127, 255, 255 }), 1, 1);
 
-	_colours.white->Create(1, GL_NEAREST);
-	_colours.grey->Create(1, GL_NEAREST);
-	_colours.normalDefault->Create(1, GL_NEAREST);
+	Texture::Info colourInfo;
+	colourInfo.aniso = 1;
+	colourInfo.mipLevels = 1;
+	colourInfo.minFilter = colourInfo.magFilter = GL_NEAREST;
+
+	_colours.white->info = colourInfo;
+	_colours.grey->info = colourInfo;
+	_colours.normalDefault->info = colourInfo;
+
+	_colours.white->Create();
+	_colours.grey->Create();
+	_colours.normalDefault->Create();
+
+	SharedPointerData<Texture>& dWhite = _MapValue("white"), & dGrey = _MapValue("grey"), & dNormalDefault = _MapValue("normal_default");
+
+	dWhite.SetPtr(_colours.white);
+	dGrey.SetPtr(_colours.grey);
+	dNormalDefault.SetPtr(_colours.normalDefault);
+
+	_colours.tWhite = SharedPointer<Texture>(dWhite);
+	_colours.tGrey = SharedPointer<Texture>(dGrey);
+	_colours.tNormalDefault = SharedPointer<Texture>(dNormalDefault);
 }

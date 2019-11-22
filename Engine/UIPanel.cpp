@@ -7,7 +7,7 @@
 inline void RenderPlaneWithTransform(const Transform &t) 
 { 
 	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.GetTransformationMatrix()); 
-	Engine::Instance().pModelManager->Plane().Render();
+	Engine::Instance().pModelManager->Plane()->Render();
 }
 
 void UIPanel::Render() const

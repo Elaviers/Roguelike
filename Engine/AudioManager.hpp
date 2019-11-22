@@ -24,16 +24,16 @@ class AudioManager : public AssetManager<WaveSound>
 
 	virtual WaveSound* _CreateResource(const String&, const String&) override;
 
-	virtual void _DestroyResource(WaveSound* sound) override;
+	virtual void _DestroyResource(WaveSound& sound) override;
 
 public:
-	AudioManager() : AssetManager(""), _waveFormat{0} {}
+	AudioManager() : AssetManager(), _waveFormat{0} {}
 	~AudioManager();
 
 	void PlaySound(const WaveSound& sound);
-	inline void PlaySound(const String& name) 
+	void PlaySound(const String& name) 
 	{
-		WaveSound *found = this->Get(name);
+		WaveSound *found = this->Get(name).Ptr();
 		if (found)
 			PlaySound(*found);
 	}

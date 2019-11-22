@@ -34,5 +34,5 @@ public:
 
 	void MakeStereo();
 
-	inline void Destroy() { delete[] data; }
+	void Destroy() { delete[] data; }
 };

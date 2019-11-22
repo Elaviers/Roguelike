@@ -55,13 +55,13 @@ const Collider* EntRenderable::GetCollider() const
 
 String EntRenderable::GetModelName() const
 {
-	if (Engine::Instance().pModelManager && _model) return Engine::Instance().pModelManager->FindNameOf(_model);
+	if (Engine::Instance().pModelManager && _model) return Engine::Instance().pModelManager->FindNameOf(_model.Ptr());
 	return "Unknown";
 }
 
 String EntRenderable::GetMaterialName() const
 {																						//todo: remove Smelly const cast
-	if (Engine::Instance().pMaterialManager && _material) return Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material));
+	if (Engine::Instance().pMaterialManager && _material) return Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material.Ptr()));
 	return "Unknown";
 }
 
@@ -71,14 +71,14 @@ void EntRenderable::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &s
 
 	if (Engine::Instance().pModelManager && _model)
 	{
-		uint16 id = strings.Add(Engine::Instance().pModelManager->FindNameOf(_model));
+		uint16 id = strings.Add(Engine::Instance().pModelManager->FindNameOf(_model.Ptr()));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);
 
 	if (!_materialIsDefault && Engine::Instance().pMaterialManager && _material)
 	{																	//todo: const cast removal
-		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material)));
+		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material.Ptr())));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);

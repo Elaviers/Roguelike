@@ -1,0 +1,2 @@
+mag nearest
+img Fonts/Arial32.png

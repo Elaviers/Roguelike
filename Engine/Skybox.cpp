@@ -20,7 +20,7 @@ void Skybox::Load(const char *faceFilenames[6])
 	uint32 faceWidth, faceHeight;
 
 	for (int i = 0; i < 6; ++i) {
-		Texture *tex = IO::ReadPNGTexture(CSTR(Engine::Instance().pTextureManager->GetRootPath(), faceFilenames[i]));
+		Texture *tex = IO::ReadPNGFile(CSTR(Engine::Instance().pTextureManager->GetRootPath(), faceFilenames[i]));
 
 		if (!tex->IsValid())
 			return;

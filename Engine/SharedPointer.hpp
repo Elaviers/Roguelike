@@ -2,125 +2,138 @@
 #include "FunctionPointer.hpp"
 #include "Types.hpp"
 
+template<typename T>
+class SharedPointer;
+
 template <typename T>
 class SharedPointerData
 {
-public:
-	T* ptr;
-	uint32 referenceCount;
-	FunctionPointer<void, SharedPointerData&> onZeroReferences;
+	friend SharedPointer<T>;
 
+	T* _ptr;
+	uint32 _referenceCount;
+	FunctionPointer<void, SharedPointerData&> _onZeroReferences;
+
+	void _Increment() { if (_ptr) ++_referenceCount; }
+
+	void _Decrement()
+	{
+		if (_ptr == nullptr)
+			return;
+
+		--_referenceCount;
+
+		if (_referenceCount == 0)
+			_onZeroReferences.TryCall(*this);
+	}
+
+public:
 	SharedPointerData(T* addr, uint32 referenceCount, const FunctionPointer<void, SharedPointerData&>& onZeroReferences = FunctionPointer<void, SharedPointerData&>()) :
-		ptr(addr),
-		referenceCount(referenceCount),
-		onZeroReferences(onZeroReferences)
+		_ptr(addr),
+		_referenceCount(referenceCount),
+		_onZeroReferences(onZeroReferences)
 	{}
 
-	inline void Decrement()
-	{
-		--referenceCount;
+	T* GetPtr()							{ return _ptr; }
+	const T* GetPtr() const				{ return _ptr; }
+	uint32 GetReferenceCount() const	{ return _referenceCount; }
 
-		if (referenceCount <= 0)
-			onZeroReferences.TryCall(*this);
-	}
-
-	inline void Increment()
-	{
-		++referenceCount;
-	}
+	void SetPtr(T* ptr)					{ _ptr = ptr; }
+	void SetOnZeroReferences(const FunctionPointer<void, SharedPointerData&>& onZeroReferences) { _onZeroReferences = onZeroReferences; }
 };
 
 extern SharedPointerData<void> _nullPtrData;
 
-/*
-	SharedPointerC
-	Base class
-
-	By default, this pointer does absolutely nothing when nothing refers to it.
-	Use SharedPointer for expected behaviour
-*/
 template <typename T>
-class SharedPointerC
+class SharedPointer
 {
-private:
+protected:
 	//Should never be nullptr
 	SharedPointerData<T>* _data;
-
-	inline SharedPointerData<T>* _NullPtrData() const { return reinterpret_cast<SharedPointerData<T>*>(&_nullPtrData); }
+	
+	static const FunctionPointer<void, SharedPointerData<T>&> _pDeletePointer;
+	static void _DeletePointer(SharedPointerData<T>& data)
+	{
+		delete data.GetPtr();
+		delete &data;
+	}
+	
+	static SharedPointerData<T>* _NullPtrData() { return reinterpret_cast<SharedPointerData<T>*>(&_nullPtrData); }
 
 public:
-	SharedPointerC() : _data(_NullPtrData()) {}
-	SharedPointerC(SharedPointerData<T>& data) : _data(&data) {}
-
-	SharedPointerC(SharedPointerC& other) : _data(other._data)
+	SharedPointer() : _data(_NullPtrData()) {}
+	SharedPointer(const SharedPointer& other) : _data(other._data)
 	{
-		_data->Increment();
+		_data->_Increment();
 	}
 
-	SharedPointerC(SharedPointerC&& other) : _data(other._data)
+	SharedPointer(SharedPointer&& other) : _data(other._data)
 	{
 		other._data = _NullPtrData();
 	}
+	
+	SharedPointer(SharedPointerData<T>& data) : _data(&data) 
+	{
+		_data->_Increment();
+	}
 
-	~SharedPointerC() { _data->Decrement(); }
+	/*
+		Note: addr will be deleted when all SharedPointer instances are out of scope
+	*/
+	explicit SharedPointer(T* addr)
+	{
+		_data = addr ? new SharedPointerData<T>(addr, 1, _pDeletePointer) : _NullPtrData();
+	}
 
-	inline void Clear() { if (_data != _NullPtrData()) operator=(*_NullPtrData()); }
+	~SharedPointer() { _data->_Decrement(); }
 
-	SharedPointerC& operator=(SharedPointerC& other)
+	void Clear() { if (_data != _NullPtrData()) operator=(*_NullPtrData()); }
+
+	SharedPointer& operator=(const SharedPointer& other)
 	{
 		if (other._data != _data)
 		{
-			_data->Decrement();
+			_data->_Decrement();
 			_data = other._data;
-			_data->Increment();
+			_data->_Increment();
 		}
 
 		return *this;
 	}
 
-	SharedPointerC& operator=(SharedPointerC&& other) noexcept
+	SharedPointer& operator=(SharedPointer&& other) noexcept
 	{
-		_data->Decrement();
+		_data->_Decrement();
 		_data = other._data;
 		other._data = _NullPtrData();
 
 		return *this;
 	}
 
-	inline bool operator==(const T* other) const				{ return _data->ptr == other;}
-	inline bool operator==(const SharedPointerC& other) const	{ return _data == other._data; }
+	bool operator==(const T* other) const				{ return _data->GetPtr() == other;}
+	bool operator==(const SharedPointer& other) const	{ return _data == other._data; }
 
-	inline T& operator*()				{ return *_data->ptr; }
-	inline const T& operator*() const	{ return *_data->ptr; }
-	inline T* operator->()				{ return _data->ptr; }
-	inline const T* operator->() const	{ return _data->ptr; }
+	T& operator*() const		{ return *_data->GetPtr(); }
+	T* operator->() const		{ return _data->GetPtr(); }
+	T* Ptr() const				{ return _data->GetPtr(); }
+	
+	operator bool() const		{ return _data->GetPtr() != nullptr; }
 
-	inline T* Ptr()						{ return _data->ptr; }
-	inline const T* Ptr() const			{ return _data->ptr; }
+	//
+	operator SharedPointer<const T>&() const { return *static_cast<SharedPointer<const T>*>((void*)this); }
 
-	inline operator bool() const		{ return _data->ptr; }
-};
-
-/*
-	SharedPointer
-
-	Reference-tracking pointer
-	Note: deletes pointer when all references are out of scope
-*/
-template <typename T>
-class SharedPointer : SharedPointerC<T>
-{
-	static void _DeletePointer(SharedPointerData<T>& data)
+	template<typename T2>
+	SharedPointer<T2> Cast() const
 	{
-		delete data.ptr;
-		delete &data;
+		if (dynamic_cast<T2*>(_data->GetPtr()))
+			return SharedPointer<T2>(*(SharedPointerData<T2>*)_data);
+
+		return SharedPointer<T2>();
 	}
-
-	const static FunctionPointer<void, SharedPointerData<T>&> _pDeletePointer;
-
-public:
-	SharedPointer(T *addr = nullptr) : SharedPointer(addr, _pDeletePointer, 1) {}
 };
+
+template<typename T>
+const FunctionPointer<void, SharedPointerData<T>&> SharedPointer<T>::_pDeletePointer(&SharedPointer<T>::_DeletePointer);
 
 class Entity;
-typedef SharedPointerC<Entity> EntityPointer;
+typedef SharedPointer<Entity> EntityPointer;

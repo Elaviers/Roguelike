@@ -17,7 +17,7 @@ public:
 
 	void AddLevel(Entity &level, int dominance = 1);
 
-	inline void RemoveLevel(const Entity *level) 
+	void RemoveLevel(const Entity *level) 
 	{
 		for (uint32 i = 0; i < _levels.GetSize();)
 			if (_levels[i].first == level)

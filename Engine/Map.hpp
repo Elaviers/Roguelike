@@ -31,16 +31,16 @@ class Map
 			return amount;
 		}
 
-		Node* FindVar(const K& k)
+		Node* Find(const K& k)
 		{
 			if (k < key)
 			{
-				if (left) return left->FindVar(k);
+				if (left) return left->Find(k);
 				return nullptr;
 			}
 			else if (k > key)
 			{
-				if (right) return right->FindVar(k);
+				if (right) return right->Find(k);
 				return nullptr;
 			}
 
@@ -134,9 +134,9 @@ public:
 	Map(const Map &other) : _data(nullptr) { if (other._data) _data = other._data->Copy(); }
 	Map(Map&& other) : _data(other._data) { other._data = nullptr; }
 
-	inline void Clear()				{ delete _data; _data = nullptr; }
-	inline uint32 GetSize() const	{ return _data ? _data->Count() : 0; }
-	inline bool IsEmpty() const		{ return _data == nullptr; }
+	void Clear()				{ delete _data; _data = nullptr; }
+	uint32 GetSize() const	{ return _data ? _data->Count() : 0; }
+	bool IsEmpty() const		{ return _data == nullptr; }
 
 	const K* const FindFirstKey(const V &value) const
 	{
@@ -153,7 +153,7 @@ public:
 	{
 		if (_data)
 		{
-			auto node = _data->FindVar(key);
+			auto node = _data->Find(key);
 			if (node) return &node->value;
 		}
 
@@ -175,30 +175,30 @@ public:
 		return _data->value;
 	}
 
-	inline V* Get(const K& key) { return const_cast<V*>(((const Map*)this)->Get(key)); }
+	V* Get(const K& key) { return const_cast<V*>(((const Map*)this)->Get(key)); }
 
-	inline Map& operator=(const Map &other)
+	Map& operator=(const Map &other)
 	{
 		Clear();
 		if (other._data) _data = other._data->Copy();
 		return *this;
 	}
 
-	inline Buffer<const K*> ToKBuffer() const
+	Buffer<const K*> ToKBuffer() const
 	{
 		Buffer<const K*> buffer;
 		if (_data) _data->AddToK(buffer);
 		return buffer;
 	}
 
-	inline Buffer<Pair<const K*, const V*>> ToKVBuffer() const
+	Buffer<Pair<const K*, const V*>> ToKVBuffer() const
 	{
 		Buffer<Pair<const K*, const V*>> buffer;
 		if (_data) _data->AddTo(buffer);
 		return buffer;
 	}
 
-	inline void ForEach(void (*function)(const K&, V&))
+	void ForEach(void (*function)(const K&, V&))
 	{
 		if (_data) _data->ForEach(function);
 	}

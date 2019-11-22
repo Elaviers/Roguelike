@@ -13,15 +13,15 @@ public:
 
 	void Load(const char *faces[6]);
 
-	inline void Bind(byte unit) const
+	void Bind(byte unit) const
 	{
 		_cubemap.Bind(unit);
 	}
 
-	inline void Render(const ModelManager &cubeRenderer) const
+	void Render(const ModelManager &cubeRenderer) const
 	{
 		Bind(0);
-		cubeRenderer.InverseCube().Render();
+		cubeRenderer.InverseCube()->Render();
 	}
 };
 

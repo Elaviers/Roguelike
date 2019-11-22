@@ -1,5 +1,6 @@
 #include "Material_Sprite.hpp"
 #include "MacroUtilities.hpp"
+#include "TextureManager.hpp"
 
 const PropertyCollection& MaterialSprite::GetProperties()
 {

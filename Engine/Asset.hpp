@@ -50,9 +50,9 @@ public:
 		return (T*)ass;
 	}
 
-	inline String GetAsText() const { return _WriteText();}
+	String GetAsText() const { return _WriteText();}
 
-	inline Buffer<byte> GetAsData() const
+	Buffer<byte> GetAsData() const
 	{
 		Buffer<byte> data;
 		BufferWriter<byte> writer(data);

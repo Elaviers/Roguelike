@@ -300,7 +300,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 
 	cube.SetRelativePosition(Vector3(2.f, 0.f, 0.f));
 	cube.SetParent(&cubeParent);
-	cube.SetModel(&modelManager.Cube());
+	cube.SetModel(modelManager.Cube());
 
 	renderable.SetParent(&cubeParent);
 	renderable.SetModel(modelName);

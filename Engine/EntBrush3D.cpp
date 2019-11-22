@@ -35,13 +35,13 @@ void EntBrush3D::Render(EnumRenderChannel channels) const
 		t.SetScale(Vector3(GetRelativeScale()[0], GetRelativeScale()[1], 1.f));
 		t.SetPosition(GetRelativePosition() + Vector3(0.f, 0.f, -GetRelativeScale()[2] / 2.f));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane().Render();
+		modelManager->Plane()->Render();
 
 		//Back
 		t.SetRotation(Vector3(0.f, 180.f, 0.f));
 		t.Move(Vector3(0.f, 0.f, GetRelativeScale()[2]));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane().Render();
+		modelManager->Plane()->Render();
 
 		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale()[2], GetRelativeScale()[1]));
 		//Left
@@ -49,13 +49,13 @@ void EntBrush3D::Render(EnumRenderChannel channels) const
 		t.SetRotation(Vector3(0.f, 90.f, 0.f));
 		t.SetPosition(Vector3(GetRelativePosition() - Vector3(GetRelativeScale()[0] / 2.f, 0.f, 0.f)));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane().Render();
+		modelManager->Plane()->Render();
 
 		//Right
 		t.SetRotation(Vector3(0.f, -90.f, 0.f));
 		t.Move(Vector3(GetRelativeScale()[0], 0.f, 0.f));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane().Render();
+		modelManager->Plane()->Render();
 
 
 		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale()[0], GetRelativeScale()[2]));
@@ -64,13 +64,13 @@ void EntBrush3D::Render(EnumRenderChannel channels) const
 		t.SetRotation(Vector3(90.f, 0.f, 0.f));
 		t.SetPosition(GetRelativePosition() - Vector3(0.f, GetRelativeScale()[1] / 2.f, 0.f));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane().Render();
+		modelManager->Plane()->Render();
 
 		//Top
 		t.SetRotation(Vector3(-90.f, 0.f, 0.f));
 		t.Move(Vector3(0.f, GetRelativeScale()[1], 0.f));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane().Render();
+		modelManager->Plane()->Render();
 
 		//Done
 		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
@@ -83,7 +83,7 @@ void EntBrush3D::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &stri
 
 	if (Engine::Instance().pMaterialManager && _material)
 	{																	//todo: const cast removal
-		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material)));
+		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material.Ptr())));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);

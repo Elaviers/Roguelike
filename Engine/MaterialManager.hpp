@@ -9,7 +9,7 @@ private:
 	virtual Material* _CreateResource(const String&, const String&) override;
 
 public:
-	MaterialManager() : AssetManager("") {}
+	MaterialManager() : AssetManager() {}
 	virtual ~MaterialManager() {}
 
 	void Initialise();

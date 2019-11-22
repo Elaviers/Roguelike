@@ -23,7 +23,7 @@ public:
 
 	void Evaluate(Skeleton& outSkeleton, float time) const;
 
-	inline AnimationTrack<Vector3>& GetTranslationTrack(const String& joint) { return _translationTracks[joint]; }
-	inline AnimationTrack<Quaternion>& GetRotationTrack(const String& joint) { return _rotationTracks[joint]; }
-	inline AnimationTrack<Vector3>& GetScalingTrack(const String& joint) { return _scalingTracks[joint]; }
+	AnimationTrack<Vector3>& GetTranslationTrack(const String& joint) { return _translationTracks[joint]; }
+	AnimationTrack<Quaternion>& GetRotationTrack(const String& joint) { return _rotationTracks[joint]; }
+	AnimationTrack<Vector3>& GetScalingTrack(const String& joint) { return _scalingTracks[joint]; }
 };

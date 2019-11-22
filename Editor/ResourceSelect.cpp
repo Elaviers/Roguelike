@@ -3,16 +3,17 @@
 #include <Engine/Colour.hpp>
 #include <Engine/Debug.hpp>
 #include <Engine/DrawUtils.hpp>
+#include <Engine/EntCamera.hpp>
+#include <Engine/EntLight.hpp>
+#include <Engine/EntRenderable.hpp>
+#include <Engine/EntSprite.hpp>
 #include <Engine/GL.hpp>
 #include <Engine/GLContext.hpp>
 #include <Engine/GLProgram.hpp>
 #include <Engine/IO.hpp>
 #include <Engine/MaterialManager.hpp>
 #include <Engine/ModelManager.hpp>
-#include <Engine/EntCamera.hpp>
-#include <Engine/EntLight.hpp>
-#include <Engine/EntRenderable.hpp>
-#include <Engine/EntSprite.hpp>
+#include <Engine/TextureManager.hpp>
 #include <Engine/Utilities.hpp>
 #include <Engine/Window.hpp>
 #include "resource.h"
@@ -22,9 +23,9 @@ constexpr LPCTSTR viewportClassName = TEXT("RESSELECTCLASS");
 class RSDialog
 {
 private:
-	const GLContext *glContext;
-	GLProgram *programLit;
-	const GLProgram *programUnlit;
+	const GLContext* glContext;
+	GLProgram* programLit;
+	const GLProgram* programUnlit;
 	MaterialManager* const materialManager;
 	ModelManager* const modelManager;
 
@@ -42,9 +43,9 @@ public:
 
 	union
 	{
-		Model* selectionAsModel;
-		Material* selectionAsMaterial;
-		Asset* selection = nullptr;
+		SharedPointer<const Model> selectionAsModel;
+		SharedPointer<const Material> selectionAsMaterial;
+		SharedPointer<const Asset> selection;
 	};
 
 	bool isModelSelect = false;
@@ -53,16 +54,19 @@ public:
 
 	HIMAGELIST imageList = NULL;
 
-	RSDialog(const GLContext &context, GLProgram &programLit, const GLProgram &programUnlit, MaterialManager& materialManager, ModelManager &modelManager) : 
+	RSDialog(const GLContext& context, GLProgram& programLit, const GLProgram& programUnlit, MaterialManager& materialManager, ModelManager& modelManager) :
 		_moving(false),
 		_sizing(false),
-		glContext(&context), 
-		programLit(&programLit), 
-		programUnlit(&programUnlit), 
-		materialManager(&materialManager), 
-		modelManager(&modelManager), 
+		glContext(&context),
+		programLit(&programLit),
+		programUnlit(&programUnlit),
+		materialManager(&materialManager),
+		modelManager(&modelManager),
+		selection(),
 		viewportDC(NULL)
 	{}
+
+	~RSDialog() {}
 
 	inline const String &GetRootPath() { return isModelSelect ? modelManager->GetRootPath() : materialManager->GetRootPath(); }
 
@@ -85,7 +89,7 @@ public:
 		_light.SetRelativePosition(Vector3(0.5f, 0.5f, 0.f));
 
 		if (!isModelSelect)
-			_object.SetModel(&modelManager->Cube());
+			_object.SetModel(modelManager->Cube());
 
 		_moving = false;
 		_sizing = false;
@@ -97,14 +101,14 @@ public:
 			_object.SetModel(selectionAsModel);
 		else
 		{
-			if (dynamic_cast<MaterialSprite*>(selectionAsMaterial))
+			if (dynamic_cast<const MaterialSprite*>(selectionAsMaterial.Ptr()))
 			{
-				_sprite.SetMaterial((MaterialSprite*)selectionAsMaterial);
-				_object.SetMaterial(nullptr);
+				_sprite.SetMaterial(selectionAsMaterial.Cast<const MaterialSprite>());
+				_object.SetMaterial(SharedPointer<const Material>());
 			}
 			else
 			{
-				_sprite.SetMaterial(nullptr);
+				_sprite.SetMaterial(SharedPointer<const MaterialSprite>());
 				_object.SetMaterial(selectionAsMaterial);
 			}
 		}
@@ -199,18 +203,18 @@ INT_PTR RSDialog::DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		insertStruct.item.iSelectedImage = 1;
 		insertStruct.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
-		Buffer<const String*> keynames;
+		Buffer<String> keynames;
 
 		if (rs->isModelSelect)
-			keynames = Engine::Instance().pModelManager->GetMap().ToKBuffer();
+			keynames = Engine::Instance().pModelManager->GetAllPossibleKeys();
 		else
-			keynames = Engine::Instance().pMaterialManager->GetMap().ToKBuffer();
+			keynames = Engine::Instance().pMaterialManager->GetAllPossibleKeys();
 
 		for (uint32 i = 0; i < keynames.GetSize(); ++i)
 		{
 			insertStruct.item.lParam = (LPARAM)i;
-			insertStruct.item.pszText = &(*keynames[i])[0];
-			insertStruct.item.cchTextMax = (int)keynames[i]->GetLength();
+			insertStruct.item.pszText = &keynames[i][0];
+			insertStruct.item.cchTextMax = (int)keynames[i].GetLength();
 			::SendDlgItemMessage(hwnd, IDC_TREE, TVM_INSERTITEM, 0, (LPARAM)&insertStruct);
 		}
 
@@ -262,9 +266,9 @@ INT_PTR RSDialog::DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			rs->currentName = textBuffer;
 
 			if (rs->isModelSelect)
-				rs->selection = Engine::Instance().pModelManager->Get(rs->currentName);
+				rs->selection = Engine::Instance().pModelManager->Get(rs->currentName).Cast<const Asset>();
 			else
-				rs->selection = Engine::Instance().pMaterialManager->Get(rs->currentName);
+				rs->selection = Engine::Instance().pMaterialManager->Get(rs->currentName).Cast<const Asset>();
 
 			rs->Update();
 			rs->Draw();
@@ -308,6 +312,8 @@ LRESULT RSDialog::ViewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 	case WM_MOUSEMOVE:
 		if (rs->_moving || rs->_sizing)
 		{
+			::SetCursor(NULL);
+
 			RECT rect;
 			::GetWindowRect(hwnd, &rect);
 			int midPointX = (rect.left + rect.right) / 2;

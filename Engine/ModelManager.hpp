@@ -10,6 +10,8 @@ private:
 	Model *_invCube = nullptr;
 	Model *_plane = nullptr;
 
+	SharedPointer<const Model> _tLine, _tCube, _tInvCube, _tPlane;
+
 	virtual Model* _CreateResource(const String&, const String&) override;
 
 	virtual void _DestroyResource(Model&);
@@ -20,8 +22,8 @@ public:
 
 	void Initialise();
 
-	inline const Model& Line() const			{ return *_line; }
-	inline const Model& Plane() const			{ return *_plane; }
-	inline const Model& Cube() const			{ return *_cube; }
-	inline const Model& InverseCube() const		{ return *_invCube; }
+	const SharedPointer<const Model>& Line() const { return _tLine; }
+	const SharedPointer<const Model>& Plane() const { return _tPlane; }
+	const SharedPointer<const Model>& Cube() const { return _tCube; }
+	const SharedPointer<const Model>& InverseCube() const { return _tInvCube; }
 };

@@ -50,7 +50,7 @@ void EntLight::Render(EnumRenderChannel channels) const
 		Engine::Instance().pTextureManager->White()->Bind(0);
 		glUniform4fv(GLProgram::Current().GetUniformLocation("Colour"), 1, colour);
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, Matrix::Scale(_editorBoxExtent * 2.f) * GetTransformationMatrix());
-		Engine::Instance().pModelManager->Cube().Render();
+		Engine::Instance().pModelManager->Cube()->Render();
 	}
 }
 

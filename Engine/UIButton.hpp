@@ -23,30 +23,30 @@ public:
 
 	virtual ~UIButton() {}
 
-	inline float GetBorderSize() const { return _panel.GetBorderSize(); }
-	inline const Colour& GetColourInactive() const { return _colourInactive; }
-	inline const Colour& GetColourActive() const { return _colourActive; }
-	inline const Font* GetFont() const { return _label.GetFont(); }
-	inline const Material* GetMaterial() const { return _panel.GetMaterial(); }
-	inline const String& GetString() const { return _label.GetString(); }
+	float GetBorderSize() const { return _panel.GetBorderSize(); }
+	const Colour& GetColourInactive() const { return _colourInactive; }
+	const Colour& GetColourActive() const { return _colourActive; }
+	const SharedPointer<const Font>& GetFont() const { return _label.GetFont(); }
+	const SharedPointer<const Material>& GetMaterial() const { return _panel.GetMaterial(); }
+	const String& GetString() const { return _label.GetString(); }
 
-	inline void SetBorderSize(float borderSize) { _panel.SetBorderSize(borderSize); }
-	inline void SetCallback(const FunctionPointer<void, UIButton&> &callback) { _callback = callback; }
-	inline void SetColourInactive(const Colour &colour) 
+	void SetBorderSize(float borderSize) { _panel.SetBorderSize(borderSize); }
+	void SetCallback(const FunctionPointer<void, UIButton&> &callback) { _callback = callback; }
+	void SetColourInactive(const Colour &colour) 
 	{ 
 		_colourInactive = colour; 
 		if (!_active) 
 			_panel.SetColour(colour); 
 	}
-	inline void SetColourActive(const Colour &colour)
+	void SetColourActive(const Colour &colour)
 	{ 
 		_colourActive = colour; 
 		if (_active) 
 			_panel.SetColour(colour); 
 	}
-	inline void SetFont(const Font *font) { _label.SetFont(font); }
-	inline void SetMaterial(const Material *material) { _panel.SetMaterial(material); }
-	inline void SetString(const String &string) { _label.SetString(string); }
+	void SetFont(const SharedPointer<const Font>& font) { _label.SetFont(font); }
+	void SetMaterial(const SharedPointer<const Material>& material) { _panel.SetMaterial(material); }
+	void SetString(const String &string) { _label.SetString(string); }
 
 	virtual void OnMouseMove(float mouseX, float mouseY) override;
 	virtual void OnClick() override;

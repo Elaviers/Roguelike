@@ -14,7 +14,7 @@ public:
 	String name;
 	Transform localTransform;
 
-	inline int GetID() const { return _id; }
-	inline Joint* GetParent() { return _parent; }
-	inline const Joint* GetParent() const { return _parent; }
+	int GetID() const { return _id; }
+	Joint* GetParent() { return _parent; }
+	const Joint* GetParent() const { return _parent; }
 };

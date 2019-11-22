@@ -34,7 +34,7 @@ public:
 
 	static void Initialise(HBRUSH);
 
-	inline void Create(const Window* parent)
+	void Create(const Window* parent)
 	{
 		Window::Create(_className, TEXT("Hierachy"), this, parent ? WS_CHILD : 0, parent ? parent->GetHwnd() : NULL);
 		Window::SetSize(256, 512);

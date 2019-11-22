@@ -6,7 +6,7 @@
 
 class UIPanel : public UIElement
 {
-	const Material *_material;
+	SharedPointer<const Material> _material;
 	Colour _colour;
 
 	float _borderSize;
@@ -21,11 +21,11 @@ public:
 
 	virtual void OnBoundsChanged() override;
 
-	inline float GetBorderSize() const { return _borderSize; }
-	inline const Material* GetMaterial() const { return _material;}
-	inline const Colour& GetColour() const { return _colour; }
+	float GetBorderSize() const { return _borderSize; }
+	const SharedPointer<const Material>& GetMaterial() const { return _material;}
+	const Colour& GetColour() const { return _colour; }
 
-	inline void SetBorderSize(float size) { _borderSize = size; OnBoundsChanged(); }
-	inline void SetColour(const Colour &colour) { _colour = colour; }
-	inline void SetMaterial(const Material *material) { _material = material; }
+	void SetBorderSize(float size) { _borderSize = size; OnBoundsChanged(); }
+	void SetColour(const Colour &colour) { _colour = colour; }
+	void SetMaterial(const SharedPointer<const Material> &material) { _material = material; }
 };

@@ -50,7 +50,31 @@ bool IO::WriteFile(const char *filename, const byte *data, size_t length)
 	return success;
 }
 
-Texture* IO::ReadPNGTexture(const Buffer<byte> &data)
+bool IO::ReadPNGFile(const Buffer<byte>& data, Buffer<byte>& outData, unsigned int& outWidth, unsigned int& outHeight)
+{
+	unsigned char* buffer;
+	unsigned int width, height;
+
+	lodepng_decode_memory(&buffer, &width, &height, data.Data(), data.GetSize(), LCT_RGBA, 8);
+	uint32 bufferSize = width * height * 4;
+
+	if (buffer)
+	{
+		if (bufferSize)
+		{
+			outData = Buffer<byte>(buffer, bufferSize);
+			outWidth = width;
+			outHeight = height;
+		}
+
+		free(buffer);
+		return true;
+	}
+
+	return false;
+}
+
+Texture* IO::ReadPNGFile(const Buffer<byte> &data)
 {
 	Texture* texture = nullptr;
 
@@ -82,7 +106,14 @@ Buffer<String> IO::FindFilesInDirectory(const char *search)
 	{
 		do
 		{
-			filenames.Add(data.cFileName);
+			for (const char *c = data.cFileName; *c != '\0'; ++c)
+				if (*c != '.')
+				{
+					filenames.Add(data.cFileName);
+					break;
+				}
+
+			
 		} while (::FindNextFile(hFile, &data));
 	}
 

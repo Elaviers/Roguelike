@@ -45,21 +45,25 @@ public:
 	String(char character);
 
 
-	inline const char* const GetData() const { return _data; }
-	inline size_t GetLength() const { return _length; }
-	inline char& operator[](size_t position) const { return _data[position]; }
+	const char* const GetData() const		{ return _data; }
+	size_t GetLength() const				{ return _length; }
+	char& operator[](size_t position) const { return _data[position]; }
 
 	Buffer<String> Split(const char *delimiters) const;
+	
+	//start is inclusive, end is exclusive
 	String SubString(size_t start, size_t end) const;
-	inline String SubString(size_t start) const { return SubString(start, _length); }
-	size_t IndexOf(char) const;
-	size_t IndexOfAny(const char* possibleChars) const;
+	String SubString(size_t start) const	{ return SubString(start, _length); }
+	int IndexOf(char) const;
+	int IndexOfAny(const char* possibleChars) const;
 
-	inline void Clear()					{ _SetLength(0); }
-	inline void Shrink(size_t amount)	{ _SetLength(_length - amount); }
-	inline void ShrinkTo(size_t length) { if (length < _length) _SetLength(length); }
+	void Clear()							{ _SetLength(0); }
+	void Shrink(size_t amount)				{ _SetLength(_length - amount); }
+	void ShrinkTo(size_t length)			{ if (length < _length) _SetLength(length); }
 
 	char& Insert(char c, size_t position);
+
+	void Lower();
 
 	String& operator=(const String&);
 	String& operator=(String&&) noexcept;
@@ -70,20 +74,20 @@ public:
 
 	String operator+(const String&) const;
 
-	size_t Compare(const String &other) const;
-	inline bool operator<(const String &other) const	{ return Compare(other) < 0;	}
-	inline bool operator>(const String &other) const	{ return Compare(other) > 0;	}
+	int Compare(const String &other) const;
+	bool operator<(const String &other) const	{ return Compare(other) < 0;	}
+	bool operator>(const String &other) const	{ return Compare(other) > 0;	}
 
-	inline bool Equals(const String& other, bool ignoreCase = false) const 
+	bool Equals(const String& other, bool ignoreCase = false) const 
 	{ 
 		return _length == other._length && 
 			(ignoreCase ? StringsEqual_CaseInsensitive(_data, other._data) : StringsEqual(_data, other._data)); 
 	}
 
-	inline bool operator==(const String &other) const { return _length == other._length && StringsEqual(_data, other._data); }
-	inline bool operator==(const char *other) const { return StringsEqual(_data, other); }
-	inline bool operator!=(const String &other) const { return _length == other._length && StringsInequal(_data, other._data); }
-	inline bool operator!=(const char *other) const { return StringsInequal(_data, other); }
+	bool operator==(const String &other) const { return _length == other._length && StringsEqual(_data, other._data); }
+	bool operator==(const char *other) const { return StringsEqual(_data, other); }
+	bool operator!=(const String &other) const { return _length == other._length && StringsInequal(_data, other._data); }
+	bool operator!=(const char *other) const { return StringsInequal(_data, other); }
 
 	String ToLower() const;
 
@@ -95,11 +99,11 @@ public:
 
 	//
 	template<typename T>
-	static inline String Concat(T first) { return From(first); }
+	static String Concat(T first) { return From(first); }
 
 	//Concatenates each argument interpreted as a string
 	template<typename T, typename ...Args>
-	static inline String Concat(T first, Args... args) { return From(first) + Concat(args...); }
+	static String Concat(T first, Args... args) { return From(first) + Concat(args...); }
 
 	//
 	static String From(int64,			unsigned int minimumDigits = 0, byte base = 10);
@@ -108,12 +112,12 @@ public:
 	static String From(const Vector3&,	unsigned int minimumDigits = 0,	unsigned int maxDecimalDigits = 3, byte base = 10);
 	static String From(const wchar_t *string);
 
-	inline static String From(bool b) { return b ? String("true") : String("false"); }
-	inline static String From(const String& string) { return string; }
-	inline static String From(char c) { return String(c); }
-	inline static String From(unsigned char c) { return String(c); }
+	static String From(bool b) { return b ? String("true") : String("false"); }
+	static String From(const String& string) { return string; }
+	static String From(char c) { return String(c); }
+	static String From(unsigned char c) { return String(c); }
 	
-#define LINKFROM(FROMTYPE, TOTYPE) inline static String From(FROMTYPE x) { return From((TOTYPE)x);}
+#define LINKFROM(FROMTYPE, TOTYPE) static String From(FROMTYPE x) { return From((TOTYPE)x);}
 	LINKFROM(const char*, String);
 	LINKFROM(short, int64);
 	LINKFROM(int, int64);

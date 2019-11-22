@@ -23,7 +23,7 @@ public:
 	Viewport();
 	~Viewport();
 
-	inline void Create(HWND parent, Editor &editor, int index) 
+	void Create(HWND parent, Editor &editor, int index) 
 	{ 
 		Window::Create(_className, nullptr, this, WS_CHILD, parent); 
 		_editor = &editor; 
@@ -32,7 +32,7 @@ public:
 
 	static void Initialise();
 
-	inline void SetSizeAndPos(uint16 x, uint16 y, uint16 width, uint16 height) { WindowFunctions::SetHWNDSizeAndPos(_hwnd, x, y, width, height); _camera.SetViewport(width, height); }
+	void SetSizeAndPos(uint16 x, uint16 y, uint16 width, uint16 height) { WindowFunctions::SetHWNDSizeAndPos(_hwnd, x, y, width, height); _camera.SetViewport(width, height); }
 
-	inline EntCamera& CameraRef() { return _camera; }
+	EntCamera& CameraRef() { return _camera; }
 };

@@ -22,17 +22,17 @@ public:
 	
 	~Colour() {}
 
-	inline const Vector4& GetData() { return _data; }
+	const Vector4& GetData() { return _data; }
 
-	inline operator Vector4() const { return _data; }
+	operator Vector4() const { return _data; }
 
-	inline Colour& operator=(const Colour& other)
+	Colour& operator=(const Colour& other)
 	{
 		_data = other._data;
 		return *this;
 	}
 
-	inline bool operator==(const Colour& other) const { return _data == other._data; }
+	bool operator==(const Colour& other) const { return _data == other._data; }
 
 	String ToColourCode() const;
 

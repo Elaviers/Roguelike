@@ -374,6 +374,7 @@
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="ColliderSphere.cpp" />
     <ClCompile Include="String.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Timer.cpp" />

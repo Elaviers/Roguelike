@@ -22,7 +22,7 @@ public:
 	//This is stupid. The model is responsible for deletion of these pointers, so don't delete them after using this!
 	Model(Mesh *mesh = nullptr, Collider *collider = nullptr) : _mesh(mesh), _collider(collider) {}
 
-	inline void Delete()
+	void Delete()
 	{
 		_meshRenderer.Delete();
 		delete _collider;
@@ -31,13 +31,13 @@ public:
 
 	virtual const PropertyCollection& GetProperties();
 
-	inline GLMeshRenderer& MeshRenderer() { return _meshRenderer; }
+	GLMeshRenderer& MeshRenderer() { return _meshRenderer; }
 
-	inline const Bounds& GetBounds() const { return _mesh->bounds; }
-	inline const Collider* GetCollider() const { return _collider; }
-	inline const String& GetDefaultMaterialName() const { return _defaultMaterialName; }
+	const Bounds& GetBounds() const { return _mesh->bounds; }
+	const Collider* GetCollider() const { return _collider; }
+	const String& GetDefaultMaterialName() const { return _defaultMaterialName; }
 
-	inline bool operator==(const Model &other) const { return _meshRenderer == other._meshRenderer; }
+	bool operator==(const Model &other) const { return _meshRenderer == other._meshRenderer; }
 
-	inline void Render() const { _meshRenderer.Render(); }
+	void Render() const { _meshRenderer.Render(); }
 };

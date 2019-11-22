@@ -62,15 +62,15 @@ protected:
 public:
 	virtual ~Property() {}
 
-	inline byte GetFlags() const { return _flags; }
-	inline PropertyType GetType() const { return _type; }
-	inline const String& GetName() const { return _name; }
-	inline const String& GetDescription() const { return _description; }
+	byte GetFlags() const { return _flags; }
+	PropertyType GetType() const { return _type; }
+	const String& GetName() const { return _name; }
+	const String& GetDescription() const { return _description; }
 
 	const String& GetTypeString() const;
 
-	inline void SetName(const String& name) { _name = name; }
-	inline void SetDescription(const String& description) { _description = description; }
+	void SetName(const String& name) { _name = name; }
+	void SetDescription(const String& description) { _description = description; }
 
 	String GetAsString(const void* obj) const;
 	void SetAsString(void* obj, const String& value) const;
@@ -95,7 +95,7 @@ class FunctionProperty : public FunctionPropertyBase
 
 	MemberCommandPtr<T> _fptr;
 
-	inline T& GetSubClass(void* obj) const { return *(T*)((byte*)obj + _offset); }
+	T& GetSubClass(void* obj) const { return *(T*)((byte*)obj + _offset); }
 public:
 	FunctionProperty(const String& name, const MemberCommandPtr<T>& function, size_t offset = 0) : FunctionPropertyBase(name), _offset(offset), _fptr(function) {}
 	virtual ~FunctionProperty() {}
@@ -130,8 +130,8 @@ class FptrProperty : public VariableProperty<V>
 
 	MemberSetter<T, V>					_set;
 
-	inline T& GetSubClass(void* obj) const { return *(T*)((byte*)obj + _offset); }
-	inline const T& GetSubClass(const void* obj) const { return *(const T*)((byte*)obj + _offset); }
+	T& GetSubClass(void* obj) const { return *(T*)((byte*)obj + _offset); }
+	const T& GetSubClass(const void* obj) const { return *(const T*)((byte*)obj + _offset); }
 
 public:
 	FptrProperty(const String& name, const MemberGetter<T, V>& getter, const MemberSetter<T, V>& setter, size_t offset = 0, byte flags = 0) :
@@ -166,7 +166,7 @@ public:
 
 	virtual ~OffsetProperty() {}
 
-	inline const V& GetRef(const void* obj) const
+	const V& GetRef(const void* obj) const
 	{
 		const V* ptr = (const V*)((const byte*)obj + _offset);
 		return *ptr;

@@ -26,6 +26,6 @@ struct Bounds
 
 	void RecalculateSphereBounds();
 
-	inline Vector3 GetCentre() const { return (min + max) / 2.f; }
-	inline Vector3 GetExtent() const { return (max - min) / 2.f; }
+	Vector3 GetCentre() const { return (min + max) / 2.f; }
+	Vector3 GetExtent() const { return (max - min) / 2.f; }
 };

@@ -66,9 +66,9 @@ WaveSound* AudioManager::_CreateResource(const String& name, const String& data)
 	return sound;
 }
 
-void AudioManager::_DestroyResource(WaveSound* sound)
+void AudioManager::_DestroyResource(WaveSound& sound)
 {
-	sound->Destroy();
+	sound.Destroy();
 }
 
 #define CHECK(result) if (!SUCCEEDED(result)) goto Finished

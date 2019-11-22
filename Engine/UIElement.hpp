@@ -40,7 +40,7 @@ public:
 
 	void UpdateAbsoluteBounds();
 
-	inline void SetParent(UIElement *parent) 
+	void SetParent(UIElement *parent) 
 	{ 
 		if (_parent)
 			_parent->_OnUnparented(this);
@@ -52,7 +52,7 @@ public:
 			_parent->_OnParented(this);
 	}
 
-	inline void SetBounds(float x, float y, float w, float h, float xOffset = 0.f, float yOffset = 0.f)
+	void SetBounds(float x, float y, float w, float h, float xOffset = 0.f, float yOffset = 0.f)
 	{
 		_bounds.x = x;
 		_bounds.y = y;
@@ -63,10 +63,10 @@ public:
 		UpdateAbsoluteBounds();
 	}
 
-	inline void SetZ(float z) { _z = z; UpdateAbsoluteBounds(); }
+	void SetZ(float z) { _z = z; UpdateAbsoluteBounds(); }
 
-	inline void MarkForDelete() { _markedForDelete = true; }
-	inline bool ShouldDelete() const { return _markedForDelete; }
+	void MarkForDelete() { _markedForDelete = true; }
+	bool ShouldDelete() const { return _markedForDelete; }
 
 	virtual void Render() const {}
 	virtual void Update() {}

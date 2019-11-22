@@ -11,7 +11,7 @@ class ToolBrush2D : public Tool
 
 	const PropertyCollection& _GetProperties();
 public:
-	ToolBrush2D(Editor &owner) : Tool(owner), _placing(false) {}
+	ToolBrush2D(Editor &owner) : Tool(owner), _placing(false), _properties(nullptr) {}
 	virtual ~ToolBrush2D() {}
 
 	virtual void Initialise();

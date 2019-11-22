@@ -713,5 +713,8 @@
     <ClCompile Include="EntSprite.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Asset</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -58,7 +58,7 @@ namespace Maths
 	float SquareRoot(float x);
 
 	template<typename T>
-	T Pow(T base, unsigned int index)
+	inline T Pow(T base, unsigned int index)
 	{
 		T result = (T)1;
 		while (index--) result *= base;

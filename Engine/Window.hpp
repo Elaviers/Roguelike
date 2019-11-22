@@ -28,16 +28,16 @@ public:
 			::DestroyWindow(_hwnd);
 	}
 
-	inline HWND GetHwnd() const { return _hwnd; }
-	inline HDC GetHDC() const { return _hdc; }
+	HWND GetHwnd() const { return _hwnd; }
+	HDC GetHDC() const { return _hdc; }
 
 	void Create(LPCTSTR className, LPCTSTR title, LPVOID param, DWORD flags = WS_OVERLAPPEDWINDOW, HWND parent = NULL);
 	void Show();
 	void Hide();
 	void SwapBuffers();
 
-	inline void SetTitle(const char *title) { ::SetWindowTextA(_hwnd, title); }
-	inline void SetSizeAndPos(uint16 x, uint16 y, uint16 width, uint16 height)	{ WindowFunctions::SetHWNDSizeAndPos(_hwnd, x, y, width, height); }
-	inline void SetSize(uint16 width, uint16 height)							{ WindowFunctions::ResizeHWND(_hwnd, width, height); }
-	inline void SetPos(uint16 x, uint16 y)										{ WindowFunctions::RepositionHWND(_hwnd, x, y); }
+	void SetTitle(const char *title) { ::SetWindowTextA(_hwnd, title); }
+	void SetSizeAndPos(uint16 x, uint16 y, uint16 width, uint16 height)	{ WindowFunctions::SetHWNDSizeAndPos(_hwnd, x, y, width, height); }
+	void SetSize(uint16 width, uint16 height)							{ WindowFunctions::ResizeHWND(_hwnd, width, height); }
+	void SetPos(uint16 x, uint16 y)										{ WindowFunctions::RepositionHWND(_hwnd, x, y); }
 };
