@@ -90,10 +90,7 @@
     <ClCompile Include="Viewport.cpp">
       <Filter>Source Files\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="FbxReader2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FbxReader_Old.cpp">
+    <ClCompile Include="FbxReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

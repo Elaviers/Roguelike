@@ -191,8 +191,7 @@ EXIT 0</Command>
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EditorIO.cpp" />
     <ClCompile Include="EditorUtil.cpp" />
-    <ClCompile Include="FbxReader_Old.cpp" />
-    <ClCompile Include="FbxReader2.cpp" />
+    <ClCompile Include="FbxReader.cpp" />
     <ClCompile Include="GizmoAxis.cpp" />
     <ClCompile Include="GizmoPlane.cpp" />
     <ClCompile Include="GizmoRing.cpp" />
