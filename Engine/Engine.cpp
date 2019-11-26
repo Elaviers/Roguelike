@@ -47,7 +47,6 @@ void Engine::Init(EngineCreateFlags flags, Entity *world)
 		{
 			pConsole->Cvars().CreateVar("Ents", CommandPtr(pWorld, &Entity::CMD_List));
 			pConsole->Cvars().CreateVar("Ent", CommandPtr(pWorld, &Entity::CMD_Ent));
-			pConsole->Cvars().CreateVar("EntProperties", CommandPtr(pWorld, &Entity::CMD_ListProperties));
 		}
 	}
 

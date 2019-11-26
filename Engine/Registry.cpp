@@ -7,12 +7,14 @@
 #include "EntCamera.hpp"
 #include "EntLight.hpp"
 #include "EntRenderable.hpp"
+#include "EntSkeletal.hpp"
 #include "EntSprite.hpp"
 
 void Registry::RegisterEngineObjects()
 {
-	RegisterObjectClass<Entity>		(EntityIDS::Entity,		"Entity");
+	RegisterObjectClass<Entity>			(EntityIDS::Entity,			"Entity");
 	RegisterObjectClass<EntRenderable>  (EntityIDS::RENDERABLE,		"Renderable");
+	RegisterObjectClass<EntSkeletal>	(EntityIDS::SKELETAL,		"Skeletal");
 	RegisterObjectClass<EntBrush3D>		(EntityIDS::BRUSH,			"Brush");
 	RegisterObjectClass<EntBrush2D>		(EntityIDS::PLANE,			"Plane");
 	RegisterObjectClass<EntLight>		(EntityIDS::LIGHT,			"Light");

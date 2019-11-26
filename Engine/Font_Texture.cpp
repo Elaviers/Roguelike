@@ -33,8 +33,8 @@ void FontTexture::_CMD_region(const Buffer<String>& args)
 		if (args[0] == "space")
 		{
 			Glyph& glyph = _charMap[' '];
-			glyph.uvOffset[0] = (float)args[1].ToInt();
-			glyph.uvOffset[1] = (float)args[2].ToInt();
+			glyph.uv[0] = (float)args[1].ToInt();
+			glyph.uv[1] = (float)args[2].ToInt();
 			glyph.uvSize[0] = (float)args[3].ToInt();
 			glyph.uvSize[1] = (float)args[4].ToInt();
 			glyph.advance = args[5].ToInt();
@@ -80,8 +80,8 @@ void FontTexture::_ReadText(const String & string)
 						cY += _rowH;
 					}
 
-					glyph.uvOffset[0] = cX / (float)_texture->GetWidth();
-					glyph.uvOffset[1] = (cY + _rowH) / (float)_texture->GetHeight();
+					glyph.uv[0] = cX / (float)_texture->GetWidth();
+					glyph.uv[1] = (cY + _rowH) / (float)_texture->GetHeight();
 					glyph.uvSize[0] = glyph.width / (float)_texture->GetWidth();
 					glyph.uvSize[1] = glyphUVH;
 
@@ -175,7 +175,7 @@ void FontTexture::RenderString(const char* string, const Transform & transform, 
 				charTransform.Move(advanceDirection * halfCharW);
 				charTransform.SetScale(Vector3(glyph->width * scale, (float)transform.GetScale()[1], 1.f));
 
-				GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, glyph->uvOffset + halfTexel);
+				GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, glyph->uv + halfTexel);
 				GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, glyph->uvSize - texel);
 				GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, charTransform.MakeTransformationMatrix());
 				Engine::Instance().pModelManager->Plane()->Render();

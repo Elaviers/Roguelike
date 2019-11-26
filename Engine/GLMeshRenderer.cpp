@@ -10,7 +10,7 @@ inline void SetGLAttribsStatic()
 	glEnableVertexAttribArray(5);	//Normal
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, pos));
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, uvOffset));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, uv));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, colour));
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, tangent));
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex17F), (GLvoid*)offsetof(Vertex17F, bitangent));
@@ -28,14 +28,15 @@ inline void SetGLAttribsSkeletal()
 	glEnableVertexAttribArray(6);
 	glEnableVertexAttribArray(7);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex19F2I), (GLvoid*)offsetof(Vertex19F2I, pos));
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex19F2I), (GLvoid*)offsetof(Vertex19F2I, uvOffset));
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex19F2I), (GLvoid*)offsetof(Vertex19F2I, colour));
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex19F2I), (GLvoid*)offsetof(Vertex19F2I, tangent));
-	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex19F2I), (GLvoid*)offsetof(Vertex19F2I, bitangent));
-	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex19F2I), (GLvoid*)offsetof(Vertex19F2I, normal));
-	glVertexAttribPointer(6, 2, GL_INT, GL_FALSE, sizeof(Vertex19F2I), (GLvoid*)offsetof(Vertex19F2I, boneIndices));
-	glVertexAttribPointer(7, 3, GL_INT, GL_FALSE, sizeof(Vertex19F2I), (GLvoid*)offsetof(Vertex19F2I, boneWeights));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, pos));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, uv));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, colour));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, tangent));
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, bitangent));
+	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, normal));
+
+	glVertexAttribPointer(6, VertexSkeletal::BONE_COUNT, GL_INT, GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, boneIndices));
+	glVertexAttribPointer(7, VertexSkeletal::BONE_COUNT, GL_FLOAT, GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, boneWeights));
 }
 
 //Creates a VAO/VBO and gets rid of any old objects
@@ -76,7 +77,7 @@ void GLMeshRenderer::Create(const Vertex17F *data, GLsizei vertexCount, const ui
 	SetGLAttribsStatic();
 }
 
-void GLMeshRenderer::Create(const Vertex19F2I* data, GLsizei vertexCount, const uint32* elements, GLsizei elementCount)
+void GLMeshRenderer::Create(const VertexSkeletal* data, GLsizei vertexCount, const uint32* elements, GLsizei elementCount)
 {
 	_CreateNewObjects();
 
@@ -85,7 +86,7 @@ void GLMeshRenderer::Create(const Vertex19F2I* data, GLsizei vertexCount, const 
 	glBindVertexArray(_vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex19F2I), data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(VertexSkeletal), data, GL_STATIC_DRAW);
 
 	if (_count > 0)
 	{

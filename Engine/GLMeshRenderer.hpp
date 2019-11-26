@@ -29,10 +29,10 @@ public:
 	~GLMeshRenderer() {}
 
 	void Create(const Vertex17F *data, GLsizei vertexCount, const uint32 *elements, GLsizei elementCount);
-	void Create(const Vertex19F2I *data, GLsizei vertexCount, const uint32 *elements, GLsizei elementCount);
+	void Create(const VertexSkeletal *data, GLsizei vertexCount, const uint32 *elements, GLsizei elementCount);
 
 	void Create(const Vertex17F* data, GLsizei vertexCount) { Create(data, vertexCount, nullptr, 0); }
-	void Create(const Vertex19F2I* data, GLsizei vertexCount) { Create(data, vertexCount, nullptr, 0); }
+	void Create(const VertexSkeletal* data, GLsizei vertexCount) { Create(data, vertexCount, nullptr, 0); }
 
 	void Create(const Vector3 *basicData, GLsizei vertexCount, const uint32 *elements, GLsizei elementCount);
 

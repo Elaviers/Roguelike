@@ -3,7 +3,7 @@
 
 struct Glyph
 {
-	Vector2 uvOffset;
+	Vector2 uv;
 	Vector2 uvSize;
 
 	int width = 0;

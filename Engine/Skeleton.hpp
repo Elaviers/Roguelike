@@ -8,38 +8,41 @@ private:
 	int _nextJointID;
 
 	List<Joint> _joints;
-
-	Buffer<Mat4> _transformCache;
+	Buffer<Mat4> _skinningMatrices;
 
 	bool _CanAddJoint(const Joint *parent) const
 	{
 		if (parent == nullptr)
-		{
-			for (auto it = _joints.First(); it; ++it)
-				if (it->GetParent() == nullptr)
-					return false;
-
 			return true;
-		}
-		else
-		{
-			for (auto it = _joints.First(); it; ++it)
-				if (&*it == parent)
-					return true;
 
-			return false;
-		}
+		for (auto it = _joints.First(); it; ++it)
+			if (&*it == parent)
+				return true;
+
+		return false;
 	}
 
 public:
 	Skeleton() : _nextJointID(0) {}
 
+	Skeleton(const Skeleton& other) : _nextJointID(other._nextJointID), _joints(other._joints), _skinningMatrices(other._skinningMatrices) {}
+
 	Skeleton(Skeleton&& other) noexcept : _nextJointID(other._nextJointID), _joints(other._joints)
 	{
 		other._nextJointID = 0;
+		other.Clear();
 	}
 
 	~Skeleton() {}
+
+	Skeleton& operator=(const Skeleton& other)
+	{
+		_nextJointID = other._nextJointID;
+		_joints = other._joints;
+		_skinningMatrices = other._skinningMatrices;
+
+		return *this;
+	}
 
 	Skeleton& operator=(Skeleton&& other) noexcept
 	{
@@ -61,10 +64,11 @@ public:
 	Joint* CreateJoint(Joint *parent)
 	{
 		if (_CanAddJoint(parent))
+		{
 			return &*_joints.Add(Joint(_nextJointID++, parent));
 
-		if (_transformCache.GetSize() != 0)
-			UpdateCache();
+			_skinningMatrices.SetSize(_joints.GetSize());
+		}
 
 		return nullptr;
 	}
@@ -76,8 +80,16 @@ public:
 		return it ? &*it : nullptr;
 	}
 
-	//Updates the internal cache of joints to be sent to the shader
-	void UpdateCache();
+	Joint* GetJointWithName(const String& name)
+	{
+		for (auto it = _joints.First(); it; ++it)
+			if (it->name == name)
+				return &*it;
+
+		return nullptr;
+	}
+
+	void SetSkinningForJoint(int jointId, Mat4 skinning) { _skinningMatrices[jointId] = skinning; }
 
 	void ToShader() const;
 };

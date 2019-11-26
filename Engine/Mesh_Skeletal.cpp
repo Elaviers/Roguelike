@@ -32,7 +32,7 @@ void Mesh_Skeletal::_ReadData(BufferReader<byte>& iterator)
 		{
 			vertices[i].pos = iterator.Read_vector3();
 			vertices[i].normal = iterator.Read_vector3();
-			vertices[i].uvOffset = iterator.Read_vector2();
+			vertices[i].uv = iterator.Read_vector2();
 
 			for (int i = 0; i < bonesPerVertex; ++i)
 			{
@@ -50,7 +50,7 @@ void Mesh_Skeletal::_ReadData(BufferReader<byte>& iterator)
 			elements[i] = iterator.Read_uint32();
 
 			if ((i + 1) % 3 == 0)
-				Vertex19F2I::CalculateTangents(vertices[elements[i - 2]], vertices[elements[i - 1]], vertices[elements[i]]);
+				VertexSkeletal::CalculateTangents(vertices[elements[i - 2]], vertices[elements[i - 1]], vertices[elements[i]]);
 		}
 
 		uint32 jointCount = iterator.Read_uint32();
@@ -61,7 +61,7 @@ void Mesh_Skeletal::_ReadData(BufferReader<byte>& iterator)
 
 			Joint* j = skeleton.CreateJoint(parent);
 			j->name = iterator.Read_string();
-			j->localTransform.ReadFromBuffer(iterator);
+			j->bindingMatrix.ReadFromBuffer(iterator);
 		}
 
 		bounds.min = iterator.Read_vector3();
@@ -86,8 +86,8 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 	{
 		jointBuffer[jointId++] = &*it;
 
-		//ParentID + name + Transform
-		jointDataSize += 4 + (it->name.GetLength() + 1) + (4 * (3 + 3 + 3));
+		//ParentID + name + binding
+		jointDataSize += 4 + (it->name.GetLength() + 1) + (4 * 4 * 4);
 	}
 
 	iterator.EnsureSpace(
@@ -95,7 +95,7 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 		1 +													//Version
 		1 +													//Bone indices/weights per vertex (2)
 		4 +													//Vert count
-		(4 * (3+3+2) + 2 * (4 + 4)) * vertices.GetSize() +	//Vertices
+		(4 * (3+2+3+3+3+3) + ((4 + 4) * VertexSkeletal::BONE_COUNT)) * vertices.GetSize() +	//Vertices
 		4 +													//Element count
 		4 * elements.GetSize() +							//Elements
 		4 +													//Joint count
@@ -111,11 +111,11 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 
 	for (size_t i = 0; i < vertices.GetSize(); ++i)
 	{
-		const Vertex19F2I& v = vertices[i];
+		const VertexSkeletal& v = vertices[i];
 
 		iterator.Write_vector3(v.pos);
 		iterator.Write_vector3(v.normal);
-		iterator.Write_vector2(v.uvOffset);
+		iterator.Write_vector2(v.uv);
 		
 		for (int i = 0; i < bonesPerVertex; ++i)
 		{
@@ -147,7 +147,7 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 
 		iterator.Write_uint32((uint32)parentId);
 		iterator.Write_string(joint->name.GetData());
-		joint->localTransform.WriteToBuffer(iterator);
+		joint->bindingMatrix.WriteToBuffer(iterator);
 	}
 
 	iterator.Write_vector3(bounds.min);

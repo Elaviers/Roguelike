@@ -9,12 +9,12 @@ void Texture::Info::CMD_min(const Buffer<String>& args)
 	{
 		String string = args[0].ToLower();
 
-		if (string == "nearest")						magFilter = GL_NEAREST;
-		else if (string == "nearest_mipmap_nearest")	magFilter = GL_NEAREST_MIPMAP_NEAREST;
-		else if (string == "nearest_mipmap_linear")		magFilter = GL_NEAREST_MIPMAP_LINEAR;
-		else if (string == "linear")					magFilter = GL_LINEAR;
-		else if (string == "linear_mipmap_nearest")		magFilter = GL_LINEAR_MIPMAP_NEAREST;
-		else if (string == "linear_mipmap_linear")		magFilter = GL_LINEAR_MIPMAP_LINEAR;
+		if (string == "nearest")						minFilter = GL_NEAREST;
+		else if (string == "nearest_mipmap_nearest")	minFilter = GL_NEAREST_MIPMAP_NEAREST;
+		else if (string == "nearest_mipmap_linear")		minFilter = GL_NEAREST_MIPMAP_LINEAR;
+		else if (string == "linear")					minFilter = GL_LINEAR;
+		else if (string == "linear_mipmap_nearest")		minFilter = GL_LINEAR_MIPMAP_NEAREST;
+		else if (string == "linear_mipmap_linear")		minFilter = GL_LINEAR_MIPMAP_LINEAR;
 	}
 
 }

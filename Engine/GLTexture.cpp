@@ -6,7 +6,7 @@ void GLTexture::Create(GLsizei width, GLsizei height, const GLvoid *data, GLint 
 
 	glBindTexture(GL_TEXTURE_2D, _id);
 
-	if (mipLevels)
+	if (mipLevels > 1)
 	{
 		glTexStorage2D(GL_TEXTURE_2D, mipLevels, GL_RGBA8, width, height);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);

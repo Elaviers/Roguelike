@@ -14,7 +14,7 @@ public:
 	Mesh_Skeletal() {}
 	virtual ~Mesh_Skeletal() {}
 
-	Buffer<Vertex19F2I> vertices;
+	Buffer<VertexSkeletal> vertices;
 	Buffer<uint32> elements;
 	Skeleton skeleton;
 

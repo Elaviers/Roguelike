@@ -1,6 +1,6 @@
 #pragma once
 #include "String.hpp"
-#include "Transform.hpp"
+#include "Matrix.hpp"
 
 class Joint
 {
@@ -12,7 +12,7 @@ public:
 	~Joint() {}
 
 	String name;
-	Transform localTransform;
+	Mat4 bindingMatrix;
 
 	int GetID() const { return _id; }
 	Joint* GetParent() { return _parent; }

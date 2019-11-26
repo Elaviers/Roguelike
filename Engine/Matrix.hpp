@@ -1,6 +1,7 @@
 #pragma once
 #include "Vector.hpp"
 #include "Vector4.hpp"
+#include "BufferIterator.hpp"
 
 class Quaternion;
 
@@ -53,7 +54,7 @@ public:
 		return *this;
 	}
 	
-	inline			T* operator[](int index)		{ return _data[index]; }
+	inline	T* operator[](int index)		{ return _data[index]; }
 	const	T* operator[](int index) const	{ return _data[index]; }
 
 	friend SquareMatrix operator*(const SquareMatrix &a, const SquareMatrix &b);
@@ -67,6 +68,32 @@ public:
 			_data[0][i] *= other;
 
 		return *this;
+	}
+
+	void MultiplyRow(int row, float x)
+	{
+		for (int c = 0; c < SIZE; ++c)
+			_data[row][c] *= x;
+	}
+
+	void MultiplyColumn(int column, float x)
+	{
+		for (int r = 0; r < SIZE; ++r)
+			_data[r][column] *= x;
+	}
+
+	void WriteToBuffer(BufferWriter<byte>& writer) const
+	{
+		for (int r = 0; r < SIZE; ++r)
+			for (int c = 0; c < SIZE; ++c)
+				writer.Write_float(_data[r][c]);
+	}
+
+	void ReadFromBuffer(BufferReader<byte>& reader)
+	{
+		for (int r = 0; r < SIZE; ++r)
+			for (int c = 0; c < SIZE; ++c)
+				_data[r][c] = reader.Read_float();
 	}
 
 	friend Vector3 operator*(const Vector3&, const SquareMatrix<float, 4>&);

@@ -13,9 +13,6 @@ class AnimationTrack
 	{
 		for (size_t i = 0; i < _keyframes.GetSize(); ++i)
 		{
-			if (_keyframes[i].time == time)
-				return i;
-
 			if (_keyframes[i].time > time)
 			{
 				if (i > 0)
@@ -62,11 +59,11 @@ public:
 
 		const Keyframe<T>& keyframe = _keyframes[index];
 
-		if (keyframe.interpolation == INTERP_LINEAR && index < _keyframes.GetSize() - 1)
-		{
-			value = keyframe.Interpolate(_keyframes[index + 1], time);
-		}
-		else
+		//if (keyframe.interpolation == INTERP_LINEAR && index < _keyframes.GetSize() - 1)
+		//{
+		//	value = keyframe.Interpolate(_keyframes[index + 1], time);
+		//}
+		//else
 			value = keyframe.value;
 		
 		return true;

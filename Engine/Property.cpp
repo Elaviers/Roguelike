@@ -41,6 +41,7 @@ void Property::SetAsString(void* obj, const String& value) const
 		SETSTRINGCASE(PropertyType::FLOAT, float, value.ToFloat());
 		SETSTRINGCASE(PropertyType::VECTOR2, Vector2, value.ToVector2());
 		SETSTRINGCASE(PropertyType::VECTOR3, Vector3, value.ToVector3());
+		SETSTRINGCASE(PropertyType::BYTE, byte, value.ToInt());
 		SETSTRINGCASE(PropertyType::UINT16, uint16, value.ToInt());
 		SETSTRINGCASE(PropertyType::UINT32, uint32, value.ToInt());
 		SETSTRINGCASE(PropertyType::UINT64, uint64, value.ToInt());
@@ -62,6 +63,7 @@ String Property::GetAsString(const void* obj) const
 		GETSTRINGCASE(PropertyType::FLOAT, String::From(GETASTYPE(float)));
 		GETSTRINGCASE(PropertyType::VECTOR2, String::From(GETASTYPE(Vector2)));
 		GETSTRINGCASE(PropertyType::VECTOR3, String::From(GETASTYPE(Vector3)));
+		GETSTRINGCASE(PropertyType::BYTE, String::From((int)GETASTYPE(byte)));
 		GETSTRINGCASE(PropertyType::UINT16, String::From(GETASTYPE(uint16)));
 		GETSTRINGCASE(PropertyType::UINT32, String::From(GETASTYPE(uint32)));
 		GETSTRINGCASE(PropertyType::UINT64, String::From(GETASTYPE(uint64)));
@@ -77,12 +79,16 @@ String Property::GetAsString(const void* obj) const
 #define TRANSFERCASE(ENUM, TYPE) case ENUM: ((VariableProperty<TYPE>*)this)->Set(to, ((VariableProperty<TYPE>*)this)->Get(from)); break
 void Property::TransferTo(const void* from, void* to) const
 {
+	if (GetFlags() & PropertyFlags::READONLY)
+		return;
+
 	switch (GetType())
 	{
 		TRANSFERCASE(PropertyType::STRING, String);
 		TRANSFERCASE(PropertyType::FLOAT, float);
 		TRANSFERCASE(PropertyType::VECTOR2, Vector2);
 		TRANSFERCASE(PropertyType::VECTOR3, Vector3);
+		TRANSFERCASE(PropertyType::BYTE, byte);
 		TRANSFERCASE(PropertyType::UINT16, uint16);
 		TRANSFERCASE(PropertyType::UINT32, uint32);
 		TRANSFERCASE(PropertyType::UINT64, uint64);

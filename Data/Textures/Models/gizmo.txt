@@ -1,0 +1,5 @@
+min nearest
+mag nearest
+mips 1
+aniso 1
+img models/gizmo.png

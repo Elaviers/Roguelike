@@ -287,30 +287,24 @@ void Entity::CMD_List(const Buffer<String>& tokens)
 
 void Entity::CMD_Ent(const Buffer<String>& tokens)
 {
-	if (tokens.GetSize() >= 2)
-	{
-		Entity* obj = FindByName(tokens[0]);
-
-		if (obj)
-		{
-			Buffer<String> objTokens(&tokens[1], tokens.GetSize() - 1);
-			Engine::Instance().pConsole->Print(obj->GetProperties().HandleCommand(obj, objTokens).GetData());
-		}
-	}
-}
-
-void Entity::CMD_ListProperties(const Buffer<String>& tokens)
-{
 	if (tokens.GetSize() >= 1)
 	{
 		Entity* obj = FindByName(tokens[0]);
 
 		if (obj)
 		{
-			const Buffer<Property*> properties = obj->GetProperties().GetAll();
+			if (tokens.GetSize() >= 2)
+			{
+				Buffer<String> objTokens(&tokens[1], tokens.GetSize() - 1);
+				Engine::Instance().pConsole->Print(obj->GetProperties().HandleCommand(obj, objTokens).GetData());
+			}
+			else
+			{
+				const Buffer<Property*> properties = obj->GetProperties().GetAll();
 
-			for (size_t i = 0; i < properties.GetSize(); ++i)
-				Engine::Instance().pConsole->Print(CSTR(properties[i]->GetName(), "\t\t", properties[i]->GetTypeString(), "\t\t<", properties[i]->GetAsString(obj), ">\n"));
+				for (size_t i = 0; i < properties.GetSize(); ++i)
+					Engine::Instance().pConsole->Print(CSTR(properties[i]->GetName(), "\t\t", properties[i]->GetTypeString(), "\t\t<", properties[i]->GetAsString(obj), ">\n"));
+			}
 		}
 	}
 }

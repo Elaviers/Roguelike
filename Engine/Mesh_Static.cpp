@@ -25,7 +25,7 @@ void Mesh_Static::_ReadData(BufferReader<byte>& iterator)
 		{
 			vertices[i].pos = iterator.Read_vector3();
 			vertices[i].normal = iterator.Read_vector3();
-			vertices[i].uvOffset = iterator.Read_vector2();
+			vertices[i].uv = iterator.Read_vector2();
 
 			if ((i + 1) % 3 == 0)
 				Vertex17F::CalculateTangents(vertices[i - 2], vertices[i - 1], vertices[i - 2]);
@@ -71,7 +71,7 @@ void Mesh_Static::_WriteData(BufferWriter<byte>& iterator) const
 
 		iterator.Write_vector3(v.pos);
 		iterator.Write_vector3(v.normal);
-		iterator.Write_vector2(v.uvOffset);
+		iterator.Write_vector2(v.uv);
 	}
 
 	iterator.Write_uint32((uint32)elements.GetSize());

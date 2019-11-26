@@ -1,411 +1,368 @@
 #include "EditorIO.hpp"
-#include <Engine/Animation.hpp>
-#include <Engine/Debug.hpp>
-#include <Engine/Hashmap.hpp>
 #include <Engine/Mesh_Skeletal.hpp>
 #include <Engine/Mesh_Static.hpp>
 
-inline Vector3 FbxVec4ToVector3(const FbxVector4& v)
+inline Vector3 FbxVector4ToVector3(const FbxVector4& v)
 {
-	return Vector3((float)-v[0], (float)v[2], (float)-v[1]);
+	return Vector3((float)v[0], (float)v[1], (float)v[2]);
 }
 
-inline Vector3 FbxD3ToVector3(const FbxDouble3& v)
-{
-	return Vector3((float)-v[0], (float)v[2], (float)-v[1]);
-}
-
-inline Vector2 FbxVec2ToVector2(const FbxVector2& v)
+inline Vector2 FbxVector2ToVector2(const FbxVector2& v)
 {
 	return Vector2((float)v[0], (float)v[1]);
 }
 
-//Returns control index
-int GetFBXVertex(Vertex17F& out, const FbxMesh* fbxMesh, int polygonIndex, int vertexIndex, const char* uvSet)
+inline Mat4 FbxAMatrixToMat4(const FbxAMatrix& m)
 {
-	Vertex17F v = Vertex17F();
-	int control = fbxMesh->GetPolygonVertex(polygonIndex, vertexIndex);
+	Mat4 result;
+	for (int r = 0; r < 4; ++r)
+		for (int c = 0; c < 4; ++c)
+			result[r][c] = (float)m.Get(r, c);
 
-	if (control > -1)
-		out.pos = FbxVec4ToVector3(fbxMesh->mControlPoints[control]);
-
-	FbxVector4 normal;
-	if (fbxMesh->GetPolygonVertexNormal(polygonIndex, vertexIndex, normal))
-		out.normal = FbxVec4ToVector3(normal);
-
-	FbxVector2 uv;
-	bool unmapped;
-	if (fbxMesh->GetPolygonVertexUV(polygonIndex, vertexIndex, uvSet, uv, unmapped))
-		out.uvOffset = FbxVec2ToVector2(uv);
-
-	return control;
+	return result;
 }
 
 class FbxMeshDataImporter
 {
+	struct Vertex
+	{
+		Vector3 pos;
+		Vector3 normal;
+		Vector2 uv;
+
+		uint32 cpIndex;
+	};
+
+	struct VertexMapping
+	{
+		uint32 cpIndex;
+		float weight;
+	};
+
 	Skeleton _skeleton;
 
-	Buffer<Vertex17F> _vertices;
-	Buffer<uint32> _elements;
-	Hashmap<String, Buffer<uint32>> _vertexMappings;
+	Buffer<Vertex>	_vertices;
+	Buffer<uint32>	_elements;
 
-	Buffer<List<uint32>> _vertsForCP;	//List of vertex indices for each control point
+	Hashmap<String, Buffer<VertexMapping>> _vertexGroups;
+
+	Buffer<List<uint32>> _vertsForCP;
 
 	uint32 _totalVertexCount = 0;
-	//
+	//////
 
-
-	uint32 GetVertexIndex(const Vertex17F& vertex, int cpIndex)
+	uint32 _GetIndexForVertex(const Vertex& vertex)
 	{
-		uint32 i = 0;
-		for (; i < _vertices.GetSize(); ++i)
-			if (_vertices[i].pos == vertex.pos && _vertices[i].normal == vertex.normal && _vertices[i].uvOffset == vertex.uvOffset)
+		for (uint32 i = 0; i < _vertices.GetSize(); ++i)
+			if (_vertices[i].pos == vertex.pos && _vertices[i].normal == vertex.normal && _vertices[i].uv == vertex.uv)
 				return i;
 
-		if (i == _vertices.GetSize())
-		{
-			_vertices.Append(1);
-			_vertsForCP[cpIndex].Add((uint32)(_vertices.GetSize() - 1));
-		}
-
-		_vertices[i].pos = vertex.pos;
-		_vertices[i].normal = vertex.normal;
-		_vertices[i].uvOffset = vertex.uvOffset;
-
+		uint32 index = _vertices.GetSize();
+		_vertices.Add(vertex);
+		_vertsForCP[vertex.cpIndex].Add(index);
 		_totalVertexCount++;
-		return i;
+		return index;
 	}
 
-	inline uint32 GetVertexIndex(const FbxMesh* fbxMesh, int polyIndex, int vertIndex, const char* uvSet)
+	Vertex _ReadMeshVertex(const FbxMesh* mesh, int polyIndex, int vertIndex, const char* uvSet)
 	{
-		Vertex17F vertex = Vertex17F();
-		int cpIndex = GetFBXVertex(vertex, fbxMesh, polyIndex, vertIndex, uvSet);
-		return GetVertexIndex(vertex, cpIndex);
+		FbxAMatrix fbxTransform = mesh->GetNode()->EvaluateGlobalTransform();
+		Mat4 transform = FbxAMatrixToMat4(fbxTransform);
+		transform.MultiplyColumn(0, -1.f);
+
+		Vertex result;
+		
+		int cpIndex = mesh->GetPolygonVertex(polyIndex, vertIndex);
+		if (cpIndex < 0)
+			Debug::Error("Could not find the control point index of a vertex!");
+
+		result.cpIndex = (uint32)cpIndex;
+		result.pos = FbxVector4ToVector3(mesh->mControlPoints[result.cpIndex]) * transform;
+
+		FbxVector4 normal;
+		if (mesh->GetPolygonVertexNormal(polyIndex, vertIndex, normal))
+			result.normal = FbxVector4ToVector3(normal) * transform;
+
+		FbxVector2 uv;
+		bool unmapped;
+		if (mesh->GetPolygonVertexUV(polyIndex, vertIndex, uvSet, uv, unmapped))
+			result.uv = FbxVector2ToVector2(uv);
+
+		return result;
 	}
 
-	void _LoadMesh(FbxMesh* fbxMesh)
+	void _ReadMeshNode(FbxNode* node)
 	{
-		_totalVertexCount = 0;
-		_vertsForCP.SetSize(fbxMesh->mControlPoints.GetCount());
-
-		const char* uvSet = nullptr;
-
-		FbxStringList uvSetNames;
-		fbxMesh->GetUVSetNames(uvSetNames);
-		if (uvSetNames.GetCount() > 0)
-			uvSet = uvSetNames[0];
-
-		int polyCount = fbxMesh->GetPolygonCount();
-		for (int i = 0; i < polyCount; ++i)
+		FbxMesh* mesh = node->GetMesh();
+		if (mesh)
 		{
-			int polySize = fbxMesh->GetPolygonSize(i);
+			_totalVertexCount = 0;
+			_vertsForCP.SetSize(mesh->mControlPoints.GetCount());
 
-			if (polySize <= 2)
+			const char* uvSet = nullptr;
+
+			FbxStringList uvSetNames;
+			mesh->GetUVSetNames(uvSetNames);
+			if (uvSetNames.GetCount() > 0)
+				uvSet = uvSetNames[0];
+
+			int polyCount = mesh->GetPolygonCount();
+			for (int i = 0; i < polyCount; ++i)
 			{
-				Debug::PrintLine("Warning: FBX polygon with less than 3 vertices?!, ignoring...");
-				continue;
-			}
+				int polySize = mesh->GetPolygonSize(i);
 
-			uint32 v1 = GetVertexIndex(fbxMesh, i, 0, uvSet);
-			uint32 v2 = GetVertexIndex(fbxMesh, i, 1, uvSet);
-			uint32 v3 = GetVertexIndex(fbxMesh, i, 2, uvSet);
+				if (polySize <= 2)
+				{
+					Debug::PrintLine("Warning: FBX polygon with less than 3 vertices?!, ignoring...");
+					continue;
+				}
 
-			size_t last = _elements.GetSize();
-			_elements.Append(3);
-
-			_elements[last] = v1;
-			_elements[last + 1] = v2;
-			_elements[last + 2] = v3;
-			Vertex17F::CalculateTangents(_vertices[v1], _vertices[v3], _vertices[v2]);
-
-			if (polySize > 3)	//Quad, add another triangle
-			{
-				uint32 v4 = GetVertexIndex(fbxMesh, i, 3, uvSet);
+				uint32 v1 = _GetIndexForVertex(_ReadMeshVertex(mesh, i, 0, uvSet));
+				uint32 v2 = _GetIndexForVertex(_ReadMeshVertex(mesh, i, 1, uvSet));
+				uint32 v3 = _GetIndexForVertex(_ReadMeshVertex(mesh, i, 2, uvSet));
 
 				size_t last = _elements.GetSize();
 				_elements.Append(3);
-
 				_elements[last] = v1;
-				_elements[last + 1] = v3;
-				_elements[last + 2] = v4;
-				Vertex17F::CalculateTangents(_vertices[v1], _vertices[v4], _vertices[v3]);
-
-				if (polySize > 4)
-					Debug::Error("Polygons with more than 4 vertices are not supported because I am lazy");
-			}
-		}
-
-		for (int i = 0; i < fbxMesh->GetDeformerCount(); ++i)
-		{
-			FbxDeformer* d = fbxMesh->GetDeformer(i);
-			auto type = d->GetDeformerType();
-
-			if (type == FbxDeformer::eSkin)
-			{
-				FbxSkin* skin = FbxCast<FbxSkin>(d);
-
-				if (skin)
+				_elements[last + 1] = v2;
+				_elements[last + 2] = v3;
+				
+				if (polySize > 3)	//Quad, add another triangle
 				{
-					auto skinningType = skin->GetSkinningType();
+					uint32 v4 = _GetIndexForVertex(_ReadMeshVertex(mesh, i, 3, uvSet));
 
-					for (int j = 0; j < skin->GetClusterCount(); ++j)
+					size_t last = _elements.GetSize();
+					_elements.Append(3);
+					_elements[last] = v1;
+					_elements[last + 1] = v3;
+					_elements[last + 2] = v4;
+					
+					if (polySize > 4)
+						Debug::Error("Polygons with more than 4 vertices are not supported because I am lazy");
+				}
+			}
+
+			for (int i = 0; i < mesh->GetDeformerCount(); ++i)
+			{
+				FbxDeformer* deformer = mesh->GetDeformer(i);
+				auto deformerType = deformer->GetDeformerType();
+
+				if (deformerType == FbxDeformer::eSkin)
+				{
+					FbxSkin* skin = FbxCast<FbxSkin>(deformer);
+					if (skin)
 					{
-						auto cluster = skin->GetCluster(j);
+						auto skinningType = skin->GetSkinningType();
 
-						int* cpIndices = cluster->GetControlPointIndices();
-						int cpIndexCount = cluster->GetControlPointIndicesCount();
+						for (int j = 0; j < skin->GetClusterCount(); ++j)
+						{
+							auto cluster = skin->GetCluster(j);
+							int* cpIndices = cluster->GetControlPointIndices();
+							double* cpWeights = cluster->GetControlPointWeights();
+							int cpIndexCount = cluster->GetControlPointIndicesCount();
 
-						Buffer<uint32>& dest = _vertexMappings[cluster->GetName()];
-						dest.SetSize(cpIndexCount);
-						for (int k = 0; k < cpIndexCount; ++k)
-							dest[k] = cpIndices[k];
+							Buffer<VertexMapping>& dest = _vertexGroups[cluster->GetName()];
+							dest.SetSize(cpIndexCount);
+							for (int k = 0; k < cpIndexCount; ++k)
+								dest[k] = VertexMapping{ (uint32)cpIndices[k], (float)cpWeights[k] };
+
+							Joint* joint = _skeleton.GetJointWithName(cluster->GetName());
+							if (joint)
+							{
+								FbxAMatrix fbxBinding = cluster->GetLink()->EvaluateGlobalTransform().Inverse();
+								joint->bindingMatrix = FbxAMatrixToMat4(fbxBinding);
+								joint->bindingMatrix.MultiplyColumn(0, -1.f);
+							}
+							else Debug::Error(CSTR("Warning: FBX deformer \"", cluster->GetName(), "\" does not have a corresponding joint!"));
+						}
 					}
 				}
-				else Debug::Error("poop error");
 			}
 		}
 	}
 
-	void _LoadSkeleton(FbxNode* node, Joint* parentJoint = nullptr)
+	void _ReadSkeletonNode(FbxNode* node, Joint* parent = nullptr)
 	{
-		Joint* joint = _skeleton.CreateJoint(parentJoint);
-
-		if (joint == nullptr)
+		FbxSkeleton* skeleton = node->GetSkeleton();
+		if (skeleton)
 		{
-			Debug::Error("Bone error");
+			Joint* joint = _skeleton.CreateJoint(parent);
+
+			if (joint == nullptr)
+			{
+				Debug::Error("Bone error");
+				return;
+			}
+
+			joint->name = node->GetSkeleton()->GetName();
+			FbxTransform& fbxt = node->GetTransform();
+
+			for (int i = 0; i < node->GetChildCount(); ++i)
+				_ReadSkeletonNode(node->GetChild(i), joint);
+		}
+	}
+
+	void _ReadSkeletonNodesRecursive(FbxNode* root)
+	{
+		if (root->GetSkeleton())
+		{
+			_ReadSkeletonNode(root);
 			return;
 		}
 
-		joint->name = node->GetSkeleton()->GetName();
-		FbxTransform& fbxt = node->GetTransform();
-
-		for (int i = 0; i < node->GetChildCount(); ++i)
-			_LoadSkeleton(node->GetChild(i), joint);
-
-		if (parentJoint == nullptr)
-		{
-			FbxScene* scene = node->GetScene();
-
-			int animStackCount = scene->GetSrcObjectCount<FbxAnimStack>();
-
-			for (int i = 0; i < animStackCount; ++i)
-			{
-				FbxAnimStack* animStack = scene->GetSrcObject<FbxAnimStack>(i);
-
-				int animLayerCount = animStack->GetMemberCount<FbxAnimLayer>();
-
-				for (int j = 0; j < animLayerCount; ++j)
-				{
-					FbxAnimLayer* layer = animStack->GetMember<FbxAnimLayer>(i);
-
-
-				}
-			}
-		}
+		for (int i = 0; i < root->GetChildCount(); ++i)
+			_ReadSkeletonNodesRecursive(root->GetChild(i));
 	}
 
-	void _LoadNodeChildren(FbxNode* parent, FbxNode*& skeletonNode, FbxTransform* parentTransform = nullptr)
+	void _ReadMeshNodesRecursive(FbxNode* root)
 	{
-		for (int i = 0; i < parent->GetChildCount(); ++i)
-		{
-			FbxNode* node = parent->GetChild(i);
+		if (root->GetMesh())
+			_ReadMeshNode(root);
 
-			FbxMesh* fbxMesh = node->GetMesh();
-
-			if (fbxMesh)
-				_LoadMesh(fbxMesh);
-
-			if (node->GetSkeleton())
-			{
-				_skeleton.Clear();
-
-				_LoadSkeleton(node);
-				skeletonNode = node;
-				continue;
-			}
-
-			_LoadNodeChildren(node, skeletonNode);
-		}
+		for (int i = 0; i < root->GetChildCount(); ++i)
+			_ReadMeshNodesRecursive(root->GetChild(i));
 	}
 
 public:
-	Mesh* Import(FbxManager *fbxManager, FbxImporter *fbxImporter)
+	Mesh* Import(FbxManager* fbxManager, const char* filename)
 	{
-		FbxScene* scene = FbxScene::Create(fbxManager, "importScene");
+		FbxImporter* fbxImporter = FbxImporter::Create(fbxManager, "");
 
-		fbxImporter->Import(scene);
-
-		fbxImporter->Destroy();
-
-		FbxNode* skeletonNode = nullptr;
-		FbxNode* root = scene->GetRootNode();
-
-		if (root)
+		if (fbxImporter->Initialize(filename, -1, fbxManager->GetIOSettings()))
 		{
-			_LoadNodeChildren(root, skeletonNode);
-		}
+			FbxScene* scene = FbxScene::Create(fbxManager, "import");
+			
+			FbxAxisSystem::OpenGL.ConvertScene(scene);
 
-		scene->Destroy();
-
-		if (_vertices.GetSize())
-		{
-			if (!_vertexMappings.IsEmpty() && _skeleton.GetJointCount())
+			fbxImporter->Import(scene);
+			fbxImporter->Destroy();
+			
+			FbxNode* root = scene->GetRootNode();
+			if (root)
 			{
-				Mesh_Skeletal* skeletalMesh = new Mesh_Skeletal();
+				_ReadSkeletonNodesRecursive(root);
+				_ReadMeshNodesRecursive(root);
 
-				Buffer<uint32> nextBoneIndices;	//Next bone index for each vertex
-				skeletalMesh->vertices.SetSize(_vertices.GetSize());
-				nextBoneIndices.SetSize(_vertices.GetSize());
-
-				for (size_t i = 0; i < skeletalMesh->vertices.GetSize(); ++i)
+				if (_totalVertexCount == 0)
+					return nullptr;
+				
+				if (_skeleton.GetJointCount() > 0)
 				{
-					nextBoneIndices[i] = 0;
-					skeletalMesh->vertices[i].pos = _vertices[i].pos;
-					skeletalMesh->vertices[i].normal = _vertices[i].normal;
-					skeletalMesh->vertices[i].tangent = _vertices[i].tangent;
-					skeletalMesh->vertices[i].bitangent = _vertices[i].bitangent;
-					skeletalMesh->vertices[i].uvOffset = _vertices[i].uvOffset;
-				}
+					Mesh_Skeletal* mesh = new Mesh_Skeletal();
+					mesh->skeleton = _skeleton;
+					mesh->vertices.SetSize(_vertices.GetSize());
+					mesh->elements.SetSize(_elements.GetSize());
 
-				for (auto it = _skeleton.FirstListElement(); it; ++it)
-				{
-					Buffer<uint32>* affectedCPs = _vertexMappings.Get(it->name);
+					Vector3 boundsMin(1000, 1000, 1000), boundsMax(-1000, -1000, -1000);
 
-					if (affectedCPs)
+					//Copy vertex info
+					for (uint32 i = 0; i < _totalVertexCount; ++i)
 					{
-						int jointID = it->GetID();
+						const Vertex& src = _vertices[i];
+						VertexSkeletal& dest = mesh->vertices[i];
+						dest.pos = src.pos;
+						dest.normal = src.normal;
+						dest.uv = src.uv;
 
-						for (size_t i = 0; i < affectedCPs->GetSize(); ++i)
+						boundsMin = Vector3(Utilities::Min(boundsMin[0], src.pos[0]), Utilities::Min(boundsMin[1], src.pos[1]), Utilities::Min(boundsMin[2], src.pos[2]));
+						boundsMax = Vector3(Utilities::Max(boundsMax[0], src.pos[0]), Utilities::Max(boundsMax[1], src.pos[1]), Utilities::Max(boundsMax[2], src.pos[2]));
+					}
+
+					//Bounds
+					mesh->bounds.min = boundsMin;
+					mesh->bounds.max = boundsMax;
+					mesh->bounds.RecalculateSphereBounds();
+
+					//Elements & TBN
+					for (size_t i = 0; i < _elements.GetSize(); ++i)
+					{
+						mesh->elements[i] = _elements[i];
+					
+						if ((i - 2) % 3 == 0)
+							VertexSkeletal::CalculateTangents(mesh->vertices[0], mesh->vertices[1], mesh->vertices[2]);
+					}
+
+					//Vertex bone info
+					for (size_t jointIndex = 0; jointIndex < _skeleton.GetJointCount(); ++jointIndex)
+					{
+						Joint* joint = _skeleton.GetJointWithID((int)jointIndex);
+						Buffer<VertexMapping>* vertGroups = _vertexGroups.Get(joint->name);
+						if (vertGroups)
 						{
-							List<uint32>& affectedVerts = _vertsForCP[(*affectedCPs)[i]];
-
-							for (auto it = affectedVerts.First(); it; ++it)
+							for (size_t vertGroupIndex = 0; vertGroupIndex < vertGroups->GetSize(); ++vertGroupIndex)
 							{
-								uint32 vertIndex = *it;
-								uint32 boneIndex = nextBoneIndices[vertIndex]++;
+								VertexMapping& vertexMapping = (*vertGroups)[vertGroupIndex];
 
-								if (boneIndex < 2)
+								List<uint32>& affectedVerts = _vertsForCP[vertexMapping.cpIndex];
+								for (auto iVertexIndex = affectedVerts.First(); iVertexIndex; ++iVertexIndex)
 								{
-									skeletalMesh->vertices[vertIndex].boneIndices[boneIndex] = jointID;
-									skeletalMesh->vertices[vertIndex].boneWeights[boneIndex] = 1.f;
+									VertexSkeletal& vertex = mesh->vertices[*iVertexIndex];
+
+									for (int slot = 0; slot < VertexSkeletal::BONE_COUNT; ++slot)
+										if (vertex.boneWeights[slot] == 0.f)
+										{
+											vertex.boneIndices[slot] = *iVertexIndex;
+											vertex.boneWeights[slot] = vertexMapping.weight;
+										}
 								}
 							}
 						}
 					}
+
+					return mesh;
 				}
 
-				skeletalMesh->elements = std::move(_elements);
-				skeletalMesh->skeleton = std::move(_skeleton);
+				//Load as static mesh
+				{
+					Mesh_Static* mesh = new Mesh_Static();
+					mesh->vertices.SetSize(_vertices.GetSize());
+					mesh->elements.SetSize(_elements.GetSize());
 
-				skeletalMesh->bounds.RecalculateSphereBounds();
+					Vector3 boundsMin, boundsMax;
 
-				return skeletalMesh;
-			}
+					//Copy vertex info
+					for (uint32 i = 0; i < _totalVertexCount; ++i)
+					{
+						const Vertex& src = _vertices[i];
+						Vertex17F& dest = mesh->vertices[i];
+						dest.pos = src.pos;
+						dest.normal = src.normal;
+						dest.uv = src.uv;
 
-			{
-				Mesh_Static* staticMesh = new Mesh_Static();
+						boundsMin = Vector3(Utilities::Min(boundsMin[0], src.pos[0]), Utilities::Min(boundsMin[1], src.pos[1]), Utilities::Min(boundsMin[2], src.pos[2]));
+						boundsMax = Vector3(Utilities::Max(boundsMax[0], src.pos[0]), Utilities::Max(boundsMax[1], src.pos[1]), Utilities::Max(boundsMax[2], src.pos[2]));
+					}
 
-				staticMesh->vertices = std::move(_vertices);
+					//Bounds
+					mesh->bounds.min = boundsMin;
+					mesh->bounds.max = boundsMax;
+					mesh->bounds.RecalculateSphereBounds();
 
-				staticMesh->elements = std::move(_elements);
-				staticMesh->bounds.RecalculateSphereBounds();
+					//Elements & TBN
+					for (size_t i = 0; i < _elements.GetSize(); ++i)
+					{
+						mesh->elements[i] = _elements[i];
 
-				return staticMesh;
+						if ((i - 2) % 3 == 0)
+							Vertex17F::CalculateTangents(mesh->vertices[0], mesh->vertices[1], mesh->vertices[2]);
+					}
+
+					return mesh;
+				}
 			}
 		}
 
+		fbxImporter->Destroy();
 		return nullptr;
 	}
 };
 
-Mesh* EditorIO::ReadFBXMesh(FbxManager *fbxManager, const char* filename)
+Mesh* EditorIO::ReadFBXMesh(FbxManager* fbxManager, const char* filename)
 {
-	FbxImporter* fbxImporter = FbxImporter::Create(fbxManager, "");
-
-	if (fbxImporter->Initialize(filename, -1, fbxManager->GetIOSettings()))
-	{
-		return FbxMeshDataImporter().Import(fbxManager, fbxImporter);
-	}
-
-	return nullptr;
-}
-
-void FBXEvaluateAnimForNode(FbxNode* node, Animation& anim, float startTime, float endTime, float frameRate)
-{
-	String name = node->GetName();
-
-	FbxTime time;
-	time.SetSecondDouble(0.0);
-
-	float frameTime = 1.f / frameRate;
-
-	AnimationTrack<Vector3>& translations = anim.GetTranslationTrack(name);
-	AnimationTrack<Quaternion>& rotations = anim.GetRotationTrack(name);
-	AnimationTrack<Vector3>& scales = anim.GetScalingTrack(name);
-
-	for (float t = startTime; t < endTime; t += frameTime)
-	{
-		time.SetSecondDouble(t);
-		translations.AddKey(t, FbxD3ToVector3(node->LclTranslation.EvaluateValue(time)));
-		rotations.AddKey(t, FbxD3ToVector3(node->LclRotation.EvaluateValue(time)));
-		scales.AddKey(t, FbxD3ToVector3(node->LclScaling.EvaluateValue(time)));
-	}
-
-	for (int i = 0; i < node->GetChildCount(); ++i)
-		FBXEvaluateAnimForNode(node->GetChild(i), anim, startTime, endTime, frameRate);
-}
-
-FbxNode* FindSkeletonRoot(FbxNode* node)
-{
-	if (node->GetSkeleton())
-		return node;
-
-	for (int i = 0; i < node->GetChildCount(); ++i)
-	{
-		FbxNode* foundNode = FindSkeletonRoot(node->GetChild(i));
-		if (foundNode)
-			return foundNode;
-	}
-
-	return nullptr;
+	return FbxMeshDataImporter().Import(fbxManager, filename);
 }
 
 Animation* EditorIO::ReadFBXAnimation(FbxManager* fbxManager, const char* filename)
 {
-	FbxImporter* importer = FbxImporter::Create(fbxManager, "");
-
-	Skeleton skeleton;
-
-	if (importer->Initialize(filename, -1, fbxManager->GetIOSettings()))
-	{
-		FbxScene* scene = FbxScene::Create(fbxManager, "importScene");
-
-		importer->Import(scene);
-
-		importer->Destroy();
-
-		FbxNode* root = scene->GetRootNode();
-
-		if (root)
-		{
-			FbxNode* skeletonRoot = FindSkeletonRoot(root);
-
-			if (skeletonRoot)
-			{
-				Animation* anim = new Animation();
-
-				auto ts = scene->GetSrcObject<FbxAnimStack>(0)->GetLocalTimeSpan();
-
-				FBXEvaluateAnimForNode(skeletonRoot, *anim, 
-					ts.GetStart().GetMilliSeconds() / 1000.f, ts.GetStop().GetMilliSeconds() / 1000.f, 30.f);
-			
-				return anim;
-			}
-		}
-
-
-		scene->Destroy();
-	}
-
 	return nullptr;
 }

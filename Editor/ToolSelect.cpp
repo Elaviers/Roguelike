@@ -338,6 +338,12 @@ void ToolSelect::Render(EnumRenderChannel channels) const
 
 void ToolSelect::Select(Entity* object)
 {
+	if (object == nullptr)
+	{
+		ClearSelection();
+		return;
+	}
+
 	if (Engine::Instance().pInputManager->IsKeyDown(Keycode::CTRL))
 		_selectedObjects.Add(Engine::Instance().pObjectTracker->Track(object));
 	else

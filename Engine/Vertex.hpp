@@ -15,7 +15,7 @@
 struct Vertex17F
 {
 	Vector3 pos;
-	Vector2 uvOffset;
+	Vector2 uv;
 	Vector3 colour = Vector3(1.f, 1.f, 1.f);
 
 	Vector3 tangent;
@@ -36,25 +36,26 @@ struct Vertex17F
 	BITANGENT	float*3
 	NORMAL		float*3
 
-	BONEINDICES	int*2
-	BONEWEIGHTS	float*2
+	BONEINDICES	int*4
+	BONEWEIGHTS	float*4
 */
-struct Vertex19F2I
+struct VertexSkeletal
 {
 	Vector3 pos;
-	Vector2 uvOffset;
+	Vector2 uv;
 	Vector3 colour = Vector3(1.f, 1.f, 1.f);
 
 	Vector3 tangent;
 	Vector3 bitangent;
 	Vector3 normal;
 
-	#define BONE_COUNT 2
+	//Cannot be more than 4
+	constexpr const static int BONE_COUNT = 4;
 
 	uint32 boneIndices[BONE_COUNT] = {};
 	float boneWeights[BONE_COUNT] = {};
 
-	static void CalculateTangents(Vertex19F2I& vertex1, Vertex19F2I& vertex2, Vertex19F2I& vertex3);
+	static void CalculateTangents(VertexSkeletal& vertex1, VertexSkeletal& vertex2, VertexSkeletal& vertex3);
 };
 
 #define VERT14F_TRI(POS1, POS2, POS3, UV1, UV2, UV3, NORMAL) \

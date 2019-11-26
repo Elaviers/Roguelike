@@ -78,7 +78,6 @@ inline bool IsPartOfToken(char c, const char *delimiters, size_t delimiterCount)
 }
 
 Buffer<String> String::Split(const char *delimiters) const
-
 {
 	size_t delimiterCount = StringLength(delimiters);
 

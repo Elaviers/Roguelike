@@ -24,29 +24,20 @@ void Animation::Evaluate(Skeleton& outSkeleton, float time) const
 		auto rotationTrack = _rotationTracks.Get(j.name);
 		auto scalingTrack = _scalingTracks.Get(j.name);
 
+		Vector3 translation, scale;
+		Quaternion rotation;
+
 		if (translationTrack)
-		{
-			Vector3 value;
-			if (translationTrack->Evaluate(value, time))
-				j.localTransform.SetPosition(value);
-		}
+			translationTrack->Evaluate(translation, time);
 
 		if (rotationTrack)
-		{
-			Quaternion value;
-			if (rotationTrack->Evaluate(value, time))
-				j.localTransform.SetRotation(value);
-		}
+			rotationTrack->Evaluate(rotation, time);
 
 		if (scalingTrack)
-		{
-			Vector3 value;
-			if (scalingTrack->Evaluate(value, time))
-				j.localTransform.SetScale(value);
-		}
-	}
+			scalingTrack->Evaluate(scale, time);
 
-	outSkeleton.UpdateCache();
+		outSkeleton.SetSkinningForJoint(j.GetID(), j.bindingMatrix * Matrix::Transformation(translation, rotation, scale));
+	}
 }
 
 void Animation::_ReadData(BufferReader<byte> &iterator)

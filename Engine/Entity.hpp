@@ -284,7 +284,6 @@ public:
 	//Commands
 	void CMD_List(const Buffer<String>& args);
 	void CMD_Ent(const Buffer<String>& args);
-	void CMD_ListProperties(const Buffer<String>& args);
 
 protected:
 	template<typename T>

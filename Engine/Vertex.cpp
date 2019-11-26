@@ -4,9 +4,9 @@ template<typename T>
 void _CalculateTangents(T& vertex1, T& vertex2, T& vertex3)
 {
 	Vector3 edge1 = vertex2.pos - vertex1.pos;
-	Vector2 deltaUV1 = vertex2.uvOffset - vertex1.uvOffset;
+	Vector2 deltaUV1 = vertex2.uv - vertex1.uv;
 	Vector3 edge2 = vertex3.pos - vertex1.pos;
-	Vector2 deltaUV2 = vertex3.uvOffset - vertex1.uvOffset;
+	Vector2 deltaUV2 = vertex3.uv - vertex1.uv;
 
 	float f = 1.0f / (deltaUV1[0] * deltaUV2[1] - deltaUV2[0] * deltaUV1[1]);
 
@@ -30,7 +30,7 @@ void Vertex17F::CalculateTangents(Vertex17F &vertex1, Vertex17F &vertex2, Vertex
 	_CalculateTangents(vertex1, vertex2, vertex3);
 }
 
-void Vertex19F2I::CalculateTangents(Vertex19F2I &vertex1, Vertex19F2I& vertex2, Vertex19F2I& vertex3)
+void VertexSkeletal::CalculateTangents(VertexSkeletal &vertex1, VertexSkeletal& vertex2, VertexSkeletal& vertex3)
 {
 	_CalculateTangents(vertex1, vertex2, vertex3);
 }
