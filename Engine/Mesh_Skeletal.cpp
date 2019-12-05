@@ -18,7 +18,7 @@ void Mesh_Skeletal::_ReadData(BufferReader<byte>& iterator)
 	if (version == (byte)FileVersion::V1)
 	{
 		byte bonesPerVertex = iterator.Read_byte();
-		if (bonesPerVertex != 2)
+		if (bonesPerVertex != VertexSkeletal::BONE_COUNT)
 		{
 			Debug::Error("I can't be bothered to load this mesh because it does not have 2 bones per vertex");
 			return;
@@ -34,10 +34,10 @@ void Mesh_Skeletal::_ReadData(BufferReader<byte>& iterator)
 			vertices[i].normal = iterator.Read_vector3();
 			vertices[i].uv = iterator.Read_vector2();
 
-			for (int i = 0; i < bonesPerVertex; ++i)
+			for (int j = 0; j < bonesPerVertex; ++j)
 			{
-				vertices[i].boneIndices[i] = iterator.Read_uint32();
-				vertices[i].boneWeights[i] = iterator.Read_float();
+				vertices[i].boneIndices[j] = iterator.Read_uint32();
+				vertices[i].boneWeights[j] = iterator.Read_float();
 			}
 		}
 
@@ -71,8 +71,6 @@ void Mesh_Skeletal::_ReadData(BufferReader<byte>& iterator)
 
 void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 {
-	static const byte bonesPerVertex = 2;
-
 	uint32 jointCount = (uint32)skeleton.GetJointCount();
 
 	Buffer<const Joint*> jointBuffer;
@@ -105,7 +103,7 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 
 	iterator.Write_byte(ASSET_MESH_SKELETAL);
 	iterator.Write_byte(CURRENT_FILE_VERSION);
-	iterator.Write_byte(bonesPerVertex);
+	iterator.Write_byte(VertexSkeletal::BONE_COUNT);
 
 	iterator.Write_uint32((uint32)vertices.GetSize());
 
@@ -117,10 +115,10 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 		iterator.Write_vector3(v.normal);
 		iterator.Write_vector2(v.uv);
 		
-		for (int i = 0; i < bonesPerVertex; ++i)
+		for (int j = 0; j < VertexSkeletal::BONE_COUNT; ++j)
 		{
-			iterator.Write_uint32(v.boneIndices[i]);
-			iterator.Write_float(v.boneWeights[i]);
+			iterator.Write_uint32(v.boneIndices[j]);
+			iterator.Write_float(v.boneWeights[j]);
 		}
 	}
 

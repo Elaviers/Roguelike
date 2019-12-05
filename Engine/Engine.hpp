@@ -6,6 +6,7 @@
 
 class Console;
 class Entity;
+class AnimationManager;
 class AudioManager;
 class DebugManager;
 class FontManager;
@@ -17,13 +18,15 @@ class TextureManager;
 enum EngineCreateFlags
 {
 	ENG_CONSOLE = 0x1,
-	ENG_AUDIOMGR = 0x2,
-	ENG_DBGMGR = 0x4,
-	ENG_FONTMGR = 0x8,
-	ENG_INPUTMGR = 0x10,
-	ENG_MATERIALMGR = 0x20,
-	ENG_MODELMGR = 0x40,
-	ENG_TEXTUREMGR = 0x80,
+	ENG_ANIMATIONMGR = 0x2,
+	ENG_AUDIOMGR = 0x4,
+	ENG_DBGMGR = 0x8,
+	ENG_FONTMGR = 0x10,
+	ENG_INPUTMGR = 0x20,
+	ENG_MATERIALMGR = 0x40,
+	ENG_MODELMGR = 0x80,
+	ENG_TEXTUREMGR = 0x100,
+
 	ENG_OBJTRACKER = 0x8000,
 
 	ENG_ALL = 0xFFFF
@@ -43,8 +46,9 @@ public:
 	Registry registry;
 
 	Console			*pConsole = nullptr;
-	Entity		*pWorld = nullptr;
+	Entity			*pWorld = nullptr;
 	
+	AnimationManager*pAnimationManager = nullptr;
 	AudioManager	*pAudioManager = nullptr;
 	DebugManager	*pDebugManager = nullptr;
 	FontManager		*pFontManager = nullptr;

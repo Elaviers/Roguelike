@@ -9,6 +9,7 @@
 #include <Engine/IO.hpp>
 #include <Engine/EntLight.hpp>
 #include <Engine/EntRenderable.hpp>
+#include <Engine/Mesh_Skeletal.hpp>
 #include <Engine/Ray.hpp>
 #include "EditorIO.hpp"
 #include "resource.h"
@@ -246,6 +247,7 @@ void Editor::Frame()
 	Engine::Instance().pDebugManager->Update(_deltaTime);
 	Engine::Instance().pDebugManager->AddToWorld(DebugFrustum::FromCamera(CameraRef(0)));
 
+	_level.UpdateAll(_deltaTime);
 	Render();
 
 	_deltaTime = _timer.SecondsSinceStart();
@@ -311,7 +313,7 @@ void Editor::RenderViewport(int index, Direction dir)
 			}
 		}
 
-		_level.Render(CameraRef(0), _litRenderChannels);
+		_level.RenderAll(CameraRef(0), _litRenderChannels);
 	}
 
 	//UNLIT PASS
@@ -319,7 +321,7 @@ void Editor::RenderViewport(int index, Direction dir)
 	camera.Use();
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
-	_level.Render(CameraRef(0), EnumRenderChannel(_unlitRenderChannels | (_drawEditorFeatures ? RenderChannel::EDITOR : 0)));
+	_level.RenderAll(CameraRef(0), EnumRenderChannel(_unlitRenderChannels | (_drawEditorFeatures ? RenderChannel::EDITOR : 0)));
 	
 	if (_drawEditorFeatures)
 	{
@@ -344,7 +346,7 @@ void Editor::RenderViewport(int index, Direction dir)
 
 	glDepthFunc(GL_ALWAYS);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
-	_level.Render(CameraRef(0), RenderChannel::SPRITE);
+	_level.RenderAll(CameraRef(0), RenderChannel::SPRITE);
 	glDepthFunc(GL_LEQUAL);
 
 	_viewports[index].SwapBuffers();
@@ -725,11 +727,14 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 			case ID_IMPORT_ANIMATION:
 			{
+				/*
 				String filename = EditorIO::OpenFileDialog(L"\\Data\\Animations", openAnimationFilter);
 				if (filename.GetLength() == 0)
 					break;
 				
-				Animation* animation = EditorIO::ReadFBXAnimation(editor->_fbxManager, filename.GetData());
+
+
+				Animation* animation = EditorIO::ReadFBXAnimation(editor->_fbxManager, filename.GetData(), skeleton);
 
 				if (animation)
 				{
@@ -739,6 +744,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 					else
 						Debug::Error("Okay, I guess you don't want to import an animation after all...");
 				}
+				*/
 			}
 			break;
 
@@ -766,7 +772,23 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 					String dest = EditorIO::SaveFileDialog(L"\\Data\\Models", saveModelFilter);
 
 					if (dest.GetLength())
+					{
 						IO::WriteFile(dest.GetData(), mesh->GetAsData());
+					
+						Mesh_Skeletal* skeletal = dynamic_cast<Mesh_Skeletal*>(mesh);
+						if (skeletal && ::MessageBox(NULL, "Do you want to import the animation too?", "Hey", MB_YESNO) == IDYES)
+						{
+							Animation* anim = EditorIO::ReadFBXAnimation(editor->_fbxManager, filename.GetData(), skeletal->skeleton);
+
+							if (anim)
+							{
+								String animDest = EditorIO::SaveFileDialog(L"\\Data\\Animations", saveAnimationFilter);
+
+								if (animDest.GetLength())
+									IO::WriteFile(animDest.GetData(), anim->GetAsData());
+							}
+						}
+					}
 					else
 						Debug::Error("Umm.. I guess you don't want that model imported then.");
 				}

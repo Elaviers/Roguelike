@@ -212,7 +212,7 @@ public:
 
 	void CloneChildrenFrom(const Entity &src)
 	{
-		for (uint32 i = 0; i < src._children.GetSize(); ++i)
+		for (size_t i = 0; i < src._children.GetSize(); ++i)
 			src._children[i]->Clone()->SetParent(this);
 	}
 
@@ -242,9 +242,11 @@ public:
 	byte GetFlags() const { return _flags; }
 	void SetFlags(byte flags) { _flags = flags; }
 
-	virtual void Update() {}
+	virtual void Update(float deltaTime) {}
 	virtual void Render(EnumRenderChannel channels) const {}
-	void Render(const EntCamera &camera, EnumRenderChannel channels) const;
+
+	void UpdateAll(float deltaTime);
+	void RenderAll(const EntCamera &camera, EnumRenderChannel channels) const;
 
 	virtual const PropertyCollection& GetProperties();
 

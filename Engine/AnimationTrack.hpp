@@ -22,8 +22,11 @@ class AnimationTrack
 			}
 		}
 
-		return -1;
+		//We are past the last keyframe
+		return _keyframes.GetSize() - 1;
 	}
+
+	static bool _TypesAreAlmostEqual(const T& a, const T& b);
 
 public:
 	AnimationTrack() {}
@@ -33,11 +36,15 @@ public:
 
 	void AddKey(float time, const T& value, byte interp = INTERP_LINEAR)
 	{
-		if (_keyframes.GetSize() != 0 || time > _keyframes.Last().time)
+		if (_keyframes.GetSize() == 0)
 			_keyframes.Add(Keyframe<T>(time, value, interp));
+		else if (time > _keyframes.Last().time)
+		{
+			if (!_TypesAreAlmostEqual(value, _keyframes.Last().value))
+				_keyframes.Add(Keyframe<T>(time, value, interp));
+		}
 		else
 			Debug::PrintLine("ERROR: Right now you can't add keyframes that have lower time values than the last one in the buffer");
-
 	}
 
 	const Keyframe<T>* GetKey(float time) const

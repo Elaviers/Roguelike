@@ -21,7 +21,7 @@ public:
 
 	static Animation* FromData(const Buffer<byte>&);
 
-	void Evaluate(Skeleton& outSkeleton, float time) const;
+	void Evaluate(Buffer<Mat4>& outSkinningMatrices, const Skeleton& skeleton, float time) const;
 
 	AnimationTrack<Vector3>& GetTranslationTrack(const String& joint) { return _translationTracks[joint]; }
 	AnimationTrack<Quaternion>& GetRotationTrack(const String& joint) { return _rotationTracks[joint]; }

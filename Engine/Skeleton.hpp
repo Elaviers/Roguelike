@@ -8,7 +8,6 @@ private:
 	int _nextJointID;
 
 	List<Joint> _joints;
-	Buffer<Mat4> _skinningMatrices;
 
 	bool _CanAddJoint(const Joint *parent) const
 	{
@@ -25,7 +24,7 @@ private:
 public:
 	Skeleton() : _nextJointID(0) {}
 
-	Skeleton(const Skeleton& other) : _nextJointID(other._nextJointID), _joints(other._joints), _skinningMatrices(other._skinningMatrices) {}
+	Skeleton(const Skeleton& other) : _nextJointID(other._nextJointID), _joints(other._joints) {}
 
 	Skeleton(Skeleton&& other) noexcept : _nextJointID(other._nextJointID), _joints(other._joints)
 	{
@@ -39,7 +38,6 @@ public:
 	{
 		_nextJointID = other._nextJointID;
 		_joints = other._joints;
-		_skinningMatrices = other._skinningMatrices;
 
 		return *this;
 	}
@@ -64,11 +62,7 @@ public:
 	Joint* CreateJoint(Joint *parent)
 	{
 		if (_CanAddJoint(parent))
-		{
 			return &*_joints.Add(Joint(_nextJointID++, parent));
-
-			_skinningMatrices.SetSize(_joints.GetSize());
-		}
 
 		return nullptr;
 	}
@@ -88,8 +82,4 @@ public:
 
 		return nullptr;
 	}
-
-	void SetSkinningForJoint(int jointId, Mat4 skinning) { _skinningMatrices[jointId] = skinning; }
-
-	void ToShader() const;
 };

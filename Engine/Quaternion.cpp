@@ -11,13 +11,23 @@ Quaternion::Quaternion(const Vector3& axis, float angle)
 	_w = Maths::CosineDegrees(angle / 2.f);
 }
 
-Quaternion::Quaternion(const Vector3& euler)
+Quaternion Quaternion::FromEulerXYZ(const Vector3& euler)
 {
 	Quaternion pitch = Quaternion(VectorMaths::V3X, euler[0]);
 	Quaternion yaw = Quaternion(VectorMaths::V3Y, -euler[1]);
 	Quaternion roll = Quaternion(VectorMaths::V3Z, euler[2]);
 
-	*this = roll * pitch * yaw;
+	return pitch * yaw * roll;
+	return roll * yaw * pitch;
+}
+
+Quaternion Quaternion::FromEulerYXZ(const Vector3& euler)
+{
+	Quaternion pitch = Quaternion(VectorMaths::V3X, euler[0]);
+	Quaternion yaw = Quaternion(VectorMaths::V3Y, -euler[1]);
+	Quaternion roll = Quaternion(VectorMaths::V3Z, euler[2]);
+
+	return roll * pitch * yaw;
 }
 
 Vector3 Quaternion::ToEuler() const

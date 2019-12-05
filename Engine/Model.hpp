@@ -33,6 +33,7 @@ public:
 
 	GLMeshRenderer& MeshRenderer() { return _meshRenderer; }
 
+	const Mesh* GetMesh() const { return _mesh; }
 	const Bounds& GetBounds() const { return _mesh->bounds; }
 	const Collider* GetCollider() const { return _collider; }
 	const String& GetDefaultMaterialName() const { return _defaultMaterialName; }

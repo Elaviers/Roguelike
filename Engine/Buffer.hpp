@@ -51,10 +51,19 @@ public:
 
 	void SetSize(size_t size)
 	{
-		T *newData = new T[size];
-		auto minSize = size < _size ? size : _size;
-		for (size_t i = 0; i < minSize; ++i)
-			newData[i] = std::move(_data[i]);
+		if (_size == size)
+			return;
+
+		T* newData;
+		if (size != 0)
+		{
+			newData = new T[size];
+			auto minSize = size < _size ? size : _size;
+			for (size_t i = 0; i < minSize; ++i)
+				newData[i] = std::move(_data[i]);
+		}
+		else
+			newData = nullptr;
 
 		delete[] _data;
 		_data = newData;

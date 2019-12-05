@@ -305,6 +305,7 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimationManager.cpp" />
+    <ClCompile Include="AnimationTrack.cpp" />
     <ClCompile Include="AudioUtilities.cpp" />
     <ClCompile Include="Colour.cpp" />
     <ClCompile Include="Console.cpp" />
@@ -328,7 +329,6 @@
     <ClCompile Include="MH2.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="SHA256.cpp" />
-    <ClCompile Include="Skeleton.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Bounds.cpp" />

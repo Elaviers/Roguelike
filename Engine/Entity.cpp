@@ -62,13 +62,21 @@ Mat4 Entity::GetInverseTransformationMatrix() const
 	return _transform.GetInverseTransformationMatrix();
 }
 
-void Entity::Render(const EntCamera &camera, EnumRenderChannel channels) const
+void Entity::UpdateAll(float deltaTime)
+{
+	Update(deltaTime);
+
+	for (size_t i = 0; i < _children.GetSize(); ++i)
+		_children[i]->UpdateAll(deltaTime);
+}
+
+void Entity::RenderAll(const EntCamera &camera, EnumRenderChannel channels) const
 {
 	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags & FLAG_DBG_ALWAYS_DRAW)
 		Render(channels);
 
-	for (uint32 i = 0; i < _children.GetSize(); ++i)
-		_children[i]->Render(camera, channels);
+	for (size_t i = 0; i < _children.GetSize(); ++i)
+		_children[i]->RenderAll(camera, channels);
 }
 
 void Entity::Delete()
@@ -150,7 +158,7 @@ void Entity::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> &str
 		}
 	}
 
-	for (uint32 i = 0; i < _children.GetSize(); ++i)
+	for (size_t i = 0; i < _children.GetSize(); ++i)
 		_children[i]->WriteAllToFile(buffer, strings);
 }
 
@@ -202,12 +210,12 @@ Buffer<RaycastResult> Entity::Raycast(const Ray &ray)
 	RaycastResult result;
 	Buffer<RaycastResult> results;
 
-	for (uint32 i = 0; i < _children.GetSize(); ++i)
+	for (size_t i = 0; i < _children.GetSize(); ++i)
 		if (_children[i]->OverlapsRay(ray, result))
 		{
 			result.object = _children[i];
 
-			uint32 index = 0;
+			size_t index = 0;
 			while (index < results.GetSize())
 				if (results[index].entryTime > result.entryTime)
 					break;
@@ -223,7 +231,7 @@ Buffer<Entity*> Entity::FindOverlaps(const Collider &collider, const Transform &
 {
 	Buffer<Entity*> results;
 
-	for (uint32 i = 0; i < _children.GetSize(); ++i)
+	for (size_t i = 0; i < _children.GetSize(); ++i)
 		if (_children[i]->OverlapsCollider(collider, _transform))
 			results.Add(_children[i]);
 
@@ -235,7 +243,7 @@ Entity& Entity::operator=(Entity&& other) noexcept
 	SetParent(other._parent);
 	other.SetParent(nullptr);
 
-	for (uint32 i = 0; i < other._children.GetSize(); ++i)
+	for (size_t i = 0; i < other._children.GetSize(); ++i)
 		other._children[i]->SetParent(this);
 
 	_transform = other._transform;

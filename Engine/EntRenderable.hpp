@@ -7,13 +7,15 @@
 
 class EntRenderable : public Entity
 {
-private:
+protected:
 	SharedPointer<const Model> _model;
 	SharedPointer<const Material> _material;
 
 	Colour _colour;
 
 	bool _materialIsDefault;
+
+	virtual void _OnModelChanged() {}
 
 public:
 	Entity_FUNCS(EntRenderable, EntityIDS::RENDERABLE)
@@ -46,6 +48,8 @@ public:
 			SetMaterial(model->GetDefaultMaterialName());
 			_materialIsDefault = true;
 		}
+
+		_OnModelChanged();
 	}
 
 	bool MaterialIsDefault() const { return _materialIsDefault; }

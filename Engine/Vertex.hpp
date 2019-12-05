@@ -36,7 +36,7 @@ struct Vertex17F
 	BITANGENT	float*3
 	NORMAL		float*3
 
-	BONEINDICES	int*4
+	BONEINDICES	uint32*4
 	BONEWEIGHTS	float*4
 */
 struct VertexSkeletal
@@ -52,7 +52,7 @@ struct VertexSkeletal
 	//Cannot be more than 4
 	constexpr const static int BONE_COUNT = 4;
 
-	uint32 boneIndices[BONE_COUNT] = {};
+	float boneIndices[BONE_COUNT] = {};
 	float boneWeights[BONE_COUNT] = {};
 
 	static void CalculateTangents(VertexSkeletal& vertex1, VertexSkeletal& vertex2, VertexSkeletal& vertex3);

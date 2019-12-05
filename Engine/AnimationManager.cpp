@@ -2,8 +2,10 @@
 
 Animation* AnimationManager::_CreateResource(const String &name, const Buffer<byte> &data)
 {
-	Animation* animation = Animation::FromData(data);
+	Animation* anim = Animation::FromData(data);
 
+	if (anim == nullptr)
+		Debug::Error(CSTR("Could not load animation \"", name, '\"'));
 
-	return nullptr;
+	return anim;
 }

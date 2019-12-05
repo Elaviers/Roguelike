@@ -101,6 +101,25 @@ public:
 
 	friend SquareMatrix<float, 3> Inverse(const SquareMatrix<float, 3>&);
 	friend SquareMatrix<float, 4> Inverse(const SquareMatrix<float, 4>&);
+
+	String ToString(const String& newLine = "\n")
+	{
+		String result;
+
+		for (int r = 0; r < SIZE; ++r)
+		{
+			for (int c = 0; c < SIZE; ++c)
+			{
+				if (c > 0) result += ", ";
+
+				result += String::From(_data[r][c]);
+			}
+
+			result += newLine;
+		}
+
+		return result;
+	}
 };
 
 typedef SquareMatrix<float, 3> Mat3;

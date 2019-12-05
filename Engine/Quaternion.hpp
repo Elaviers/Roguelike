@@ -28,11 +28,16 @@ public:
 
 	Quaternion(const Vector3& axis, float angle);
 
-	Quaternion(const Vector3& euler);
+	Quaternion(const Vector3& euler) { *this = FromEulerYXZ(euler); }
 
 	Quaternion(const Quaternion& other) : _data(other._data) {}
 
 	~Quaternion() {}
+
+	static Quaternion FromEulerYXZ(const Vector3& euler);
+	static Quaternion FromEulerXYZ(const Vector3& euler);
+
+	const Vector4& GetData() const { return _data; }
 
 	Vector3 ToEuler() const;
 
@@ -75,4 +80,14 @@ public:
 	}
 
 	static Quaternion Lerp(const Quaternion& from, const Quaternion& to, float alpha);
+
+	bool operator!=(const Quaternion& other) const
+	{
+		return _data != other._data;
+	}
+
+	bool operator==(const Quaternion& other) const
+	{
+		return _data == other._data;
+	}
 };

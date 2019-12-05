@@ -22,6 +22,26 @@ inline Mat4 FbxAMatrixToMat4(const FbxAMatrix& m)
 	return result;
 }
 
+inline FbxAMatrix Mat4ToFbxAMatrix(const Mat4& m)
+{
+	FbxAMatrix result;
+	for (int r = 0; r < 4; ++r)
+		for (int c = 0; c < 4; ++c)
+			result.mData[r][c] = m[r][c];
+
+	return result;
+}
+
+inline void FbxSpaceToEngineSpace(FbxAMatrix& m)
+{
+	m.mData[3][2] *= -1.f;
+}
+
+inline void EngineSpaceToFbxSpace(FbxAMatrix& m)
+{
+	m.mData[3][2] *= -1.f;
+}
+
 class FbxMeshDataImporter
 {
 	struct Vertex
@@ -30,12 +50,12 @@ class FbxMeshDataImporter
 		Vector3 normal;
 		Vector2 uv;
 
-		uint32 cpIndex;
+		uint32 cpIndex = 0;
 	};
 
 	struct VertexMapping
 	{
-		uint32 cpIndex;
+		uint32 cpIndex = 0;
 		float weight;
 	};
 
@@ -57,7 +77,7 @@ class FbxMeshDataImporter
 			if (_vertices[i].pos == vertex.pos && _vertices[i].normal == vertex.normal && _vertices[i].uv == vertex.uv)
 				return i;
 
-		uint32 index = _vertices.GetSize();
+		uint32 index = (uint32)_vertices.GetSize();
 		_vertices.Add(vertex);
 		_vertsForCP[vertex.cpIndex].Add(index);
 		_totalVertexCount++;
@@ -67,8 +87,14 @@ class FbxMeshDataImporter
 	Vertex _ReadMeshVertex(const FbxMesh* mesh, int polyIndex, int vertIndex, const char* uvSet)
 	{
 		FbxAMatrix fbxTransform = mesh->GetNode()->EvaluateGlobalTransform();
+
+		//Flip Z on import
+		fbxTransform.mData[0][2] *= -1.f;
+		fbxTransform.mData[1][2] *= -1.f;
+		fbxTransform.mData[2][2] *= -1.f;
+		fbxTransform.mData[3][2] *= -1.f;
+
 		Mat4 transform = FbxAMatrixToMat4(fbxTransform);
-		transform.MultiplyColumn(0, -1.f);
 
 		Vertex result;
 		
@@ -79,9 +105,12 @@ class FbxMeshDataImporter
 		result.cpIndex = (uint32)cpIndex;
 		result.pos = FbxVector4ToVector3(mesh->mControlPoints[result.cpIndex]) * transform;
 
-		FbxVector4 normal;
-		if (mesh->GetPolygonVertexNormal(polyIndex, vertIndex, normal))
-			result.normal = FbxVector4ToVector3(normal) * transform;
+		FbxVector4 fbxNormal;
+		if (mesh->GetPolygonVertexNormal(polyIndex, vertIndex, fbxNormal))
+		{
+			Vector4 normal = Vector4(FbxVector4ToVector3(fbxNormal), 0.f) * transform;
+			result.normal = Vector3(normal[0], normal[1], normal[2]).Normalise();
+		}
 
 		FbxVector2 uv;
 		bool unmapped;
@@ -142,6 +171,8 @@ class FbxMeshDataImporter
 				}
 			}
 
+			FbxAMatrix nodeTransform = node->EvaluateGlobalTransform();
+
 			for (int i = 0; i < mesh->GetDeformerCount(); ++i)
 			{
 				FbxDeformer* deformer = mesh->GetDeformer(i);
@@ -169,9 +200,45 @@ class FbxMeshDataImporter
 							Joint* joint = _skeleton.GetJointWithName(cluster->GetName());
 							if (joint)
 							{
-								FbxAMatrix fbxBinding = cluster->GetLink()->EvaluateGlobalTransform().Inverse();
-								joint->bindingMatrix = FbxAMatrixToMat4(fbxBinding);
-								joint->bindingMatrix.MultiplyColumn(0, -1.f);
+								FbxAMatrix binding = cluster->GetLink()->EvaluateGlobalTransform().Inverse();
+								FbxSpaceToEngineSpace(binding);
+								joint->bindingMatrix = FbxAMatrixToMat4(binding);
+
+								FbxAMatrix lt = cluster->GetLink()->EvaluateLocalTransform();
+								FbxSpaceToEngineSpace(lt);
+
+								FbxAMatrix gt = cluster->GetLink()->EvaluateGlobalTransform();
+								
+								EngineSpaceToFbxSpace(binding);
+								FbxAMatrix startSkinning = gt * binding;
+								FbxSpaceToEngineSpace(startSkinning);
+
+								FbxSpaceToEngineSpace(gt);
+
+								FbxAMatrix trueStartSkinning = cluster->GetLink()->EvaluateGlobalTransform() * cluster->GetLink()->EvaluateGlobalTransform().Inverse();
+								FbxSpaceToEngineSpace(trueStartSkinning);
+
+								Debug::PrintLine(cluster->GetName());
+								Debug::PrintLine("{");
+								Debug::PrintLine(CSTR("\tNodeTranslation: ", FbxVector4ToVector3(nodeTransform.GetT())));
+								Debug::PrintLine(CSTR("\tNodeRotation: ", FbxVector4ToVector3(nodeTransform.GetR())));
+								Debug::PrintLine(CSTR("\tNodeScaling: ", FbxVector4ToVector3(nodeTransform.GetS())));
+								Debug::PrintLine(CSTR("\n\tLocalLinkTranslation: ", FbxVector4ToVector3(lt.GetT())));
+								Debug::PrintLine(CSTR("\tLocalLinkRotation: ", FbxVector4ToVector3(lt.GetR())));
+								Debug::PrintLine(CSTR("\tLocalLinkScaling: ", FbxVector4ToVector3(lt.GetS())));
+								Debug::PrintLine(CSTR("\n\tGlobalLinkTranslation: ", FbxVector4ToVector3(gt.GetT())));
+								Debug::PrintLine(CSTR("\tGlobalLinkRotation: ", FbxVector4ToVector3(gt.GetR())));
+								Debug::PrintLine(CSTR("\tGlobalLinkScaling: ", FbxVector4ToVector3(gt.GetS())));
+								Debug::PrintLine(CSTR("\n\tBindingTranslation: ", FbxVector4ToVector3(binding.GetT())));
+								Debug::PrintLine(CSTR("\tBindingRotation: ", FbxVector4ToVector3(binding.GetR())));
+								Debug::PrintLine(CSTR("\tBindingScaling: ", FbxVector4ToVector3(binding.GetS())));
+								Debug::PrintLine(CSTR("\n\tInitialSkinningTranslation: ", FbxVector4ToVector3(startSkinning.GetT())));
+								Debug::PrintLine(CSTR("\tInitialSkinningRotation: ", FbxVector4ToVector3(startSkinning.GetR())));
+								Debug::PrintLine(CSTR("\tInitialSkinningScaling: ", FbxVector4ToVector3(startSkinning.GetS())));
+								Debug::PrintLine(CSTR("\n\tTrueInitialSkinningTranslation: ", FbxVector4ToVector3(trueStartSkinning.GetT())));
+								Debug::PrintLine(CSTR("\tTrueInitialSkinningRotation: ", FbxVector4ToVector3(trueStartSkinning.GetR())));
+								Debug::PrintLine(CSTR("\tTrueInitialSkinningScaling: ", FbxVector4ToVector3(trueStartSkinning.GetS())));
+								Debug::PrintLine("}");
 							}
 							else Debug::Error(CSTR("Warning: FBX deformer \"", cluster->GetName(), "\" does not have a corresponding joint!"));
 						}
@@ -232,11 +299,10 @@ public:
 		{
 			FbxScene* scene = FbxScene::Create(fbxManager, "import");
 			
-			FbxAxisSystem::OpenGL.ConvertScene(scene);
-
 			fbxImporter->Import(scene);
 			fbxImporter->Destroy();
-			
+			FbxAxisSystem::OpenGL.ConvertScene(scene);
+
 			FbxNode* root = scene->GetRootNode();
 			if (root)
 			{
@@ -289,9 +355,9 @@ public:
 						Buffer<VertexMapping>* vertGroups = _vertexGroups.Get(joint->name);
 						if (vertGroups)
 						{
-							for (size_t vertGroupIndex = 0; vertGroupIndex < vertGroups->GetSize(); ++vertGroupIndex)
+							for (size_t vgIndex = 0; vgIndex < vertGroups->GetSize(); ++vgIndex)
 							{
-								VertexMapping& vertexMapping = (*vertGroups)[vertGroupIndex];
+								VertexMapping& vertexMapping = (*vertGroups)[vgIndex];
 
 								List<uint32>& affectedVerts = _vertsForCP[vertexMapping.cpIndex];
 								for (auto iVertexIndex = affectedVerts.First(); iVertexIndex; ++iVertexIndex)
@@ -301,8 +367,9 @@ public:
 									for (int slot = 0; slot < VertexSkeletal::BONE_COUNT; ++slot)
 										if (vertex.boneWeights[slot] == 0.f)
 										{
-											vertex.boneIndices[slot] = *iVertexIndex;
+											vertex.boneIndices[slot] = (uint32)jointIndex;
 											vertex.boneWeights[slot] = vertexMapping.weight;
+											break;
 										}
 								}
 							}
@@ -362,7 +429,111 @@ Mesh* EditorIO::ReadFBXMesh(FbxManager* fbxManager, const char* filename)
 	return FbxMeshDataImporter().Import(fbxManager, filename);
 }
 
-Animation* EditorIO::ReadFBXAnimation(FbxManager* fbxManager, const char* filename)
+class FbxAnimationImporter
 {
-	return nullptr;
+	Skeleton* _skeleton;
+	Animation* _result;
+
+	float _startTime;
+	float _endTime;
+	float _frameLength;
+
+public:
+	FbxAnimationImporter(Skeleton& skeleton) : _skeleton(&skeleton), _result(nullptr), _startTime(0.f), _endTime(0.f), _frameLength(0.f) {}
+
+	void _ReadMesh(FbxNode* node)
+	{
+		FbxMesh* mesh = node->GetMesh();
+		if (mesh)
+		{
+			for (int i = 0; i < mesh->GetDeformerCount(); ++i)
+			{
+				FbxDeformer* deformer = mesh->GetDeformer(i);
+				auto deformerType = deformer->GetDeformerType();
+
+				if (deformerType == FbxDeformer::eSkin)
+				{
+					FbxSkin* skin = FbxCast<FbxSkin>(deformer);
+					if (skin)
+					{
+						FbxTime fbxTime;
+
+						for (float t = _startTime; t <= _endTime; t += _frameLength)
+						{
+							fbxTime.SetSecondDouble(t);
+
+							for (int j = 0; j < skin->GetClusterCount(); ++j)
+							{
+								auto cluster = skin->GetCluster(j);
+								const char* name = cluster->GetName();
+								Joint* joint = _skeleton->GetJointWithName(name);
+
+								if (joint)
+								{
+									FbxAMatrix binding = Mat4ToFbxAMatrix(joint->bindingMatrix);
+									EngineSpaceToFbxSpace(binding);
+
+									FbxAMatrix transform = cluster->GetLink()->EvaluateGlobalTransform(fbxTime) * binding;
+									FbxSpaceToEngineSpace(transform);
+
+									Vector3 fbxRotation = FbxVector4ToVector3(transform.GetR());
+									fbxRotation[1] *= -1.f;
+									fbxRotation[2] *= -1.f;
+
+									_result->GetTranslationTrack(name).	AddKey(t, FbxVector4ToVector3(transform.GetT()));
+									_result->GetRotationTrack(name).	AddKey(t, Quaternion::FromEulerXYZ(fbxRotation));
+									_result->GetScalingTrack(name).		AddKey(t, FbxVector4ToVector3(transform.GetS()));
+								}
+								else
+									Debug::Error(CSTR("Animation track \"", name, "\" has no corresponding joint!"));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void _ReadNodesRecursive(FbxNode* root)
+	{
+		if (root->GetMesh())
+			_ReadMesh(root);
+
+		for (int i = 0; i < root->GetChildCount(); ++i)
+			_ReadNodesRecursive(root->GetChild(i));
+	}
+
+	Animation* Import(FbxManager* fbxManager, const char* filename)
+	{
+		FbxImporter* fbxImporter = FbxImporter::Create(fbxManager, "");
+
+		if (fbxImporter->Initialize(filename, -1, fbxManager->GetIOSettings()))
+		{
+			FbxScene* scene = FbxScene::Create(fbxManager, "import");
+
+			fbxImporter->Import(scene);
+			fbxImporter->Destroy();
+			FbxAxisSystem::OpenGL.ConvertScene(scene);
+
+			FbxNode* root = scene->GetRootNode();
+			if (root)
+			{
+				_startTime = (float)scene->GetCurrentAnimationStack()->GetLocalTimeSpan().GetStart().GetSecondDouble();
+				_endTime = (float)scene->GetCurrentAnimationStack()->GetLocalTimeSpan().GetStop().GetSecondDouble();
+				_frameLength = 1.f / 60.f;
+
+				_result = new Animation();
+				_ReadNodesRecursive(root);
+				return _result;
+			}
+		}
+
+		fbxImporter->Destroy();
+		return nullptr;
+	}
+};
+
+Animation* EditorIO::ReadFBXAnimation(FbxManager* fbxManager, const char* filename, Skeleton& skeleton)
+{
+	return FbxAnimationImporter(skeleton).Import(fbxManager, filename);
 }

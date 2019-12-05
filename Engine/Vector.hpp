@@ -108,14 +108,16 @@ public:
 	Vector operator+(const Vector& other) const { Vector v(*this); v += other; return v; }
 	Vector operator-(const Vector& other) const { Vector v(*this); v -= other; return v; }
 
-	bool operator==(const Vector &other) const
+	bool operator!=(const Vector& other) const
 	{
 		for (int i = 0; i < SIZE; ++i)
 			if (_data[i] != other._data[i])
-				return false;
+				return true;
 
-		return true;
+		return false;
 	}
+
+	bool operator==(const Vector& other) const { return !operator!=(other); }
 
 	bool AlmostEqual(const Vector& other, float tolerance) const
 	{

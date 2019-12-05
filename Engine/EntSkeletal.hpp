@@ -4,11 +4,22 @@
 
 class EntSkeletal : public EntRenderable
 {
+	Buffer<Mat4> _skinningMatrices;
+
+	SharedPointer<const Animation> _animation;
+	float _currentTime;
+
+	void _CMD_PlayAnimation(const Buffer<String>& args);
+
+	virtual void _OnModelChanged() override;
 
 public:
 	Entity_FUNCS(EntSkeletal, EntityIDS::SKELETAL);
 
-	virtual void Render();
+	virtual void Update(float deltaTime) override;
+	virtual void Render(EnumRenderChannel) const override;
 
-	void PlayAnimation(const Animation&);
+	virtual PropertyCollection& GetProperties() override;
+
+	void PlayAnimation(const SharedPointer<const Animation>&);
 };

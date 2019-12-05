@@ -1,5 +1,6 @@
 #include "Engine.hpp"
 #include "Console.hpp"
+#include "AnimationManager.hpp"
 #include "AudioManager.hpp"
 #include "DebugManager.hpp"
 #include "FontManager.hpp"
@@ -10,7 +11,16 @@
 
 Engine::~Engine()
 {
-	delete pConsole; delete pAudioManager; delete pDebugManager; delete pFontManager; delete pInputManager; delete pMaterialManager; delete pModelManager; delete pTextureManager;
+	delete pConsole; 
+	delete pAnimationManager; 
+	delete pAudioManager;
+	delete pDebugManager;
+	delete pFontManager; 
+	delete pInputManager;
+	delete pMaterialManager;
+	delete pModelManager;
+	delete pTextureManager;
+	delete pObjectTracker;
 
 	FT_Done_FreeType(_ftLib);
 }
@@ -27,6 +37,7 @@ void Engine::Init(EngineCreateFlags flags, Entity *world)
 	registry.RegisterEngineObjects();
 
 	pConsole =			CREATE(flags & ENG_CONSOLE,		new Console());
+	pAnimationManager = CREATE(flags & ENG_ANIMATIONMGR,new AnimationManager());
 	pAudioManager =		CREATE(flags & ENG_AUDIOMGR,	new AudioManager());
 	pDebugManager =		CREATE(flags & ENG_DBGMGR,		new DebugManager());
 	pFontManager =		CREATE(flags & ENG_FONTMGR,		new FontManager());
@@ -34,7 +45,6 @@ void Engine::Init(EngineCreateFlags flags, Entity *world)
 	pMaterialManager =	CREATE(flags & ENG_MATERIALMGR, new MaterialManager());
 	pModelManager =		CREATE(flags & ENG_MODELMGR,	new ModelManager());
 	pTextureManager =	CREATE(flags & ENG_TEXTUREMGR,	new TextureManager());
-	pInputManager =		CREATE(flags & ENG_INPUTMGR,	new InputManager());
 	pObjectTracker =	CREATE(flags & ENG_OBJTRACKER,	new Tracker<Entity>());
 
 	if (pConsole)
@@ -48,6 +58,12 @@ void Engine::Init(EngineCreateFlags flags, Entity *world)
 			pConsole->Cvars().CreateVar("Ents", CommandPtr(pWorld, &Entity::CMD_List));
 			pConsole->Cvars().CreateVar("Ent", CommandPtr(pWorld, &Entity::CMD_Ent));
 		}
+	}
+
+	if (pAnimationManager)
+	{
+		pAnimationManager->Initialise();
+		pAnimationManager->SetRootPath("Data/Animations/");
 	}
 
 	if (pAudioManager)
@@ -74,5 +90,9 @@ void Engine::Init(EngineCreateFlags flags, Entity *world)
 		pMaterialManager->SetRootPath("Data/Materials/");
 	}
 
-	if (pFontManager) pFontManager->SetRootPath("Data/Fonts/");
+	if (pFontManager) 
+	{
+		pFontManager->Initialise();
+		pFontManager->SetRootPath("Data/Fonts/");
+	}
 }
