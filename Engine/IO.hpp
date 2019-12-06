@@ -31,4 +31,5 @@ namespace IO {
 
 	//searchPath must have a wildcard in it, like C:/Example/*.poo
 	Buffer<String> FindFilesInDirectory(const char *searchPath);
+	Buffer<String> FindFilesInDirectoryRecursive(const char *searchPath, const char *wildcard = "*.*");
 }

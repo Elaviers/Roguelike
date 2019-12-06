@@ -16,6 +16,9 @@ class EntSkeletal : public EntRenderable
 public:
 	Entity_FUNCS(EntSkeletal, EntityIDS::SKELETAL);
 
+	EntSkeletal() : _currentTime(0.f) {}
+	virtual ~EntSkeletal() {}
+
 	virtual void Update(float deltaTime) override;
 	virtual void Render(EnumRenderChannel) const override;
 

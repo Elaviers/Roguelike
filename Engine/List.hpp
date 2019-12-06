@@ -131,7 +131,7 @@ public:
 	Iterator Last() { return _first ? _first->Last() : nullptr; }
 	Iterator Last() const { return _first ? _first->Last() : nullptr; }
 
-	Iterator Get(int index)
+	Iterator Get(int index) const
 	{
 		auto node = _first;
 		for (int i = 0; node; node = node->next)

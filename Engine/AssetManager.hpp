@@ -84,18 +84,8 @@ public:
 		return _map.Set(name, SharedPointerData<T>(value, 0));
 	}
 
-	SharedPointer<T> Get(const String& name)
+	String GetFilename(const String& name, bool* out_IsBinary = nullptr) const
 	{
-		if (name.GetLength() == 0)
-			return SharedPointer<T>();
-
-		String lowerName = name.ToLower();
-
-		SharedPointerData<T>* existing = _map.Get(lowerName);
-			
-		if (existing && existing->GetPtr()) 
-			return SharedPointer<T>(*existing);
-
 		String extension = Utilities::GetExtension(name);
 		bool extIsText = false;
 		bool extIsBinary = false;
@@ -121,7 +111,7 @@ public:
 			}
 
 			if (!extIsText && !extIsBinary)
-				return SharedPointer<T>();
+				return "";
 		}
 
 		T* resource = nullptr;
@@ -135,8 +125,13 @@ public:
 				if (extIsText)
 				{
 					if (IO::FileExists(baseName.GetData()))
-						resource = _CreateResource(lowerName, IO::ReadFileString(baseName.GetData()));
-						
+					{
+						if (out_IsBinary)
+							*out_IsBinary = false;
+
+						return baseName;
+					}
+
 					break;
 				}
 
@@ -146,8 +141,10 @@ public:
 
 					if (IO::FileExists(filename.GetData()))
 					{
-						resource = _CreateResource(lowerName, IO::ReadFileString(filename.GetData()));
-						break;
+						if (out_IsBinary)
+							*out_IsBinary = false;
+
+						return filename;
 					}
 				}
 			}
@@ -157,8 +154,13 @@ public:
 				if (extIsBinary)
 				{
 					if (IO::FileExists(baseName.GetData()))
-						resource = _CreateResource(lowerName, IO::ReadFile(baseName.GetData()));
-						
+					{
+						if (out_IsBinary)
+							*out_IsBinary = true;
+
+						return baseName;
+					}
+
 					break;
 				}
 
@@ -168,22 +170,46 @@ public:
 
 					if (IO::FileExists(filename.GetData()))
 					{
-						resource = _CreateResource(lowerName, IO::ReadFile(filename.GetData()));
-						break;
+						if (out_IsBinary)
+							*out_IsBinary = true;
+
+						return filename;
 					}
 				}
 			}
 		}
 
-		if (resource)
-		{
-			if (existing)
-			{
-				existing->SetPtr(resource);
-				return SharedPointer<T>(*existing);
-			}
+		return "";
+	}
+
+	SharedPointer<T> Get(const String& name)
+	{
+		if (name.GetLength() == 0)
+			return SharedPointer<T>();
+
+		String lowerName = name.ToLower();
+
+		SharedPointerData<T>* existing = _map.Get(lowerName);
 			
-			return SharedPointer<T>(_map.Set(lowerName, SharedPointerData<T>(resource, 0)));
+		if (existing && existing->GetPtr()) 
+			return SharedPointer<T>(*existing);
+
+		bool binary = false;
+		String filename = GetFilename(name, &binary);
+		if (filename.GetLength())
+		{
+			T* resource = binary ? _CreateResource(lowerName, IO::ReadFile(filename.GetData())) : _CreateResource(lowerName, IO::ReadFileString(filename.GetData()));
+
+			if (resource)
+			{
+				if (existing)
+				{
+					existing->SetPtr(resource);
+					return SharedPointer<T>(*existing);
+				}
+
+				return SharedPointer<T>(_map.Set(lowerName, SharedPointerData<T>(resource, 0)));
+			}
 		}
 
 		return SharedPointer<T>();
@@ -225,7 +251,7 @@ public:
 
 		for (size_t pathIndex = 0; pathIndex < _paths.GetSize(); ++pathIndex)
 		{
-			Buffer<String> filenames = IO::FindFilesInDirectory(CSTR(_paths[pathIndex], "*.*"));
+			Buffer<String> filenames = IO::FindFilesInDirectoryRecursive(_paths[pathIndex].GetData(), "*.*");
 
 			for (size_t filenameIndex = 0; filenameIndex < filenames.GetSize(); ++filenameIndex)
 			{

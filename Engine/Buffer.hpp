@@ -163,6 +163,26 @@ public:
 		return result;
 	}
 
+	Buffer operator+(const Buffer& other) const
+	{
+		Buffer result;
+		result._size = _size + other._size;
+		result._data = new T[result._size];
+
+		for (size_t i = 0; i < _size; ++i)
+			result._data[i] = _data[i];
+
+		for (size_t i = 0; i < other._size; ++i)
+			result._data[_size + i] = other._data[i];
+
+		return result;
+	}
+
+	Buffer& operator+=(const Buffer& other)
+	{
+		return *this = *this + other;
+	}
+
 	Buffer& operator=(const Buffer& other)
 	{
 		delete[] _data;
@@ -183,20 +203,6 @@ public:
 		other._size = 0;
 
 		return *this;
-	}
-
-	Buffer operator+(const Buffer &other) const
-	{
-		Buffer result;
-		result.SetSize(_size + other._size);
-
-		for (size_t i = 0; i < _size; ++i)
-			result._data[i] = _data[i];
-		
-		for (size_t i = 0; i < other._size; ++i)
-			result._data[_size + i] = other._data[i];
-
-		return result;
 	}
 
 	bool operator==(const Buffer& other) const

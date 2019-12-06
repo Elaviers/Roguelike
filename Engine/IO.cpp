@@ -95,7 +95,7 @@ Texture* IO::ReadPNGFile(const Buffer<byte> &data)
 	return texture;
 }
 
-Buffer<String> IO::FindFilesInDirectory(const char *search)
+Buffer<String> IO::FindFilesInDirectory(const char* search)
 {
 	Buffer<String> filenames;
 
@@ -118,4 +118,39 @@ Buffer<String> IO::FindFilesInDirectory(const char *search)
 	}
 
 	return filenames;
+}
+
+Buffer<String> _FindFilesInDirectoryRecursive(const char* rootDir, const char* dir, const char* wildcard)
+{
+	Buffer<String> filenames;
+	
+	WIN32_FIND_DATAA data;
+	HANDLE hFile = ::FindFirstFileA(CSTR(rootDir, dir, wildcard), &data);
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			for (const char* c = data.cFileName; *c != '\0'; ++c)
+				if (*c != '.')
+				{
+					String filename(String::Concat(dir, data.cFileName));
+
+					if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+						filenames += _FindFilesInDirectoryRecursive(rootDir, CSTR(filename, '/'), wildcard);
+					else
+						filenames.Add(filename);
+					
+					break;
+				}
+
+
+		} while (::FindNextFile(hFile, &data));
+	}
+
+	return filenames;
+}
+
+Buffer<String> IO::FindFilesInDirectoryRecursive(const char* dir, const char* wildcard)
+{
+	return _FindFilesInDirectoryRecursive(dir, "", wildcard);
 }

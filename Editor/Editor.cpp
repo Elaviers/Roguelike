@@ -727,24 +727,48 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 			case ID_IMPORT_ANIMATION:
 			{
-				/*
-				String filename = EditorIO::OpenFileDialog(L"\\Data\\Animations", openAnimationFilter);
-				if (filename.GetLength() == 0)
-					break;
-				
+				Buffer<String> skeletalMeshNames = Engine::Instance().pModelManager->GetAllPossibleKeys();
 
-
-				Animation* animation = EditorIO::ReadFBXAnimation(editor->_fbxManager, filename.GetData(), skeleton);
-
-				if (animation)
+				for (size_t i = 0; i < skeletalMeshNames.GetSize();)
 				{
-					String dest = EditorIO::SaveFileDialog(L"\\Data\\Animations", saveAnimationFilter);
-					if (dest.GetLength())
-						IO::WriteFile(dest.GetData(), animation->GetAsData());
+					SharedPointer<const Model> model = Engine::Instance().pModelManager->Get(skeletalMeshNames[i]);
+
+					if (dynamic_cast<const Mesh_Skeletal*>(model->GetMesh()))
+						++i;
 					else
-						Debug::Error("Okay, I guess you don't want to import an animation after all...");
+						skeletalMeshNames.RemoveIndex(i);
 				}
-				*/
+
+				String choice = StringSelect::Dialog(editor->_window.GetHwnd(), skeletalMeshNames, "Pick a skeleton...");
+
+				if (choice.GetLength())
+				{
+					SharedPointer<Model> model = Engine::Instance().pModelManager->Get(choice);
+
+					if (model)
+					{
+						const Mesh_Skeletal* skeletalMesh = dynamic_cast<const Mesh_Skeletal*>(model->GetMesh());
+
+						if (skeletalMesh)
+						{
+							String filename = EditorIO::OpenFileDialog(L"\\Data\\Animations", openAnimationFilter);
+							if (filename.GetLength() == 0)
+								break;
+
+							Animation* animation = EditorIO::ReadFBXAnimation(editor->_fbxManager, filename.GetData(), skeletalMesh->skeleton);
+
+							if (animation)
+							{
+								String dest = EditorIO::SaveFileDialog(L"\\Data\\Animations", saveAnimationFilter);
+								if (dest.GetLength())
+									IO::WriteFile(dest.GetData(), animation->GetAsData());
+								else
+									Debug::Error("Okay, I guess you don't want to import an animation after all...");
+							}
+
+						}
+					}
+				}
 			}
 			break;
 

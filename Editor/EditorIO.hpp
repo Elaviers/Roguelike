@@ -12,5 +12,5 @@ namespace EditorIO
 	String SaveFileDialog(const wchar_t *dir, const Buffer<Pair<const wchar_t*>>& ext);
 
 	Mesh* ReadFBXMesh(FbxManager*, const char* filename);
-	Animation* ReadFBXAnimation(FbxManager*, const char* filename, Skeleton&);
+	Animation* ReadFBXAnimation(FbxManager*, const char* filename, const Skeleton&);
 }

@@ -35,7 +35,7 @@ public:
 	~Quaternion() {}
 
 	static Quaternion FromEulerYXZ(const Vector3& euler);
-	static Quaternion FromEulerXYZ(const Vector3& euler);
+	static Quaternion FromEulerZYX(const Vector3& euler);
 
 	const Vector4& GetData() const { return _data; }
 

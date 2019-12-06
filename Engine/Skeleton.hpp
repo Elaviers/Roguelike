@@ -67,14 +67,14 @@ public:
 		return nullptr;
 	}
 
-	Joint* GetJointWithID(int id)
+	Joint* GetJointWithID(int id) const
 	{
 		auto it = _joints.Get(id);
 
 		return it ? &*it : nullptr;
 	}
 
-	Joint* GetJointWithName(const String& name)
+	Joint* GetJointWithName(const String& name) const
 	{
 		for (auto it = _joints.First(); it; ++it)
 			if (it->name == name)

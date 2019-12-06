@@ -431,7 +431,7 @@ Mesh* EditorIO::ReadFBXMesh(FbxManager* fbxManager, const char* filename)
 
 class FbxAnimationImporter
 {
-	Skeleton* _skeleton;
+	const Skeleton* _skeleton;
 	Animation* _result;
 
 	float _startTime;
@@ -439,7 +439,7 @@ class FbxAnimationImporter
 	float _frameLength;
 
 public:
-	FbxAnimationImporter(Skeleton& skeleton) : _skeleton(&skeleton), _result(nullptr), _startTime(0.f), _endTime(0.f), _frameLength(0.f) {}
+	FbxAnimationImporter(const Skeleton& skeleton) : _skeleton(&skeleton), _result(nullptr), _startTime(0.f), _endTime(0.f), _frameLength(0.f) {}
 
 	void _ReadMesh(FbxNode* node)
 	{
@@ -481,7 +481,7 @@ public:
 									fbxRotation[2] *= -1.f;
 
 									_result->GetTranslationTrack(name).	AddKey(t, FbxVector4ToVector3(transform.GetT()));
-									_result->GetRotationTrack(name).	AddKey(t, Quaternion::FromEulerXYZ(fbxRotation));
+									_result->GetRotationTrack(name).	AddKey(t, Quaternion::FromEulerZYX(fbxRotation));
 									_result->GetScalingTrack(name).		AddKey(t, FbxVector4ToVector3(transform.GetS()));
 								}
 								else
@@ -533,7 +533,7 @@ public:
 	}
 };
 
-Animation* EditorIO::ReadFBXAnimation(FbxManager* fbxManager, const char* filename, Skeleton& skeleton)
+Animation* EditorIO::ReadFBXAnimation(FbxManager* fbxManager, const char* filename, const Skeleton& skeleton)
 {
 	return FbxAnimationImporter(skeleton).Import(fbxManager, filename);
 }
