@@ -69,8 +69,8 @@ private:
 	//Editor
 	bool _drawEditorFeatures = true;
 
-	EnumRenderChannel _litRenderChannels = RenderChannel::NONE;
-	EnumRenderChannel _unlitRenderChannels = EnumRenderChannel(RenderChannel::SURFACE | RenderChannel::UNLIT);
+	RenderChannels _litRenderChannels = RenderChannels::NONE;
+	RenderChannels _unlitRenderChannels = RenderChannels(RenderChannels::SURFACE | RenderChannels::UNLIT);
 
 	Entity _level;
 

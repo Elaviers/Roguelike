@@ -111,7 +111,7 @@ void Game::_InitGL()
 
 void Game::_Init()
 {
-	Engine::Instance().Init(ENG_ALL, nullptr);
+	Engine::Instance().Init(EngineCreateFlags::ALL, nullptr);
 	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	_consoleIsActive = false;
@@ -128,7 +128,7 @@ void Game::Run()
 	_Init();
 
 	MenuMain *menu = new MenuMain();
-	menu->SetBounds(0.5f, 0.5f, 400, 400, -200, -200);
+	menu->SetBounds(0.5f, 0.5f, 512, 512, -256, -256);
 	menu->Initialise(FunctionPointer<void, const String&>(this, &Game::StartLevel), Callback(this, &Game::ButtonQuit));
 	menu->SetParent(&_ui);
 

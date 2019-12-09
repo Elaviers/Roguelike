@@ -203,7 +203,7 @@
     <ClInclude Include="Mesh.hpp" />
     <ClInclude Include="Font_TTF.hpp" />
     <ClInclude Include="Font_Texture.hpp" />
-    <ClInclude Include="EntityIDS.hpp" />
+    <ClInclude Include="EntityID.hpp" />
     <ClInclude Include="EntSkeletal.hpp" />
     <ClInclude Include="EntSprite.hpp" />
     <ClInclude Include="Random.hpp" />

@@ -70,7 +70,7 @@ void Entity::UpdateAll(float deltaTime)
 		_children[i]->UpdateAll(deltaTime);
 }
 
-void Entity::RenderAll(const EntCamera &camera, EnumRenderChannel channels) const
+void Entity::RenderAll(const EntCamera &camera, RenderChannels channels) const
 {
 	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags & FLAG_DBG_ALWAYS_DRAW)
 		Render(channels);
@@ -150,10 +150,10 @@ void Entity::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> &str
 {
 	if (_flags & FLAG_SAVEABLE)
 	{
-		auto id = GetTypeID();
-		if (id != 0)
+		EntityID id = GetTypeID();
+		if (id != EntityID::NONE)
 		{
-			buffer.Write_byte(id);
+			buffer.Write_byte((byte)id);
 			WriteData(buffer, strings);
 		}
 	}
@@ -165,7 +165,7 @@ void Entity::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> &str
 //static
 Entity* Entity::CreateFromData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
 {
-	byte id = reader.Read_byte();
+	EntityID id = EntityID(reader.Read_byte());
 	Entity* obj = Engine::Instance().registry.GetNode(id)->New();
 	if (obj)
 		obj->ReadData(reader, strings);

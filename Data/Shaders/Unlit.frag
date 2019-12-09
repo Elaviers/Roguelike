@@ -10,11 +10,11 @@ out vec4 OutColour;
 
 void main()
 {
-	vec2 uv = vec2(UV.x, 1 - UV.y);
+	vec4 tex = texture(T_Diffuse, UV);
 
 	if (IsFont)
 	{
-		float alpha = texture(T_Diffuse, uv).r;
+		float alpha = tex.r;
 
 		if (alpha > 0)
 		{
@@ -25,5 +25,5 @@ void main()
 			OutColour = vec4(0);
 	}
 	else
-		OutColour = Colour * VertexColour * texture(T_Diffuse, uv);
+		OutColour = Colour * VertexColour * tex;
 }

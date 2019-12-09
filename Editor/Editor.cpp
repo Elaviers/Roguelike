@@ -133,7 +133,7 @@ void Editor::_Init()
 	CameraRef(3).SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
 
 	_fbxManager = FbxManager::Create();
-	Engine::Instance().Init(ENG_ALL, &_level);
+	Engine::Instance().Init(EngineCreateFlags::ALL, &_level);
 	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	InputManager* inputManager = Engine::Instance().pInputManager;
@@ -321,7 +321,7 @@ void Editor::RenderViewport(int index, Direction dir)
 	camera.Use();
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
-	_level.RenderAll(CameraRef(0), EnumRenderChannel(_unlitRenderChannels | (_drawEditorFeatures ? RenderChannel::EDITOR : 0)));
+	_level.RenderAll(CameraRef(0), RenderChannels(_unlitRenderChannels | (_drawEditorFeatures ? RenderChannels::EDITOR : RenderChannels::NONE)));
 	
 	if (_drawEditorFeatures)
 	{
@@ -342,11 +342,11 @@ void Editor::RenderViewport(int index, Direction dir)
 
 	Engine::Instance().pTextureManager->White()->Bind(0);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
-	if (_currentTool) _currentTool->Render(RenderChannel::ALL);
+	if (_currentTool) _currentTool->Render(RenderChannels::ALL);
 
 	glDepthFunc(GL_ALWAYS);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
-	_level.RenderAll(CameraRef(0), RenderChannel::SPRITE);
+	_level.RenderAll(CameraRef(0), RenderChannels::SPRITE);
 	glDepthFunc(GL_LEQUAL);
 
 	_viewports[index].SwapBuffers();
@@ -846,13 +846,13 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			break;
 
 			case ID_SHADING_UNLIT:
-				editor->_litRenderChannels = RenderChannel::NONE;
-				editor->_unlitRenderChannels = EnumRenderChannel(RenderChannel::SURFACE | RenderChannel::UNLIT);
+				editor->_litRenderChannels = RenderChannels::NONE;
+				editor->_unlitRenderChannels = RenderChannels(RenderChannels::SURFACE | RenderChannels::UNLIT);
 				break;
 
 			case ID_SHADING_PHONG:
-				editor->_litRenderChannels = RenderChannel::SURFACE;
-				editor->_unlitRenderChannels = RenderChannel::UNLIT;
+				editor->_litRenderChannels = RenderChannels::SURFACE;
+				editor->_unlitRenderChannels = RenderChannels::UNLIT;
 				break;
 
 			case ID_DRAWEDITORFEATURES:

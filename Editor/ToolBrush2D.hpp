@@ -24,6 +24,6 @@ public:
 	virtual void MouseDown(const MouseData&) override;
 	virtual void MouseUp(const MouseData&) override;
 
-	virtual void Render(EnumRenderChannel) const override;
+	virtual void Render(RenderChannels) const override;
 };
 

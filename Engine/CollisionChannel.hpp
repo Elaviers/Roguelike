@@ -1,14 +1,34 @@
 #pragma once
 #include "Types.hpp"
 
-enum CollisionChannel : byte
+enum class CollisionChannels : byte
 {
-	COLL_ALL_CHANNELS = 0xFF,
-	COLL_STATIC = 0x01,			//Static Geometry
-	COLL_DYNAMIC = 0x02,		//Dynamic (movable) Geometry
-	COLL_PROP = 0x04,			//Physics / small object
-	COLL_PLAYER = 0x08,
-	COLL_EDITOR = 0x0F,
+	ALL = 0xFF,
+	STATIC = 0x01,		//Static Geometry
+	DYNAMIC = 0x02,		//Dynamic (movable) Geometry
+	PROP = 0x04,		//Physics / small object
+	PLAYER = 0x08,
+	EDITOR = 0x0F,
 
-	COLL_SURFACE = COLL_STATIC | COLL_DYNAMIC | COLL_PROP | COLL_PLAYER
+	SURFACE = STATIC | DYNAMIC | PROP | PLAYER
 };
+
+inline CollisionChannels operator|(const CollisionChannels& a, const CollisionChannels& b)
+{
+	return CollisionChannels(int(a) | int(b));
+}
+
+inline CollisionChannels& operator|=(CollisionChannels& a, const CollisionChannels& b)
+{
+	return a = a | b;
+}
+
+inline CollisionChannels operator~(const CollisionChannels& cc)
+{
+	return CollisionChannels(~int(cc));
+}
+
+inline bool operator&(const CollisionChannels& a, const CollisionChannels& b)
+{
+	return int(a) & int(b);
+}

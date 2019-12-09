@@ -40,7 +40,7 @@ Ray EntCamera::ScreenCoordsToRay(const Vector2 &coords) const
 		Vector2 scale = GetZPlaneDimensions();
 		Vector3 pointOnPlane = GetWorldRotation().GetQuat().Transform(Vector3(coords[0] * scale[0], coords[1] * scale[1], 1.f));
 		pointOnPlane.Normalise();
-		return Ray(GetWorldPosition(), pointOnPlane, COLL_ALL_CHANNELS);
+		return Ray(GetWorldPosition(), pointOnPlane, CollisionChannels::ALL);
 	}
 	else
 	{
@@ -49,7 +49,7 @@ Ray EntCamera::ScreenCoordsToRay(const Vector2 &coords) const
 		return Ray(GetWorldPosition() + 
 			wt.GetRightVector() * ((_viewport[0] * coords[0]) / _scale) + 
 			wt.GetUpVector() * ((_viewport[1] * coords[1]) / _scale), 
-			wt.GetForwardVector(), COLL_ALL_CHANNELS);
+			wt.GetForwardVector(), CollisionChannels::ALL);
 	}
 }
 

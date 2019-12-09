@@ -5,8 +5,8 @@
 #include "ModelManager.hpp"
 #include "TextureManager.hpp"
 
-void EntConnector::Render(EnumRenderChannel channels) const {
-	if (Engine::Instance().pModelManager && channels & RenderChannel::UNLIT)
+void EntConnector::Render(RenderChannels channels) const {
+	if (Engine::Instance().pModelManager && channels & RenderChannels::UNLIT)
 	{
 		Engine::Instance().pTextureManager->White()->Bind(0);
 

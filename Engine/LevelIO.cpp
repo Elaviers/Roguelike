@@ -71,9 +71,9 @@ bool LevelIO::Read(Entity &world, const char *filename)
 
 		while (reader.Valid())
 		{
-			byte id = reader.Read_byte();
+			EntityID id = EntityID(reader.Read_byte());
 
-			if (id == 0)
+			if (id == EntityID::NONE)
 			{
 				switch (reader.Read_byte())
 				{

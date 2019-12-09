@@ -137,7 +137,7 @@ public:
 
 			_light.ToShader(0);
 
-			_object.Render(RenderChannel::SURFACE);
+			_object.Render(RenderChannels::SURFACE);
 		}
 
 		programUnlit->Use();
@@ -155,7 +155,7 @@ public:
 		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(0.f, 0.f, -1.f), Vector3(0.f, 0.f, 1.f));
 
 		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
-		_sprite.Render(RenderChannel::SPRITE);
+		_sprite.Render(RenderChannels::SPRITE);
 
 		::SwapBuffers(viewportDC);
 	};

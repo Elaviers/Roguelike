@@ -21,10 +21,10 @@ Mat4 Transform::GetTransformationMatrix() const
 	//todo: hm.
 	Transform *disgusting = const_cast<Transform*>(this);
 
-	if (_matrixStatus != MAT_TRANSFORM)
+	if (_matrixStatus != MatrixStatus::TRANSFORM)
 	{
 		_MakeTransformationMatrix(disgusting->_matrix);
-		disgusting->_matrixStatus = MAT_TRANSFORM;
+		disgusting->_matrixStatus = MatrixStatus::TRANSFORM;
 	}
 
 	return _matrix;
@@ -34,10 +34,10 @@ Mat4 Transform::GetInverseTransformationMatrix() const
 {
 	Transform *disgusting = const_cast<Transform*>(this);
 
-	if (_matrixStatus != MAT_INVERSETRANSFORM)
+	if (_matrixStatus != MatrixStatus::INVERSETRANSFORM)
 	{
 		_MakeInverseTransformationMatrix(disgusting->_matrix);
-		disgusting->_matrixStatus = MAT_INVERSETRANSFORM;
+		disgusting->_matrixStatus = MatrixStatus::INVERSETRANSFORM;
 	}
 
 	return _matrix;
@@ -45,7 +45,7 @@ Mat4 Transform::GetInverseTransformationMatrix() const
 
 Mat4 Transform::MakeTransformationMatrix() const
 {
-	if (_matrixStatus == MAT_TRANSFORM)
+	if (_matrixStatus == MatrixStatus::TRANSFORM)
 		return _matrix;
 
 	Mat4 m;
@@ -55,7 +55,7 @@ Mat4 Transform::MakeTransformationMatrix() const
 
 Mat4 Transform::MakeInverseTransformationMatrix() const
 {
-	if (_matrixStatus == MAT_INVERSETRANSFORM)
+	if (_matrixStatus == MatrixStatus::INVERSETRANSFORM)
 		return _matrix;
 
 	Mat4 m;

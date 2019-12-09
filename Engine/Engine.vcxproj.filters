@@ -447,7 +447,7 @@
     <ClInclude Include="EntSkeletal.hpp">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="EntityIDS.hpp">
+    <ClInclude Include="EntityID.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

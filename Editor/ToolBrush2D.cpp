@@ -76,7 +76,7 @@ void ToolBrush2D::MouseUp(const MouseData &mouseData)
 	}
 }
 
-void ToolBrush2D::Render(EnumRenderChannel channels) const
+void ToolBrush2D::Render(RenderChannels channels) const
 {
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(.8f, .8f, .8f, .5f));
 	_object.Render(channels);

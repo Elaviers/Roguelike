@@ -86,7 +86,7 @@ void ToolBrush3D::KeySubmit()
 	_object.Clone()->SetParent(&_owner.LevelRef());
 }
 
-void ToolBrush3D::Render(EnumRenderChannel channels) const
+void ToolBrush3D::Render(RenderChannels channels) const
 {
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(.8f, .8f, .8f, .5f));
 	_object.Render(channels);

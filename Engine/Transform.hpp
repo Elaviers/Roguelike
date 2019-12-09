@@ -14,16 +14,16 @@ class Transform
 	Callback _onChanged;
 	void _Update()
 	{
-		_matrixStatus = MAT_EMPTY;
+		_matrixStatus = MatrixStatus::EMPTY;
 		_onChanged.TryCall();
 	}
 
 	Mat4 _matrix;
-	enum
+	enum class MatrixStatus
 	{
-		MAT_EMPTY,
-		MAT_TRANSFORM,
-		MAT_INVERSETRANSFORM
+		EMPTY,
+		TRANSFORM,
+		INVERSETRANSFORM
 	} _matrixStatus;
 
 	void _MakeTransformationMatrix(Mat4&) const;
@@ -35,7 +35,7 @@ public:
 		_rotation(rotation), 
 		_scale(scale), 
 		_onChanged(callback), 
-		_matrixStatus(MAT_EMPTY) 
+		_matrixStatus(MatrixStatus::EMPTY) 
 	{
 		_onChanged.TryCall();
 	}
@@ -81,9 +81,9 @@ public:
 
 	void SetPosition(const Vector3 &position)	{ _position = position; _Update(); }
 	void SetRotation(const Rotation &rotation)	{ _rotation = rotation; _Update(); }
-	void SetRotationEuler(const Vector3& euler)  { SetRotation(Rotation(euler)); }
+	void SetRotationEuler(const Vector3& euler) { SetRotation(Rotation(euler)); }
 	void SetScale(const Vector3 &scale)			{ _scale = scale;		_Update(); }
-	void SetCallback(const Callback& callback) { _onChanged = callback; _onChanged.TryCall(); }
+	void SetCallback(const Callback& callback)	{ _onChanged = callback; _onChanged.TryCall(); }
 
 	void Move(const Vector3 &delta)				{ _position += delta;				_Update(); }
 	void Rotate(const Rotation &delta)			{ _rotation = delta * _rotation;	_Update(); }
@@ -95,9 +95,9 @@ public:
 	Mat4 MakeTransformationMatrix() const;
 	Mat4 MakeInverseTransformationMatrix() const;
 
-	Vector3 GetForwardVector() const		{ return _rotation.GetQuat().GetForwardVector(); }
-	Vector3 GetRightVector() const		{ return _rotation.GetQuat().GetRightVector(); }
-	Vector3 GetUpVector() const			{ return _rotation.GetQuat().GetUpVector(); }
+	Vector3 GetForwardVector() const			{ return _rotation.GetQuat().GetForwardVector(); }
+	Vector3 GetRightVector() const				{ return _rotation.GetQuat().GetRightVector(); }
+	Vector3 GetUpVector() const					{ return _rotation.GetQuat().GetUpVector(); }
 
 	Transform& operator*=(const Transform &other);
 	Transform operator*(const Transform &other) const

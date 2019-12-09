@@ -100,7 +100,7 @@ LRESULT PropertyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 			if (pw->_child_hwnds[LOWORD(wparam)].property->GetFlags() & PropertyFlags::CLASSID)
 			{
 				auto regTypes = Engine::Instance().registry.GetRegisteredTypes();
-				reinterpret_cast<VariableProperty<byte>*>(pw->_child_hwnds[LOWORD(wparam)].property)->Set(pw->_currentObject, *regTypes[cbIndex].first);
+				reinterpret_cast<VariableProperty<byte>*>(pw->_child_hwnds[LOWORD(wparam)].property)->Set(pw->_currentObject, (byte)*regTypes[cbIndex].first);
 			}
 			else
 			{
@@ -194,7 +194,7 @@ void PropertyWindow::_CreateHWNDs(bool readOnly)
 		{
 			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_COMBOBOXA, properties[i]->GetAsString(_currentObject).GetData(), WS_CHILD | WS_VISIBLE | CBS_HASSTRINGS | CBS_DROPDOWNLIST, w, y, w, boxH, _hwnd, menu, instance, NULL);
 
-			byte current = reinterpret_cast<VariableProperty<byte>*>(properties[i])->Get(_currentObject);
+			EntityID current = EntityID(reinterpret_cast<VariableProperty<byte>*>(properties[i])->Get(_currentObject));
 
 			auto listItems = Engine::Instance().registry.GetRegisteredTypes();
 			for (uint32 i = 0; i < listItems.GetSize(); ++i)

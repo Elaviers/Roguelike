@@ -64,7 +64,7 @@ public:
 	virtual void KeySubmit() override;
 	virtual void KeyDelete() override;
 
-	virtual void Render(EnumRenderChannel) const override;
+	virtual void Render(RenderChannels) const override;
 
 	void Select(Entity* object);
 	void ClearSelection();

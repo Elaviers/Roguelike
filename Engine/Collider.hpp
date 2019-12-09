@@ -16,20 +16,20 @@ class Collider
 {
 protected:
 	const ColliderType _type;
-	CollisionChannel _channels;
+	CollisionChannels _channels;
 
-	Collider(ColliderType type, CollisionChannel channels) : _type(type), _channels(channels) {}
+	Collider(ColliderType type, CollisionChannels channels) : _type(type), _channels(channels) {}
 
 public:
 	virtual ~Collider() {}
 
 	const ColliderType& GetType() const { return _type; }
-	const CollisionChannel& GetChannels() const { return _channels; }
+	const CollisionChannels& GetChannels() const { return _channels; }
 
-	void SetChannels(CollisionChannel channels) { _channels = channels; }
-	void AddChannels(CollisionChannel channels) { _channels = (CollisionChannel)(_channels | channels); }
-	void RemoveChannels(CollisionChannel channels) { _channels = (CollisionChannel)(_channels & (~channels)); }
-	bool CanCollideWithChannels(CollisionChannel channels) const { return (_channels & channels) != 0; }
+	void SetChannels(CollisionChannels channels) { _channels = channels; }
+	void AddChannels(CollisionChannels channels) { _channels |= channels; }
+	void RemoveChannels(CollisionChannels channels) { _channels = (CollisionChannels)(_channels & (~channels)); }
+	bool CanCollideWithChannels(CollisionChannels channels) const { return (_channels & channels) != 0; }
 	bool CanCollideWith(const Collider& other) const { return CanCollideWithChannels(other._channels); }
 
 	virtual bool IntersectsRay(const Ray&, RaycastResult&, const Transform& _transform) const = 0;

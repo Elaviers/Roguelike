@@ -52,7 +52,7 @@ struct VertexSkeletal
 	//Cannot be more than 4
 	constexpr const static int BONE_COUNT = 4;
 
-	float boneIndices[BONE_COUNT] = {};
+	uint32 boneIndices[BONE_COUNT] = {};
 	float boneWeights[BONE_COUNT] = {};
 
 	static void CalculateTangents(VertexSkeletal& vertex1, VertexSkeletal& vertex2, VertexSkeletal& vertex3);

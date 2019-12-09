@@ -36,16 +36,16 @@ void Engine::Init(EngineCreateFlags flags, Entity *world)
 	
 	registry.RegisterEngineObjects();
 
-	pConsole =			CREATE(flags & ENG_CONSOLE,		new Console());
-	pAnimationManager = CREATE(flags & ENG_ANIMATIONMGR,new AnimationManager());
-	pAudioManager =		CREATE(flags & ENG_AUDIOMGR,	new AudioManager());
-	pDebugManager =		CREATE(flags & ENG_DBGMGR,		new DebugManager());
-	pFontManager =		CREATE(flags & ENG_FONTMGR,		new FontManager());
-	pInputManager =		CREATE(flags & ENG_INPUTMGR,	new InputManager());
-	pMaterialManager =	CREATE(flags & ENG_MATERIALMGR, new MaterialManager());
-	pModelManager =		CREATE(flags & ENG_MODELMGR,	new ModelManager());
-	pTextureManager =	CREATE(flags & ENG_TEXTUREMGR,	new TextureManager());
-	pObjectTracker =	CREATE(flags & ENG_OBJTRACKER,	new Tracker<Entity>());
+	pConsole =			CREATE(flags & EngineCreateFlags::CONSOLE,		new Console());
+	pAnimationManager = CREATE(flags & EngineCreateFlags::ANIMATIONMGR,	new AnimationManager());
+	pAudioManager =		CREATE(flags & EngineCreateFlags::AUDIOMGR,		new AudioManager());
+	pDebugManager =		CREATE(flags & EngineCreateFlags::DEBUGMGR,		new DebugManager());
+	pFontManager =		CREATE(flags & EngineCreateFlags::FONTMGR,		new FontManager());
+	pInputManager =		CREATE(flags & EngineCreateFlags::INPUTMGR,		new InputManager());
+	pMaterialManager =	CREATE(flags & EngineCreateFlags::MATERIALMGR,	new MaterialManager());
+	pModelManager =		CREATE(flags & EngineCreateFlags::MODELMGR,		new ModelManager());
+	pTextureManager =	CREATE(flags & EngineCreateFlags::TEXTUREMGR,	new TextureManager());
+	pObjectTracker =	CREATE(flags & EngineCreateFlags::OBJTRACKER,	new Tracker<Entity>());
 
 	if (pConsole)
 	{

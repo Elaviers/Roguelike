@@ -131,20 +131,20 @@ public:
 
 						return baseName;
 					}
-
-					break;
 				}
-
-				for (size_t i = 0; i < _textExtensions.GetSize(); ++i)
+				else
 				{
-					String filename = baseName + _textExtensions[i];
-
-					if (IO::FileExists(filename.GetData()))
+					for (size_t i = 0; i < _textExtensions.GetSize(); ++i)
 					{
-						if (out_IsBinary)
-							*out_IsBinary = false;
+						String filename = baseName + _textExtensions[i];
 
-						return filename;
+						if (IO::FileExists(filename.GetData()))
+						{
+							if (out_IsBinary)
+								* out_IsBinary = false;
+
+							return filename;
+						}
 					}
 				}
 			}
@@ -160,20 +160,20 @@ public:
 
 						return baseName;
 					}
-
-					break;
 				}
-
-				for (size_t i = 0; i < _binaryExtensions.GetSize(); ++i)
+				else
 				{
-					String filename = baseName + _binaryExtensions[i];
-
-					if (IO::FileExists(filename.GetData()))
+					for (size_t i = 0; i < _binaryExtensions.GetSize(); ++i)
 					{
-						if (out_IsBinary)
-							*out_IsBinary = true;
+						String filename = baseName + _binaryExtensions[i];
 
-						return filename;
+						if (IO::FileExists(filename.GetData()))
+						{
+							if (out_IsBinary)
+								* out_IsBinary = true;
+
+							return filename;
+						}
 					}
 				}
 			}

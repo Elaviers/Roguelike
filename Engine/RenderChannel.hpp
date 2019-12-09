@@ -1,17 +1,32 @@
 #pragma once
 
-namespace RenderChannel
+enum class RenderChannels : byte
 {
-	enum RenderChannel : byte
-	{
-		SURFACE = 0x1,
-		UNLIT = 0x2,
-		SPRITE = 0x4,
-		EDITOR = 0x8,
+	SURFACE = 0x1,
+	UNLIT = 0x2,
+	SPRITE = 0x4,
+	EDITOR = 0x8,
 
-		NONE = 0,
-		ALL = 0xFF
-	};
+	NONE = 0,
+	ALL = 0xFF
+};
+
+inline RenderChannels operator|(const RenderChannels& a, const RenderChannels& b)
+{
+	return RenderChannels(int(a) | int(b));
 }
 
-typedef RenderChannel::RenderChannel EnumRenderChannel;
+inline RenderChannels operator|=(RenderChannels& a, const RenderChannels& b)
+{
+	return a = a | b;
+}
+
+inline RenderChannels operator~(const RenderChannels& rc)
+{
+	return RenderChannels(~int(rc));
+}
+
+inline bool operator&(const RenderChannels& a, const RenderChannels& b)
+{
+	return int(a) & int(b);
+}

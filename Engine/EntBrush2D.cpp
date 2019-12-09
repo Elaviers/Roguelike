@@ -16,7 +16,7 @@ void EntBrush2D::_OnTransformChanged()
 	SetRelativeScale(Vector3(w, h, 1));
 }
 
-void EntBrush2D::Render(EnumRenderChannel channels) const
+void EntBrush2D::Render(RenderChannels channels) const
 {
 	if (Engine::Instance().pModelManager && _material && channels & _material->GetRenderChannels())
 	{

@@ -24,7 +24,7 @@ const PropertyCollection& ToolEntity::_GetProperties()
 
 void ToolEntity::_SetClassID(const byte &id)
 {
-	_classID = id;
+	_classID = EntityID(id);
 
 	if (_placement)
 		_placement->Delete();
@@ -36,7 +36,7 @@ void ToolEntity::_SetClassID(const byte &id)
 
 void ToolEntity::Initialise()
 {
-	_classID = 1;
+	_classID = EntityID::RENDERABLE;
 }
 
 void ToolEntity::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
@@ -45,7 +45,7 @@ void ToolEntity::Activate(PropertyWindow &properties, PropertyWindow &toolProper
 	toolProperties.SetCvars(_GetProperties(), this);
 
 	//Creates the placement object
-	_SetClassID(_classID);
+	_SetClassID((byte)_classID);
 
 	_readyToPlace = false;
 }
@@ -94,7 +94,7 @@ void ToolEntity::MouseDown(const MouseData &mouseData)
 	}
 }
 
-void ToolEntity::Render(EnumRenderChannel channels) const
+void ToolEntity::Render(RenderChannels channels) const
 {
 	if (_placement && _readyToPlace)
 	{

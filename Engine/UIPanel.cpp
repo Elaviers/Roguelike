@@ -1,6 +1,7 @@
 #include "UIPanel.hpp"
 #include "Engine.hpp"
 #include "GLProgram.hpp"
+#include "Material_Grid.hpp"
 #include "ModelManager.hpp"
 #include "RenderParam.hpp"
 
@@ -12,51 +13,62 @@ inline void RenderPlaneWithTransform(const Transform &t)
 
 void UIPanel::Render() const
 {
-	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
-
-	RenderParam param;
-	param.type = RenderParam::Type::GRID_PARAM;
-
 	if (!_material)
 		return;
 
-	param.gridData.row = param.gridData.column = 0;
-	_material->Apply(&param);
-	RenderPlaneWithTransform(_transforms[0]);
-	
-	param.gridData.column = 1;
-	_material->Apply(&param);
-	RenderPlaneWithTransform(_transforms[1]);
-	
-	param.gridData.column = 2;
-	_material->Apply(&param);
-	RenderPlaneWithTransform(_transforms[2]);
+	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
 
-	param.gridData.row = 1;
-	param.gridData.column = 0;
-	_material->Apply(&param);
-	RenderPlaneWithTransform(_transforms[3]);
+	if (dynamic_cast<const MaterialGrid*>(_material.Ptr()))
+	{
+		RenderParam param;
+		param.type = RenderParam::Type::GRID_PARAM;
 
-	param.gridData.column = 1;
-	_material->Apply(&param);
-	RenderPlaneWithTransform(_transforms[4]);
+		param.gridData.row = param.gridData.column = 0;
+		_material->Apply(&param);
+		RenderPlaneWithTransform(_transforms[0]);
 
-	param.gridData.column = 2;
-	_material->Apply(&param);
-	RenderPlaneWithTransform(_transforms[5]);
+		param.gridData.column = 1;
+		_material->Apply(&param);
+		RenderPlaneWithTransform(_transforms[1]);
 
-	param.gridData.row = 2;
-	param.gridData.column = 0;
-	_material->Apply(&param);
-	RenderPlaneWithTransform(_transforms[6]);
+		param.gridData.column = 2;
+		_material->Apply(&param);
+		RenderPlaneWithTransform(_transforms[2]);
 
-	param.gridData.column = 1;
-	_material->Apply(&param);
-	RenderPlaneWithTransform(_transforms[7]);
+		param.gridData.row = 1;
+		param.gridData.column = 0;
+		_material->Apply(&param);
+		RenderPlaneWithTransform(_transforms[3]);
 
-	param.gridData.column = 2;
-	_material->Apply(&param);
-	RenderPlaneWithTransform(_transforms[8]);
+		param.gridData.column = 1;
+		_material->Apply(&param);
+		RenderPlaneWithTransform(_transforms[4]);
+
+		param.gridData.column = 2;
+		_material->Apply(&param);
+		RenderPlaneWithTransform(_transforms[5]);
+
+		param.gridData.row = 2;
+		param.gridData.column = 0;
+		_material->Apply(&param);
+		RenderPlaneWithTransform(_transforms[6]);
+
+		param.gridData.column = 1;
+		_material->Apply(&param);
+		RenderPlaneWithTransform(_transforms[7]);
+
+		param.gridData.column = 2;
+		_material->Apply(&param);
+		RenderPlaneWithTransform(_transforms[8]);
+	}
+	else
+	{
+		_material->Apply();
+		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, _transforms[4].GetTransformationMatrix());
+		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
+		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
+		Engine::Instance().pModelManager->Plane()->Render();
+	}
 }
 
 void UIPanel::OnBoundsChanged()
@@ -89,13 +101,13 @@ void UIPanel::OnBoundsChanged()
 	_transforms[5].SetScale(Vector3(absBorderSize, centreH, 1.f));
 	_transforms[4].SetScale(Vector3(centreW, centreH, 1.f));
 
-	_transforms[0].SetPosition(Vector3(x0,		y0,			_z));
-	_transforms[1].SetPosition(Vector3(centreX, y0,			_z));
-	_transforms[2].SetPosition(Vector3(x2,		y0,			_z));
+	_transforms[0].SetPosition(Vector3(x0,		y2,			_z));
+	_transforms[1].SetPosition(Vector3(centreX, y2,			_z));
+	_transforms[2].SetPosition(Vector3(x2,		y2,			_z));
 	_transforms[3].SetPosition(Vector3(x0,		centreY,	_z));
 	_transforms[4].SetPosition(Vector3(centreX, centreY,	_z));
 	_transforms[5].SetPosition(Vector3(x2,		centreY,	_z));
-	_transforms[6].SetPosition(Vector3(x0,		y2,			_z));
-	_transforms[7].SetPosition(Vector3(centreX, y2,			_z));
-	_transforms[8].SetPosition(Vector3(x2,		y2,			_z));
+	_transforms[6].SetPosition(Vector3(x0,		y0,			_z));
+	_transforms[7].SetPosition(Vector3(centreX, y0,			_z));
+	_transforms[8].SetPosition(Vector3(x2,		y0,			_z));
 }

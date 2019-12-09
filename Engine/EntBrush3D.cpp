@@ -18,7 +18,7 @@ void EntBrush3D::_OnTransformChanged()
 
 #include "DrawUtils.hpp"
 
-void EntBrush3D::Render(EnumRenderChannel channels) const
+void EntBrush3D::Render(RenderChannels channels) const
 {
 	ModelManager* modelManager = Engine::Instance().pModelManager;
 

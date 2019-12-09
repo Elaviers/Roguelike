@@ -66,8 +66,6 @@ void FontTexture::_ReadText(const String & string)
 			{
 				Buffer<String> tokens = lines[i + slot].Split(" ");
 
-				float glyphUVH = -_rowH / (float)_texture->GetHeight();
-
 				if (tokens.GetSize() > 1)
 				{
 					Glyph& glyph = _charMap[tokens[0][0]];
@@ -81,9 +79,9 @@ void FontTexture::_ReadText(const String & string)
 					}
 
 					glyph.uv[0] = cX / (float)_texture->GetWidth();
-					glyph.uv[1] = (cY + _rowH) / (float)_texture->GetHeight();
+					glyph.uv[1] = cY / (float)_texture->GetHeight();
 					glyph.uvSize[0] = glyph.width / (float)_texture->GetWidth();
-					glyph.uvSize[1] = glyphUVH;
+					glyph.uvSize[1] = _rowH / (float)_texture->GetHeight();
 
 					cX += glyph.width;
 				}

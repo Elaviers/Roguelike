@@ -6,7 +6,7 @@ class ColliderSphere : public Collider
 	float _radius;
 
 public:
-	ColliderSphere(CollisionChannel channels, float radius = 0.f) : Collider(ColliderType::SPHERE, channels), _radius(radius) {}
+	ColliderSphere(CollisionChannels channels, float radius = 0.f) : Collider(ColliderType::SPHERE, channels), _radius(radius) {}
 	virtual ~ColliderSphere() {}
 
 	float GetRadius() const { return _radius; }

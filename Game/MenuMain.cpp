@@ -23,18 +23,18 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	_panel.SetBorderSize(-8.f);
 	
 	_buttonStart.SetParent(this);
-	_buttonStart.SetBounds(0.f, 1.f, .5f, 32.f, 0.f, -32.f);
+	_buttonStart.SetBounds(0.f, 1.f, .4f, 64.f, 0.f, -64.f);
 	_buttonStart.SetCallback(FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonStart));
 	
 	_buttonQuit.SetParent(this);
-	_buttonQuit.SetBounds(.5f, 1.f, .5f, 32.f, 0.f, -32.f);
+	_buttonQuit.SetBounds(.6f, 1.f, .4f, 64.f, 0.f, -64.f);
 	_buttonQuit.SetCallback(FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonQuit));
 
 	_buttonStart.SetMaterial(material);
 	_buttonQuit.SetMaterial(material);
 
-	_buttonStart.SetBorderSize(8.f);
-	_buttonQuit.SetBorderSize(8.f);
+	_buttonStart.SetBorderSize(16.f);
+	_buttonQuit.SetBorderSize(16.f);
 
 	_buttonStart.SetColourInactive(inactiveBtnColour);
 	_buttonQuit.SetColourInactive(inactiveBtnColour);

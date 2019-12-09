@@ -15,22 +15,42 @@ class MaterialManager;
 class ModelManager;
 class TextureManager;
 
-enum EngineCreateFlags
+enum class EngineCreateFlags : uint16
 {
-	ENG_CONSOLE = 0x1,
-	ENG_ANIMATIONMGR = 0x2,
-	ENG_AUDIOMGR = 0x4,
-	ENG_DBGMGR = 0x8,
-	ENG_FONTMGR = 0x10,
-	ENG_INPUTMGR = 0x20,
-	ENG_MATERIALMGR = 0x40,
-	ENG_MODELMGR = 0x80,
-	ENG_TEXTUREMGR = 0x100,
+	CONSOLE = 0x1,
+	ANIMATIONMGR = 0x2,
+	AUDIOMGR = 0x4,
+	DEBUGMGR = 0x8,
+	FONTMGR = 0x10,
+	INPUTMGR = 0x20,
+	MATERIALMGR = 0x40,
+	MODELMGR = 0x80,
+	TEXTUREMGR = 0x100,
 
-	ENG_OBJTRACKER = 0x8000,
+	OBJTRACKER = 0x8000,
 
-	ENG_ALL = 0xFFFF
+	ALL = 0xFFFF
 };
+
+inline EngineCreateFlags operator|(const EngineCreateFlags& a, const EngineCreateFlags& b)
+{
+	return EngineCreateFlags(int(a) | int(b));
+}
+
+inline EngineCreateFlags& operator|=(EngineCreateFlags& a, const EngineCreateFlags& b)
+{
+	return a = a | b;
+}
+
+inline EngineCreateFlags operator~(const EngineCreateFlags& ecf)
+{
+	return EngineCreateFlags(~int(ecf));
+}
+
+inline bool operator&(const EngineCreateFlags& a, const EngineCreateFlags& b)
+{
+	return int(a) & int(b);
+}
 
 class Engine
 {

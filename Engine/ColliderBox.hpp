@@ -9,8 +9,8 @@
 class ColliderBox : public Collider
 {
 public:
-	ColliderBox(CollisionChannel channels, const Vector3 &extent = Vector3(), const Transform &transform = Transform()) : Collider(ColliderType::BOX, channels), extent(extent), transform(transform) {}
-	ColliderBox(CollisionChannel channels, const Box& box) : Collider(ColliderType::BOX, channels), extent(box.extent), transform(box.centre) {}
+	ColliderBox(CollisionChannels channels, const Vector3 &extent = Vector3(), const Transform &transform = Transform()) : Collider(ColliderType::BOX, channels), extent(extent), transform(transform) {}
+	ColliderBox(CollisionChannels channels, const Box& box) : Collider(ColliderType::BOX, channels), extent(box.extent), transform(box.centre) {}
 	virtual ~ColliderBox() {}
 
 	Vector3 extent;

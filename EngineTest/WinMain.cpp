@@ -213,7 +213,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	window.SetTitle("Manager Init");
 
 	//
-	Engine::Instance().Init(ENG_ALL, nullptr);
+	Engine::Instance().Init(EngineCreateFlags::ALL, nullptr);
 	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	ModelManager& modelManager = *Engine::Instance().pModelManager;
@@ -387,12 +387,12 @@ void Frame()
 		textureManager.Get(texSpecular)->Bind(UNIT_SPECULAR);
 		textureManager.Get(texReflection)->Bind(UNIT_REFLECTION);
 		
-		cube.Render(RenderChannel::ALL);
+		cube.Render(RenderChannels::ALL);
 
 		textureManager.NormalDefault()->Bind(UNIT_NORMAL);
 		textureManager.White()->Bind(UNIT_SPECULAR);
 		textureManager.White()->Bind(UNIT_REFLECTION);
-		renderable.Render(RenderChannel::ALL);
+		renderable.Render(RenderChannels::ALL);
 		//
 
 		//
@@ -421,10 +421,10 @@ void Frame()
 
 			textureManager.White()->Bind(0);
 
-			light1.Render(RenderChannel::ALL);
-			light2.Render(RenderChannel::ALL);
-			light3.Render(RenderChannel::ALL);
-			light4.Render(RenderChannel::ALL);
+			light1.Render(RenderChannels::ALL);
+			light2.Render(RenderChannels::ALL);
+			light3.Render(RenderChannels::ALL);
+			light4.Render(RenderChannels::ALL);
 
 			glDisable(GL_CULL_FACE);
 			

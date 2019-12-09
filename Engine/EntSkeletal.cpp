@@ -52,7 +52,7 @@ void EntSkeletal::Update(float deltaTime)
 	}
 }
 
-void EntSkeletal::Render(EnumRenderChannel channels) const
+void EntSkeletal::Render(RenderChannels channels) const
 {
 	if (_model)
 	{

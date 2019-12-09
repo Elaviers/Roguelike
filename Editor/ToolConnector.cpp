@@ -115,7 +115,7 @@ void ToolConnector::KeySubmit()
 	_connector.SetMax(Vector3());
 }
 
-void ToolConnector::Render(EnumRenderChannel channels) const
+void ToolConnector::Render(RenderChannels channels) const
 {
 	glLineWidth(3);
 	_connector.Render(channels);

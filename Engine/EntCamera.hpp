@@ -26,7 +26,7 @@ private:
 
 	void UpdateProjectionMatrix();
 public:
-	Entity_FUNCS(EntCamera, EntityIDS::CAMERA)
+	Entity_FUNCS(EntCamera, EntityID::CAMERA)
 
 	EntCamera() : _type(ProjectionType::PERSPECTIVE), _fov(90.f), _scale(1.f), _near(.001f), _far(100.f) { }
 	~EntCamera() {}

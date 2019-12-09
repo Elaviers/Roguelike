@@ -18,7 +18,8 @@ private:
 	Window _window;
 
 	GLContext _glContext;
-	GLProgram _shader;
+	GLProgram _shaderUnlit;
+	GLProgram _shaderLit;
 
 	bool _consoleIsActive;
 

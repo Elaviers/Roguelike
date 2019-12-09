@@ -11,7 +11,7 @@ class EntBrush : public Entity
 {
 protected:
 	//todo: add dimensions
-	ColliderBox _collider = ColliderBox(COLL_SURFACE, Vector3(.5f, .5f, .5f));
+	ColliderBox _collider = ColliderBox(CollisionChannels::SURFACE, Vector3(.5f, .5f, .5f));
 	Bounds _bounds = Bounds(Vector3(.5f, .5f, .5f));
 
 	Vector<float, SIZE> _point1;

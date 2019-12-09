@@ -1,4 +1,4 @@
 grid
 texture UI/Panel
-rows 32 32 32
-columns 32 32 32
+rows 32 64 32
+columns 32 64 32

@@ -227,7 +227,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 			::GetClientRect(_owner.ViewportRef(mouseData.viewport).GetHwnd(), &windowDims);
 
 			Ray r(camera.ScreenCoordsToRay(Vector2((float)mouseData.x / (float)windowDims.right, (float)mouseData.y / (float)windowDims.bottom)));
-			r.channels = COLL_ALL_CHANNELS;
+			r.channels = CollisionChannels::ALL;
 
 			//Gizmo
 			if (_selectedObjects.GetSize())
@@ -291,7 +291,7 @@ void ToolSelect::KeySubmit()
 	_placing = false;
 	ClearSelection();
 
-	Buffer<Entity*> result = _owner.LevelRef().FindOverlaps(ColliderBox(COLL_ALL_CHANNELS, Box::FromMinMax(_box.GetMin(), _box.GetMax())));
+	Buffer<Entity*> result = _owner.LevelRef().FindOverlaps(ColliderBox(CollisionChannels::ALL, Box::FromMinMax(_box.GetMin(), _box.GetMax())));
 
 	_selectedObjects.SetSize(result.GetSize());
 
@@ -307,7 +307,7 @@ void ToolSelect::KeyDelete()
 	ClearSelection();
 }
 
-void ToolSelect::Render(EnumRenderChannel channels) const
+void ToolSelect::Render(RenderChannels channels) const
 {
 	glLineWidth(3);
 	

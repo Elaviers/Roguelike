@@ -94,10 +94,6 @@ void MaterialGrid::Apply(const RenderParam *param) const
 	if (_texture) _texture->Bind(0);
 	else GLTexture::Unbind(0);
 
-	GLTexture::Unbind(1);
-	GLTexture::Unbind(2);
-	GLTexture::Unbind(3);
-
 	GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, uv.pos);
 	GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, uv.size);
 }

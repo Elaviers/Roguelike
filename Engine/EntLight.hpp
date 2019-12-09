@@ -13,7 +13,7 @@ class EntLight : public Entity
 	const static Vector3 _editorBoxExtent;
 	const static ColliderBox _lightCollider;
 public:
-	Entity_FUNCS(EntLight, EntityIDS::LIGHT)
+	Entity_FUNCS(EntLight, EntityID::LIGHT)
 
 	EntLight() : Entity(FLAG_SAVEABLE), _radius(-1.f), _colour(1.f, 1.f, 1.f) { }
 	virtual ~EntLight() {}
@@ -28,7 +28,7 @@ public:
 
 	void ToShader(int glArrayIndex);
 
-	void Render(EnumRenderChannel) const override;
+	void Render(RenderChannels) const override;
 
 	virtual const PropertyCollection& GetProperties() override;
 

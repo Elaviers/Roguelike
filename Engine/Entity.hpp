@@ -4,20 +4,22 @@
 #include "Event.hpp"
 #include "Map.hpp"
 #include "NumberedSet.hpp"
-#include "EntityIDS.hpp"
+#include "EntityID.hpp"
 #include "RenderChannel.hpp"
 #include "PropertyCollection.hpp"
 #include "Transform.hpp"
 #include <cstdlib>
 
-#define Entity_FUNCS(CLASSNAME, ID)														\
-public:																						\
-	virtual EntityIDS::EntityID GetTypeID() const { return ID; }							\
-	virtual const char* GetClassString() const { return #CLASSNAME;}						\
-	virtual size_t SizeOf() const { return sizeof(*this); }									\
-	virtual Entity* Clone() const { return Entity::_CreateCopy<CLASSNAME>(*this); } \
-	CLASSNAME* TypedClone() const { return (CLASSNAME*)Clone(); }					\
-	static CLASSNAME* Create() { CLASSNAME* obj = new CLASSNAME(); const_cast<bool&>(obj->_dynamic) = true; return obj; }
+#define Entity_FUNCS(CLASSNAME, ID)																							\
+public:																														\
+	virtual byte GetTypeID() const { return (byte)(ID); }																	\
+	virtual const char* GetClassString() const { return #CLASSNAME;}														\
+	virtual size_t SizeOf() const { return sizeof(*this); }																	\
+	virtual Entity* Clone() const { return Entity::_CreateCopy<CLASSNAME>(*this); }											\
+	CLASSNAME* TypedClone() const { return (CLASSNAME*)Clone(); }															\
+																															\
+	static CLASSNAME* Create() { CLASSNAME* obj = new CLASSNAME(); const_cast<bool&>(obj->_dynamic) = true; return obj; }	\
+	static const byte TypeID = (byte)(ID);
 
 class Collider;
 class EntCamera; //!!! todo - make this forward declaration unnecessary
@@ -70,7 +72,7 @@ public:
 		FLAG_DBG_ALWAYS_DRAW = 0x2
 	};
 
-	Entity_FUNCS(Entity, EntityIDS::Entity)
+	Entity_FUNCS(Entity, EntityID::Entity)
 
 	Entity(byte flags = 0, const String &name = String()) : 
 		_name(name), 
@@ -243,10 +245,10 @@ public:
 	void SetFlags(byte flags) { _flags = flags; }
 
 	virtual void Update(float deltaTime) {}
-	virtual void Render(EnumRenderChannel channels) const {}
+	virtual void Render(RenderChannels) const {}
 
 	void UpdateAll(float deltaTime);
-	void RenderAll(const EntCamera &camera, EnumRenderChannel channels) const;
+	void RenderAll(const EntCamera &camera, RenderChannels) const;
 
 	virtual const PropertyCollection& GetProperties();
 

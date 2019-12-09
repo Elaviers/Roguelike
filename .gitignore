@@ -32,8 +32,8 @@ bld/
 !Libraries/[Rr]elease/
 !Libraries/[Rr]elease/x64/
 
-# SrcAssets
-!SrcAssets/[Dd]ebug/
+!Data/**/[Dd]ebug/
+!SrcAssets/**/[Dd]ebug/
 *.blend1
 *.blend2
 

@@ -25,6 +25,7 @@ public:
 		_data = new T[_size];
 
 		for (size_t i = 0; i < _size; ++i)
+#pragma warning(suppress: 6385)
 			_data[i] = array.begin()[i];
 	}
 
@@ -32,9 +33,12 @@ public:
 
 	~Buffer() { delete[] _data; }
 
-	Buffer(const Buffer& other) : _size(other._size), _data(new T[other._size])
+	Buffer(const Buffer& other) : _size(other._size)
 	{
+		_data = new T[_size];
+
 		for (size_t i = 0; i < _size; ++i)
+#pragma warning(suppress: 6385)
 			_data[i] = other._data[i];
 	}
 
@@ -60,6 +64,7 @@ public:
 			newData = new T[size];
 			auto minSize = size < _size ? size : _size;
 			for (size_t i = 0; i < minSize; ++i)
+#pragma warning(suppress: 6385)
 				newData[i] = std::move(_data[i]);
 		}
 		else
@@ -129,7 +134,7 @@ public:
 
 			T* newData = new T[_size];
 			for (size_t i = 0; i < index; ++i)
-#pragma warning(suppress: 6386) //False positive
+#pragma warning(suppress: 6386)
 				newData[i] = std::move(_data[i]);
 
 			for (size_t i = index; i < _size; ++i)
@@ -173,6 +178,7 @@ public:
 			result._data[i] = _data[i];
 
 		for (size_t i = 0; i < other._size; ++i)
+#pragma warning(suppress: 6385; suppress: 6386)
 			result._data[_size + i] = other._data[i];
 
 		return result;
@@ -223,11 +229,5 @@ public:
 				return (int)i;
 
 		return -1;
-	}
-
-	void Shuffle()
-	{
-		for (size_t i = 0; i < _size; ++i)
-			Utilities::Swap(_data[i], _data[Maths::Random() * _size]);
 	}
 };

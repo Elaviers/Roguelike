@@ -6,7 +6,7 @@
 class EntConnector : public EntBox
 {
 public:
-	Entity_FUNCS(EntConnector, EntityIDS::LEVEL_CONNECTOR)
+	Entity_FUNCS(EntConnector, EntityID::LEVEL_CONNECTOR)
 
 	Direction2D direction;
 	bool connected;
@@ -14,7 +14,7 @@ public:
 	EntConnector() : EntBox(FLAG_SAVEABLE), direction(Direction2D::NORTH), connected(false) { }
 	virtual ~EntConnector() {}
 
-	virtual void Render(EnumRenderChannel) const;
+	virtual void Render(RenderChannels) const;
 
 	virtual void WriteData(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;
 	virtual void ReadData(BufferReader<byte> &buffer, const NumberedSet<String> &strings) override;

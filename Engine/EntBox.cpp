@@ -3,9 +3,9 @@
 #include "Engine.hpp"
 #include "GLProgram.hpp"
 
-void EntBox::Render(EnumRenderChannel channels) const
+void EntBox::Render(RenderChannels channels) const
 {
-	if (Engine::Instance().pModelManager && channels & RenderChannel::UNLIT)
+	if (Engine::Instance().pModelManager && channels & RenderChannels::UNLIT)
 	{
 		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
 		DrawUtils::DrawBox(*Engine::Instance().pModelManager, _min, _max);

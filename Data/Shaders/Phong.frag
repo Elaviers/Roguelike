@@ -21,7 +21,7 @@ uniform sampler2D T_Reflection;
 uniform vec4 Colour;
 
 layout(location = 0) in vec3 WorldPosition;
-layout(location = 1) in vec2 UV_IN;
+layout(location = 1) in vec2 UV;
 layout(location = 3) in mat3 TBN;
 
 out vec4 OutColour;
@@ -31,8 +31,6 @@ float shine = 32;
 
 void main()
 {
-	vec2 UV = vec2(UV_IN.x, 1 - UV_IN.y);
-
 	vec3 UVNormal = texture(T_Normal, UV).rgb * 2 - 1;
 
 	vec3 WorldNormal;

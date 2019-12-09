@@ -8,7 +8,7 @@
 #include "TextureManager.hpp"
 
 const Vector3 EntLight::_editorBoxExtent(.1f, .1f, .1f);
-const ColliderBox EntLight::_lightCollider(COLL_EDITOR, EntLight::_editorBoxExtent);
+const ColliderBox EntLight::_lightCollider(CollisionChannels::EDITOR, EntLight::_editorBoxExtent);
 
 bool EntLight::drawLightSources = true;
 
@@ -41,11 +41,11 @@ void EntLight::ToShader(int glArrayIndex)
 	glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Radius")),			1, &_radius);
 }
 
-void EntLight::Render(EnumRenderChannel channels) const
+void EntLight::Render(RenderChannels channels) const
 {
 	const float colour[4] = {_colour[0], _colour[1], _colour[2], 1.f};
 
-	if (drawLightSources && Engine::Instance().pTextureManager && channels & RenderChannel::EDITOR)
+	if (drawLightSources && Engine::Instance().pTextureManager && channels & RenderChannels::EDITOR)
 	{
 		Engine::Instance().pTextureManager->White()->Bind(0);
 		glUniform4fv(GLProgram::Current().GetUniformLocation("Colour"), 1, colour);

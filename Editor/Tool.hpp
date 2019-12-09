@@ -27,6 +27,6 @@ public:
 	virtual void KeySubmit()					{}
 	virtual void KeyDelete()					{}
 
-	virtual void Render(EnumRenderChannel) const{}
+	virtual void Render(RenderChannels) const{}
 };
 

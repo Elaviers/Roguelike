@@ -1,4 +1,4 @@
-#pragma warning(disable : 26451; disable : 6011)
+#pragma warning(disable : 26451; disable : 6011; disable: 26812)
 /////////
 
 /*

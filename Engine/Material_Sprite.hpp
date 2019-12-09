@@ -9,7 +9,7 @@ class MaterialSprite : public Material
 	void _CMD_tex(const Buffer<String>& args);
 
 public:
-	MaterialSprite(const SharedPointer<const Texture>& diffuse = SharedPointer<const Texture>()) : Material(RenderChannel::SPRITE), _diffuse(diffuse) {}
+	MaterialSprite(const SharedPointer<const Texture>& diffuse = SharedPointer<const Texture>()) : Material(RenderChannels::SPRITE), _diffuse(diffuse) {}
 
 	virtual ~MaterialSprite() {}
 

@@ -4,7 +4,7 @@
 
 class ToolEntity : public Tool
 {
-	byte _classID;
+	EntityID _classID;
 
 	EntityPointer _placement;
 	bool _readyToPlace;
@@ -12,10 +12,10 @@ class ToolEntity : public Tool
 	const PropertyCollection& _GetProperties();
 
 	void _SetClassID(const byte &id);
-	byte _GetClassID() const { return _classID; }
+	byte _GetClassID() const { return (byte)_classID; }
 
 public:
-	ToolEntity(Editor &level) : Tool(level), _classID(0), _placement(), _readyToPlace(false) {}
+	ToolEntity(Editor &level) : Tool(level), _classID(EntityID::NONE), _placement(), _readyToPlace(false) {}
 	virtual ~ToolEntity() {}
 
 	virtual void Initialise() override;
@@ -24,5 +24,5 @@ public:
 	virtual void MouseMove(const MouseData&) override;
 	virtual void MouseDown(const MouseData&) override;
 
-	virtual void Render(EnumRenderChannel) const override;
+	virtual void Render(RenderChannels) const override;
 };

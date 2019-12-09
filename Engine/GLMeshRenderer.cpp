@@ -35,7 +35,7 @@ inline void SetGLAttribsSkeletal()
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, bitangent));
 	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, normal));
 
-	glVertexAttribPointer(6, VertexSkeletal::BONE_COUNT, GL_FLOAT,			GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, boneIndices));
+	glVertexAttribPointer(6, VertexSkeletal::BONE_COUNT, GL_UNSIGNED_INT,	GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, boneIndices));
 	glVertexAttribPointer(7, VertexSkeletal::BONE_COUNT, GL_FLOAT,			GL_FALSE, sizeof(VertexSkeletal), (GLvoid*)offsetof(VertexSkeletal, boneWeights));
 }
 

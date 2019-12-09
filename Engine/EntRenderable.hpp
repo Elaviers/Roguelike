@@ -18,7 +18,7 @@ protected:
 	virtual void _OnModelChanged() {}
 
 public:
-	Entity_FUNCS(EntRenderable, EntityIDS::RENDERABLE)
+	Entity_FUNCS(EntRenderable, EntityID::RENDERABLE)
 	
 	EntRenderable() : 
 		Entity(FLAG_SAVEABLE), 
@@ -54,7 +54,7 @@ public:
 
 	bool MaterialIsDefault() const { return _materialIsDefault; }
 
-	virtual void Render(EnumRenderChannel) const override;
+	virtual void Render(RenderChannels) const override;
 
 	virtual const PropertyCollection& GetProperties() override;
 
