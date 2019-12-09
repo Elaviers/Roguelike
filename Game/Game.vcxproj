@@ -186,6 +186,7 @@ EXIT 0</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EntPlayer.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="LevelBag.cpp" />
     <ClCompile Include="LevelGeneration.cpp" />
@@ -194,6 +195,7 @@ EXIT 0</Command>
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EntPlayer.h" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="LevelBag.hpp" />
     <ClInclude Include="LevelGeneration.hpp" />

@@ -194,7 +194,7 @@ void PropertyWindow::_CreateHWNDs(bool readOnly)
 		{
 			box = ::CreateWindowEx(WS_EX_CLIENTEDGE, WC_COMBOBOXA, properties[i]->GetAsString(_currentObject).GetData(), WS_CHILD | WS_VISIBLE | CBS_HASSTRINGS | CBS_DROPDOWNLIST, w, y, w, boxH, _hwnd, menu, instance, NULL);
 
-			EntityID current = EntityID(reinterpret_cast<VariableProperty<byte>*>(properties[i])->Get(_currentObject));
+			byte current = reinterpret_cast<VariableProperty<byte>*>(properties[i])->Get(_currentObject);
 
 			auto listItems = Engine::Instance().registry.GetRegisteredTypes();
 			for (uint32 i = 0; i < listItems.GetSize(); ++i)

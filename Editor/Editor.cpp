@@ -166,7 +166,7 @@ void Editor::_Init()
 	tools.entity.Initialise();
 	tools.select.Initialise();
 
-	SetTool(TOOL_SELECT);
+	SetTool(ToolEnum::SELECT);
 }
 
 void Editor::_InitGL()
@@ -396,25 +396,25 @@ String Editor::SelectModelDialog()
 void Editor::SetTool(ToolEnum tool, bool changeToolbar)
 {
 	if (changeToolbar)
-		SendMessage(_toolbar, TB_CHECKBUTTON, tool, MAKELONG(TRUE, 0));
+		SendMessage(_toolbar, TB_CHECKBUTTON, (WPARAM)tool, MAKELONG(TRUE, 0));
 
 	Tool* newTool = nullptr;
 
 	switch (tool)
 	{
-	case TOOL_SELECT:
+	case ToolEnum::SELECT:
 		newTool = &tools.select;
 		break;
-	case TOOL_BRUSH2D:
+	case ToolEnum::BRUSH2D:
 		newTool = &tools.brush2D;
 		break;
-	case TOOL_BRUSH3D:
+	case ToolEnum::BRUSH3D:
 		newTool = &tools.brush3D;
 		break;
-	case TOOL_ENTITY:
+	case ToolEnum::ENTITY:
 		newTool = &tools.entity;
 		break;
-	case TOOL_CONNECTOR:
+	case ToolEnum::CONNECTOR:
 		newTool = &tools.connector;
 		break;
 	}
@@ -689,11 +689,11 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 		TBBUTTON tbButtons[] =
 		{
-			{0, TOOL_SELECT,  TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Select") },
-			{1, TOOL_BRUSH2D, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Edit")},
-			{2, TOOL_BRUSH3D, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Brush")},
-			{3, TOOL_ENTITY, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Entity")},
-			{4, TOOL_CONNECTOR, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Connector")}
+			{0, (int)ToolEnum::SELECT,  TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Select") },
+			{1, (int)ToolEnum::BRUSH2D, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Edit")},
+			{2, (int)ToolEnum::BRUSH3D, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Brush")},
+			{3, (int)ToolEnum::ENTITY, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Entity")},
+			{4, (int)ToolEnum::CONNECTOR, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Connector")}
 		};
 
 		SendMessage(editor->_toolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
@@ -862,11 +862,11 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 				break;
 
 
-			case TOOL_SELECT:
-			case TOOL_BRUSH2D:
-			case TOOL_BRUSH3D:
-			case TOOL_ENTITY:
-			case TOOL_CONNECTOR:
+			case (int)ToolEnum::SELECT:
+			case (int)ToolEnum::BRUSH2D:
+			case (int)ToolEnum::BRUSH3D:
+			case (int)ToolEnum::ENTITY:
+			case (int)ToolEnum::CONNECTOR:
 				editor->SetTool((ToolEnum)LOWORD(wparam), false);
 				break;
 			}

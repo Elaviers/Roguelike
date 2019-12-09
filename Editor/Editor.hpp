@@ -20,13 +20,13 @@
 
 #define VIEWPORTCOUNT 4
 
-enum ToolEnum
+enum class ToolEnum
 {
-	TOOL_SELECT = 0,
-	TOOL_BRUSH2D = 1,
-	TOOL_BRUSH3D = 2,
-	TOOL_ENTITY = 3,
-	TOOL_CONNECTOR = 4
+	SELECT = 0,
+	BRUSH2D = 1,
+	BRUSH3D = 2,
+	ENTITY = 3,
+	CONNECTOR = 4
 };
 
 class Editor

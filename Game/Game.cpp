@@ -106,7 +106,7 @@ void Game::_InitGL()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
-	_shader.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
+	_shaderUnlit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
 }
 
 void Game::_Init()
@@ -175,14 +175,14 @@ void Game::Render()
 
 	glDepthFunc(GL_LEQUAL);
 
-	_shader.Use();
+	_shaderUnlit.Use();
 	_uiCamera.Use();
 
 	_ui.Render();
 
 	if (_consoleIsActive)
 	{
-		_shader.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
+		_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 		Engine::Instance().pConsole->Render(*Engine::Instance().pFontManager->Get("consolas"), _deltaTime);
 	}
 

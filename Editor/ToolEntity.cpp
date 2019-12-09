@@ -24,7 +24,7 @@ const PropertyCollection& ToolEntity::_GetProperties()
 
 void ToolEntity::_SetClassID(const byte &id)
 {
-	_classID = EntityID(id);
+	_classID = id;
 
 	if (_placement)
 		_placement->Delete();
@@ -36,7 +36,7 @@ void ToolEntity::_SetClassID(const byte &id)
 
 void ToolEntity::Initialise()
 {
-	_classID = EntityID::RENDERABLE;
+	_classID = (byte)EntityID::RENDERABLE;
 }
 
 void ToolEntity::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)

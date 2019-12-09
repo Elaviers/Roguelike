@@ -150,10 +150,10 @@ void Entity::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> &str
 {
 	if (_flags & FLAG_SAVEABLE)
 	{
-		EntityID id = GetTypeID();
-		if (id != EntityID::NONE)
+		byte id = GetTypeID();
+		if (id != 0)
 		{
-			buffer.Write_byte((byte)id);
+			buffer.Write_byte(id);
 			WriteData(buffer, strings);
 		}
 	}
@@ -165,7 +165,7 @@ void Entity::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> &str
 //static
 Entity* Entity::CreateFromData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
 {
-	EntityID id = EntityID(reader.Read_byte());
+	byte id = reader.Read_byte();
 	Entity* obj = Engine::Instance().registry.GetNode(id)->New();
 	if (obj)
 		obj->ReadData(reader, strings);

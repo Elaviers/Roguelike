@@ -30,7 +30,7 @@ public:
 
 class Registry
 {
-	Map<EntityID, RegistryNodeBase*> _registry;
+	Map<byte, RegistryNodeBase*> _registry;
 
 public:
 	Registry() {}
@@ -41,7 +41,7 @@ public:
 	{
 		byte id = T::TypeID;
 
-		Debug::Assert(id != EntityID::NONE, "An invalid object ID was registered");
+		Debug::Assert(id != 0, "An invalid object ID was registered");
 
 		if (_registry.Get(id))
 			Debug::Error("Multiple classes can not have the same ID!");
@@ -50,7 +50,7 @@ public:
 		_registry[id] = newNode;
 	}
 
-	RegistryNodeBase* GetNode(EntityID id)
+	RegistryNodeBase* GetNode(byte id)
 	{
 		auto regNode = _registry.Get(id);
 		if (regNode)
@@ -59,7 +59,7 @@ public:
 		return nullptr;
 	}
 
-	Buffer<Pair<const EntityID*, RegistryNodeBase* const *>> GetRegisteredTypes() const { return _registry.ToKVBuffer(); }
+	Buffer<Pair<const byte*, RegistryNodeBase* const *>> GetRegisteredTypes() const { return _registry.ToKVBuffer(); }
 
 	void RegisterEngineObjects();
 };
