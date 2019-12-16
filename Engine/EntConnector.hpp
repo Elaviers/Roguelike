@@ -11,7 +11,7 @@ public:
 	Direction2D direction;
 	bool connected;
 
-	EntConnector() : EntBox(FLAG_SAVEABLE), direction(Direction2D::NORTH), connected(false) { }
+	EntConnector() : EntBox(Flags::SAVEABLE), direction(Direction2D::NORTH), connected(false) { }
 	virtual ~EntConnector() {}
 
 	virtual void Render(RenderChannels) const;

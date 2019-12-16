@@ -4,7 +4,7 @@
 
 const EntCamera* EntCamera::_currentCamera = nullptr;
 
-void EntCamera::Use()
+void EntCamera::Use() const
 {
 	_currentCamera = this;
 	glViewport(0, 0, _viewport[0], _viewport[1]);

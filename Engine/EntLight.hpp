@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.hpp"
-#include "ColliderBox.hpp"
+#include "Collider.hpp"
 #include "Vector.hpp"
 
 class ModelManager;
@@ -10,15 +10,18 @@ class EntLight : public Entity
 	Vector3 _colour;
 	float _radius;
 
-	const static Vector3 _editorBoxExtent;
-	const static ColliderBox _lightCollider;
+	static int _frameLightCounter;
+
+	static Vector3 _editorBoxExtent;
 public:
 	Entity_FUNCS(EntLight, EntityID::LIGHT)
 
-	EntLight() : Entity(FLAG_SAVEABLE), _radius(-1.f), _colour(1.f, 1.f, 1.f) { }
+	EntLight() : Entity(Flags::SAVEABLE), _radius(-1.f), _colour(1.f, 1.f, 1.f) { }
 	virtual ~EntLight() {}
 
 	static bool drawLightSources;
+
+	static void FinaliseLightingForFrame();
 
 	const Vector3& GetColour() const { return _colour; }
 	float GetRadius() const { return _radius; }
@@ -26,14 +29,24 @@ public:
 	void SetColour(const Vector3 &colour) { _colour = colour; }
 	void SetRadius(float radius) { _radius = radius; }
 
-	void ToShader(int glArrayIndex);
+	void ToShader(int glArrayIndex) const;
 
+	void Update(float deltaTime) override;
 	void Render(RenderChannels) const override;
 
 	virtual const PropertyCollection& GetProperties() override;
 
-	virtual Bounds GetBounds() const { return Bounds(_editorBoxExtent); }
-	virtual const Collider* GetCollider() const { return &_lightCollider; }
+	virtual Bounds GetBounds() const 
+	{
+		static Bounds bounds(_editorBoxExtent);
+		return bounds;
+	}
+
+	virtual const Collider* GetCollider() const 
+	{
+		static Collider editorCollider(CollisionChannels::EDITOR, Box(_editorBoxExtent));
+		return &editorCollider;
+	}
 
 	//File IO
 	virtual void WriteData(BufferWriter<byte>&, NumberedSet<String>& strings) const override;

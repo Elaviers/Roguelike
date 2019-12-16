@@ -8,64 +8,90 @@ template <typename T>
 class Buffer
 {
 private:
-	T *_data;
+	union
+	{
+		T* _elements;
+		byte* _data;
+	};
+
 	size_t _size;
+
+	byte* _CreateNewArray(size_t newSize) const { return new byte[sizeof(T) * newSize]; }
 
 public:
 	Buffer() : _data(nullptr), _size(0) {}
 
 	Buffer(const T& v) : _size(1)
 	{
-		_data = new T[1];
-		_data[0] = v;
+		_data = _CreateNewArray(_size);
+		new (_elements) T(v);
+	}
+
+	Buffer(const Buffer& other) : _size(other._size)
+	{
+		_data = _CreateNewArray(_size);
+
+		for (size_t i = 0; i < _size; ++i)
+			new (_elements + i) T(other[i]);
 	}
 
 	Buffer(std::initializer_list<T> array) : _size(array.size())
 	{
-		_data = new T[_size];
+		_data = _CreateNewArray(_size);
 
 		for (size_t i = 0; i < _size; ++i)
-#pragma warning(suppress: 6385)
-			_data[i] = array.begin()[i];
+			new (_elements + i) T(array.begin()[i]);
 	}
 
-	Buffer(const T* data, size_t size) : _data(Utilities::CopyOfArray(data, size)), _size(size) {}
-
-	~Buffer() { delete[] _data; }
-
-	Buffer(const Buffer& other) : _size(other._size)
+	Buffer(const T* data, size_t size) : _size(size) 
 	{
-		_data = new T[_size];
+		_data = _CreateNewArray(_size);
 
 		for (size_t i = 0; i < _size; ++i)
-#pragma warning(suppress: 6385)
-			_data[i] = other._data[i];
+			new (_elements + i) T(data[i]);
 	}
 
-	Buffer(Buffer&& buffer) noexcept : _data(buffer._data), _size(buffer._size) { buffer._data = nullptr; }
+	Buffer(Buffer&& other) noexcept : _data(other._data), _size(other._size)
+	{ 
+		other._data = nullptr;
+		other._size = 0;
+	}
+
+	~Buffer() 
+	{
+		for (size_t i = 0; i < _size; ++i)
+			_elements[i].~T();
+
+		delete[] _data; 
+	}
 
 	size_t GetSize() const	{ return _size; }
-	T* Data()				{ return _data; }
-	const T* Data() const	{ return _data; }
-	T& Last()				{ return _data[_size - 1]; }
-	const T& Last() const	{ return _data[_size - 1]; }
+	T* Data()				{ return _elements; }
+	const T* Data() const	{ return _elements; }
 
-	T& operator[](size_t index)				{ return _data[index]; }
-	const T& operator[](size_t index) const	{ return _data[index]; }
+	T& operator[](size_t index)				{ return _elements[index]; }
+	const T& operator[](size_t index) const	{ return _elements[index]; }
+
+	T& Last() { return _elements[_size - 1]; }
+	const T& Last() const { return _elements[_size - 1]; }
 
 	void SetSize(size_t size)
 	{
 		if (_size == size)
 			return;
 
-		T* newData;
+		byte* newData;
 		if (size != 0)
 		{
-			newData = new T[size];
+			for (size_t i = size; i < _size; ++i)
+				_elements[i].~T();
+
+			newData = _CreateNewArray(size);
 			auto minSize = size < _size ? size : _size;
-			for (size_t i = 0; i < minSize; ++i)
-#pragma warning(suppress: 6385)
-				newData[i] = std::move(_data[i]);
+			Utilities::CopyBytes(_data, newData, minSize * sizeof(T));
+
+			for (size_t i = minSize; i < size; ++i)
+				new (newData + sizeof(T) * i) T();
 		}
 		else
 			newData = nullptr;
@@ -78,19 +104,13 @@ public:
 	T& Add(const T& item)
 	{
 		SetSize(_size + 1);
-		return _data[_size - 1] = item;
+		return *new (_elements + _size - 1) T(item);
 	}
 
 	T& Add(T&& item)
 	{
 		SetSize(_size + 1);
-		return _data[_size - 1] = std::move(item);
-	}
-
-	Buffer& operator+=(const T& item)
-	{
-		Add(item);
-		return *this;
+		return *new (_elements + _size - 1) T(std::move(item));
 	}
 
 	void Clear() { SetSize(0); }
@@ -101,26 +121,23 @@ public:
 	{
 		if (pos > _size) return nullptr;
 
-		T *newData = new T[_size + 1];
-		for (size_t i = 0; i < pos; ++i)
-			newData[i] = std::move(_data[i]);
+		byte *newData = _CreateNewArray(_size + 1);
+		Utilities::CopyBytes(_data, newData, pos * sizeof(T));
+		Utilities::CopyBytes(_data + pos * sizeof(T), newData + (pos + 1) * sizeof(T), (_size - pos) * sizeof(T));
 
-		newData[pos] = item;
-
-		for (size_t i = pos; i < _size; ++i)
-			newData[i + 1] = std::move(_data[i]);
-
+		new (newData + sizeof(T) * pos) T(item);
+		
 		delete[] _data;
 		_data = newData;
 		_size++;
 
-		return &newData[pos];
+		return &_elements[pos];
 	}
 
 	T& OrderedAdd(const T &item)
 	{
 		for (size_t i = 0; i < _size; ++i)
-			if (_data[i] > item)
+			if (_elements[i] > item)
 				return *Insert(item, i);
 
 		return Add(item);
@@ -131,14 +148,11 @@ public:
 		if (index < _size)
 		{
 			_size--;
+			_elements[index].~T();
 
-			T* newData = new T[_size];
-			for (size_t i = 0; i < index; ++i)
-#pragma warning(suppress: 6386)
-				newData[i] = std::move(_data[i]);
-
-			for (size_t i = index; i < _size; ++i)
-				newData[i] = std::move(_data[i + 1]);
+			byte* newData = _CreateNewArray(_size);
+			Utilities::CopyBytes(_data, newData, index * sizeof(T));
+			Utilities::CopyBytes(_data + (index + 1) * sizeof(T), newData + index * sizeof(T), (_size - index) * sizeof(T));
 
 			delete[] _data;
 			_data = newData;
@@ -149,7 +163,7 @@ public:
 	{
 		for (size_t i = 0; i < _size;)
 		{
-			if (_data[i] == item)
+			if (_elements[i] == item)
 				RemoveIndex(i);
 			else
 				++i;
@@ -159,12 +173,13 @@ public:
 	Buffer operator+(const T& other)
 	{
 		Buffer result;
-		result.SetSize(_size + 1);
-
+		result._size = _size + 1;
+		result._data = _CreateNewArray(result._size);
+		
 		for (size_t i = 0; i < _size; ++i)
-			result._data[i] = _data[i];
+			new (result._elements + i) T(_elements[i]);
 
-		result._data[_size] = other;
+		new (result._elements + _size) T(other);
 		return result;
 	}
 
@@ -172,14 +187,13 @@ public:
 	{
 		Buffer result;
 		result._size = _size + other._size;
-		result._data = new T[result._size];
+		result._data = _CreateNewArray(result._size);
 
 		for (size_t i = 0; i < _size; ++i)
-			result._data[i] = _data[i];
+			new (result._elements + i) T(_elements[i]);
 
 		for (size_t i = 0; i < other._size; ++i)
-#pragma warning(suppress: 6385; suppress: 6386)
-			result._data[_size + i] = other._data[i];
+			new (result._elements + _size + i) T(other._elements[i]);
 
 		return result;
 	}
@@ -193,10 +207,10 @@ public:
 	{
 		delete[] _data;
 		_size = other._size;
-		_data = new T[_size];
+		_data = _CreateNewArray(_size);
 
 		for (size_t i = 0; i < _size; ++i)
-			_data[i] = other._data[i];
+			new (_elements + i) T(other[i]);
 
 		return *this;
 	}
@@ -216,7 +230,7 @@ public:
 		if (_size != other._size) return false;
 
 		for (size_t i = 0; i < _size; ++i)
-			if (_data[i] != other._data[i])
+			if (_elements[i] != other[i])
 				return false;
 
 		return true;
@@ -225,7 +239,7 @@ public:
 	int IndexOf(const T& item)
 	{
 		for (size_t i = 0; i < _size; ++i)
-			if (_data[i] == item)
+			if (_elements[i] == item)
 				return (int)i;
 
 		return -1;

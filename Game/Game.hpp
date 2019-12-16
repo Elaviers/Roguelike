@@ -18,13 +18,20 @@ private:
 	Window _window;
 
 	GLContext _glContext;
+
 	GLProgram _shaderUnlit;
 	GLProgram _shaderLit;
 
 	bool _consoleIsActive;
+	bool _uiIsActive;
 
 	UIContainer _ui;
 	EntCamera _uiCamera;
+
+	Entity _world;
+
+	short _mouseXForFrame;
+	short _mouseYForFrame;
 
 	static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -32,21 +39,23 @@ private:
 	void _InitGL();
 	void _Init();
 public:
-	Game() : _consoleIsActive(false), _running(false), _deltaTime(0.f) {}
+	Game() : _consoleIsActive(false), _uiIsActive(true), _running(false), _deltaTime(0.f), _mouseXForFrame(0), _mouseYForFrame(0) {}
 	~Game() {}
 
 	void Run();
 	void Frame();
 	void Render();
 
-	void StartLevel(const String &level);
+	void StartLevel(const String &filename);
 
 	void Resize(uint16 w, uint16 h);
 
-	void MouseMove(unsigned short x, unsigned short y);
+	void MouseInput(short x, short y);
+	void MouseMove(uint16 x, uint16 y);
 	void MouseDown();
 
 	void KeyDown(Keycode key);
+	void KeyUp(Keycode key);
 	void InputChar(char character);
 
 	void ButtonQuit();

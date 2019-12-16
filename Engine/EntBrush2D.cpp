@@ -13,12 +13,12 @@ void EntBrush2D::_OnTransformChanged()
 	float h = Maths::Abs(_point1[1] - _point2[1]);
 
 	SetRelativePosition(Vector3(x, level, z));
-	SetRelativeScale(Vector3(w, h, 1));
+	SetRelativeScale(Vector3(w, h, 0.f));
 }
 
 void EntBrush2D::Render(RenderChannels channels) const
 {
-	if (Engine::Instance().pModelManager && _material && channels & _material->GetRenderChannels())
+	if (Engine::Instance().pModelManager && _material && channels & _material->GetRenderChannelss())
 	{
 		_material->Apply();
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());

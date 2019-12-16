@@ -5,7 +5,7 @@
 #include "Map.hpp"
 #include "NumberedSet.hpp"
 #include "EntityID.hpp"
-#include "RenderChannel.hpp"
+#include "RenderChannels.hpp"
 #include "PropertyCollection.hpp"
 #include "Transform.hpp"
 #include <cstdlib>
@@ -28,6 +28,16 @@ struct RaycastResult;
 
 class Entity
 {
+public:
+	enum class Flags : byte
+	{
+		NONE = 0,
+		SAVEABLE = 0x1,
+		DBG_ALWAYS_DRAW = 0x2
+	};
+
+
+private:
 	Transform _transform;
 
 	String _name;
@@ -47,7 +57,7 @@ protected:
 
 	const uint32 _uid;
 
-	byte _flags;
+	Flags _flags;
 	const bool _dynamic;
 
 	Entity *_parent;
@@ -66,15 +76,9 @@ public:
 	Event<> onChildChanged;
 	Event<> onTransformChanged;
 
-	enum Flag
-	{
-		FLAG_SAVEABLE = 0x1,
-		FLAG_DBG_ALWAYS_DRAW = 0x2
-	};
-
 	Entity_FUNCS(Entity, EntityID::Entity)
 
-	Entity(byte flags = 0, const String &name = String()) : 
+	Entity(Flags flags = Flags::NONE, const String &name = String()) : 
 		_name(name), 
 		_uid(_TakeNextUID()), 
 		_flags(flags), 
@@ -131,7 +135,7 @@ public:
 		return _transform;
 	}
 
-	Vector3 GetWorldPosition() const							{ return GetWorldTransform().GetPosition(); }
+	Vector3 GetWorldPosition() const						{ return GetWorldTransform().GetPosition(); }
 	Rotation GetWorldRotation() const						{ return GetWorldTransform().GetRotation(); }
 	Vector3 GetWorldScale() const							{ return GetWorldTransform().GetScale(); }
 
@@ -178,38 +182,32 @@ public:
 
 	void SetParent(Entity* parent);
 
-	Entity* FindByName(const String& name);
-	Entity* FindByUID(uint32 uid);
+	Entity* FindChildWithName(const String& name);
+	Entity* FindChildWithUID(uint32 uid);
 
 	template<typename T>
-	void FindChildrenOfType(Buffer<T*>& out, bool searchChildren)
+	void FindChildrenOfType(Buffer<T*>& out)
 	{
-		for (size_t i = 0; i < _children.GetSize(); ++i)
+		if (_children.GetSize())
 		{
-			if (_children[i]->IsType<T>())
-				out.Add((T*)_children[i]);
+			size_t firstIndex = out.GetSize();
+			out.Append(_children.GetSize());
 
-			if (searchChildren)
-				_children[i]->FindChildrenOfType<T>(out, true);
+			for (size_t i = 0; i < _children.GetSize(); ++i)
+				if (_children[i]->IsType<T>())
+					out[firstIndex + i] = (T*)_children[i];
+
+			for (size_t i = 0; i < _children.GetSize(); ++i)
+				_children[i]->FindChildrenOfType<T>(out);
 		}
 	}
 
 	template<typename T>
-	Buffer<T*> FindChildrenOfType(bool searchChildren) 
+	Buffer<T*> FindChildrenOfType() 
 	{ 
 		Buffer<T*> buffer; 
-		FindChildrenOfType<T>(buffer, searchChildren); 
+		FindChildrenOfType<T>(buffer); 
 		return buffer; 
-	}
-
-
-	template <typename T>
-	T* NewChild()
-	{
-		Entity* object = new T();
-		object->_dynamic = true;
-		object->SetParent(this);
-		return dynamic_cast<T*>(object);
 	}
 
 	void CloneChildrenFrom(const Entity &src)
@@ -238,11 +236,13 @@ public:
 	#pragma endregion
 
 	//General
+	uint32 GetUID() const { return _uid; }
+	
 	const String& GetName() const { return _name; }
 	void SetName(const String& name) { _name = name; onNameChanged(); if (_parent) _parent->_OnChildChanged(); }
 
-	byte GetFlags() const { return _flags; }
-	void SetFlags(byte flags) { _flags = flags; }
+	Flags GetFlags() const { return _flags; }
+	void SetFlags(Flags flags) { _flags = flags; }
 
 	virtual void Update(float deltaTime) {}
 	virtual void Render(RenderChannels) const {}
@@ -251,8 +251,6 @@ public:
 	void RenderAll(const EntCamera &camera, RenderChannels) const;
 
 	virtual const PropertyCollection& GetProperties();
-
-	uint32 GetUID() const { return _uid; }
 
 	//IO
 	void WriteAllToFile(BufferWriter<byte>&, NumberedSet<String> &strings) const;
@@ -296,7 +294,10 @@ protected:
 		Entity *go = new T(other);
 		const_cast<bool&>(go->_dynamic) = true;
 		go->SetParent(other._parent);
-		const_cast<byte&>(go->_flags) = other._flags;
+		const_cast<Flags&>(go->_flags) = other._flags;
 		return dynamic_cast<T*>(go);
 	}
 };
+
+#include "MacroUtilities.hpp"
+DEFINE_BITMASK_FUNCS(Entity::Flags)

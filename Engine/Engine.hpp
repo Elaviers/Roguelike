@@ -32,25 +32,8 @@ enum class EngineCreateFlags : uint16
 	ALL = 0xFFFF
 };
 
-inline EngineCreateFlags operator|(const EngineCreateFlags& a, const EngineCreateFlags& b)
-{
-	return EngineCreateFlags(int(a) | int(b));
-}
-
-inline EngineCreateFlags& operator|=(EngineCreateFlags& a, const EngineCreateFlags& b)
-{
-	return a = a | b;
-}
-
-inline EngineCreateFlags operator~(const EngineCreateFlags& ecf)
-{
-	return EngineCreateFlags(~int(ecf));
-}
-
-inline bool operator&(const EngineCreateFlags& a, const EngineCreateFlags& b)
-{
-	return int(a) & int(b);
-}
+#include "MacroUtilities.hpp"
+DEFINE_BITMASK_FUNCS(EngineCreateFlags)
 
 class Engine
 {

@@ -66,7 +66,7 @@ void GenerateConnectedSegments(Entity &world, const Entity &src, const LevelBag 
 	}
 }
 
-Entity LevelGeneration::GenerateLevel(const String &string)
+bool LevelGeneration::GenerateLevel(Entity& root, const String &string)
 {
 	Random random;
 
@@ -90,7 +90,7 @@ Entity LevelGeneration::GenerateLevel(const String &string)
 					if (tokens[0] == "segment")
 					{
 						Entity *level = Entity::Create();
-						if (LevelIO::Read(*level, CSTR(root, tokens[1])))
+						if (LevelIO::Read(*level, CSTR(ROOT_DIR, tokens[1])))
 							bag.AddLevel(*level, 1);
 						else
 							level->Delete();
@@ -99,13 +99,11 @@ Entity LevelGeneration::GenerateLevel(const String &string)
 		}
 	}
 
-	Entity world;
-
 	const Entity &lvl = bag.GetNextLevel(random);
-	Entity *root = Entity::Create();
-	root->CloneChildrenFrom(lvl);
+	Entity *seg1 = Entity::Create();
+	seg1->CloneChildrenFrom(lvl);
 	
-	GenerateConnectedSegments(world, *root, bag, random, depth);
+	GenerateConnectedSegments(root, *seg1, bag, random, depth);
 
-	return world;
+	return true;
 }

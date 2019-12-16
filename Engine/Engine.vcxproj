@@ -129,7 +129,7 @@
       <EnablePREfast>true</EnablePREfast>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>freetype.lib;</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib;Shell32.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
@@ -192,7 +192,8 @@
     <ClInclude Include="Asset.hpp" />
     <ClInclude Include="AudioUtilities.hpp" />
     <ClInclude Include="Box.hpp" />
-    <ClInclude Include="CollisionChannel.hpp" />
+    <ClInclude Include="CollisionChannels.hpp" />
+    <ClInclude Include="CollisionShape.hpp" />
     <ClInclude Include="Colour.hpp" />
     <ClInclude Include="Console.hpp" />
     <ClInclude Include="Event.hpp" />
@@ -234,7 +235,7 @@
     <ClInclude Include="Collider.hpp" />
     <ClInclude Include="Collision.hpp" />
     <ClInclude Include="EntConnector.hpp" />
-    <ClInclude Include="ColliderBox.hpp" />
+    <ClInclude Include="CollisionBox.hpp" />
     <ClInclude Include="DebugFrustum.hpp" />
     <ClInclude Include="DebugManager.hpp" />
     <ClInclude Include="DebugObject.hpp" />
@@ -278,9 +279,9 @@
     <ClInclude Include="AssetManager.hpp" />
     <ClInclude Include="NumberedSet.hpp" />
     <ClInclude Include="Sampler.hpp" />
-    <ClInclude Include="RenderChannel.hpp" />
+    <ClInclude Include="RenderChannels.hpp" />
     <ClInclude Include="Skybox.hpp" />
-    <ClInclude Include="ColliderSphere.hpp" />
+    <ClInclude Include="CollisionSphere.hpp" />
     <ClInclude Include="String.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="TextureManager.hpp" />
@@ -340,7 +341,7 @@
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="EntConnector.cpp" />
-    <ClCompile Include="ColliderBox.cpp" />
+    <ClCompile Include="CollisionBox.cpp" />
     <ClCompile Include="DebugFrustum.cpp" />
     <ClCompile Include="DebugManager.cpp" />
     <ClCompile Include="DebugObject.cpp" />
@@ -372,7 +373,7 @@
     <ClCompile Include="EntRenderable.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Skybox.cpp" />
-    <ClCompile Include="ColliderSphere.cpp" />
+    <ClCompile Include="CollisionSphere.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />

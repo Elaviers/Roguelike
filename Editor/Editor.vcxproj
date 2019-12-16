@@ -189,7 +189,6 @@ EXIT 0</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Editor.cpp" />
-    <ClCompile Include="EditorIO.cpp" />
     <ClCompile Include="EditorUtil.cpp" />
     <ClCompile Include="FbxReader.cpp" />
     <ClCompile Include="GizmoAxis.cpp" />

@@ -10,10 +10,7 @@ void GizmoAxis::_OnTransformChanged()
 {
 	_fv = transform.GetForwardVector();
 
-	_collider.extent = Vector3(0.1f, 0.1f, _length / 2.f);
-
-	_collider.transform.SetPosition((2.f * transform.GetPosition() + _fv * _length) / 2.f);
-	_collider.transform.SetRotation(transform.GetRotation());
+	_collisionBox->SetTransform(Transform((2.f * transform.GetPosition() + _fv * _length) / 2.f, transform.GetRotation(), Vector3(0.1f, 0.1f, _length / 2.f)));
 }
 
 void GizmoAxis::Draw() const
@@ -49,14 +46,11 @@ void GizmoAxis::Update(const Ray& mouseRay, float &minT)
 	else
 	{
 		RaycastResult rr;
-		if (_collider.IntersectsRay(mouseRay, rr) && rr.entryTime < minT)
+		if (_collider.IntersectsRay(Transform(), mouseRay, rr) && rr.entryTime < minT)
 		{
 			minT = rr.entryTime;
 
 			_grabOffset = mouseRay.origin + mouseRay.direction * rr.entryTime - transform.GetPosition();
-			
-			//Snap
-			//_grabOffset = _fv * Vector3::Dot(_fv, _grabOffset);
 			
 			_canDrag = true;
 		}

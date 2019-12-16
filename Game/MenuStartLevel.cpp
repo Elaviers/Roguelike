@@ -16,7 +16,7 @@ void MenuStartLevel::Initialise(const FunctionPointer<void, const String&> &onLe
 	_panel.SetMaterial(_buttonMaterial);
 	_panel.SetBorderSize(-8.f);
 
-	Buffer<String> filenames = IO::FindFilesInDirectoryRecursive(LevelGeneration::root, "*.lvl");
+	Buffer<String> filenames = IO::FindFilesInDirectoryRecursive(LevelGeneration::ROOT_DIR, "*.lvl");
 
 	const float btnH = 32.f;
 
@@ -37,5 +37,5 @@ void MenuStartLevel::Initialise(const FunctionPointer<void, const String&> &onLe
 
 void MenuStartLevel::ButtonLevel(UIButton &button)
 {
-	_onLevelChosen(String(LevelGeneration::root) + button.GetString());
+	_onLevelChosen(String(LevelGeneration::ROOT_DIR) + button.GetString());
 }

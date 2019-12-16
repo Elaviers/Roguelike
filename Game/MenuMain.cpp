@@ -17,6 +17,7 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 
 	_buttonStart.SetFont(arial);
 	_buttonQuit.SetFont(arial);
+	_buttonSingleLevel.SetFont(arial);
 
 	_panel.SetParent(this);
 	_panel.SetMaterial(material);
@@ -30,20 +31,29 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	_buttonQuit.SetBounds(.6f, 1.f, .4f, 64.f, 0.f, -64.f);
 	_buttonQuit.SetCallback(FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonQuit));
 
+	_buttonSingleLevel.SetParent(this);
+	_buttonSingleLevel.SetBounds(0.f, 0.f, 1.f, 64.f);
+	_buttonSingleLevel.SetCallback(FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonSingleLevel));
+
 	_buttonStart.SetMaterial(material);
 	_buttonQuit.SetMaterial(material);
+	_buttonSingleLevel.SetMaterial(material);
 
 	_buttonStart.SetBorderSize(16.f);
 	_buttonQuit.SetBorderSize(16.f);
+	_buttonSingleLevel.SetBorderSize(16.f);
 
 	_buttonStart.SetColourInactive(inactiveBtnColour);
 	_buttonQuit.SetColourInactive(inactiveBtnColour);
+	_buttonSingleLevel.SetColourInactive(inactiveBtnColour);
 
 	_buttonStart.SetColourActive(activeBtnColour);
 	_buttonQuit.SetColourActive(activeBtnColour);
+	_buttonSingleLevel.SetColourActive(activeBtnColour);
 
 	_buttonStart.SetString("Start");
 	_buttonQuit.SetString("Exit");
+	_buttonSingleLevel.SetString("Load Level");
 }
 
 void MenuMain::ButtonStart(UIButton&)
@@ -64,4 +74,17 @@ void MenuMain::ButtonStart(UIButton&)
 void MenuMain::ButtonQuit(UIButton&)
 {
 	_onQuit();
+}
+
+#include <Engine/IO.hpp>
+const Buffer<Pair<const wchar_t*>> LEVELFILTER({Pair<const wchar_t*>(L"Level File", L"*.lvl")});
+
+void MenuMain::ButtonSingleLevel(UIButton&)
+{
+	String filename = IO::OpenFileDialog(L"Data/Levels", LEVELFILTER);
+
+	if (filename.GetLength())
+	{
+		_onLevelChosen(filename);
+	}
 }

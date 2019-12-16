@@ -7,8 +7,9 @@
 #include "String.hpp"
 #include "TextureManager.hpp"
 
-const Vector3 EntLight::_editorBoxExtent(.1f, .1f, .1f);
-const ColliderBox EntLight::_lightCollider(CollisionChannels::EDITOR, EntLight::_editorBoxExtent);
+int EntLight::_frameLightCounter;
+
+Vector3 EntLight::_editorBoxExtent(.1f, .1f, .1f);
 
 bool EntLight::drawLightSources = true;
 
@@ -31,22 +32,29 @@ const PropertyCollection& EntLight::GetProperties()
 	return cvars;
 }
 
-void EntLight::ToShader(int glArrayIndex)
+void EntLight::ToShader(int glArrayIndex) const
 {
 	Mat4 worldTransform = GetWorldTransform().GetTransformationMatrix();
 
 	String arrayElemName = String("Lights[") + String::From(glArrayIndex) + ']';
-	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Position")),		1, worldTransform[3]);
-	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Colour")),			1, &_colour[0]);
-	glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Radius")),			1, &_radius);
+	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Position")),	1, worldTransform[3]);
+	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Colour")),	1, &_colour[0]);
+	glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Radius")),	1, &_radius);
+}
+
+void EntLight::Update(float deltaTime)
+{
+	EntLight::_frameLightCounter = 0;
 }
 
 void EntLight::Render(RenderChannels channels) const
 {
-	const float colour[4] = {_colour[0], _colour[1], _colour[2], 1.f};
+	if (channels & RenderChannels::PRE_RENDER && EntLight::_frameLightCounter < GLProgram::Current().GetMaxLightCount())
+		ToShader(EntLight::_frameLightCounter++);
 
-	if (drawLightSources && Engine::Instance().pTextureManager && channels & RenderChannels::EDITOR)
+	if (EntLight::drawLightSources && Engine::Instance().pTextureManager && channels & RenderChannels::EDITOR)
 	{
+		const float colour[4] = { _colour[0], _colour[1], _colour[2], 1.f };
 		Engine::Instance().pTextureManager->White()->Bind(0);
 		glUniform4fv(GLProgram::Current().GetUniformLocation("Colour"), 1, colour);
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, Matrix::Scale(_editorBoxExtent * 2.f) * GetTransformationMatrix());
@@ -68,4 +76,13 @@ void EntLight::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& s
 
 	_radius = reader.Read_float();
 	_colour = reader.Read_vector3();
+}
+
+//static
+void EntLight::FinaliseLightingForFrame()
+{
+	for (int i = _frameLightCounter; i < GLProgram::Current().GetMaxLightCount(); ++i)
+	{
+		GLProgram::Current().SetFloat(CSTR("Lights[", i, "].Radius"), 0.f);
+	}
 }

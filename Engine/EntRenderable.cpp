@@ -33,7 +33,7 @@ void EntRenderable::Render(RenderChannels channels) const
 	{
 		if (_material)
 		{
-			if (! (channels & _material->GetRenderChannels()))
+			if (! (channels & _material->GetRenderChannelss()))
 				return;
 
 			_material->Apply();
@@ -48,7 +48,7 @@ void EntRenderable::Render(RenderChannels channels) const
 const Collider* EntRenderable::GetCollider() const
 {
 	if (_model)
-		return _model->GetCollider();
+		return &_model->GetCollider();
 
 	return nullptr;
 }

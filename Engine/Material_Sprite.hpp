@@ -17,4 +17,3 @@ public:
 
 	virtual void Apply(const RenderParam* param = nullptr) const override { _diffuse->Bind(0); }
 };
-

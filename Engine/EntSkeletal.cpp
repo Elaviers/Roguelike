@@ -58,7 +58,7 @@ void EntSkeletal::Render(RenderChannels channels) const
 	{
 		if (_material)
 		{
-			if (!(channels & _material->GetRenderChannels()))
+			if (!(channels & _material->GetRenderChannelss()))
 				return;
 
 			_material->Apply();

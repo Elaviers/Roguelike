@@ -21,7 +21,7 @@ public:
 	Entity_FUNCS(EntRenderable, EntityID::RENDERABLE)
 	
 	EntRenderable() : 
-		Entity(FLAG_SAVEABLE), 
+		Entity(Flags::SAVEABLE), 
 		_model(nullptr), 
 		_material(nullptr), 
 		_colour(1.f, 1.f, 1.f),

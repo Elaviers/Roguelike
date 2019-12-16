@@ -14,7 +14,7 @@ public:
 		const SharedPointer<const Texture>& normal = SharedPointer<const Texture>(), 
 		const SharedPointer<const Texture>& specular = SharedPointer<const Texture>(), 
 		const SharedPointer<const Texture>& reflection = SharedPointer<const Texture>())
-		: Material(RenderChannels::SURFACE), _diffuse(diffuse), _normal(normal), _specular(specular), _reflection(reflection)
+		: Material(RenderChannels::SURFACE | RenderChannels::UNLIT), _diffuse(diffuse), _normal(normal), _specular(specular), _reflection(reflection)
 	{}
 	
 	virtual ~MaterialSurface() {}

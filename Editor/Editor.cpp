@@ -186,6 +186,7 @@ void Editor::_InitGL()
 
 	glLineWidth(lineW);
 
+	_shaderLit.SetMaxLightCount(8);
 	_shaderLit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Phong.frag");
 	_shaderUnlit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
 }
@@ -300,20 +301,9 @@ void Editor::RenderViewport(int index, Direction dir)
 		_shaderLit.SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
 		_shaderLit.SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1, 1));
 
-		Buffer<EntLight*> lights = _level.FindChildrenOfType<EntLight>(true);
-
-		for (size_t i = 0; i < 8; ++i)
-		{
-			if (i < lights.GetSize())
-				lights[i]->ToShader((int)i);
-			else
-			{
-				float zero = 0.f;
-				glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR("Lights[", i, "].Radius")), 1, &zero);
-			}
-		}
-
-		_level.RenderAll(CameraRef(0), _litRenderChannels);
+		_level.RenderAll(CameraRef(0), RenderChannels::PRE_RENDER);
+		EntLight::FinaliseLightingForFrame();
+		_level.RenderAll(CameraRef(0), _litRenderChannelss);
 	}
 
 	//UNLIT PASS
@@ -321,7 +311,7 @@ void Editor::RenderViewport(int index, Direction dir)
 	camera.Use();
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
-	_level.RenderAll(CameraRef(0), RenderChannels(_unlitRenderChannels | (_drawEditorFeatures ? RenderChannels::EDITOR : RenderChannels::NONE)));
+	_level.RenderAll(CameraRef(0), RenderChannels(_unlitRenderChannelss | (_drawEditorFeatures ? RenderChannels::EDITOR : RenderChannels::NONE)));
 	
 	if (_drawEditorFeatures)
 	{
@@ -342,7 +332,7 @@ void Editor::RenderViewport(int index, Direction dir)
 
 	Engine::Instance().pTextureManager->White()->Bind(0);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
-	if (_currentTool) _currentTool->Render(RenderChannels::ALL);
+	if (_currentTool) _currentTool->Render(RenderChannels::UNLIT);
 
 	glDepthFunc(GL_ALWAYS);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
@@ -711,7 +701,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			{
 			case ID_FILE_OPEN:
 			{
-				String filename = EditorIO::OpenFileDialog(L"\\Data\\Levels", levelDialogFilter);
+				String filename = IO::OpenFileDialog(L"\\Data\\Levels", levelDialogFilter);
 				editor->KeyCancel();
 				editor->_level.DeleteChildren();
 				LevelIO::Read(editor->_level, filename.GetData());
@@ -720,7 +710,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 			case ID_FILE_SAVEAS:
 			{
-				String filename = EditorIO::SaveFileDialog(L"\\Data\\Levels", levelDialogFilter);
+				String filename = IO::SaveFileDialog(L"\\Data\\Levels", levelDialogFilter);
 				LevelIO::Write(editor->_level, filename.GetData());
 			}
 			break;
@@ -751,7 +741,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 						if (skeletalMesh)
 						{
-							String filename = EditorIO::OpenFileDialog(L"\\Data\\Animations", openAnimationFilter);
+							String filename = IO::OpenFileDialog(L"\\Data\\Animations", openAnimationFilter);
 							if (filename.GetLength() == 0)
 								break;
 
@@ -759,7 +749,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 							if (animation)
 							{
-								String dest = EditorIO::SaveFileDialog(L"\\Data\\Animations", saveAnimationFilter);
+								String dest = IO::SaveFileDialog(L"\\Data\\Animations", saveAnimationFilter);
 								if (dest.GetLength())
 									IO::WriteFile(dest.GetData(), animation->GetAsData());
 								else
@@ -774,7 +764,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 			case ID_IMPORT_MODEL:
 			{
-				String filename = EditorIO::OpenFileDialog(L"\\Data\\Models", openModelFilter);
+				String filename = IO::OpenFileDialog(L"\\Data\\Models", openModelFilter);
 				if (filename.GetLength() == 0)
 					break;
 
@@ -793,7 +783,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 				if (mesh && mesh->IsValid())
 				{
-					String dest = EditorIO::SaveFileDialog(L"\\Data\\Models", saveModelFilter);
+					String dest = IO::SaveFileDialog(L"\\Data\\Models", saveModelFilter);
 
 					if (dest.GetLength())
 					{
@@ -806,7 +796,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 							if (anim)
 							{
-								String animDest = EditorIO::SaveFileDialog(L"\\Data\\Animations", saveAnimationFilter);
+								String animDest = IO::SaveFileDialog(L"\\Data\\Animations", saveAnimationFilter);
 
 								if (animDest.GetLength())
 									IO::WriteFile(animDest.GetData(), anim->GetAsData());
@@ -823,7 +813,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 			case ID_IMPORT_TEXTURE:
 			{
-				String filename = EditorIO::OpenFileDialog(L"\\Data\\Textures", openTextureFilter);
+				String filename = IO::OpenFileDialog(L"\\Data\\Textures", openTextureFilter);
 
 			}
 				break;
@@ -846,13 +836,13 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			break;
 
 			case ID_SHADING_UNLIT:
-				editor->_litRenderChannels = RenderChannels::NONE;
-				editor->_unlitRenderChannels = RenderChannels(RenderChannels::SURFACE | RenderChannels::UNLIT);
+				editor->_litRenderChannelss = RenderChannels::NONE;
+				editor->_unlitRenderChannelss = RenderChannels(RenderChannels::SURFACE | RenderChannels::UNLIT);
 				break;
 
 			case ID_SHADING_PHONG:
-				editor->_litRenderChannels = RenderChannels::SURFACE;
-				editor->_unlitRenderChannels = RenderChannels::UNLIT;
+				editor->_litRenderChannelss = RenderChannels::SURFACE;
+				editor->_unlitRenderChannelss = RenderChannels::UNLIT;
 				break;
 
 			case ID_DRAWEDITORFEATURES:

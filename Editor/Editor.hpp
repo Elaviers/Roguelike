@@ -69,8 +69,8 @@ private:
 	//Editor
 	bool _drawEditorFeatures = true;
 
-	RenderChannels _litRenderChannels = RenderChannels::NONE;
-	RenderChannels _unlitRenderChannels = RenderChannels(RenderChannels::SURFACE | RenderChannels::UNLIT);
+	RenderChannels _litRenderChannelss = RenderChannels::NONE;
+	RenderChannels _unlitRenderChannelss = RenderChannels(RenderChannels::SURFACE | RenderChannels::UNLIT);
 
 	Entity _level;
 
@@ -106,7 +106,7 @@ public:
 		_EditorTools(Editor& editor) : select(editor), brush2D(editor), brush3D(editor), entity(editor), connector(editor) {}
 	} tools;
 
-	Editor() : _fbxManager(nullptr), _hierachyWindow(this), _propertyWindow(this), _toolWindow(this), tools(*this), _level(0, "Level") {}
+	Editor() : _fbxManager(nullptr), _hierachyWindow(this), _propertyWindow(this), _toolWindow(this), tools(*this), _level(Entity::Flags::NONE, "Level") {}
 	~Editor();
 
 	void Run();

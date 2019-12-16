@@ -72,7 +72,7 @@ void Entity::UpdateAll(float deltaTime)
 
 void Entity::RenderAll(const EntCamera &camera, RenderChannels channels) const
 {
-	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags & FLAG_DBG_ALWAYS_DRAW)
+	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags & Flags::DBG_ALWAYS_DRAW)
 		Render(channels);
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
@@ -116,28 +116,28 @@ void Entity::SetParent(Entity* parent)
 	}
 }
 
-Entity* Entity::FindByName(const String& name)
+Entity* Entity::FindChildWithName(const String& name)
 {
 	if (_name == name)
 		return this;
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
 	{
-		Entity* result = _children[i]->FindByName(name);
+		Entity* result = _children[i]->FindChildWithName(name);
 		if (result) return result;
 	}
 
 	return nullptr;
 }
 
-Entity* Entity::FindByUID(uint32 uid)
+Entity* Entity::FindChildWithUID(uint32 uid)
 {
 	if (_uid == uid)
 		return this;
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
 	{
-		Entity* result = _children[i]->FindByUID(uid);
+		Entity* result = _children[i]->FindChildWithUID(uid);
 		if (result) return result;
 	}
 
@@ -148,7 +148,7 @@ Entity* Entity::FindByUID(uint32 uid)
 
 void Entity::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const
 {
-	if (_flags & FLAG_SAVEABLE)
+	if (_flags & Flags::SAVEABLE)
 	{
 		byte id = GetTypeID();
 		if (id != 0)
@@ -192,7 +192,7 @@ void Entity::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& str
 bool Entity::OverlapsRay(const Ray &ray, RaycastResult &result) const
 {
 	if (this->GetCollider())
-		return this->GetCollider()->IntersectsRay(ray, result, GetWorldTransform());
+		return this->GetCollider()->IntersectsRay(GetWorldTransform(), ray, result);
 
 	return false;
 }
@@ -200,7 +200,7 @@ bool Entity::OverlapsRay(const Ray &ray, RaycastResult &result) const
 bool Entity::OverlapsCollider(const Collider &other, const Transform &otherTransform) const
 {
 	if (this->GetCollider())
-		return this->GetCollider()->Overlaps(other, otherTransform, GetWorldTransform());
+		return this->GetCollider()->Overlaps(GetWorldTransform(), other, otherTransform);
 
 	return false;
 }
@@ -297,7 +297,7 @@ void Entity::CMD_Ent(const Buffer<String>& tokens)
 {
 	if (tokens.GetSize() >= 1)
 	{
-		Entity* obj = FindByName(tokens[0]);
+		Entity* obj = FindChildWithName(tokens[0]);
 
 		if (obj)
 		{

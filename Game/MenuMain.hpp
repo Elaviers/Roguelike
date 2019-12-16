@@ -9,6 +9,8 @@ class MenuMain : public UIContainer
 	UIButton _buttonStart;
 	UIButton _buttonQuit;
 
+	UIButton _buttonSingleLevel;
+
 	FunctionPointer<void, const String&> _onLevelChosen;
 	Callback _onQuit;
 
@@ -20,4 +22,6 @@ public:
 
 	void ButtonStart(UIButton&);
 	void ButtonQuit(UIButton&);
+
+	void ButtonSingleLevel(UIButton&);
 };

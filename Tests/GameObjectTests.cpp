@@ -142,7 +142,7 @@ namespace EngineTests
 
 #define SRC(TYPE) \
 		TYPE src;									\
-		src.SetFlags(Entity::FLAG_SAVEABLE);	\
+		src.SetFlags(Entity::Flags::SAVEABLE);		\
 		src.SetRelativeTransform(t);				\
 		src.SetName(name);
 		TEST_METHOD(TestReadWrite)

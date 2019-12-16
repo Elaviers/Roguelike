@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.hpp"
-#include "ColliderBox.hpp"
+#include "CollisionBox.hpp"
 #include "Engine.hpp"
 #include "MaterialManager.hpp"
 #include "SharedPointer.hpp"
@@ -10,10 +10,6 @@ template <int SIZE>
 class EntBrush : public Entity
 {
 protected:
-	//todo: add dimensions
-	ColliderBox _collider = ColliderBox(CollisionChannels::SURFACE, Vector3(.5f, .5f, .5f));
-	Bounds _bounds = Bounds(Vector3(.5f, .5f, .5f));
-
 	Vector<float, SIZE> _point1;
 	Vector<float, SIZE> _point2;
 	
@@ -21,7 +17,7 @@ protected:
 
 	virtual void _OnTransformChanged() = 0;
 
-	EntBrush() : Entity(FLAG_SAVEABLE), _material(nullptr) { }
+	EntBrush() : Entity(Flags::SAVEABLE), _material(nullptr) { }
 	virtual ~EntBrush() {}
 
 public:
@@ -39,6 +35,15 @@ public:
 		return "Unknown";
 	}
 
-	virtual const Collider* GetCollider() const override { return &_collider; }
-	virtual Bounds GetBounds() const override { return _bounds; }
+	virtual const Collider* GetCollider() const override 
+	{
+		static Collider collider(CollisionChannels::SURFACE, Box(Vector3(), Vector3(.5f, .5f, .5f)));
+		return &collider;
+	}
+	
+	virtual Bounds GetBounds() const override 
+	{ 
+		static Bounds bounds(Vector3(.5f, .5f, .5f));
+		return bounds;
+	}
 };

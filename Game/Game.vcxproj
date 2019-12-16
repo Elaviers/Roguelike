@@ -188,6 +188,7 @@ EXIT 0</Command>
   <ItemGroup>
     <ClCompile Include="EntPlayer.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameInstance.cpp" />
     <ClCompile Include="LevelBag.cpp" />
     <ClCompile Include="LevelGeneration.cpp" />
     <ClCompile Include="MenuMain.cpp" />
@@ -197,6 +198,7 @@ EXIT 0</Command>
   <ItemGroup>
     <ClInclude Include="EntPlayer.h" />
     <ClInclude Include="Game.hpp" />
+    <ClInclude Include="GameInstance.h" />
     <ClInclude Include="LevelBag.hpp" />
     <ClInclude Include="LevelGeneration.hpp" />
     <ClInclude Include="MenuMain.hpp" />

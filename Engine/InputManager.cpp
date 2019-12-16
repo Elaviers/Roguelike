@@ -89,7 +89,7 @@ void InputManager::KeyUp(Keycode key)
 		(*keyBind)->KeyUp();
 }
 
-void InputManager::MouseMove(short x, short y)
+void InputManager::SetMouseAxes(short x, short y)
 {
 	auto mouseX = _axisBinds.Get(AxisType::MOUSE_X);
 	auto mouseY = _axisBinds.Get(AxisType::MOUSE_Y);

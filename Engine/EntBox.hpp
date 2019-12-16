@@ -19,7 +19,7 @@ protected:
 public:
 	Entity_FUNCS(EntBox, EntityID::BOX)
 
-	EntBox(byte flags = 0) : Entity(flags), _colour(1.f, 1.f, 1.f, 1.f) {}
+	EntBox(Flags flags = Flags::NONE) : Entity(flags), _colour(1.f, 1.f, 1.f, 1.f) {}
 	virtual ~EntBox() {}
 
 	virtual void Render(RenderChannels) const override;

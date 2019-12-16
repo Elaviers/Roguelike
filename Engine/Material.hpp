@@ -1,7 +1,7 @@
 #pragma once
 #include "Asset.hpp"
 #include "Engine.hpp"
-#include "RenderChannel.hpp"
+#include "RenderChannels.hpp"
 #include "String.hpp"
 
 struct RenderParam;
@@ -9,9 +9,9 @@ struct RenderParam;
 class Material : public Asset
 {
 protected:
-	RenderChannels _renderChannels;
+	RenderChannels _RenderChannelss;
 
-	Material(RenderChannels channels) : _renderChannels(channels) { }
+	Material(RenderChannels channels) : _RenderChannelss(channels) { }
 
 public:
 	virtual ~Material() {}
@@ -20,5 +20,5 @@ public:
 
 	virtual void Apply(const RenderParam* param = nullptr) const = 0;
 
-	RenderChannels GetRenderChannels() const { return _renderChannels; }
+	RenderChannels GetRenderChannelss() const { return _RenderChannelss; }
 };

@@ -31,24 +31,24 @@ public:
 	EntCamera() : _type(ProjectionType::PERSPECTIVE), _fov(90.f), _scale(1.f), _near(.001f), _far(100.f) { }
 	~EntCamera() {}
 
-	void Use();
+	void Use() const;
 	static const EntCamera* Current() { return _currentCamera; }
 
-	void SetProjectionType(ProjectionType type)	{ _type = type; UpdateProjectionMatrix(); }
-	void SetFOV(float fieldOfView)				{ _fov = fieldOfView; UpdateProjectionMatrix(); }
-	void SetScale(float scale)					{ _scale = scale; UpdateProjectionMatrix(); }
-	void SetZBounds(float n, float f)			{ _near = n; _far = f; UpdateProjectionMatrix(); }
-	void SetViewport(uint16 width, uint16 height){ _viewport[0] = width; _viewport[1] = height;	UpdateProjectionMatrix(); }
+	void SetProjectionType(ProjectionType type)		{ _type = type; UpdateProjectionMatrix(); }
+	void SetFOV(float fieldOfView)					{ _fov = fieldOfView; UpdateProjectionMatrix(); }
+	void SetScale(float scale)						{ _scale = scale; UpdateProjectionMatrix(); }
+	void SetZBounds(float n, float f)				{ _near = n; _far = f; UpdateProjectionMatrix(); }
+	void SetViewport(uint16 width, uint16 height)	{ _viewport[0] = width; _viewport[1] = height;	UpdateProjectionMatrix(); }
 
 	ProjectionType GetProjectionType() const		{ return _type; }
 	float GetFOV() const							{ return _fov; }
-	float GetFOVHorizontal() const				{ return _fov * (float)_viewport[0] / (float)_viewport[1]; }
-	float GetScale() const						{ return _scale; }
+	float GetFOVHorizontal() const					{ return _fov * (float)_viewport[0] / (float)_viewport[1]; }
+	float GetScale() const							{ return _scale; }
 	const Vector<uint16, 2>& GetViewport() const	{ return _viewport; }
-	float GetNear() const						{ return _near; }
+	float GetNear() const							{ return _near; }
 	float GetFar() const							{ return _far; }
 
-	const Mat4& GetProjectionMatrix() const		{ return _projection; }
+	const Mat4& GetProjectionMatrix() const			{ return _projection; }
 
 	bool FrustumOverlaps(const Bounds &b) const;
 

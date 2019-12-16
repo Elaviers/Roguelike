@@ -7,8 +7,8 @@ class LevelBag;
 
 namespace LevelGeneration
 {
-	constexpr const char* root = "Data/Levels/";
+	constexpr const char* ROOT_DIR = "Data/Levels/";
 
-	Entity GenerateLevel(const String&);
+	bool GenerateLevel(Entity& root, const String&);
 
 }

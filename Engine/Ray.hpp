@@ -1,5 +1,5 @@
 #pragma once
-#include "CollisionChannel.hpp"
+#include "CollisionChannels.hpp"
 #include "Vector.hpp"
 
 struct Ray

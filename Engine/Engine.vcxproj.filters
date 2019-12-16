@@ -15,9 +15,6 @@
     <Filter Include="Source Files\GL">
       <UniqueIdentifier>{1d01c458-8af9-46ec-8f6c-be82e6f19149}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Objects">
-      <UniqueIdentifier>{b493a4d8-6b89-4099-915d-f6b1e24dba32}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Managers">
       <UniqueIdentifier>{7bb587e0-f989-40e0-b70c-3d55c2dcf9d9}</UniqueIdentifier>
     </Filter>
@@ -103,6 +100,9 @@
     <Filter Include="Header Files\Entities">
       <UniqueIdentifier>{c60b00f4-374f-4db6-9c75-a51fa3273a7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Entitites">
+      <UniqueIdentifier>{b493a4d8-6b89-4099-915d-f6b1e24dba32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Types.hpp">
@@ -175,9 +175,6 @@
       <Filter>Header Files\Templates</Filter>
     </ClInclude>
     <ClInclude Include="Collider.hpp">
-      <Filter>Header Files\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="ColliderSphere.hpp">
       <Filter>Header Files\Collision</Filter>
     </ClInclude>
     <ClInclude Include="Collision.hpp">
@@ -366,17 +363,8 @@
     <ClInclude Include="StackAllocator.hpp">
       <Filter>Header Files\Classes</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionChannel.hpp">
-      <Filter>Header Files\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="ColliderBox.hpp">
-      <Filter>Header Files\Collision</Filter>
-    </ClInclude>
     <ClInclude Include="Box.hpp">
       <Filter>Header Files\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderChannel.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Material_Sprite.hpp">
       <Filter>Header Files\Asset</Filter>
@@ -450,6 +438,21 @@
     <ClInclude Include="EntityID.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RenderChannels.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionShape.hpp">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionBox.hpp">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionSphere.hpp">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionChannels.hpp">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLProgram.cpp">
@@ -514,9 +517,6 @@
     </ClCompile>
     <ClCompile Include="Window.cpp">
       <Filter>Source Files\Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="ColliderSphere.cpp">
-      <Filter>Source Files\Collision</Filter>
     </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>Source Files\Collision</Filter>
@@ -653,9 +653,6 @@
     <ClCompile Include="StackAllocator.cpp">
       <Filter>Source Files\Classes</Filter>
     </ClCompile>
-    <ClCompile Include="ColliderBox.cpp">
-      <Filter>Source Files\Collision</Filter>
-    </ClCompile>
     <ClCompile Include="Material_Sprite.cpp">
       <Filter>Source Files\Asset</Filter>
     </ClCompile>
@@ -681,40 +678,46 @@
       <Filter>Source Files\Classes</Filter>
     </ClCompile>
     <ClCompile Include="Entity.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="EntBox.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="EntBrush2D.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="EntBrush3D.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="EntCamera.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="EntConnector.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="EntLight.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="EntRenderable.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="EntSkeletal.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="EntSprite.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files\Asset</Filter>
     </ClCompile>
     <ClCompile Include="AnimationTrack.cpp">
       <Filter>Source Files\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionBox.cpp">
+      <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionSphere.cpp">
+      <Filter>Source Files\Collision</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -20,7 +20,7 @@ class MaterialGrid : public Material
 	void _CMD_columns(const Buffer<String> &args);
 
 public:
-	MaterialGrid() : Material(RenderChannels::ALL), _texture(nullptr) {}
+	MaterialGrid() : Material(RenderChannels::UNLIT), _texture(nullptr) {}
 
 	virtual ~MaterialGrid() {}
 

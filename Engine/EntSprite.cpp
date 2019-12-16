@@ -6,7 +6,7 @@
 
 void EntSprite::Render(RenderChannels channels) const
 {
-	if (Engine::Instance().pModelManager && EntCamera::Current() && _material && channels & _material->GetRenderChannels())
+	if (Engine::Instance().pModelManager && EntCamera::Current() && _material && channels & _material->GetRenderChannelss())
 	{
 		Mat4 t;
 

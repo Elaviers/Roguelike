@@ -340,7 +340,7 @@ void Frame()
 	if (cursorLocked) {
 		POINT cursorPos;
 		::GetCursorPos(&cursorPos);
-		Engine::Instance().pInputManager->MouseMove((short)(cursorPos.x - lockPos.x), (short)(cursorPos.y - lockPos.y));
+		Engine::Instance().pInputManager->SetMouseAxes((short)(cursorPos.x - lockPos.x), (short)(cursorPos.y - lockPos.y));
 		::SetCursorPos(lockPos.x, lockPos.y);
 	}
 
@@ -387,12 +387,12 @@ void Frame()
 		textureManager.Get(texSpecular)->Bind(UNIT_SPECULAR);
 		textureManager.Get(texReflection)->Bind(UNIT_REFLECTION);
 		
-		cube.Render(RenderChannels::ALL);
+		cube.Render(RenderChannels::SURFACE);
 
 		textureManager.NormalDefault()->Bind(UNIT_NORMAL);
 		textureManager.White()->Bind(UNIT_SPECULAR);
 		textureManager.White()->Bind(UNIT_REFLECTION);
-		renderable.Render(RenderChannels::ALL);
+		renderable.Render(RenderChannels::SURFACE);
 		//
 
 		//
@@ -421,10 +421,10 @@ void Frame()
 
 			textureManager.White()->Bind(0);
 
-			light1.Render(RenderChannels::ALL);
-			light2.Render(RenderChannels::ALL);
-			light3.Render(RenderChannels::ALL);
-			light4.Render(RenderChannels::ALL);
+			light1.Render(RenderChannels::EDITOR);
+			light2.Render(RenderChannels::EDITOR);
+			light3.Render(RenderChannels::EDITOR);
+			light4.Render(RenderChannels::EDITOR);
 
 			glDisable(GL_CULL_FACE);
 			

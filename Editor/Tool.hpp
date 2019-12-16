@@ -1,6 +1,6 @@
 #pragma once
 #include "PropertyWindow.hpp"
-#include <Engine/RenderChannel.hpp>
+#include <Engine/RenderChannels.hpp>
 
 class Editor;
 struct MouseData;
@@ -27,6 +27,6 @@ public:
 	virtual void KeySubmit()					{}
 	virtual void KeyDelete()					{}
 
-	virtual void Render(RenderChannels) const{}
+	virtual void Render(RenderChannels) const	{}
 };
 

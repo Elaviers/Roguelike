@@ -22,7 +22,7 @@ void EntBrush3D::Render(RenderChannels channels) const
 {
 	ModelManager* modelManager = Engine::Instance().pModelManager;
 
-	if (modelManager && _material && channels & _material->GetRenderChannels())
+	if (modelManager && _material && channels & _material->GetRenderChannelss())
 	{
 		_material->Apply();
 

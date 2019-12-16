@@ -32,19 +32,19 @@ namespace Collision
 
 	bool SphereOverlapsBox(
 		const Transform& t1, float r1,
-		const Transform& t2, const Vector3& extent2)
+		const Transform& t2)
 	{
+		Transform invRotationTransform = Transform(Vector3(), t2.GetRotation().Inverse());
+		Transform tt2 = t2 * invRotationTransform;
 
-
-		return false;
+		//todo: verify
+		return SphereOverlapsAABB(t1 * invRotationTransform, r1, tt2.GetPosition() - tt2.GetScale(), tt2.GetPosition() + tt2.GetScale());
 	}
 
-	bool BoxOverlapsBox(
-		const Transform& t1, const Vector3& extent1,
-		const Transform& t2, const Vector3& extent2)
+	bool BoxOverlapsBox(const Transform& t1, const Transform& t2)
 	{
-		Vector3 e1 = extent1 * t1.GetScale();
-		Vector3 e2 = extent2 * t2.GetScale();
+		Vector3 e1 = t1.GetScale();
+		Vector3 e2 = t2.GetScale();
 
 		const Quaternion& r1 = t1.GetRotation().GetQuat();
 		const Quaternion& r2 = t2.GetRotation().GetQuat();

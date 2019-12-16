@@ -2,10 +2,14 @@
 #include <Engine/AudioManager.hpp>
 #include <Engine/Console.hpp>
 #include <Engine/Engine.hpp>
+#include <Engine/EntLight.hpp>
 #include <Engine/FontManager.hpp>
 #include <Engine/GL.hpp>
+#include <Engine/LevelIO.hpp>
 #include <Engine/IO.hpp>
 #include <windowsx.h>
+#include "EntPlayer.h"
+#include "GameInstance.h"
 #include "LevelGeneration.hpp"
 #include "MenuMain.hpp"
 
@@ -51,8 +55,33 @@ LRESULT CALLBACK Game::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 		game->KeyDown((Keycode)wparam);
 		break;
 
+	case WM_KEYUP:
+		game->KeyUp((Keycode)wparam);
+
+		break;
+
 	case WM_CHAR:
 		game->InputChar((char)wparam);
+		break;
+
+	case WM_INPUT:
+	{
+		static Buffer<byte> buffer;
+
+		UINT size;
+		GetRawInputData((HRAWINPUT)lparam, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
+
+		if (buffer.GetSize() < size)
+			buffer.SetSize(size);
+
+		GetRawInputData((HRAWINPUT)lparam, RID_INPUT, &buffer[0], &size, sizeof(RAWINPUTHEADER));
+
+		RAWINPUT* input = (RAWINPUT*)buffer.Data();
+		if (input->header.dwType == RIM_TYPEMOUSE)
+		{
+			game->MouseInput((short)input->data.mouse.lLastX, (short)input->data.mouse.lLastY);
+		}
+	}
 		break;
 
 	default: return ::DefWindowProc(hwnd, msg, wparam, lparam);
@@ -106,15 +135,35 @@ void Game::_InitGL()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
+	glEnable(GL_MULTISAMPLE);
+
+	_shaderLit.SetMaxLightCount(8);
+	_shaderLit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Phong.frag");
 	_shaderUnlit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
 }
 
 void Game::_Init()
 {
+	RAWINPUTDEVICE rawMouseInput;
+	rawMouseInput.usUsagePage = 0x01;
+	rawMouseInput.usUsage = 0x02;
+	rawMouseInput.dwFlags = 0;
+	rawMouseInput.hwndTarget = 0;
+
+	if (RegisterRawInputDevices(&rawMouseInput, 1, sizeof(rawMouseInput)) == FALSE)
+	{
+		Debug::Error("Raw mouse input registration error!");
+	}
+
 	Engine::Instance().Init(EngineCreateFlags::ALL, nullptr);
 	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
 
+	Engine::Instance().pWorld = &_world;
+
+	GameInstance::Instance().SetupInputs();
+
 	_consoleIsActive = false;
+	_uiIsActive = true;
 
 	_uiCamera.SetProjectionType(ProjectionType::ORTHOGRAPHIC);
 	_uiCamera.SetScale(1.f);
@@ -148,21 +197,44 @@ void Game::Run()
 	}
 }
 
-void Game::StartLevel(const String &level)
+void Game::StartLevel(const String& filename)
 {
-	_running = false;
-	
-	String fileString = IO::ReadFileString(level.GetData());
-	Entity world = LevelGeneration::GenerateLevel(fileString);
+	String ext = Utilities::GetExtension(filename);
 
+	if (ext == ".txt")
+	{
+		_world.DeleteChildren();
+
+		String fileString = IO::ReadFileString(filename.GetData());
+		LevelGeneration::GenerateLevel(_world, fileString);
+	}
+	else
+	{
+		_world.DeleteChildren();
+		LevelIO::Read(_world, filename.GetData());
+		
+		EntPlayer* player = EntPlayer::Create();
+		player->SetParent(&_world);
+
+		Transform spawnTransform(Vector3(0, 0.5f, 0));
+		player->SetRelativeTransform(spawnTransform);
+	}
+
+	_uiIsActive = false;
 }
 
 void Game::Frame()
 {
 	_timer.Start();
 
+	_window.SetTitle(CSTR(_mouseXForFrame, " ", _mouseYForFrame));
+
+	Engine::Instance().pInputManager->SetMouseAxes(_mouseXForFrame, _mouseYForFrame);
+	_mouseXForFrame = _mouseYForFrame = 0;
+
 	Engine::Instance().pAudioManager->FillBuffer();
 
+	_world.UpdateAll(_deltaTime);
 	_ui.Update();
 
 	Render();
@@ -175,10 +247,30 @@ void Game::Render()
 
 	glDepthFunc(GL_LEQUAL);
 
+
+	const EntCamera* activeCamera = GameInstance::Instance().GetActiveCamera();
+	if (activeCamera)
+	{
+		_shaderLit.Use();
+		_shaderLit.SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
+		_shaderLit.SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1, 1));
+		_shaderLit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
+		_shaderLit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
+		_shaderLit.SetInt(DefaultUniformVars::intTextureNormal, 1);
+		_shaderLit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
+		_shaderLit.SetInt(DefaultUniformVars::intTextureReflection, 3);
+
+		activeCamera->Use();
+		_world.RenderAll(*activeCamera, RenderChannels::PRE_RENDER);
+		EntLight::FinaliseLightingForFrame();
+		_world.RenderAll(*activeCamera, RenderChannels::SURFACE);
+	}
+
 	_shaderUnlit.Use();
 	_uiCamera.Use();
 
-	_ui.Render();
+	if (_uiIsActive)
+		_ui.Render();
 
 	if (_consoleIsActive)
 	{
@@ -191,31 +283,50 @@ void Game::Render()
 
 void Game::Resize(uint16 w, uint16 h)
 {
+	GameInstance::Instance().OnResize(w, h);
+
 	_ui.SetBounds(0, 0, w, h);
 	_uiCamera.SetViewport(w, h);
 	_uiCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
 }
 
-void Game::MouseMove(unsigned short x, unsigned short y)
+void Game::MouseInput(short x, short y)
 {
-	_ui.OnMouseMove((float)x, (float)(_uiCamera.GetViewport()[1] - y));
+	_mouseXForFrame += x;
+	_mouseYForFrame += y;
+}
+
+void Game::MouseMove(uint16 x, uint16 y)
+{
+	if (_uiIsActive)
+	{
+		_ui.OnMouseMove((float)x, (float)(_uiCamera.GetViewport()[1] - y));
+	}
 }
 
 void Game::MouseDown()
 {
-	_ui.OnClick();
+	if (_uiIsActive)
+	{
+		_ui.OnClick();
+	}
 }
 
 void Game::KeyDown(Keycode key)
 {
+	Engine::Instance().pInputManager->KeyDown(key);
+
 	if (key == Keycode::TILDE)
 	{
 		_consoleIsActive = !_consoleIsActive;
 		return;
 	}
-	
-	if (_consoleIsActive)
-		Engine::Instance().pInputManager->KeyDown(key);
+}
+
+void Game::KeyUp(Keycode key)
+{
+	Engine::Instance().pInputManager->KeyUp(key);
+
 }
 
 void Game::InputChar(char character)

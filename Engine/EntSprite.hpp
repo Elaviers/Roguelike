@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.hpp"
-#include "ColliderSphere.hpp"
+#include "Collider.hpp"
 #include "Colour.hpp"
 #include "MaterialManager.hpp"
 #include "Material_Sprite.hpp"
@@ -11,8 +11,6 @@ class EntSprite : public Entity
 	float _size;
 	Colour _colour;
 
-	ColliderSphere _editorCollider;
-
 	bool _fixedYaw;
 
 public:
@@ -22,7 +20,6 @@ public:
 		_material(material), 
 		_size(size),
 		_colour(1.f, 1.f, 1.f),
-		_editorCollider(CollisionChannels::EDITOR, size / 2.f),
 		_fixedYaw(true)
 	{}
 	virtual ~EntSprite() {}
@@ -30,13 +27,17 @@ public:
 	float GetSize() const { return _size; }
 	const Colour& GetColour() const { return _colour; }
 
-	void SetSize(float size) { _size = size; _editorCollider.SetRadius(size / 2.f); }
+	void SetSize(float size) { _size = size; SetWorldScale(Vector3(size, size, size)); }
 	void SetColour(const Colour& colour) { _colour = colour; }
 
 	virtual void Render(RenderChannels) const override;
 
 	virtual Bounds GetBounds() const override { return Bounds(_size / 2.f); }
-	virtual const Collider* GetCollider() const override { return &_editorCollider; }
+	virtual const Collider* GetCollider() const override 
+	{ 
+		static Collider editorCollider(CollisionChannels::EDITOR, CollisionSphere(0.5f)); 
+		return &editorCollider;
+	}
 
 	virtual const PropertyCollection& GetProperties() override;
 

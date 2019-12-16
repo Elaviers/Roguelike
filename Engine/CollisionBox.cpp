@@ -1,5 +1,4 @@
-#include "ColliderBox.hpp"
-#include "ColliderSphere.hpp"
+#include "CollisionBox.hpp"
 #include "Collision.hpp"
 #include "Entity.hpp"
 #include "Maths.hpp"
@@ -38,21 +37,17 @@ inline void FindT(const float &originComponent, const float &directionComponent,
 	}
 }
 
-bool ColliderBox::IntersectsRay(const Ray &ray, RaycastResult &result, const Transform &worldTransform) const
+bool CollisionBox::IntersectsRay(const Ray &ray, RaycastResult &result, const Transform &worldTransform) const
 {
-	if (!CanCollideWithChannels(ray.channels))
-		return false;
-
-	Transform t = transform * worldTransform;
+	Transform t = _transform * worldTransform;
 
 	Mat4 mat = t.GetRotation().GetQuat().Inverse().ToMatrix();
-	//Quaternion invRotation = t.GetRotation().GetQuat().Inverse();
 
 	Vector3 origin = (ray.origin - t.GetPosition()) * mat;
 	Vector3 dir = ray.direction * mat;
 	
-	Vector3 scaledMin = -1.f * extent * t.GetScale();
-	Vector3 scaledMax = extent * t.GetScale();
+	Vector3 scaledMin = -1.f * t.GetScale();
+	Vector3 scaledMax = t.GetScale();
 
 	float minT, maxT;
 	float minT_y, maxT_y;
@@ -75,7 +70,7 @@ bool ColliderBox::IntersectsRay(const Ray &ray, RaycastResult &result, const Tra
 	maxT = Utilities::Min(maxT, maxT_z);
 
 	if (maxT < 0.f) return false; //Should probably check if behind a bit earlier
-
+	
 	result.entryTime = minT < 0.f ? 0.f : minT;
 	return true;
 }
@@ -87,3 +82,59 @@ bool ColliderBox::IntersectsRay(const Ray &ray, RaycastResult &result, const Tra
 	d.x(t) = min.x - O.x
 	t = (min.x - O.x)/d.x
 */
+
+Vector3 CollisionBox::GetNormalForPoint(const Vector3& point, const Transform& worldTransform) const
+{
+	Vector3 p = point * (_transform * worldTransform).GetInverseTransformationMatrix();
+
+	float x = Maths::Abs(point[0]), y = Maths::Abs(point[1]), z = Maths::Abs(point[2]);
+
+	if (x > y)
+	{
+		if (x > z)
+			return Vector3(point[0] > 0 ? 1.f : -1.f, 0.f, 0.f);
+		else
+			return Vector3(0.f, 0.f, point[2] > 0 ? 1.f : -1.f);
+	}
+
+	if (y > z) return Vector3(0.f, point[1] > 0 ? 1.f : -1.f, 0.f);
+
+	return Vector3(0.f, 0.f, point[2] > 0 ? 1.f : -1.f);
+}
+
+Vector3 CollisionBox::GetPointWithHighestDot(const Vector3& axis, const Transform& worldTransform) const
+{
+	float sx = _transform.GetScale()[0];
+	float sy = _transform.GetScale()[1];
+	float sz = _transform.GetScale()[2];
+
+	Vector3 points[8] = {
+		_transform.GetPosition() + Vector3(-sx, -sy, -sz),
+		_transform.GetPosition() + Vector3(-sx, sy, -sz),
+		_transform.GetPosition() + Vector3(sx, sy, -sz),
+		_transform.GetPosition() + Vector3(sx, -sy, -sz),
+		_transform.GetPosition() + Vector3(-sx, -sy, sz),
+		_transform.GetPosition() + Vector3(-sx, sy, sz),
+		_transform.GetPosition() + Vector3(sx, sy, sz),
+		_transform.GetPosition() + Vector3(sx, -sy, sz)
+	};
+
+	int index = -1;
+	float maxDot = 0.f;
+
+	Mat4 fullTransform = (_transform * worldTransform).GetTransformationMatrix();
+	for (int i = 0; i < 8; ++i)
+	{
+		points[i] = points[i] * fullTransform;
+		
+		float dot = Vector3::Dot(points[i], axis);
+
+		if (dot > maxDot || index < 0)
+		{
+			index = i;
+			maxDot = dot;
+		}
+	}
+
+	return points[index];
+}

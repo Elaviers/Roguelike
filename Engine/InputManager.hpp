@@ -117,5 +117,5 @@ public:
 	void KeyUp(Keycode);
 
 	//xDelta and yDelta are in pixels
-	void MouseMove(short xDelta, short yDelta);
+	void SetMouseAxes(short xDelta, short yDelta);
 };

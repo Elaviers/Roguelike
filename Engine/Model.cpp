@@ -1,6 +1,6 @@
 #include "Model.hpp"
-#include "ColliderBox.hpp"
-#include "ColliderSphere.hpp"
+#include "CollisionBox.hpp"
+#include "CollisionSphere.hpp"
 #include "Engine.hpp"
 #include "MacroUtilities.hpp"
 #include "ModelManager.hpp"
@@ -50,8 +50,7 @@ void Model::_CMD_collision(const Buffer<String>& args)
 		{
 			if (args.GetSize() >= 2)
 			{
-				delete this->_collider;
-				this->_collider = new ColliderSphere(CollisionChannels::SURFACE, args[1].ToFloat());
+				_collider = Collider(CollisionChannels::SURFACE, CollisionSphere(args[1].ToFloat()));
 			}
 			else Debug::Error("Insufficient sphere collision arguments");
 		}
@@ -59,8 +58,7 @@ void Model::_CMD_collision(const Buffer<String>& args)
 		{
 			if (_mesh && _mesh->IsValid())
 			{
-				delete _collider;
-				_collider = new ColliderBox(CollisionChannels::SURFACE, Box::FromMinMax(_mesh->bounds.min, _mesh->bounds.max));
+				_collider = Collider(CollisionChannels::SURFACE, Box::FromMinMax(_mesh->bounds.min, _mesh->bounds.max));
 			}
 			else Debug::Error("Box collision cannot be used without specifying the model first!");
 		}

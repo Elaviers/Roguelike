@@ -1,6 +1,7 @@
 #pragma once
 #include "Buffer.hpp"
 #include "Mesh_Static.hpp"
+#include "Pair.hpp"
 #include "Texture.hpp"
 
 class WaveSound;
@@ -32,4 +33,7 @@ namespace IO {
 	//searchPath must have a wildcard in it, like C:/Example/*.poo
 	Buffer<String> FindFilesInDirectory(const char *searchPath);
 	Buffer<String> FindFilesInDirectoryRecursive(const char *searchPath, const char *wildcard = "*.*");
+
+	String OpenFileDialog(const wchar_t* dir, const Buffer<Pair<const wchar_t*>>& ext);
+	String SaveFileDialog(const wchar_t* dir, const Buffer<Pair<const wchar_t*>>& ext);
 }
