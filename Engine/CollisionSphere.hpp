@@ -19,7 +19,7 @@ public:
 
 	virtual Vector3 GetNormalForPoint(const Vector3& point, const Transform& transform) const override;
 
-	Vector3 GetPointWithHighestDot(const Vector3& axis, const Transform&) const;
+	virtual Vector3 GetFarthestPointInDirection(const Vector3& axis, const Transform&) const override;
 
 	//
 	CollisionSphere& operator=(const CollisionSphere& other)

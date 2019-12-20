@@ -51,6 +51,14 @@ private:
 
 	CollisionChannels _channels;
 
+	struct GJKResult
+	{
+		const CollisionShape* hitShape;
+		float distance;
+	};
+
+	GJKResult _GJK(const Transform& transform, const Collider& other, const Transform &otherTransform) const;
+
 public:
 	Collider(CollisionChannels channels, const CollisionBox& box) : _channels(channels), _shapes(box) {}
 	Collider(CollisionChannels channels, const CollisionSphere& sphere) : _channels(channels), _shapes(sphere) {}
@@ -64,7 +72,7 @@ public:
 	size_t GetShapeCount() const						{ return _shapes.GetSize(); }
 	CollisionShape& GetShape(size_t index)				{ return _shapes[index].Get(); }
 	const CollisionShape& GetShape(size_t index) const	{ return _shapes[index].Get(); }
-	//void RemoveShape(size_t index)						{ _shapes.RemoveIndex(index); }
+	void RemoveShape(size_t index)						{ _shapes.RemoveIndex(index); }
 
 	void SetChannels(CollisionChannels channels)					{ _channels = channels; }
 	void AddChannels(CollisionChannels channels)					{ _channels |= channels; }

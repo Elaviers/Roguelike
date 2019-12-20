@@ -34,4 +34,6 @@ public:
 	virtual bool IntersectsRay(const Ray&, RaycastResult&, const Transform& transform) const = 0;
 
 	virtual Vector3 GetNormalForPoint(const Vector3& point, const Transform& transform) const = 0;
+
+	virtual Vector3 GetFarthestPointInDirection(const Vector3& axis, const Transform&) const = 0;
 };

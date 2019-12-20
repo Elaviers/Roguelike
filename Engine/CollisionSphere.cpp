@@ -35,8 +35,7 @@ Vector3 CollisionSphere::GetNormalForPoint(const Vector3& point, const Transform
 	return (point - (_transform * worldTransform).GetPosition()).Normalise();
 }
 
-Vector3 CollisionSphere::GetPointWithHighestDot(const Vector3& axis, const Transform& worldTransform) const
+Vector3 CollisionSphere::GetFarthestPointInDirection(const Vector3& axis, const Transform& worldTransform) const
 {
-	Transform t = _transform * worldTransform;
-	return t.GetPosition() + (axis * _radius * t.GetScale()[0]);
+	return (axis.Normalised() * _radius) * (_transform * worldTransform).GetTransformationMatrix();
 }

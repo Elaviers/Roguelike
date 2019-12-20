@@ -29,7 +29,7 @@ public:
 	}
 
 	float Length() const { return Maths::SquareRoot(LengthSquared()); }
-	Vector Normalised() { return *this / Length(); }
+	Vector Normalised() const { return *this / Length(); }
 	Vector& Normalise() { *this /= Length(); return *this; }
 
 	T&		operator[](int index) { return _data[index]; }

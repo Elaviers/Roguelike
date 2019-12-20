@@ -6,14 +6,14 @@ class CollisionBox : public CollisionShape
 {
 public:
 	CollisionBox(const Transform &transform = Transform()) : CollisionShape(CollisionType::BOX, transform) {}
-	CollisionBox(const Box& box) : CollisionShape(CollisionType::BOX, Transform(box.centre, Rotation(), box.extent)) {}
+	CollisionBox(const Box& box) : CollisionShape(CollisionType::BOX, Transform(box.centre, Rotation(), box.halfSize)) {}
 	virtual ~CollisionBox() {}
 
 	virtual bool IntersectsRay(const Ray&, RaycastResult&, const Transform& = Transform()) const override;
 
 	virtual Vector3 GetNormalForPoint(const Vector3& point, const Transform& transform) const override;
 
-	Vector3 GetPointWithHighestDot(const Vector3& axis, const Transform&) const;
+	virtual Vector3 GetFarthestPointInDirection(const Vector3& axis, const Transform&) const override;
 
 
 	//

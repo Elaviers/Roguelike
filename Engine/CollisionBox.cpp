@@ -102,21 +102,17 @@ Vector3 CollisionBox::GetNormalForPoint(const Vector3& point, const Transform& w
 	return Vector3(0.f, 0.f, point[2] > 0 ? 1.f : -1.f);
 }
 
-Vector3 CollisionBox::GetPointWithHighestDot(const Vector3& axis, const Transform& worldTransform) const
+Vector3 CollisionBox::GetFarthestPointInDirection(const Vector3& axis, const Transform& worldTransform) const
 {
-	float sx = _transform.GetScale()[0];
-	float sy = _transform.GetScale()[1];
-	float sz = _transform.GetScale()[2];
-
 	Vector3 points[8] = {
-		_transform.GetPosition() + Vector3(-sx, -sy, -sz),
-		_transform.GetPosition() + Vector3(-sx, sy, -sz),
-		_transform.GetPosition() + Vector3(sx, sy, -sz),
-		_transform.GetPosition() + Vector3(sx, -sy, -sz),
-		_transform.GetPosition() + Vector3(-sx, -sy, sz),
-		_transform.GetPosition() + Vector3(-sx, sy, sz),
-		_transform.GetPosition() + Vector3(sx, sy, sz),
-		_transform.GetPosition() + Vector3(sx, -sy, sz)
+		Vector3(-1, -1, -1),
+		Vector3(-1, -1, 1),
+		Vector3(-1, 1, -1),
+		Vector3(-1, 1, 1),
+		Vector3(1, -1, -1),
+		Vector3(1, -1, 1),
+		Vector3(1, 1, -1),
+		Vector3(1, 1, 1)
 	};
 
 	int index = -1;
@@ -128,7 +124,6 @@ Vector3 CollisionBox::GetPointWithHighestDot(const Vector3& axis, const Transfor
 		points[i] = points[i] * fullTransform;
 		
 		float dot = Vector3::Dot(points[i], axis);
-
 		if (dot > maxDot || index < 0)
 		{
 			index = i;
