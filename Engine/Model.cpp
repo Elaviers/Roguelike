@@ -1,6 +1,4 @@
 #include "Model.hpp"
-#include "CollisionBox.hpp"
-#include "CollisionSphere.hpp"
 #include "Engine.hpp"
 #include "MacroUtilities.hpp"
 #include "ModelManager.hpp"
@@ -42,6 +40,10 @@ void Model::_CMD_model(const Buffer<String> &args)
 	}
 }
 
+#include "CollisionBox.hpp"
+#include "CollisionCapsule.hpp"
+#include "CollisionSphere.hpp"
+
 void Model::_CMD_collision(const Buffer<String>& args)
 {
 	if (args.GetSize() > 0)
@@ -58,9 +60,17 @@ void Model::_CMD_collision(const Buffer<String>& args)
 		{
 			if (_mesh && _mesh->IsValid())
 			{
-				_collider = Collider(CollisionChannels::SURFACE, Box::FromMinMax(_mesh->bounds.min, _mesh->bounds.max));
+				_collider = Collider(CollisionChannels::SURFACE, CollisionBox(Box::FromMinMax(_mesh->bounds.min, _mesh->bounds.max)));
 			}
 			else Debug::Error("Box collision cannot be used without specifying the model first!");
+		}
+		else if (args[0] == "capsule")
+		{
+			if (args.GetSize() >= 3)
+			{
+				_collider = Collider(CollisionChannels::SURFACE, CollisionCapsule(args[1].ToFloat(), args[2].ToFloat()));
+			}
+			else Debug::Error("Insufficient capsule collision arguments");
 		}
 	}
 }

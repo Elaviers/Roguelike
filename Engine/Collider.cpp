@@ -13,60 +13,6 @@ bool Collider::IntersectsRay(const Transform& transform, const Ray& ray, Raycast
 	return false;
 }
 
-bool Collider::Overlaps(const Transform& transform, const CollisionShape& otherShape, const Transform& otherShapeTransform) const
-{
-	for (size_t i = 0; i < _shapes.GetSize(); ++i)
-	{
-		const CollisionShape& shape = GetShape(i);
-
-		if (shape.GetType() == CollisionType::BOX && otherShape.GetType() == CollisionType::BOX)
-		{
-			auto a = reinterpret_cast<const CollisionBox&>(shape);
-			auto b = reinterpret_cast<const CollisionBox&>(otherShape);
-
-			return Collision::BoxOverlapsBox(a.GetTransform() * transform, b.GetTransform() * otherShapeTransform);
-		}
-
-		if (shape.GetType() == CollisionType::SPHERE && otherShape.GetType() == CollisionType::SPHERE)
-		{
-			auto a = reinterpret_cast<const CollisionSphere&> (shape);
-			auto b = reinterpret_cast<const CollisionSphere&> (otherShape);
-
-			return Collision::SphereOverlapsSphere(a.GetTransform() * transform, a.GetRadius(), b.GetTransform() * otherShapeTransform, b.GetRadius());
-		}
-
-		if (shape.GetType() == CollisionType::SPHERE && otherShape.GetType() == CollisionType::BOX)
-		{
-			auto a = reinterpret_cast<const CollisionSphere&> (shape);
-			auto b = reinterpret_cast<const CollisionBox&> (otherShape);
-
-			return Collision::SphereOverlapsBox(a.GetTransform() * transform, a.GetRadius(), b.GetTransform() * otherShapeTransform);
-		}
-
-		if (shape.GetType() == CollisionType::BOX && otherShape.GetType() == CollisionType::SPHERE)
-		{
-			auto a = reinterpret_cast<const CollisionBox&> (shape);
-			auto b = reinterpret_cast<const CollisionSphere&> (otherShape);
-
-			return Collision::SphereOverlapsBox(b.GetTransform() * transform, b.GetRadius(), a.GetTransform() * transform);
-		}
-	}
-
-	return false;
-}
-
-bool Collider::Overlaps(const Transform& transform, const Collider &other, const Transform &otherTransform) const
-{
-	return _GJK(transform, other, otherTransform).distance >= 0.f;
-
-	if (CanCollideWith(other))
-		for (size_t i = 0; i < other.GetShapeCount(); ++i)
-			if (Overlaps(transform, other.GetShape(i), otherTransform))
-				return true;
-
-	return false;
-}
-
 /*
 	Returns the farthest point in the minkowski difference in the given direction
 */
@@ -85,9 +31,9 @@ Vector3 TripleCross(const Vector3& a, const Vector3& b, const Vector3& c)
 
 constexpr const int GJK_MAX_ITERATIONS = 50;
 
-float GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShape& shapeB, const Transform& tB)
+bool GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShape& shapeB, const Transform& tB)
 {
-	//The simplex is a quadrahedron inside the minkowski difference
+	//The simplex is a tetrahedron inside the minkowski difference
 	Vector3 simplex[4];
 	Vector3 d;
 	int i = 0;
@@ -111,7 +57,7 @@ float GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShap
 			case 2:
 			{
 				//The simplex is a line with points on either side of the origin
-				//Look for the third supoort perpendicular to the line, facing the origin
+				//Look for the third support perpendicular to the line, facing the origin
 
 				Vector3 ba = simplex[0] - simplex[1];
 				Vector3 b0 = simplex[1] * -1.f;
@@ -138,8 +84,8 @@ float GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShap
 			}
 			case 4:
 			{
-				//The simplex is a quadrahedron whose base (points 0, 1, 2) is on the opposite side of the origin from its peak (point 3)
-				//Check if the quadrahedron contains the origin by checking the dot products of the normals of the 3 faces related to the peak
+				//The simplex is a tetrahedron whose base (points 0, 1, 2) is on the opposite side of the origin from its peak (point 3)
+				//Check if the tetrahedron contains the origin by checking the dot products of the normals of the 3 faces related to the peak
 				//The base's normal doesn't have to be checked as it is on the opposite side of the origin from the peak
 
 				Vector3 d0 = simplex[3] * -1.f;
@@ -187,7 +133,7 @@ float GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShap
 				}
 
 				//The origin is behind the three face normals, collision found
-				return 0.f;
+				return true;
 			}
 		}
 
@@ -195,32 +141,21 @@ float GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShap
 
 		//Check if the new point is past the origin
 		if (Vector3::Dot(simplex[i], d) < 0.f)
-			return -1.f;
+			return false;
 
 		++i;
 	}
 
 	//Failsafe
-	return -1.f;
+	return true;
 }
 
-Collider::GJKResult Collider::_GJK(const Transform &transform, const Collider& other, const Transform &otherTransform) const
+bool Collider::Overlaps(const Transform &transform, const Collider& other, const Transform &otherTransform) const
 {
-	GJKResult result = { nullptr, -1.f };
-
 	for (size_t i = 0; i < GetShapeCount(); ++i)
-	{
 		for (size_t j = 0; j < GetShapeCount(); ++j)
-		{
-			float d = GJK(GetShape(i), transform, other.GetShape(j), otherTransform);
+			if (GJK(GetShape(i), transform, other.GetShape(j), otherTransform))
+				return true;
 
-			if (d >= 0.f && (result.hitShape == nullptr || d < result.distance))
-			{
-				result.hitShape = &other.GetShape(j);
-				result.distance = d;
-			}
-		}
-	}
-
-	return result;
+	return false;
 }

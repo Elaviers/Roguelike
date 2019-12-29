@@ -453,6 +453,9 @@
     <ClInclude Include="CollisionChannels.hpp">
       <Filter>Header Files\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="CollisionCapsule.hpp">
+      <Filter>Header Files\Collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLProgram.cpp">
@@ -717,6 +720,9 @@
       <Filter>Source Files\Collision</Filter>
     </ClCompile>
     <ClCompile Include="CollisionSphere.cpp">
+      <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionCapsule.cpp">
       <Filter>Source Files\Collision</Filter>
     </ClCompile>
   </ItemGroup>

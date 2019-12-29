@@ -1,6 +1,7 @@
 #pragma once
 #include "Entity.hpp"
 #include "Collider.hpp"
+#include "CollisionSphere.hpp"
 #include "Colour.hpp"
 #include "MaterialManager.hpp"
 #include "Material_Sprite.hpp"

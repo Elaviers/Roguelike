@@ -4,26 +4,65 @@
 
 bool CollisionSphere::IntersectsRay(const Ray &ray, RaycastResult &result, const Transform & worldTransform) const
 {
-	//Assuming ray.direction is normalised
+	/*
+		SPHERE:		||P||^2 = r^2
+		RAY:		RAY(t) = S + Dt
+		
+		AT THE OVERLAP:
+		||RAY(t)||^2 = ||P||^2 = r^2
+		||RAY(t)||^2 = r^2
+		||S + Dt||^2 = r^2
+		(S+Dt)(S+Dt) = r^2
+		S.S + 2 * S.D * t + (Dt)^2 = r^2
+		(Dt)^2   +  2 * S.D * t + S.S = r^2
+		D.D * t^2 + 2 * S.D * t + S.S = r^2
 
-	if (worldTransform.GetScale()[0] != worldTransform.GetScale()[1] || worldTransform.GetScale()[0] != worldTransform.GetScale()[2])
-		Debug::PrintLine("WARNING: Sphere collision used with nonuniform scaling");
+		Rearrange to polynomial:
+		D.D * t^2 + 2 * S.D * t + S.S - r^2 = 0
 
-	float r = _radius * worldTransform.GetScale()[0];
+		Apply quadratic formula...
+		a = D.D
+		b = 2 * 2.D
+		c = S.S - r^2
 
-	Vector3 selfToRayOrigin = ray.origin - worldTransform.GetPosition();
-	float dot = Vector3::Dot(selfToRayOrigin, ray.direction);
-	float distanceSq = selfToRayOrigin.LengthSquared() - r * r;	//The distance from the surface of the sphere to the ray's origin
+		t = -2 * S.D +|- sqrt((2 * S.D)^2 - 4(D.D)(S.S - R^2))
+			--------------------------------------------------
+								2 * D.D
 
-	if (distanceSq > 0.f && dot > 0.f) //We are not inside the sphere and not facing it
-		return false;
+___________________________________________________________________
+								discriminant
+							--------------------------
+							|						|
+		t = -S.D +|- sqrt( (S.D)^2 - (D.D)(S.S - R^2) )
+			-----------------------------------------
+								D.D
+___________________________________________________________________
 
+		If D*D = 1:
+		t = -S.D +|- sqrt( (S.D)^2 - (S.S - R^2) )
+	*/
+
+
+	Mat4 inv = (_transform * worldTransform).GetInverseTransformationMatrix();
+	Vector3 transformedRayOrigin = ray.origin * inv;
+	Vector4 transformedRayDirection4 = Vector4(ray.direction, 0.f) * inv;
+	Vector3 transformedRayDirection = Vector3(transformedRayDirection4[0], transformedRayDirection4[1], transformedRayDirection4[2]);
+	transformedRayDirection.Normalise();
+
+	//The transformed space has the sphere at the origin with its radius
+	float distanceSq = transformedRayOrigin.LengthSquared() - _radius * _radius;	//The distance from the surface of the sphere to the ray's origin
+	
+	//Equivalent to transformedRayOrigin.LengthSquared() * cos(theta)
+	float dot = Vector3::Dot(transformedRayOrigin, transformedRayDirection);
+
+	if (distanceSq > 0.f && dot > 0.f)
+		return false;	//Ray does not start inside or does not face sphere
+	
 	float discriminant = dot * dot - distanceSq;
-	if (discriminant < 0.f) //We missed the sphere
-		return false;
+	if (discriminant < 0.f) 
+		return false;	//Ray doesn't intersect sphere
 
 	result.entryTime = -dot - Maths::SquareRoot(discriminant);
-	
 	if (result.entryTime < 0.f)
 		result.entryTime = 0.f;
 
@@ -37,5 +76,5 @@ Vector3 CollisionSphere::GetNormalForPoint(const Vector3& point, const Transform
 
 Vector3 CollisionSphere::GetFarthestPointInDirection(const Vector3& axis, const Transform& worldTransform) const
 {
-	return (axis.Normalised() * _radius) * (_transform * worldTransform).GetTransformationMatrix();
+	return worldTransform.GetPosition() + _radius * axis.Normalised() * worldTransform.GetScale();
 }

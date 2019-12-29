@@ -37,7 +37,7 @@ public:
 
 	virtual const Collider* GetCollider() const override 
 	{
-		static Collider collider(CollisionChannels::SURFACE, Box(Vector3(), Vector3(.5f, .5f, .5f)));
+		static Collider collider(CollisionChannels::SURFACE, CollisionBox(Box(Vector3(), Vector3(.5f, .5f, .5f))));
 		return &collider;
 	}
 	

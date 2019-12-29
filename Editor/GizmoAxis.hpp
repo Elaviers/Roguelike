@@ -1,6 +1,7 @@
 #pragma once
 #include "GizmoComponent.hpp"
 #include <Engine/Collider.hpp>
+#include <Engine/CollisionBox.hpp>
 #include <Engine/FunctionPointer.hpp>
 
 /*

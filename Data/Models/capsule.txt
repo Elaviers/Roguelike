@@ -1,0 +1,5 @@
+model capsule.mesh
+
+material bricks
+
+collision capsule 2 1

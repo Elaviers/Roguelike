@@ -9,7 +9,8 @@ enum class RenderChannels : byte
 	SPRITE = 0x4,
 	EDITOR = 0x8,
 
-	NONE = 0
+	NONE = 0,
+	ALL = 0xFF
 };
 
 #include "MacroUtilities.hpp"

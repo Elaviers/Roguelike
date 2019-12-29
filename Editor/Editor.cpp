@@ -303,7 +303,7 @@ void Editor::RenderViewport(int index, Direction dir)
 
 		_level.RenderAll(CameraRef(0), RenderChannels::PRE_RENDER);
 		EntLight::FinaliseLightingForFrame();
-		_level.RenderAll(CameraRef(0), _litRenderChannelss);
+		_level.RenderAll(CameraRef(0), _litRenderChannels);
 	}
 
 	//UNLIT PASS
@@ -311,7 +311,7 @@ void Editor::RenderViewport(int index, Direction dir)
 	camera.Use();
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
-	_level.RenderAll(CameraRef(0), RenderChannels(_unlitRenderChannelss | (_drawEditorFeatures ? RenderChannels::EDITOR : RenderChannels::NONE)));
+	_level.RenderAll(CameraRef(0), RenderChannels(_unlitRenderChannels | (_drawEditorFeatures ? RenderChannels::EDITOR : RenderChannels::NONE)));
 	
 	if (_drawEditorFeatures)
 	{
@@ -332,7 +332,7 @@ void Editor::RenderViewport(int index, Direction dir)
 
 	Engine::Instance().pTextureManager->White()->Bind(0);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
-	if (_currentTool) _currentTool->Render(RenderChannels::UNLIT);
+	if (_currentTool) _currentTool->Render(RenderChannels::ALL);
 
 	glDepthFunc(GL_ALWAYS);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
@@ -836,13 +836,13 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			break;
 
 			case ID_SHADING_UNLIT:
-				editor->_litRenderChannelss = RenderChannels::NONE;
-				editor->_unlitRenderChannelss = RenderChannels(RenderChannels::SURFACE | RenderChannels::UNLIT);
+				editor->_litRenderChannels = RenderChannels::NONE;
+				editor->_unlitRenderChannels = RenderChannels::SURFACE | RenderChannels::UNLIT;
 				break;
 
 			case ID_SHADING_PHONG:
-				editor->_litRenderChannelss = RenderChannels::SURFACE;
-				editor->_unlitRenderChannelss = RenderChannels::UNLIT;
+				editor->_litRenderChannels = RenderChannels::SURFACE;
+				editor->_unlitRenderChannels = RenderChannels::UNLIT;
 				break;
 
 			case ID_DRAWEDITORFEATURES:

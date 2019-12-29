@@ -291,7 +291,7 @@ void ToolSelect::KeySubmit()
 	_placing = false;
 	ClearSelection();
 
-	Buffer<Entity*> result = _owner.LevelRef().FindOverlaps(Collider(CollisionChannels::ALL, Box::FromMinMax(_box.GetMin(), _box.GetMax())));
+	Buffer<Entity*> result = _owner.LevelRef().FindOverlaps(Collider(CollisionChannels::ALL, CollisionBox(Box::FromMinMax(_box.GetMin(), _box.GetMax()))));
 
 	_selectedObjects.SetSize(result.GetSize());
 

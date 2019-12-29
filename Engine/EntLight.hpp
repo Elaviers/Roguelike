@@ -1,6 +1,7 @@
 #pragma once
 #include "Entity.hpp"
 #include "Collider.hpp"
+#include "CollisionBox.hpp"
 #include "Vector.hpp"
 
 class ModelManager;
@@ -44,7 +45,7 @@ public:
 
 	virtual const Collider* GetCollider() const 
 	{
-		static Collider editorCollider(CollisionChannels::EDITOR, Box(_editorBoxExtent));
+		static Collider editorCollider(CollisionChannels::EDITOR, CollisionBox(Box(_editorBoxExtent)));
 		return &editorCollider;
 	}
 

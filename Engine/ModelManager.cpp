@@ -1,4 +1,5 @@
 #include "ModelManager.hpp"
+#include "CollisionBox.hpp"
 #include "Debug.hpp"
 #include "IO.hpp"
 #include "Utilities.hpp"
@@ -93,9 +94,9 @@ void ModelManager::Initialise()
 	planeMesh->bounds = Bounds(Vector3(.5f, .5f, 0.f));
 	cubeMesh->bounds = Bounds(Vector3(.5f, .5f, .5f));
 
-	_line = new Model(lineMesh, Collider(CollisionChannels::SURFACE, Box::FromMinMax(lineMesh->bounds.min, lineMesh->bounds.max)));
-	_plane = new Model(planeMesh, Collider(CollisionChannels::SURFACE, Box::FromMinMax(planeMesh->bounds.min, planeMesh->bounds.max)));
-	_cube = new Model(cubeMesh, Collider(CollisionChannels::SURFACE, Box::FromMinMax(cubeMesh->bounds.min, cubeMesh->bounds.max)));
+	_line = new Model(lineMesh, Collider(CollisionChannels::SURFACE, CollisionBox(Box::FromMinMax(lineMesh->bounds.min, lineMesh->bounds.max))));
+	_plane = new Model(planeMesh, Collider(CollisionChannels::SURFACE, CollisionBox(Box::FromMinMax(planeMesh->bounds.min, planeMesh->bounds.max))));
+	_cube = new Model(cubeMesh, Collider(CollisionChannels::SURFACE, CollisionBox(Box::FromMinMax(cubeMesh->bounds.min, cubeMesh->bounds.max))));
 
 	_line->MeshRenderer().SetDrawMode(GL_LINES);
 	lineMesh->CreateGLMeshRenderer(_line->MeshRenderer());
@@ -115,7 +116,7 @@ void ModelManager::Initialise()
 		Vertex17F::CalculateTangents(invCubeMesh->vertices[i], invCubeMesh->vertices[i + 1], invCubeMesh->vertices[i + 2]);
 	}
 
-	_invCube = new Model(invCubeMesh, Collider(CollisionChannels::SURFACE, Box::FromMinMax(invCubeMesh->bounds.min, invCubeMesh->bounds.max)));
+	_invCube = new Model(invCubeMesh, Collider(CollisionChannels::SURFACE, CollisionBox(Box::FromMinMax(invCubeMesh->bounds.min, invCubeMesh->bounds.max))));
 	invCubeMesh->CreateGLMeshRenderer(_invCube->MeshRenderer());
 
 	SharedPointerData<Model> &dLine = _MapValue("line"), &dPlane = _MapValue("plane"), &dCube = _MapValue("cube"), &dInvCube = _MapValue("invcube");
