@@ -6,10 +6,10 @@
 
 #define DO_ONCE(BODY) DO_ONCE_BEGIN BODY; DO_ONCE_END
 
-#define DEFINE_BITMASK_FUNCS(ENUMCLASS)								\
+#define DEFINE_BITMASK_FUNCS(ENUMCLASS, NUMERICALTYPE)				\
 inline ENUMCLASS operator|(const ENUMCLASS& a, const ENUMCLASS& b)	\
 {																	\
-	return ENUMCLASS(int(a) | int(b));								\
+	return ENUMCLASS((NUMERICALTYPE)a | (NUMERICALTYPE)b);			\
 }																	\
 																	\
 inline ENUMCLASS operator|=(ENUMCLASS& a, const ENUMCLASS& b)		\
@@ -19,11 +19,10 @@ inline ENUMCLASS operator|=(ENUMCLASS& a, const ENUMCLASS& b)		\
 																	\
 inline ENUMCLASS operator~(const ENUMCLASS& rc)						\
 {																	\
-	return ENUMCLASS(~int(rc));										\
+	return ENUMCLASS(~(NUMERICALTYPE)rc);							\
 }																	\
 																	\
 inline bool operator&(const ENUMCLASS& a, const ENUMCLASS& b)		\
 {																	\
-	return int(a) & int(b);											\
+	return (NUMERICALTYPE)a & (NUMERICALTYPE)b;						\
 }
-

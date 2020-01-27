@@ -9,12 +9,12 @@ class DebugFrustum : public DebugObject
 	Vector3 _far[4];
 
 public:
-	DebugFrustum(float time = 0.f, Colour colour = Colour::Red) : DebugObject(time, colour) {}
+	DebugFrustum(float time = 0.f, const Colour& colour = Colour::Red, float lineWidth = 2, float fadeTime = 0.f) : DebugObject(time, fadeTime, colour, lineWidth) {}
 	virtual ~DebugFrustum() {}
 
 	virtual void Render() const override;
 
-	static DebugFrustum FromCamera(const EntCamera&);
+	static DebugFrustum FromCamera(const EntCamera&, float time = 0.f, const Colour& colour = Colour::Red, float lineWidth = 2.f, float fadeTime = 0.f);
 
 	SIZEOF_DEF;
 };

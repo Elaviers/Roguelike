@@ -29,9 +29,9 @@ void DebugFrustum::Render() const
 
 //static
 
-DebugFrustum DebugFrustum::FromCamera(const EntCamera &camera)
+DebugFrustum DebugFrustum::FromCamera(const EntCamera &camera, float time, const Colour& colour, float lineWidth, float fadeTime)
 {
-	DebugFrustum frustum;
+	DebugFrustum frustum(time, colour, lineWidth, fadeTime);
 
 	frustum._origin = camera.GetWorldPosition();
 		

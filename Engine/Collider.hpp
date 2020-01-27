@@ -3,6 +3,7 @@
 #include "CollisionChannels.hpp"
 #include "CollisionShape.hpp"
 
+struct LineSegment;
 struct RaycastResult;
 
 class Collider
@@ -84,5 +85,14 @@ public:
 
 	bool IntersectsRay(const Transform& transform, const Ray&, RaycastResult&) const;
 
-	bool Overlaps(const Transform& transform, const Collider &other, const Transform &otherTransform) const;
+	bool Overlaps(
+		const Transform& transform, 
+		const Collider& other, const Transform& otherTransform, 
+		const LineSegment* lineA = nullptr) const;
+	
+	float MinimumDistanceTo(
+		const Transform& transform, 
+		const Collider& other, const Transform& otherTransform, 
+		Vector3& out_PointA, Vector3& out_PointB, 
+		const LineSegment* lineA = nullptr) const;
 };

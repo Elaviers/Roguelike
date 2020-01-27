@@ -1,10 +1,11 @@
 #include "Entity.hpp"
 #include "Collider.hpp"
 #include "Engine.hpp"
+#include "EntCamera.hpp"
 #include "GL.hpp"
 #include "GLProgram.hpp"
+#include "LineSegment.h"
 #include "MacroUtilities.hpp"
-#include "EntCamera.hpp"
 #include "RaycastResult.hpp"
 
 void Entity::_AddBaseProperties(PropertyCollection &cvars)
@@ -132,6 +133,9 @@ Entity* Entity::FindChildWithName(const String& name)
 
 Entity* Entity::FindChildWithUID(uint32 uid)
 {
+	if (uid == 0)
+		return nullptr;
+
 	if (_uid == uid)
 		return this;
 
@@ -191,18 +195,39 @@ void Entity::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& str
 
 bool Entity::OverlapsRay(const Ray &ray, RaycastResult &result) const
 {
-	if (this->GetCollider())
-		return this->GetCollider()->IntersectsRay(GetWorldTransform(), ray, result);
+	const Collider* collider = GetCollider();
+	if (collider)
+		return collider->IntersectsRay(GetWorldTransform(), ray, result);
 
 	return false;
 }
 
-bool Entity::OverlapsCollider(const Collider &other, const Transform &otherTransform) const
+bool Entity::OverlapsCollider(const Collider &other, const Transform &otherTransform, const Vector3& sweep) const
 {
-	if (this->GetCollider())
-		return this->GetCollider()->Overlaps(GetWorldTransform(), other, otherTransform);
+	const Collider* collider = GetCollider();
+	if (collider)
+	{
+		if (sweep.LengthSquared() == 0.f)
+			return collider->Overlaps(GetWorldTransform(), other, otherTransform);
+
+		collider->Overlaps(GetWorldTransform(), other, otherTransform, &LineSegment(Vector3(), sweep));
+	}	
 
 	return false;
+}
+
+float Entity::MinimumDistanceToCollider(const Collider& other, const Transform& otherTransform, Vector3& out_PointA, Vector3& out_PointB, const Vector3& sweep) const
+{
+	const Collider* collider = GetCollider();
+	if (collider)
+	{
+		if (sweep.LengthSquared() == 0.f)
+			return collider->MinimumDistanceTo(GetWorldTransform(), other, otherTransform, out_PointA, out_PointB);
+	
+		return collider->MinimumDistanceTo(GetWorldTransform(), other, otherTransform, out_PointA, out_PointB, &LineSegment(Vector3(), sweep));
+	}
+
+	return -1.f;
 }
 
 Buffer<RaycastResult> Entity::Raycast(const Ray &ray)
@@ -227,7 +252,7 @@ Buffer<RaycastResult> Entity::Raycast(const Ray &ray)
 	return results;
 }
 
-Buffer<Entity*> Entity::FindOverlaps(const Collider &collider, const Transform &_transform)
+Buffer<Entity*> Entity::FindOverlappingChildren(const Collider &collider, const Transform &_transform)
 {
 	Buffer<Entity*> results;
 

@@ -14,6 +14,10 @@ class EntPlayer : public Entity
 
 	static Collider _COLLIDER;
 
+	void _Jump();
+
+	bool _TryMovement(const Transform &wt, const Vector3 &movement, float testYOffset);
+
 public:
 	Entity_FUNCS(EntPlayer, 100);
 

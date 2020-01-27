@@ -33,7 +33,7 @@ enum class EngineCreateFlags : uint16
 };
 
 #include "MacroUtilities.hpp"
-DEFINE_BITMASK_FUNCS(EngineCreateFlags)
+DEFINE_BITMASK_FUNCS(EngineCreateFlags, uint16)
 
 class Engine
 {

@@ -20,7 +20,8 @@ namespace Debug
 		}
 	}
 #else
-	inline void Assert(bool condition, const char* message) {}
+	__forceinline void Assert(bool condition) {}
+	__forceinline void Assert(bool condition, const char* message) {}
 #endif
 
 }

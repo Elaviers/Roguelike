@@ -197,9 +197,11 @@
     <ClInclude Include="CollisionShape.hpp" />
     <ClInclude Include="Colour.hpp" />
     <ClInclude Include="Console.hpp" />
+    <ClInclude Include="DebugLine.hpp" />
     <ClInclude Include="Event.hpp" />
     <ClInclude Include="Hashing.hpp" />
     <ClInclude Include="Hashmap.hpp" />
+    <ClInclude Include="LineSegment.h" />
     <ClInclude Include="MacroUtilities.hpp" />
     <ClInclude Include="Material_Sprite.hpp" />
     <ClInclude Include="Mesh.hpp" />
@@ -312,6 +314,7 @@
     <ClCompile Include="CollisionCapsule.cpp" />
     <ClCompile Include="Colour.cpp" />
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="DebugLine.cpp" />
     <ClCompile Include="PropertyCollection.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Font.cpp" />

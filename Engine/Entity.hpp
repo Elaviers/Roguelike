@@ -262,15 +262,34 @@ public:
 	//Collision
 	virtual const Collider* GetCollider() const { return nullptr; }
 
-	virtual bool OverlapsCollider(const Collider&, const Transform&) const;
-	virtual bool OverlapsRay(const Ray&, RaycastResult&) const;
+	//Sweeps this object along the movement vector
+	virtual bool OverlapsCollider(const Collider& other, const Transform& otherTransform, const Vector3& sweep = Vector3()) const;
+	virtual float MinimumDistanceToCollider(const Collider& other, const Transform& otherTransform, Vector3& out_PointA, Vector3& out_PointB, const Vector3& sweep = Vector3()) const;
+	virtual bool OverlapsRay(const Ray&, RaycastResult& out_Result) const;
 
 	Buffer<RaycastResult> Raycast(const Ray&);
-	Buffer<Entity*> FindOverlaps(const Collider&, const Transform& = Transform());
+	Buffer<Entity*> FindOverlappingChildren(const Collider& other, const Transform& otherTransform = Transform());
+
+	bool Overlaps(const Entity& other, const Vector3& sweep = Vector3()) const 
+	{
+		const Collider* collider = other.GetCollider();
+		if (collider)
+			return OverlapsCollider(*collider, other.GetWorldTransform(), sweep);
+
+		return false;
+	}
+
+	float MinimumDistanceTo(const Entity& other, Vector3& out_PointA, Vector3& out_PointB, const Vector3& sweep = Vector3()) const
+	{
+		const Collider* collider = other.GetCollider();
+		if (collider)
+			return MinimumDistanceToCollider(*collider, other.GetWorldTransform(), out_PointA, out_PointB, sweep);
+
+		return -1.f;;
+	}
 
 	//Operators
 	Entity& operator=(const Entity&) = delete;
-
 	Entity& operator=(Entity&& other) noexcept;
 
 	bool operator==(const Entity &other) const { return _uid == other._uid; }
@@ -300,4 +319,4 @@ protected:
 };
 
 #include "MacroUtilities.hpp"
-DEFINE_BITMASK_FUNCS(Entity::Flags)
+DEFINE_BITMASK_FUNCS(Entity::Flags, byte)

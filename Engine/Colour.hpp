@@ -24,7 +24,8 @@ public:
 
 	const Vector4& GetData() { return _data; }
 
-	operator Vector4() const { return _data; }
+	operator Vector4& () { return _data; }
+	operator const Vector4&() const { return _data; }
 
 	Colour& operator=(const Colour& other)
 	{

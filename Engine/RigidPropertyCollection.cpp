@@ -24,7 +24,7 @@ void RigidPropertyCollection::HandleCommand(const Buffer<String>& tokens) const
 			if (tokens.GetSize() >= 2)
 				property->SetAsString(tokens[1]);
 
-			Engine::Instance().pConsole->Print(CSTR(name, " : ", property->GetAsString()));
+			Engine::Instance().pConsole->Print(CSTR(name, " : ", property->GetAsString(), '\n'));
 		}
 	}
 }

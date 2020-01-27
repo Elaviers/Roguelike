@@ -456,6 +456,12 @@
     <ClInclude Include="CollisionCapsule.hpp">
       <Filter>Header Files\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="LineSegment.h">
+      <Filter>Header Files\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugLine.hpp">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLProgram.cpp">
@@ -724,6 +730,9 @@
     </ClCompile>
     <ClCompile Include="CollisionCapsule.cpp">
       <Filter>Source Files\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugLine.cpp">
+      <Filter>Source Files\Debug</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

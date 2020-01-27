@@ -14,4 +14,4 @@ enum class RenderChannels : byte
 };
 
 #include "MacroUtilities.hpp"
-DEFINE_BITMASK_FUNCS(RenderChannels)
+DEFINE_BITMASK_FUNCS(RenderChannels, byte)

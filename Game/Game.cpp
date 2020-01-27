@@ -216,7 +216,7 @@ void Game::StartLevel(const String& filename)
 		EntPlayer* player = EntPlayer::Create();
 		player->SetParent(&_world);
 
-		Transform spawnTransform(Vector3(0, 0.5f, 0));
+		Transform spawnTransform(Vector3(0, 4.f, 0));
 		player->SetRelativeTransform(spawnTransform);
 	}
 

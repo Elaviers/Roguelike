@@ -12,8 +12,8 @@ class DebugString : public DebugObject
 	String _string;
 
 public:
-	DebugString(const Font &font, const Vector3 &position, float size, const String &string, float time, const Colour& colour) : 
-		DebugObject(time, colour), 
+	DebugString(const Font &font, const Vector3 &position, float size, const String &string, float time, const Colour& colour, float fadeTime = 1.f) : 
+		DebugObject(time, fadeTime, colour, 0.f), 
 		_font(&font), 
 		_string(string) 
 	{ 

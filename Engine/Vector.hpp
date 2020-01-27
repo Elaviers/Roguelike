@@ -108,6 +108,8 @@ public:
 	Vector operator+(const Vector& other) const { Vector v(*this); v += other; return v; }
 	Vector operator-(const Vector& other) const { Vector v(*this); v -= other; return v; }
 
+	Vector operator-() const { return -1.f * *this; }
+
 	bool operator!=(const Vector& other) const
 	{
 		for (int i = 0; i < SIZE; ++i)

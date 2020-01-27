@@ -113,4 +113,3 @@ Vector3 CollisionCapsule::GetFarthestPointInDirection(const Vector3& axisIn, con
     
     return (Vector3(0.f, -_halfHeight + _radius, 0.f) + _radius * axis) * (_transform * worldTransform).GetTransformationMatrix();
 }
-

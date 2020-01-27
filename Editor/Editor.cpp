@@ -2,6 +2,7 @@
 #include <Engine/Colour.hpp>
 #include <Engine/Console.hpp>
 #include <Engine/DebugFrustum.hpp>
+#include <Engine/DebugLine.hpp>
 #include <Engine/DebugManager.hpp>
 #include <Engine/DrawUtils.hpp>
 #include <Engine/FontManager.hpp>
@@ -28,6 +29,8 @@ const Buffer<Pair<const wchar_t*>> openTextureFilter({Pair<const wchar_t*>(L"PNG
 
 const Buffer<Pair<const wchar_t*>> saveAnimationFilter({ Pair<const wchar_t*>(L"Animation", L"*.anim") });
 const Buffer<Pair<const wchar_t*>> saveModelFilter({Pair<const wchar_t*>(L"Mesh", L"*.mesh")});
+
+uint32 dbgIDA, dbgIDB;
 
 Editor::~Editor()
 {
@@ -167,6 +170,10 @@ void Editor::_Init()
 	tools.select.Initialise();
 
 	SetTool(ToolEnum::SELECT);
+
+
+	Engine::Instance().pConsole->Cvars().Add<uint32>("dbga", dbgIDA);
+	Engine::Instance().pConsole->Cvars().Add<uint32>("dbgb", dbgIDB);
 }
 
 void Editor::_InitGL()
@@ -232,8 +239,8 @@ void Editor::Run()
 
 void Editor::Frame()
 {
-	const float moveSpeed = 4.f; // units/s
-	const float rotSpeed = 90.f; //	degs/s
+	const float moveSpeed = 4.f; //units/s
+	const float rotSpeed = 180.f; //degs/s
 
 	_timer.Start();
 
@@ -247,6 +254,19 @@ void Editor::Frame()
 
 	Engine::Instance().pDebugManager->Update(_deltaTime);
 	Engine::Instance().pDebugManager->AddToWorld(DebugFrustum::FromCamera(CameraRef(0)));
+
+
+	Entity* dbgObjA = Engine::Instance().pWorld->FindChildWithUID(dbgIDA);
+	Entity* dbgObjB = Engine::Instance().pWorld->FindChildWithUID(dbgIDB);
+
+	if (dbgObjA && dbgObjB)
+	{
+		Vector3 a, b;
+		float dist = dbgObjA->MinimumDistanceTo(*dbgObjB, a, b);
+
+		Debug::PrintLine(CSTR(dist));
+		Engine::Instance().pDebugManager->AddToWorld(DebugLine(a, b, 0.5f, Colour::Pink, 2.f, 0.5f));
+	}
 
 	_level.UpdateAll(_deltaTime);
 	Render();
