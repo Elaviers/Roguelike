@@ -135,7 +135,7 @@ public:
 
 	static T Dot(const Vector &a, const Vector &b)
 	{
-		float result = 0.f;
+		T result = 0.f;
 		for (int i = 0; i < SIZE; ++i)
 			result += a[i] * b[i];
 

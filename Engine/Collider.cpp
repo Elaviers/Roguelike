@@ -28,10 +28,19 @@ constexpr const int GJK_MAX_ITERATIONS = 50;
 constexpr const float GJK_EDGE_TOLERANCE = 0.001f;
 
 //GJKDist will terminate if a the dot product between an existing point and the direction and the dot product between the new point and the direction is lower than this
-constexpr const float GJK_TOLERANCE = 0.00000001f;
+constexpr const double GJK_TOLERANCE = 1e-10;
 
 //#define GJK_DEBUG 1
-#define GJK_MATHEMATICA_DEBUG 1
+#define GJK_MATHEMATICA_DEBUG 0
+
+#if GJK_MATHEMATICA_DEBUG
+inline void MathematicaDebugState(const Vector3& a, const Vector3& b, const Vector3& c, const Vector3& d, const Vector3& closestPoint)
+{
+	Debug::PrintLine(CSTR("{{", a, "},{", b, "},{", c, "},{", d, "},{", closestPoint, "}},"));
+}
+#else
+__forceinline void MathematicaDebugState(const Vector3& a, const Vector3& b, const Vector3& c, const Vector3& d, const Vector3& closestPoint) {}
+#endif
 
 bool GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShape& shapeB, const Transform& tB, const LineSegment* pLineA = nullptr)
 {
@@ -214,28 +223,46 @@ Vector3 ClosestPointToOriginOnTriangle(const Vector3& a, const Vector3& b, const
 	Vector3 bc = c - b;
 	Vector3 ca = a - c;
 
-	Vector3 centroid = (a + b + c) / 3.f;
-
-	//Dot products with normals (positive if outside, negative if inside, zero if on edge)
-	float dotAB = Vector3::Dot(a, TripleCross(ab, centroid - a, ab));
-	float dotBC = Vector3::Dot(b, TripleCross(bc, centroid - b, bc));
-	float dotCA = Vector3::Dot(c, TripleCross(ca, centroid - c, ca));
-
-	if (dotAB > 0.f)
+	//A.-N[AB]
+	if (Vector3::Dot(a, TripleCross(ab, ca, ab)) <= 0.f)
 	{
-		if (dotBC > 0.f) return b;
-		if (dotCA > 0.f) return a;
+		if (Vector3::Dot(a, -ab) <= 0.f)				//A.BA (outside a on ab)
+		{
+			if (Vector3::Dot(a, ca) <= 0.f) return a;	//A.CA (outside a on ca)
+			return ClosestPointToOriginOnLineSegment(c, ca);
+		}
+
+		if (Vector3::Dot(b, ab) <= 0.f)					//B.AB (outside b on ab)
+		{
+			if (Vector3::Dot(b, -bc) <= 0.f) return b;	//B.CB (outside b on bc)
+			return ClosestPointToOriginOnLineSegment(b, bc);
+		}
+
 		return ClosestPointToOriginOnLineSegment(a, ab);
 	}
 
-	if (dotBC > 0.f)
+	//B.-N[BC]
+	if (Vector3::Dot(b, TripleCross(bc, ab, bc)) <= 0.f)
 	{
-		if (dotCA > 0.f) return c;
+		if (Vector3::Dot(b, -bc) <= 0.f) return b;		//B.CB (outside b on bc)
+
+		if (Vector3::Dot(c, bc) <= 0.f)					//B.BC (outside c on bc)
+		{
+			if (Vector3::Dot(c, -ca) <= 0.f) return c;	//C.AC (outside c on ca)
+
+			return ClosestPointToOriginOnLineSegment(c, ca);
+		}
+
 		return ClosestPointToOriginOnLineSegment(b, bc);
 	}
 
-	if (dotCA > 0.f)
+	//C.-N[CA]
+	if (Vector3::Dot(c, TripleCross(ca, -ab, ca)) <= 0.f)
+	{
+		if (Vector3::Dot(a, ca) <= 0.f) return a;		//A.CA (outside a on ca)
+		if (Vector3::Dot(c, -ca) <= 0.f) return c;		//C.AC (outside c on ca)
 		return ClosestPointToOriginOnLineSegment(c, ca);
+	}
 
 	return ClosestPointToOriginOnPlane(a, Vector3::Cross(ab, bc).Normalised());
 }
@@ -250,6 +277,18 @@ inline Vector2 Cartesian2Barycentric(const Vector3& p, const Vector3& a, const V
 
 Vector3 Cartesian2Barycentric(const Vector3& p, const Vector3& a, const Vector3& b, const Vector3& c)
 {
+	if (a == b)
+	{
+		Vector2 bary2D = Cartesian2Barycentric(p, a, c);
+		return Vector3(bary2D[0], 0.f, bary2D[1]);
+	}
+
+	if (a == c || b == c)
+	{
+		Vector2 bary2D = Cartesian2Barycentric(p, a, b);
+		return Vector3(0.f, bary2D[0], bary2D[1]);
+	}
+
 	Vector3 result;
 	Vector3 ab = b - a, ac = c - a, ap = p - a;
 	float ab_ab = Vector3::Dot(ab, ab);
@@ -258,10 +297,33 @@ Vector3 Cartesian2Barycentric(const Vector3& p, const Vector3& a, const Vector3&
 	float ap_ab = Vector3::Dot(ap, ab);
 	float ap_ac = Vector3::Dot(ap, ac);
 	float denom = ab_ab * ac_ac - ab_ac * ab_ac;
+
+	if (denom == 0.f)
+	{
+		Vector2 bary2D = Cartesian2Barycentric(p, a, b);
+		return Vector3(bary2D[0], bary2D[1], 0.f);
+	}
+
 	result[1] = (ac_ac * ap_ab - ab_ac * ap_ac) / denom;
 	result[2] = (ab_ab * ap_ac - ab_ac * ap_ab) / denom;
 	result[0] = 1.0f - result[1] - result[2];
 	return result;
+}
+
+//Returns vector perpendicular to the two sides in the direction of dir
+inline Vector3 GetNormalForFace(const Vector3& side1, const Vector3& side2, const Vector3& dir)
+{
+	Vector3 result = Vector3::Cross(side1, side2);
+
+	if (Vector3::Dot(result, dir) < 0.f)
+		return -result;
+
+	return result;
+}
+
+inline float CoolDot(const Vector3& side1, const Vector3& side2, const Vector3& dirFromCentroid, const Vector3& dirFromOrigin)
+{
+	return Vector3::Dot(GetNormalForFace(side1, side2, dirFromCentroid), dirFromOrigin);
 }
 
 #include "Engine.hpp"
@@ -330,10 +392,7 @@ float GJKDist(
 				closestPoint = ClosestPointToOriginOnTriangle(mA, mB, mC);
 
 				////
-				Vector3 cb = mB - mC;
-				Vector3 ca = mA - mC;
-
-				dir = Vector3::Cross(cb, ca);
+				dir = Vector3::Cross(mB-mC, mA-mC);
 
 				//If cross product is not facing origin, flip it
 				if (Vector3::Dot(dir, -mC) < 0.f)
@@ -342,185 +401,62 @@ float GJKDist(
 			}
 			case 4:
 			{
-				Vector3 centroid = (mA + mB + mC + mD) / 4.f;
-				Vector3 centreToD = mD - centroid;
-
-				//DAB
-				Vector3 da = mA - mD;
-				Vector3 db = mB - mD;
-				Vector3 n = Vector3::Cross(da, db);
-
-				//Ensure that all of the points are not on the same plane
-				//If the centroid does not contribute less in a face's direction than any other point, then all of the points are on the same plane
-				if (Vector3::Dot(centroid, n) == Vector3::Dot(mA, n))
 				{
-					Vector3 ab = mB - mA;
-					Vector3 bc = mC - mB;
-					Vector3 cd = mD - mC;
+					Vector3 da = mA - mD;
+					Vector3 db = mB - mD;
+					Vector3 dc = mC - mD;
+					//I did have a more efficient way of doing this but it is way uglier and has a small issue so it is not used here, see UnusedCollider.txt
 
-					//AB
-					Vector3 n = TripleCross(ab, centroid - mA, ab);
-					if (Vector3::Dot(mA, n) > 0.f)
+					if (Vector3::Dot(mD, GetNormalForFace(da, db, -dc)) > 0.f &&	//Inside DAB
+						Vector3::Dot(mD, GetNormalForFace(db, dc, -da)) > 0.f &&	//Inside DBC
+						Vector3::Dot(mD, GetNormalForFace(dc, da, -db)) > 0.f &&	//Inside DCA
+						Vector3::Dot(mA, GetNormalForFace(mB - mA, mC - mA, da)) > 0.f)//Inside ABC
 					{
-#if GJK_DEBUG
-						Debug::PrintLine(CSTR("Removing points 2 and 3..."));
-#endif
-
-						closestPoint = ClosestPointToOriginOnLineSegment(mA, mB);
-						dir = -n;
-						i = 2;
-						break;
+						//Inside all faces of tetrahedron
+						return 0.f;
 					}
-					//BC
-					n = TripleCross(bc, centroid - mB, bc);
-					if (Vector3::Dot(mB, n) > 0.f)
+
+
+					//Outside tetrahedron, find each triangle's closest point and use the triangle with the lowest one
+					Vector3 triPoints[4] = {
+						ClosestPointToOriginOnTriangle(mD, mB, mC),
+						ClosestPointToOriginOnTriangle(mD, mC, mA),
+						ClosestPointToOriginOnTriangle(mD, mA, mB),
+						ClosestPointToOriginOnTriangle(mA, mB, mC)
+					};
+
+					int smallestPoint = 0;
+					float smallestLengthSq = triPoints[smallestPoint].LengthSquared();
+					for (int i = 1; i < 4; ++i)
 					{
-#if GJK_DEBUG
-						Debug::PrintLine(CSTR("Removing points 0 and 3..."));
-#endif
+						float lengthSq = triPoints[i].LengthSquared();
+						if (lengthSq < smallestLengthSq)
+						{
+							smallestPoint = i;
+							smallestLengthSq = lengthSq;
+						}
+					}
 
-						closestPoint = ClosestPointToOriginOnLineSegment(mB, mC);
-						dir = -n;
-						i = 2;
+					MathematicaDebugState(mA, mB, mC, mD, triPoints[smallestPoint]);
 
-						//b,c -> a,b
+					//Remove point not on closest triangle
+					//Note: cases fall through
+					switch (smallestPoint)
+					{
+					case 0: //DBC
 						a = b;
+					case 1: //DCA
 						b = c;
-						break;
-					}
-					//CD
-					n = TripleCross(cd, centroid - mC, cd);
-					if (Vector3::Dot(mC, n) > 0.f)
-					{
-#if GJK_DEBUG
-						Debug::PrintLine(CSTR("Removing points 0 and 1..."));
-#endif
-
-						closestPoint = ClosestPointToOriginOnLineSegment(mC, mD);
-						dir = -n;
-						i = 2;
-
-						//c,dir -> a,b
-						a = c;
-						b = d;
-						break;
-					}
-					//DA
-					n = TripleCross(da, centroid - mD, da);
-					if (Vector3::Dot(mD, n) > 0.f)
-					{
-#if GJK_DEBUG
-						Debug::PrintLine(CSTR("Removing points 1 and 2..."));
-#endif
-
-						closestPoint = ClosestPointToOriginOnLineSegment(mD, mA);
-						dir = -n;
-						i = 2;
-
-						//a,dir -> a,b
-						b = d;
+					case 2:	//DAB
+						c = d;
 						break;
 					}
 
-#if GJK_DEBUG
-					Debug::PrintLine(CSTR("Strange occurrence!!!"));
-#endif
-					
-					//Honestly if we get to this point it's either a really strange edge case or the quad contains the origin
-					closestPoint = ClosestPointToOriginOnPlane(mA, n.Normalised());
+					closestPoint = triPoints[smallestPoint];
 					dir = -closestPoint;
 					i = 3;
 					break;
 				}
-
-				//Ensure normal is always facing outwards from centroid
-				if (Vector3::Dot(centreToD, n) < 0.f)
-					n *= -1.f;
-
-				//True if outside of face
-				if (Vector3::Dot(mD, n) < 0.f)
-				{
-#if GJK_DEBUG
-					Debug::PrintLine(CSTR("Removing point 2..."));
-#endif
-
-					//Remove C
-					c = d;
-					i = 3;
-
-					closestPoint = ClosestPointToOriginOnTriangle(mA, mB, mC);
-					dir = -closestPoint;
-					break;
-				}
-
-				//DCA
-				Vector3 dc = mC - mD;
-				n = Vector3::Cross(dc, da);
-				if (Vector3::Dot(centreToD, n) < 0.f)
-					n *= -1.f;
-
-				if (Vector3::Dot(mD, n) < 0.f)
-				{
-#if GJK_DEBUG
-					Debug::PrintLine(CSTR("Removing point 1..."));
-#endif
-
-					//Remove B
-					b = c;
-					c = d;
-					i = 3;
-
-					closestPoint = ClosestPointToOriginOnTriangle(mA, mB, mC);
-					dir = -closestPoint;
-					break;
-				}
-
-				//DBC
-				n = Vector3::Cross(db, dc);
-				if (Vector3::Dot(centreToD, n) < 0.f)
-					n *= -1.f;
-
-				if (Vector3::Dot(mD, n) < 0.f)
-				{
-#if GJK_DEBUG
-					Debug::PrintLine(CSTR("Removing point 0..."));
-#endif
-
-					//Remove A
-					a = b;
-					b = c;
-					c = d;
-					i = 3;
-
-					closestPoint = ClosestPointToOriginOnTriangle(mA, mB, mC);
-					dir = -closestPoint;
-					break;
-				}
-
-				//ABC
-				Vector3 ab = mB - mA;
-				Vector3 ac = mC - mA;
-				n = Vector3::Cross(ab, ac);
-				if (Vector3::Dot(mA - centroid, n) < 0.f)
-					n *= -1.f;
-
-				if (Vector3::Dot(mA, n) < 0.f)
-				{
-#if GJK_DEBUG
-					Debug::PrintLine(CSTR("Removing point 3..."));
-#endif
-
-					//Remove D
-					//...okay, done
-					i = 3;
-
-					closestPoint = ClosestPointToOriginOnTriangle(mA, mB, mC);
-					dir = -closestPoint;
-					break;
-				}
-
-				//The origin is inside, overlapping
-				return 0.f;
 			}
 		}
 
@@ -546,56 +482,62 @@ float GJKDist(
 			") = minkowski(", simplex[i].difference, ")"));
 #endif
 
-#if GJK_MATHEMATICA_DEBUG
-		if (i == 3)
+		if (i >= 1)
 		{
-			Debug::PrintLine(CSTR("{{", mA, "},{", mB, "},{", mC, "},{", mD, "},{", closestPoint, "}},"));
-		}
-#endif
+			bool stopIterating = false;
 
-		for (int j = 0; j < i; ++j)
-		{
-			if (Vector3::Dot(dir, simplex[i].difference) - Vector3::Dot(dir, simplex[j].difference) <= GJK_TOLERANCE)
+			double dotD = Vector<double, 3>::Dot(dir, simplex[i].difference);
+			for (int j = 0; j < i; ++j)
 			{
-				switch (i)
+				double dotP = Vector<double, 3>::Dot(dir, simplex[j].difference);
+
+				//Debug::PrintLine(CSTR("dot is ", String::From(dotD-dotP, 0, 100)));
+
+				if (dotD - dotP <= GJK_TOLERANCE)
 				{
-				case 1:
-				{
-					pointA = a.aSupport;
-					pointB = a.bSupport;
+					stopIterating = true;
 					break;
 				}
-				case 2:
-				{
-					Vector2 bary = Cartesian2Barycentric(closestPoint, mA, mB);
-					pointA = a.aSupport * bary[0] + b.aSupport * bary[1];
-					pointB = a.bSupport * bary[0] + b.bSupport * bary[1];
-					break;
-				}
-				case 3:
-				{
-					Vector3 bary = Cartesian2Barycentric(closestPoint, mA, mB, mC);
-					pointA = a.aSupport * bary[0] + b.aSupport * bary[1] + c.aSupport * bary[2];
-					pointB = a.bSupport * bary[0] + b.bSupport * bary[1] + c.bSupport * bary[2];
-					break;
-				}
-				}
-
-				float result = closestPoint.Length();
-
-#if GJK_DEBUG
-				Debug::PrintLine(CSTR("DONE (", result, ")"));
-#endif
-
-				return result;
 			}
+
+			if (stopIterating) break;
 		}
 
 		++i;
 	}
 
-	//Failsafe
-	return -1.f;
+	switch (i)
+	{
+	case 1:
+	{
+		pointA = a.aSupport;
+		pointB = a.bSupport;
+		break;
+	}
+	case 2:
+	{
+		Vector2 bary = Cartesian2Barycentric(closestPoint, mA, mB);
+		pointA = a.aSupport * bary[0] + b.aSupport * bary[1];
+		pointB = a.bSupport * bary[0] + b.bSupport * bary[1];
+		break;
+	}
+	case 3:
+	case 4:
+	{
+		Vector3 bary = Cartesian2Barycentric(closestPoint, mA, mB, mC);
+		pointA = a.aSupport * bary[0] + b.aSupport * bary[1] + c.aSupport * bary[2];
+		pointB = a.bSupport * bary[0] + b.bSupport * bary[1] + c.bSupport * bary[2];
+		break;
+	}
+	}
+
+	float result = closestPoint.Length();
+
+#if GJK_DEBUG
+	Debug::PrintLine(CSTR("DONE (", result, ")"));
+#endif
+
+	return result;
 }
 
 float Collider::MinimumDistanceTo(
