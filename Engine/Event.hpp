@@ -18,7 +18,7 @@ public:
 
 	Event& operator+=(const FunctionPointer<void, Args...>& function) 
 	{
-		for (auto it = _list.First(); it; ++it)
+		for (auto it = _list.First(); it.IsValid(); ++it)
 			if (*it == function)
 				return *this;
 
@@ -35,7 +35,7 @@ public:
 
 	void operator()(Args... args) const 
 	{
-		for (auto it = _list.First(); it; ++it)
+		for (auto it = _list.First(); it.IsValid(); ++it)
 			it->TryCall();
 	}
 };

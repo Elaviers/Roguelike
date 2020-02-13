@@ -57,8 +57,8 @@ bool CollisionBox::IntersectsRay(const Ray &ray, RaycastResult &result, const Tr
 	if (minT > maxT_y || minT_y > maxT)
 		return false;
 
-	minT = Utilities::Max(minT, minT_y);
-	maxT = Utilities::Min(maxT, maxT_y);
+	minT = Maths::Max(minT, minT_y);
+	maxT = Maths::Min(maxT, maxT_y);
 
 	float minT_z, maxT_z;
 	FindT(origin[2], dir[2], scaledMin[2], scaledMax[2], minT_z, maxT_z);
@@ -66,8 +66,8 @@ bool CollisionBox::IntersectsRay(const Ray &ray, RaycastResult &result, const Tr
 	if (minT > maxT_z || minT_z > maxT)
 		return false;
 
-	minT = Utilities::Max(minT, minT_z);
-	maxT = Utilities::Min(maxT, maxT_z);
+	minT = Maths::Max(minT, minT_z);
+	maxT = Maths::Min(maxT, maxT_z);
 
 	if (maxT < 0.f) return false; //Should probably check if behind a bit earlier
 	

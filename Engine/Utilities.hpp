@@ -13,23 +13,6 @@ namespace Utilities
 		b = std::move(temp);
 	}
 
-	template <typename T>
-	inline T Min(const T &a, const T &b) { return a < b ? a : b; }
-
-	template <typename T>
-	inline T Max(const T &a, const T &b) { return a > b ? a : b; }
-
-	template <typename T>
-	inline T Clamp(const T &x, const T &lower, const T &upper)
-	{
-		if (x < lower)
-			return lower;
-		if (x > upper)
-			return upper;
-
-		return x;
-	}
-
 	inline void CopyBytes(const void *src, void *dest, size_t length)
 	{
 		for (size_t i = 0; i < length; ++i)

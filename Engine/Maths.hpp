@@ -16,6 +16,23 @@ namespace Maths
 	template <typename T>
 	T Lerp(const T& from, const T& to, float alpha) { return (T)((from * (1.f - alpha)) + (to * alpha)); }
 
+	template <typename T>
+	inline T Min(const T& a, const T& b) { return a < b ? a : b; }
+
+	template <typename T>
+	inline T Max(const T& a, const T& b) { return a > b ? a : b; }
+
+	template <typename T>
+	inline T Clamp(const T& x, const T& lower, const T& upper)
+	{
+		if (x < lower)
+			return lower;
+		if (x > upper)
+			return upper;
+
+		return x;
+	}
+
 	template<>
 	Quaternion Lerp(const Quaternion& from, const Quaternion& to, float alpha);
 

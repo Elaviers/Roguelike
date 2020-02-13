@@ -263,18 +263,19 @@ public:
 	virtual const Collider* GetCollider() const { return nullptr; }
 
 	//Sweeps this object along the movement vector
-	virtual bool OverlapsCollider(const Collider& other, const Transform& otherTransform, const Vector3& sweep = Vector3()) const;
+	virtual bool OverlapsCollider(const Collider& other, const Transform& otherTransform, const Vector3& sweep = Vector3(), Vector3* out_Penetration = nullptr) const;
 	virtual float MinimumDistanceToCollider(const Collider& other, const Transform& otherTransform, Vector3& out_PointA, Vector3& out_PointB, const Vector3& sweep = Vector3()) const;
+	virtual Pair<Vector3> GetShallowContactPointsWithCollider(float shrink, const Collider& other, const Transform& otherTransform, float otherShrink) const;
 	virtual bool OverlapsRay(const Ray&, RaycastResult& out_Result) const;
 
 	Buffer<RaycastResult> Raycast(const Ray&);
 	Buffer<Entity*> FindOverlappingChildren(const Collider& other, const Transform& otherTransform = Transform());
 
-	bool Overlaps(const Entity& other, const Vector3& sweep = Vector3()) const 
+	bool Overlaps(const Entity& other, const Vector3& sweep = Vector3(), Vector3* out_Penetration = nullptr) const 
 	{
 		const Collider* collider = other.GetCollider();
 		if (collider)
-			return OverlapsCollider(*collider, other.GetWorldTransform(), sweep);
+			return OverlapsCollider(*collider, other.GetWorldTransform(), sweep, out_Penetration);
 
 		return false;
 	}
@@ -286,6 +287,15 @@ public:
 			return MinimumDistanceToCollider(*collider, other.GetWorldTransform(), out_PointA, out_PointB, sweep);
 
 		return -1.f;;
+	}
+
+	Pair<Vector3> GetShallowContactPoints(float shrink, const Entity& other, float otherShrink) const
+	{
+		const Collider* collider = other.GetCollider();
+		if (collider)
+			return GetShallowContactPointsWithCollider(shrink, *collider, other.GetWorldTransform(), otherShrink);
+
+		return Pair<Vector3>();
 	}
 
 	//Operators

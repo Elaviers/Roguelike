@@ -155,7 +155,7 @@ Mesh_Static* IO::ReadOBJFile(const char *filename)
 				{
 					if (mesh->vertices.GetSize() == 0)
 					{
-						size_t maxSizeSoFar = Utilities::Max(Utilities::Max(positions.GetSize(), normals.GetSize()), uvs.GetSize());
+						size_t maxSizeSoFar = Maths::Max(Maths::Max(positions.GetSize(), normals.GetSize()), uvs.GetSize());
 						mesh->vertices.SetSize(maxSizeSoFar);
 					}
 

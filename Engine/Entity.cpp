@@ -202,15 +202,15 @@ bool Entity::OverlapsRay(const Ray &ray, RaycastResult &result) const
 	return false;
 }
 
-bool Entity::OverlapsCollider(const Collider &other, const Transform &otherTransform, const Vector3& sweep) const
+bool Entity::OverlapsCollider(const Collider &other, const Transform &otherTransform, const Vector3& sweep, Vector3* out_Penetration) const
 {
 	const Collider* collider = GetCollider();
 	if (collider)
 	{
 		if (sweep.LengthSquared() == 0.f)
-			return collider->Overlaps(GetWorldTransform(), other, otherTransform);
+			return collider->Overlaps(GetWorldTransform(), other, otherTransform, nullptr, out_Penetration);
 
-		collider->Overlaps(GetWorldTransform(), other, otherTransform, &LineSegment(Vector3(), sweep));
+		collider->Overlaps(GetWorldTransform(), other, otherTransform, &LineSegment(Vector3(), sweep), out_Penetration);
 	}	
 
 	return false;
@@ -228,6 +228,15 @@ float Entity::MinimumDistanceToCollider(const Collider& other, const Transform& 
 	}
 
 	return -1.f;
+}
+
+Pair<Vector3> Entity::GetShallowContactPointsWithCollider(float shrink, const Collider& other, const Transform& otherTransform, float otherShrink) const
+{
+	const Collider* collider = GetCollider();
+	if (collider)
+		return collider->GetShallowContactPoints(GetWorldTransform(), shrink, other, otherTransform, otherShrink);
+
+	return Pair<Vector3>();
 }
 
 Buffer<RaycastResult> Entity::Raycast(const Ray &ray)
@@ -257,7 +266,7 @@ Buffer<Entity*> Entity::FindOverlappingChildren(const Collider &collider, const 
 	Buffer<Entity*> results;
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
-		if (_children[i]->OverlapsCollider(collider, _transform))
+		if (_children[i]->OverlapsCollider(collider, _transform, Vector3(), nullptr))
 			results.Add(_children[i]);
 
 	return results;
@@ -300,8 +309,8 @@ Bounds Entity::GetWorldBounds(bool noTranslation) const
 
 	for (int i = 0; i < 8; ++i)
 	{
-		min = Vector3(Utilities::Min(min[0], testPoints[i][0]), Utilities::Min(min[1], testPoints[i][1]), Utilities::Min(min[2], testPoints[i][2]));
-		max = Vector3(Utilities::Max(max[0], testPoints[i][0]), Utilities::Max(max[1], testPoints[i][1]), Utilities::Max(max[2], testPoints[i][2]));
+		min = Vector3(Maths::Min(min[0], testPoints[i][0]), Maths::Min(min[1], testPoints[i][1]), Maths::Min(min[2], testPoints[i][2]));
+		max = Vector3(Maths::Max(max[0], testPoints[i][0]), Maths::Max(max[1], testPoints[i][1]), Maths::Max(max[2], testPoints[i][2]));
 	}
 
 	return Bounds(min, max);

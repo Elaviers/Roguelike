@@ -19,9 +19,9 @@ namespace Collision
 		const Vector3& min2, const Vector3& max2)
 	{
 		Vector3 closestPoint = Vector3(
-			Utilities::Clamp(t1.GetPosition()[0], min2[0], max2[0]),
-			Utilities::Clamp(t1.GetPosition()[1], min2[1], max2[1]),
-			Utilities::Clamp(t1.GetPosition()[2], min2[2], max2[2]));
+			Maths::Clamp(t1.GetPosition()[0], min2[0], max2[0]),
+			Maths::Clamp(t1.GetPosition()[1], min2[1], max2[1]),
+			Maths::Clamp(t1.GetPosition()[2], min2[2], max2[2]));
 
 		float dist = (t1.GetPosition() - closestPoint).LengthSquared();
 		if (dist <= r1 * r1)

@@ -11,6 +11,7 @@ public:
 	_PtrData(void* obj, void* ptr) : obj(obj), ptr(ptr) {}
 
 	bool operator==(const _PtrData& other) const { return ptr == other.ptr && obj == other.obj; }
+	bool operator!=(const _PtrData& other) const { return ptr != other.ptr || obj != other.obj; }
 };
 
 template<typename T, typename RETURNTYPE, typename ...Args>
@@ -47,6 +48,9 @@ public:
 	}
 
 	void* GetRawPointer() const { return _voidPtr; }
+
+	bool operator==(const MemberFunctionPointer& other) const { return _voidPtr == other._voidPtr && _isConstFunction == other._isConstFunction; }
+	bool operator!=(const MemberFunctionPointer& other) const { return _voidPtr != other._voidPtr || _isConstFunction != other._isConstFunction; }
 };
 
 /*
@@ -72,6 +76,7 @@ class FunctionPointer
 		void TryCall(Args... args) const	{ if (IsCallable()) Call(args...); }
 
 		bool operator==(const FunctionCaller& other) const { return _GetPtrData() == other._GetPtrData(); }
+		bool operator!=(const FunctionCaller& other) const { return _GetPtrData() != other._GetPtrData(); }
 	};
 
 	class FunctionCallerStatic : public FunctionCaller
@@ -164,9 +169,10 @@ public:
 	RETURNTYPE operator()(Args ...args) const	{ return _Fptr().Call(args...); }
 	bool IsCallable() const						{ return _Fptr().IsCallable(); }
 	void TryCall(Args ...args)					{ _Fptr().TryCall(args...); }
-	void TryCall(Args ...args) const				{ _Fptr().TryCall(args...); }
+	void TryCall(Args ...args) const			{ _Fptr().TryCall(args...); }
 
 	bool operator==(const FunctionPointer& other) const { return (FunctionCaller&)_u == (FunctionCaller&)other._u; }
+	bool operator!=(const FunctionPointer& other) const { return (FunctionCaller&)_u != (FunctionCaller&)other._u; }
 };
 
 typedef FunctionPointer<void> Callback;
@@ -187,3 +193,7 @@ using Setter = FunctionPointer<void, const T&>;
 
 template<typename T, typename V>
 using MemberSetter = MemberFunctionPointer<T, void, const V&>;
+
+using NewHandler = FunctionPointer<byte*, size_t>;
+
+using DeleteHandler = FunctionPointer<void, byte*>;

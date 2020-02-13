@@ -60,8 +60,8 @@ public:
 	{
 		_glTexture.Delete();
 		_glTexture.Create(_width, _height, _data.Data(), 
-			maxMipLevels ? Utilities::Min(maxMipLevels, info.mipLevels) : info.mipLevels, 
-			maxAnisotropy ? Utilities::Min(maxAnisotropy, info.aniso) : info.aniso, 
+			maxMipLevels ? Maths::Min(maxMipLevels, info.mipLevels) : info.mipLevels, 
+			maxAnisotropy ? Maths::Min(maxAnisotropy, info.aniso) : info.aniso, 
 			info.minFilter, 
 			info.magFilter);
 	}

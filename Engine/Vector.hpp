@@ -36,7 +36,7 @@ public:
 	const T& operator[](int index) const { return _data[index]; }
 
 	template <typename CAST>
-	operator Vector<CAST, SIZE>()
+	operator Vector<CAST, SIZE>() const
 	{
 		Vector<CAST, SIZE> result;
 		for (int i = 0; i < SIZE; ++i)

@@ -133,7 +133,7 @@ void Console::Render(const Font &font, float deltaTime)
 				--i;
 			}
 
-			linesNeeded = Utilities::Min((int)lc, linesToDraw);
+			linesNeeded = Maths::Min((int)lc, linesToDraw);
 		}
 
 		transform.SetPosition(Vector3(0, yOffset + linesNeeded * transform.GetScale()[1], 0));

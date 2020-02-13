@@ -18,9 +18,9 @@ void Animation::Evaluate(Buffer<Mat4>& skinningMatrices, const Skeleton& skeleto
 {
 	skinningMatrices.SetSize(skeleton.GetJointCount());
 
-	for (auto it = skeleton.FirstListElement(); it; ++it)
+	for (auto it = skeleton.FirstListElement(); it.IsValid(); ++it)
 	{
-		Joint& j = *it;
+		const Joint& j = *it;
 
 		auto translationTrack = _translationTracks.Get(j.name);
 		auto rotationTrack = _rotationTracks.Get(j.name);

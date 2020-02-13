@@ -70,7 +70,7 @@ bool EntCamera::FrustumOverlaps(const Bounds &b) const
 		clipRadius = b.radius / (v3.Length() * Maths::TangentDegrees(_fov / 2.f));
 	}
 	else
-		clipRadius = (b.radius * _scale) / (float)Utilities::Min(_viewport[0], _viewport[1]) * 2.f;
+		clipRadius = (b.radius * _scale) / (float)Maths::Min(_viewport[0], _viewport[1]) * 2.f;
 
 	Debug::PrintLine(CSTR(v3, ", ", v[3], " (", clipRadius, ")"));
 	

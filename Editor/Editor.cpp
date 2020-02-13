@@ -244,6 +244,9 @@ void Editor::Frame()
 
 	_timer.Start();
 
+	if (_deltaTime > .1f) //Do not allow very long time deltas, they screw up the physics
+		_deltaTime = 0.1f;
+
 	EntCamera &perspCam = CameraRef(_activeVP);
 	perspCam.RelativeMove(
 		perspCam.GetRelativeTransform().GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed
@@ -261,11 +264,18 @@ void Editor::Frame()
 
 	if (dbgObjA && dbgObjB)
 	{
+		/*
 		Vector3 a, b;
 		float dist = dbgObjA->MinimumDistanceTo(*dbgObjB, a, b);
 
 		Debug::PrintLine(CSTR(dist));
 		Engine::Instance().pDebugManager->AddToWorld(DebugLine(a, b, 0.5f, Colour::Pink, 2.f, 0.5f));
+		*/
+
+		Vector3 penetration;
+		dbgObjA->Overlaps(*dbgObjB, Vector3(), &penetration);
+		Debug::PrintLine(CSTR(penetration));
+		//Debug::PrintLine(dbgObjA->Overlaps(*dbgObjB) ? CSTR(dbgObjA->GetPenetrationVector(*dbgObjB)) : "no");
 	}
 
 	_level.UpdateAll(_deltaTime);

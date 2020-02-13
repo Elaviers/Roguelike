@@ -10,7 +10,7 @@ class Tracker
 
 	SharedPointerData<T>* _Find(T* addr)
 	{
-		for (auto it = _list.First(); it; ++it)
+		for (auto it = _list.First(); it.IsValid(); ++it)
 			if (it->GetPtr() == addr)
 				return &*it;
 
@@ -22,7 +22,7 @@ class Tracker
 		if (pd.GetPtr())
 			return;
 
-		for (auto it = _list.First(); it; ++it)
+		for (auto it = _list.First(); it.IsValid(); ++it)
 			if (it->GetPtr() == pd.GetPtr())
 			{
 				_list.Remove(it);

@@ -360,9 +360,6 @@
     <ClInclude Include="Hashmap.hpp">
       <Filter>Header Files\Templates</Filter>
     </ClInclude>
-    <ClInclude Include="StackAllocator.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
     <ClInclude Include="Box.hpp">
       <Filter>Header Files\Structs</Filter>
     </ClInclude>
@@ -461,6 +458,12 @@
     </ClInclude>
     <ClInclude Include="DebugLine.hpp">
       <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Pool.h">
+      <Filter>Header Files\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="StackAllocator.hpp">
+      <Filter>Header Files\Classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -659,9 +662,6 @@
     <ClCompile Include="Utilities.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="StackAllocator.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
     <ClCompile Include="Material_Sprite.cpp">
       <Filter>Source Files\Asset</Filter>
     </ClCompile>
@@ -733,6 +733,9 @@
     </ClCompile>
     <ClCompile Include="DebugLine.cpp">
       <Filter>Source Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="StackAllocator.cpp">
+      <Filter>Source Files\Classes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

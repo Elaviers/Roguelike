@@ -330,8 +330,8 @@ public:
 						dest.normal = src.normal;
 						dest.uv = src.uv;
 
-						boundsMin = Vector3(Utilities::Min(boundsMin[0], src.pos[0]), Utilities::Min(boundsMin[1], src.pos[1]), Utilities::Min(boundsMin[2], src.pos[2]));
-						boundsMax = Vector3(Utilities::Max(boundsMax[0], src.pos[0]), Utilities::Max(boundsMax[1], src.pos[1]), Utilities::Max(boundsMax[2], src.pos[2]));
+						boundsMin = Vector3(Maths::Min(boundsMin[0], src.pos[0]), Maths::Min(boundsMin[1], src.pos[1]), Maths::Min(boundsMin[2], src.pos[2]));
+						boundsMax = Vector3(Maths::Max(boundsMax[0], src.pos[0]), Maths::Max(boundsMax[1], src.pos[1]), Maths::Max(boundsMax[2], src.pos[2]));
 					}
 
 					//Bounds
@@ -360,7 +360,7 @@ public:
 								VertexMapping& vertexMapping = (*vertGroups)[vgIndex];
 
 								List<uint32>& affectedVerts = _vertsForCP[vertexMapping.cpIndex];
-								for (auto iVertexIndex = affectedVerts.First(); iVertexIndex; ++iVertexIndex)
+								for (auto iVertexIndex = affectedVerts.First(); iVertexIndex.IsValid(); ++iVertexIndex)
 								{
 									VertexSkeletal& vertex = mesh->vertices[*iVertexIndex];
 
@@ -396,8 +396,8 @@ public:
 						dest.normal = src.normal;
 						dest.uv = src.uv;
 
-						boundsMin = Vector3(Utilities::Min(boundsMin[0], src.pos[0]), Utilities::Min(boundsMin[1], src.pos[1]), Utilities::Min(boundsMin[2], src.pos[2]));
-						boundsMax = Vector3(Utilities::Max(boundsMax[0], src.pos[0]), Utilities::Max(boundsMax[1], src.pos[1]), Utilities::Max(boundsMax[2], src.pos[2]));
+						boundsMin = Vector3(Maths::Min(boundsMin[0], src.pos[0]), Maths::Min(boundsMin[1], src.pos[1]), Maths::Min(boundsMin[2], src.pos[2]));
+						boundsMax = Vector3(Maths::Max(boundsMax[0], src.pos[0]), Maths::Max(boundsMax[1], src.pos[1]), Maths::Max(boundsMax[2], src.pos[2]));
 					}
 
 					//Bounds
@@ -466,7 +466,7 @@ public:
 							{
 								auto cluster = skin->GetCluster(j);
 								const char* name = cluster->GetName();
-								Joint* joint = _skeleton->GetJointWithName(name);
+								const Joint* joint = _skeleton->GetJointWithName(name);
 
 								if (joint)
 								{

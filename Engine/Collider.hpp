@@ -2,6 +2,7 @@
 #include "Buffer.hpp"
 #include "CollisionChannels.hpp"
 #include "CollisionShape.hpp"
+#include "Pair.hpp"
 
 struct LineSegment;
 struct RaycastResult;
@@ -88,11 +89,15 @@ public:
 	bool Overlaps(
 		const Transform& transform, 
 		const Collider& other, const Transform& otherTransform, 
-		const LineSegment* lineA = nullptr) const;
+		const LineSegment* lineA, Vector3* out_PenetrationVector) const;
 	
 	float MinimumDistanceTo(
 		const Transform& transform, 
 		const Collider& other, const Transform& otherTransform, 
 		Vector3& out_PointA, Vector3& out_PointB, 
 		const LineSegment* lineA = nullptr) const;
+
+	Pair<Vector3> GetShallowContactPoints(
+		const Transform& transform, float shrink,
+		const Collider& other, const Transform& otherTransform, float otherShrink) const;
 };

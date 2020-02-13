@@ -1,5 +1,6 @@
 #pragma once
 #include "Buffer.hpp"
+#include "FunctionPointer.hpp"
 #include "List.hpp"
 #include "Hashing.hpp"
 #include "Pair.hpp"
@@ -22,25 +23,50 @@ public:
 template <typename K, typename V, typename H_TYPE = uint32>
 class Hashmap
 {
+	NewHandler _handlerNew;
+	DeleteHandler _handlerDelete;
+
+	class Node;
+	Node* _NewNode(H_TYPE hash) const
+	{
+		if (_handlerNew.IsCallable())
+			return new (_handlerNew(sizeof(Node))) Node(hash, _handlerNew, _handlerDelete);
+
+		return new Node(hash, _handlerNew, _handlerDelete);
+	}
+
+	void _DeleteNode(Node* node) const
+	{
+		if (_handlerDelete.IsCallable())
+		{
+			node->~Node();
+			_handlerDelete((byte*)node);
+			return;
+		}
+
+		delete node;
+	}
+
 	static H_TYPE _Hash(const K& key) { return Hasher<H_TYPE>::template Hash<K>(key); }
 
 	typedef Pair<const K, V> KVPair;
 	typedef Pair<const K, const V> KVPairConst;
 
-	class HashNode
+	class Node
 	{
 	public:
 		const H_TYPE hash;
 		List<KVPair> keys;
 		
-		HashNode *left, *right;
+		Node *left, *right;
 
-		HashNode(H_TYPE hash) : hash(hash), left(nullptr), right(nullptr) {}
+		Node(H_TYPE hash, const NewHandler& newHandler, const DeleteHandler& deleteHandler) : hash(hash), keys(newHandler, deleteHandler), left(nullptr), right(nullptr) {}
+		~Node() {}
 
-		~HashNode()
+		void DeleteChildren(const Hashmap& map) const
 		{
-			if (left) delete left;
-			if (right) delete right;
+			if (left) map._DeleteNode(left);
+			if (right) map._DeleteNode(right);
 		}
 
 		uint32 Count() const
@@ -55,14 +81,14 @@ class Hashmap
 
 		V* GetValueForKey(const K &key)
 		{
-			for (auto it = keys.First(); it; ++it)
+			for (auto it = keys.First(); it.IsValid(); ++it)
 				if (it->first == key)
 					return &it->second;
 
 			return nullptr;
 		}
 
-		HashNode* Find(H_TYPE h)
+		Node* Find(H_TYPE h)
 		{
 			if (h < hash)
 			{
@@ -78,17 +104,17 @@ class Hashmap
 			return this;
 		}
 
-		HashNode& Get(H_TYPE h)
+		Node& Get(H_TYPE h, const Hashmap& map)
 		{
 			if (h < hash)
 			{
-				if (left) return left->Get(h);
-				return *(left = new HashNode(h));
+				if (left) return left->Get(h, map);
+				return *(left = map._NewNode(h));
 			}
 			else if (h > hash)
 			{
-				if (right) return right->Get(h);
-				return *(right = new HashNode(h));
+				if (right) return right->Get(h, map);
+				return *(right = map._NewNode(h));
 			}
 
 			return *this;
@@ -96,7 +122,7 @@ class Hashmap
 
 		KVPair* GetWithValue(const V& v)
 		{
-			for (auto it = keys.First(); it; ++it)
+			for (auto it = keys.First(); it.IsValid(); ++it)
 				if (it->second == v)
 					return &*it;
 
@@ -106,9 +132,9 @@ class Hashmap
 			return nullptr;
 		}
 
-		HashNode* Copy()
+		Node* Copy(const Hashmap& map)
 		{
-			HashNode* node = new HashNode(hash);
+			Node* node = map->_NewNode(hash);
 			node->keys = keys;
 
 			if (left)	node->left =	left->Copy();
@@ -119,7 +145,7 @@ class Hashmap
 
 		void AddToK(Buffer<const K*>& buffer) const
 		{
-			for (auto it = keys.First(); it; ++it)
+			for (auto it = keys.First(); it.IsValid(); ++it)
 				buffer.Add(&it->first);
 
 			if (left)	left->AddToK(buffer);
@@ -129,7 +155,7 @@ class Hashmap
 		void AddTo(Buffer<KVPair*> &buffer, int depth, int currentDepth = 0)
 		{
 			if (depth < 0 || currentDepth == depth)
-				for (auto it = keys.First(); it; ++it)
+				for (auto it = keys.First(); it.IsValid(); ++it)
 					buffer.Add(&*it);
 			
 			if (left)	left->AddTo(buffer, depth, currentDepth + 1);
@@ -139,7 +165,7 @@ class Hashmap
 		void AddTo(Buffer<KVPairConst*>& buffer, int depth, int currentDepth = 0)
 		{
 			if (depth < 0 || currentDepth == depth)
-				for (auto it = keys.First(); it; ++it)
+				for (auto it = keys.First(); it.IsValid(); ++it)
 					buffer.Add(reinterpret_cast<KVPairConst*>(&*it));
 
 			if (left)	left->AddTo(buffer, depth, currentDepth + 1);
@@ -148,7 +174,7 @@ class Hashmap
 
 		void ForEach(void (*function)(const K&, V&))
 		{
-			for (auto it = keys.First(); it; ++it)
+			for (auto it = keys.First(); it.IsValid(); ++it)
 				function(it->first, it->second);
 			
 			if (left)	left->ForEach(function);
@@ -156,16 +182,41 @@ class Hashmap
 		}
 	};
 
-	HashNode *_data;
+	Node *_data;
 
 public:
 	Hashmap() : _data(nullptr) {}
+	Hashmap(const NewHandler& newHandler, const DeleteHandler& deleteHandler) : _handlerNew(newHandler), _handlerDelete(deleteHandler), _data(nullptr) {}
 	Hashmap(const Hashmap& other) : _data(nullptr) { if (other._data) _data = other._data->Copy(); }
-	~Hashmap() { delete _data; }
+	Hashmap(Hashmap&& other) : _data(other._data)
+	{
+		other._data = nullptr;
 
-	void Clear() { delete _data; _data = nullptr; }
-	uint32 GetSize() const { return _data ? _data->Count() : 0; }
-	bool IsEmpty() const { return _data == nullptr; }
+		if (other._handlerNew != _handlerNew || other._handlerDelete != _handlerDelete)
+			operator=((const Hashmap&)*this);
+	}
+
+	~Hashmap() 
+	{
+		if (_data)
+		{
+			_data->DeleteChildren(*this);
+			_DeleteNode(_data);
+		}
+	}
+
+	void Clear()			
+	{ 
+		if (_data)
+		{
+			_data->DeleteChildren(*this);
+			_DeleteNode(_data);
+			_data = nullptr;
+		}
+	}
+
+	uint32 GetSize() const	{ return _data ? _data->Count() : 0; }
+	bool IsEmpty() const	{ return _data == nullptr; }
 
 	const K* const FindFirstKey(const V& value) const
 	{
@@ -195,7 +246,7 @@ public:
 	{
 		if (_data)
 		{
-			HashNode& node = _data->Get(_Hash(key));
+			Node& node = _data->Get(_Hash(key), *this);
 
 			V* value = node.GetValueForKey(key);
 			if (value) return *value;
@@ -203,7 +254,7 @@ public:
 			return node.keys.Add(KVPair(key, V()))->second;
 		}
 
-		_data = new HashNode(_Hash(key));
+		_data = _NewNode(_Hash(key));
 		return _data->keys.Add(KVPair(key, V()))->second;
 	}
 
@@ -211,7 +262,7 @@ public:
 	{
 		if (_data)
 		{
-			HashNode& node = _data->Get(_Hash(key));
+			Node& node = _data->Get(_Hash(key), *this);
 		
 			V* v = node.GetValueForKey(key);
 			if (v)
@@ -220,7 +271,7 @@ public:
 			return node.keys.Add(KVPair(key, value))->second;
 		}
 
-		_data = new HashNode(_Hash(key));
+		_data = _NewNode(_Hash(key));
 		return _data->keys.Add(KVPair(key, value))->second;
 	}
 
@@ -230,6 +281,17 @@ public:
 	{
 		Clear();
 		if (other._data) _data = other._data->Copy();
+		return *this;
+	}
+
+	Hashmap& operator=(Hashmap&& other)
+	{
+		_data = other._data;
+		other._data = nullptr;
+
+		if (other._handlerNew != _handlerNew || other._handlerDelete != _handlerDelete)
+			return operator=((const Hashmap&)*this);
+
 		return *this;
 	}
 

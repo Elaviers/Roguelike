@@ -48,7 +48,7 @@ WaveSound* AudioManager::_CreateResource(const String& name, const String& data)
 		byte* originalData = new byte[sound->dataSize];
 		Utilities::CopyBytes(sound->data, originalData, sound->dataSize);
 
-		uint32 cutoff = (uint32)(Utilities::Min<uint32>(sound->sampleRate, _waveFormat.nSamplesPerSec) / 2.f);
+		uint32 cutoff = (uint32)(Maths::Min<uint32>(sound->sampleRate, _waveFormat.nSamplesPerSec) / 2.f);
 
 		AudioUtilities::LowPassFilter(
 			(int16*)originalData,
@@ -94,7 +94,7 @@ void AudioManager::Initialise(uint32 minimumBufferDurationMillis)
 	CHECK(result);
 
 	{
-		const REFERENCE_TIME buffer_duration = Utilities::Max((REFERENCE_TIME)minimumBufferDurationMillis * 10000, minimumDevicePeriod);
+		const REFERENCE_TIME buffer_duration = Maths::Max((REFERENCE_TIME)minimumBufferDurationMillis * 10000, minimumDevicePeriod);
 
 		result = _audioClient->GetMixFormat(&descriptor);
 		CHECK(result);
@@ -147,13 +147,13 @@ void AudioManager::FillBuffer()
 
 		List<Sampler>::Iterator it = _playingSounds.First();
 
-		while (it)
+		while (it.IsValid())
 		{
 			List<Sampler>::Iterator next = it.Next();
 
 			uint32 framesWritten = it->ReadToSoundBuffer(buffer, availableFrames, _waveFormat.nSamplesPerSec, _waveFormat.nChannels, .5f);
 
-			destFramesWritten = Utilities::Max(destFramesWritten, framesWritten);
+			destFramesWritten = Maths::Max(destFramesWritten, framesWritten);
 
 			if (framesWritten == 0)
 				_playingSounds.Remove(it);

@@ -1,4 +1,5 @@
 #pragma once
+#include "FunctionPointer.hpp"
 #include "Types.hpp"
 #include "Utilities.hpp"
 #include <initializer_list>
@@ -8,6 +9,9 @@ template <typename T>
 class Buffer
 {
 private:
+	NewHandler _handlerNew;
+	DeleteHandler _handlerDelete;
+
 	union
 	{
 		T* _elements;
@@ -16,7 +20,21 @@ private:
 
 	size_t _size;
 
-	byte* _CreateNewArray(size_t newSize) const { return new byte[sizeof(T) * newSize]; }
+	byte* _CreateNewArray(size_t newSize) const 
+	{
+		if (_handlerNew.IsCallable())
+			return _handlerNew(sizeof(T) * newSize);
+
+		return new byte[sizeof(T) * newSize]; 
+	}
+
+	void _DeleteData()
+	{
+		if (_handlerDelete.IsCallable())
+			_handlerDelete(_data);
+		else
+			delete[] _data;
+	}
 
 public:
 	Buffer() : _data(nullptr), _size(0) {}
@@ -27,20 +45,20 @@ public:
 		new (_elements) T(v);
 	}
 
+	Buffer(const std::initializer_list<T>& elements) : _size(elements.size())
+	{
+		_data = _CreateNewArray(_size);
+
+		for (size_t i = 0; i < _size; ++i)
+			new (_elements + i) T(elements.begin()[i]);
+	}
+
 	Buffer(const Buffer& other) : _size(other._size)
 	{
 		_data = _CreateNewArray(_size);
 
 		for (size_t i = 0; i < _size; ++i)
 			new (_elements + i) T(other[i]);
-	}
-
-	Buffer(std::initializer_list<T> array) : _size(array.size())
-	{
-		_data = _CreateNewArray(_size);
-
-		for (size_t i = 0; i < _size; ++i)
-			new (_elements + i) T(array.begin()[i]);
 	}
 
 	Buffer(const T* data, size_t size) : _size(size) 
@@ -52,9 +70,12 @@ public:
 	}
 
 	Buffer(Buffer&& other) noexcept : _data(other._data), _size(other._size)
-	{ 
+	{
 		other._data = nullptr;
 		other._size = 0;
+
+		if (other._handlerNew != _handlerNew || other._handlerDelete != _handlerDelete)
+			operator=((const Buffer&)*this);
 	}
 
 	~Buffer() 
@@ -62,7 +83,7 @@ public:
 		for (size_t i = 0; i < _size; ++i)
 			_elements[i].~T();
 
-		delete[] _data; 
+		_DeleteData();
 	}
 
 	size_t GetSize() const	{ return _size; }
@@ -96,7 +117,7 @@ public:
 		else
 			newData = nullptr;
 
-		delete[] _data;
+		_DeleteData();
 		_data = newData;
 		_size = size;
 	}
@@ -127,7 +148,7 @@ public:
 
 		new (newData + sizeof(T) * pos) T(item);
 		
-		delete[] _data;
+		_DeleteData();
 		_data = newData;
 		_size++;
 
@@ -154,7 +175,7 @@ public:
 			Utilities::CopyBytes(_data, newData, index * sizeof(T));
 			Utilities::CopyBytes(_data + (index + 1) * sizeof(T), newData + index * sizeof(T), (_size - index) * sizeof(T));
 
-			delete[] _data;
+			_DeleteData();
 			_data = newData;
 		}
 	}
@@ -205,7 +226,7 @@ public:
 
 	Buffer& operator=(const Buffer& other)
 	{
-		delete[] _data;
+		_DeleteData();
 		_size = other._size;
 		_data = _CreateNewArray(_size);
 
@@ -221,6 +242,9 @@ public:
 		_size = other._size;
 		other._data = nullptr;
 		other._size = 0;
+
+		if (other._handlerNew != _handlerNew || other._handlerDelete != _handlerDelete)
+			operator=((const Buffer&)*this);
 
 		return *this;
 	}

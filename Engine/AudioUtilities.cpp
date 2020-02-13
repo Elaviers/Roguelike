@@ -1,6 +1,5 @@
 #include "AudioUtilities.hpp"
 #include "Maths.hpp"
-#include "Utilities.hpp"
 #include <limits>
 
 void AudioUtilities::LowPassFilter(const int16 *src, int16 *dest, int channelCount, size_t frameCount, uint32 sampleRate, uint32 cutoff)
@@ -66,7 +65,7 @@ uint32 AudioUtilities::ResampleTo(int16 *src, uint32 srcSampleRate, uint16 srcCh
 	const float srcFramesPerDestFrame = (float)srcSampleRate / (float)destSampleRate;
 	const float destFramesPerSrcFrame = (float)destSampleRate / (float)srcSampleRate;
 
-	uint32 framesToWrite = Utilities::Min<uint32>((uint32)((float)srcFrameCount * destFramesPerSrcFrame), destFrameCount);
+	uint32 framesToWrite = Maths::Min<uint32>((uint32)((float)srcFrameCount * destFramesPerSrcFrame), destFrameCount);
 
 	for (uint32 f = 0; f < framesToWrite; ++f)
 	{
@@ -84,7 +83,7 @@ uint32 AudioUtilities::ResampleTo(int16 *src, uint32 srcSampleRate, uint16 srcCh
 
 			float amount = dest[destIndex] + mix * AudioUtilities::LanczosInterp(src, srcChannelCount, srcFrameCount, srcIndex + c, blend, filterSize);
 
-			dest[destIndex] = (int16)Utilities::Clamp<float>(amount, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max());
+			dest[destIndex] = (int16)Maths::Clamp<float>(amount, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max());
 		}
 	}
 

@@ -14,7 +14,7 @@ private:
 		if (parent == nullptr)
 			return true;
 
-		for (auto it = _joints.First(); it; ++it)
+		for (auto it = _joints.First(); it.IsValid(); ++it)
 			if (&*it == parent)
 				return true;
 
@@ -57,7 +57,7 @@ public:
 	size_t GetJointCount() const { return _joints.GetSize(); }
 
 	List<Joint>::Iterator FirstListElement() { return _joints.First(); }
-	const List<Joint>::Iterator FirstListElement() const { return _joints.First(); }
+	List<Joint>::ConstIterator FirstListElement() const { return _joints.First(); }
 
 	Joint* CreateJoint(Joint *parent)
 	{
@@ -67,19 +67,22 @@ public:
 		return nullptr;
 	}
 
-	Joint* GetJointWithID(int id) const
+	Joint* GetJointWithID(int id)
 	{
 		auto it = _joints.Get(id);
 
-		return it ? &*it : nullptr;
+		return it.IsValid() ? &*it : nullptr;
 	}
 
-	Joint* GetJointWithName(const String& name) const
+	Joint* GetJointWithName(const String& name)
 	{
-		for (auto it = _joints.First(); it; ++it)
+		for (auto it = _joints.First(); it.IsValid(); ++it)
 			if (it->name == name)
 				return &*it;
 
 		return nullptr;
 	}
+
+	const Joint* GetJointWithID(int id) const				{ return (const Joint*)const_cast<Skeleton*>(this)->GetJointWithID(id); }
+	const Joint* GetJointWithName(const String& name) const { return (const Joint*)const_cast<Skeleton*>(this)->GetJointWithName(name); }
 };

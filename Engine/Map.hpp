@@ -1,10 +1,36 @@
 #pragma once
 #include "Buffer.hpp"
+#include "FunctionPointer.hpp"
 #include "Pair.hpp"
 
 template <typename K, typename V>
 class Map
 {
+	NewHandler _handlerNew;
+	DeleteHandler _handlerDelete;
+
+	class Node;
+
+	Node* _NewNode(const K& key, const V& value) const
+	{
+		if (_handlerNew.IsCallable())
+			return new (_handlerNew(sizeof(Node))) Node(key, value);
+
+		return new Node(key, value);
+	}
+
+	void _DeleteNode(Node* node) const
+	{
+		if (_handlerDelete.IsCallable())
+		{
+			node->~Node();
+			_handlerDelete((byte*)node);
+			return;
+		}
+
+		delete node;
+	}
+
 	struct Node
 	{
 		K key;
@@ -14,11 +40,12 @@ class Map
 		Node* right;
 
 		Node(const K& key, const V &value) : key(key), value(value), left(nullptr), right(nullptr) {}
+		~Node() {}
 
-		~Node()
+		void DeleteChildren(const Map& map) const
 		{
-			if (left) delete left;
-			if (right) delete right;
+			if (left) map._DeleteNode(left);
+			if (right) map._DeleteNode(right);
 		}
 
 		uint32 Count() const
@@ -47,33 +74,33 @@ class Map
 			return this;
 		}
 
-		Node& Get(const K& k)
+		Node& Get(const K& k, const Map& map)
 		{
 			if (k < key)
 			{
-				if (left) return left->Get(k);
-				return *(left = new Node(k, V()));
+				if (left) return left->Get(k, map);
+				return *(left = map._NewNode(k, V()));
 			}
 			else if (k > key)
 			{
-				if (right) return right->Get(k);
-				return *(right = new Node(k, V()));
+				if (right) return right->Get(k, map);
+				return *(right = map._NewNode(k, V()));
 			}
 
 			return *this;
 		}
 
-		Node& Set(const K& k, const V& v)
+		Node& Set(const K& k, const V& v, const Map& map)
 		{
 			if (k < key)
 			{
-				if (left) return left->Set(k, v);
-				return *(left = new Node(k, v));
+				if (left) return left->Set(k, v, map);
+				return *(left = map._NewNode(k, v));
 			}
 			else if (k > key)
 			{
-				if (right) return right->Set(k, v);
-				return *(right = new Node(k, v));
+				if (right) return right->Set(k, v, map);
+				return *(right = map._NewNode(k, v));
 			}
 
 			value = v;
@@ -91,9 +118,9 @@ class Map
 			return nullptr;
 		}
 
-		Node* Copy()
+		Node* Copy(const Map& map)
 		{
-			Node* node = new Node(key, value);
+			Node* node = map._NewNode(key, value);
 
 			if (left)	node->left = left->Copy();
 			if (right)	node->right = right->Copy();
@@ -129,13 +156,35 @@ class Map
 
 public:
 	Map() : _data(nullptr) {}
-	~Map() { delete _data; }
+	~Map() 
+	{ 
+		if (_data)
+		{
+			_data->DeleteChildren(*this);
+			_DeleteNode(_data);
+		}
+	}
 
-	Map(const Map &other) : _data(nullptr) { if (other._data) _data = other._data->Copy(); }
-	Map(Map&& other) : _data(other._data) { other._data = nullptr; }
+	Map(const Map& other) : _data(nullptr)	{ if (other._data) _data = other._data->Copy(); }
+	Map(Map&& other) : _data(other._data)	
+	{
+		other._data = nullptr;
 
-	void Clear()				{ delete _data; _data = nullptr; }
-	uint32 GetSize() const	{ return _data ? _data->Count() : 0; }
+		if (other._handlerNew != _handlerNew || other._handlerDelete != _handlerDelete)
+			operator=((const Map&)*this);
+	}
+
+	void Clear()				
+	{ 
+		if (_data)
+		{
+			_data->DeleteChildren(*this);
+			_DeleteNode(_data);
+			_data = nullptr;
+		}
+	}
+
+	uint32 GetSize() const		{ return _data ? _data->Count() : 0; }
 	bool IsEmpty() const		{ return _data == nullptr; }
 
 	const K* const FindFirstKey(const V &value) const
@@ -149,7 +198,7 @@ public:
 		return nullptr;
 	}
 
-	const V* Get(const K& key) const
+	V* Get(const K& key)
 	{
 		if (_data)
 		{
@@ -160,27 +209,38 @@ public:
 		return nullptr;
 	}
 
+	const V* Get(const K& key) const { return (const V*)const_cast<Map*>(this)->Get(key); }
+
 	V& operator[](const K& key)
 	{
-		if (_data) return _data->Get(key).value;
+		if (_data) return _data->Get(key, *this).value;
 
 		return Set(key, V());
 	}
 
 	V& Set(const K &key, const V &value)
 	{
-		if (_data) return _data->Set(key, value).value;
+		if (_data) return _data->Set(key, value, *this).value;
 		
-		_data = new Node(key, value);
+		_data = _NewNode(key, value);
 		return _data->value;
 	}
-
-	V* Get(const K& key) { return const_cast<V*>(((const Map*)this)->Get(key)); }
 
 	Map& operator=(const Map &other)
 	{
 		Clear();
-		if (other._data) _data = other._data->Copy();
+		if (other._data) _data = other._data->Copy(*this);
+		return *this;
+	}
+
+	Map& operator=(Map&& other)
+	{
+		_data = other._data;
+		other._data = nullptr;
+
+		if (other._handlerNew != _handlerNew || other._handlerDelete != _handlerDelete)
+			return operator=((const Map&)*this);
+
 		return *this;
 	}
 

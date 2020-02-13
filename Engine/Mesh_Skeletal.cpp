@@ -80,7 +80,7 @@ void Mesh_Skeletal::_WriteData(BufferWriter<byte>& iterator) const
 
 	size_t jointDataSize = 0;
 
-	for (auto it = skeleton.FirstListElement(); it; ++it)
+	for (auto it = skeleton.FirstListElement(); it.IsValid(); ++it)
 	{
 		jointBuffer[jointId++] = &*it;
 

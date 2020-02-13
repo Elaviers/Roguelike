@@ -53,6 +53,10 @@ bool EntPlayer::_TryMovement(const Transform& wt, const Vector3& movement, float
 
 void EntPlayer::Update(float deltaTime)
 {
+	Entity* spinner = Engine::Instance().pWorld->FindChildWithName("spin");
+	if (spinner)
+		spinner->AddRelativeRotation(Vector3(0.f, deltaTime * 30.f, 0.f));
+
 	GameInstance& game = GameInstance::Instance();
 
 	_cameraPivot.AddRelativeRotation(Vector3(100.f * deltaTime * game.GetAxisLookUp(), 100.f * deltaTime * game.GetAxisLookRight(), 0));
@@ -60,18 +64,9 @@ void EntPlayer::Update(float deltaTime)
 	Transform worldTransform = GetWorldTransform();
 	Transform cameraT = _camera.GetWorldTransform();
 	
-	Debug::PrintLine(String::From(worldTransform.GetPosition()[1], 0, 10).GetData());
+	//Debug::PrintLine(String::From(_velocity).GetData());
 
 	_velocity[1] -= 9.8f * deltaTime;
-
-	Vector3 gMovement = Vector3(0.f, _velocity[1] * deltaTime, 0.f);
-
-	bool inAir = _TryMovement(worldTransform, gMovement, 0.f);
-
-	if (inAir)
-		worldTransform.Move(gMovement);
-	else
-		_velocity[1] *= -0.5f;
 
 	Vector3 dv;
 	float amountForward = game.GetAxisMoveForward() * 10;
@@ -84,18 +79,40 @@ void EntPlayer::Update(float deltaTime)
 
 	_velocity[0] += dv[0];
 	_velocity[2] += dv[2];
+	
 
-	if (_TryMovement(worldTransform, Vector3(_velocity[0] * deltaTime, 0.f, _velocity[2] * deltaTime), 0.f))
-	{
-		if (!inAir)
+	Vector3 movement = _velocity * deltaTime;
+
+	Transform desiredTransform = Transform(worldTransform.GetPosition() + movement, worldTransform.GetRotation(), worldTransform.GetScale());
+
+	Vector3 penetration;
+	Buffer<Entity*> ents = Engine::Instance().pWorld->FindChildrenOfType<Entity>();
+	for (size_t i = 0; i < ents.GetSize(); ++i)
+		if (ents[i]->GetUID() != GetUID() && !ents[i]->IsChildOf(this) && ents[i]->OverlapsCollider(_COLLIDER, desiredTransform, Vector3(), &penetration))
 		{
-			_velocity[0] *= .998f;
-			_velocity[2] *= .998f;
+			Pair<Vector3> contacts = ents[i]->GetShallowContactPointsWithCollider(.1f, _COLLIDER, desiredTransform, .1f);
+			Debug::PrintLine(CSTR(contacts.first, "\t", contacts.second));
+
+			if (isnan(penetration[0]) || isnan(penetration[1]) || isnan(penetration[2])) continue;
+
+			if (penetration.LengthSquared())
+			{
+				if (_velocity.LengthSquared())
+				{
+					Vector3 forbiddenDir = -penetration.Normalised();
+
+					_velocity -= 1.5f * forbiddenDir * Vector3::Dot(forbiddenDir, _velocity);
+				}
+
+				if (Maths::AlmostEqual(_velocity[1], 0.f, 0.1f))
+				{
+					_velocity[0] *= .998f;
+					_velocity[2] *= .998f;
+				}
+
+				desiredTransform.Move(penetration);
+			}
 		}
-	}
-	else
-	{
-		_velocity[0] *= -.5f;
-		_velocity[2] *= -.5f;
-	}
+
+	SetWorldTransform(desiredTransform);
 }
