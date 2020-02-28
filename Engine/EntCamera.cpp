@@ -12,7 +12,7 @@ void EntCamera::Use() const
 	GLProgram::Current().SetMat4(DefaultUniformVars::mat4View, GetInverseTransformationMatrix());
 }
 
-void EntCamera::Use(float vpX, float vpY) const
+void EntCamera::Use(int vpX, int vpY) const
 {
 	_currentCamera = this;
 	glViewport(vpX, vpY, _viewport[0], _viewport[1]);

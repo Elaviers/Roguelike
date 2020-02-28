@@ -82,6 +82,7 @@ LRESULT HierachyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 			LPNMTREEVIEW nmtv = (LPNMTREEVIEW)lparam;
 
 			hw->_owner->tools.select.Select(hw->_currentRoot->FindChildWithUID((uint32)nmtv->itemNew.lParam));
+			hw->_owner->FocusVPArea();
 		}
 			break;
 

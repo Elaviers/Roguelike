@@ -27,5 +27,5 @@ void UIComboBox::_OnSelectionSubmitted(UILabel& label)
 void UIComboBox::_UpdateListBounds()
 {
 	float h = _listBox.GetItemHeight() * _listBox.GetItems().GetSize();
-	_listBox.SetBounds(0.f, 1.f, 1.f, h, 0.f, -h - _absoluteBounds.h);
+	_listBox.SetBounds(0.f, UICoord(1.f, -h - _absoluteBounds.h), 1.f, UICoord(0.f, h));
 }

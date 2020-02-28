@@ -137,15 +137,15 @@ void Editor::_Init()
 	_uiCamera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
 	_uiCamera.SetZBounds(-100, 100);
 
-	_t2oolbar.SetButtonMaterial(Engine::Instance().pMaterialManager->Get("uibutton1")).SetButtonBorderSize(2.f)
+	_toolbar.SetButtonMaterial(Engine::Instance().pMaterialManager->Get("uibutton1")).SetButtonBorderSize(2.f)
 		.SetButtonColourFalse(Colour::White).SetButtonColourTrue(Colour::Blue).SetButtonColourHover(Colour(.8f, .8f, .7f)).SetButtonColourHold(Colour::Grey)
-		.SetParent(&_ui).SetBounds(0.f, 1.f, 1.f, 64.f, 0.f, -64.f);
-	_t2oolbar.AddButton("Select", Engine::Instance().pTextureManager->Get("editor/tools/select"), (uint16)ETool::SELECT);
-	_t2oolbar.AddButton("Brush2D", Engine::Instance().pTextureManager->Get("editor/tools/brush2d"), (uint16)ETool::BRUSH2D);
-	_t2oolbar.AddButton("Brush3D", Engine::Instance().pTextureManager->Get("editor/tools/brush3d"), (uint16)ETool::BRUSH3D);
-	_t2oolbar.AddButton("Entity", Engine::Instance().pTextureManager->Get("editor/tools/entity"), (uint16)ETool::ENTITY);
-	_t2oolbar.AddButton("Connector", Engine::Instance().pTextureManager->Get("editor/tools/connector"), (uint16)ETool::CONNECTOR);
-	_t2oolbar.onItemSelected += FunctionPointer<void, UIToolbarItem&>(this, &Editor::_OnToolbarItemSelection);
+		.SetParent(&_ui).SetBounds(0.f, UICoord(1.f, -64.f), 1.f, UICoord(0.f, 64.f));
+	_toolbar.AddButton("Select", Engine::Instance().pTextureManager->Get("editor/tools/select"), (uint16)ETool::SELECT);
+	_toolbar.AddButton("Brush2D", Engine::Instance().pTextureManager->Get("editor/tools/brush2d"), (uint16)ETool::BRUSH2D);
+	_toolbar.AddButton("Brush3D", Engine::Instance().pTextureManager->Get("editor/tools/brush3d"), (uint16)ETool::BRUSH3D);
+	_toolbar.AddButton("Entity", Engine::Instance().pTextureManager->Get("editor/tools/entity"), (uint16)ETool::ENTITY);
+	_toolbar.AddButton("Connector", Engine::Instance().pTextureManager->Get("editor/tools/connector"), (uint16)ETool::CONNECTOR);
+	_toolbar.onItemSelected += FunctionPointer<void, UIToolbarItem&>(this, &Editor::_OnToolbarItemSelection);
 
 	_sideUI.SetParent(&_ui);
 	_vpAreaUI.SetParent(&_ui);
@@ -184,8 +184,8 @@ void Editor::_Init()
 	UISplitter* splitterHoriz = new UISplitter(&_vpAreaUI);
 	UISplitter* splitterVert = new UISplitter(&_vpAreaUI);
 
-	splitterHoriz->ShowSiblingAfter(&_viewports[0].ui).ShowSiblingAfter(&_viewports[1].ui).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(0.f, .5f, 1.f, 5.f, 0.f, -2.5f);
-	splitterVert->ShowSiblingAfter(&_viewports[1].ui).ShowSiblingAfter(&_viewports[3].ui).SetIsHorizontal(false).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(.5f, 0.f, 5.f, 1.f, -2.5f, 0.f);
+	splitterHoriz->ShowSiblingAfter(&_viewports[0].ui).ShowSiblingAfter(&_viewports[1].ui).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(0.f, UICoord(.5f, -2.5f), 1.f, UICoord(0.f, 5.f));
+	splitterVert->ShowSiblingAfter(&_viewports[1].ui).ShowSiblingAfter(&_viewports[3].ui).SetIsHorizontal(false).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UICoord(.5f, -2.5f), 0.f, UICoord(0.f, 5.f), 1.f);
 
 	splitterHoriz->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
 	splitterVert->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
@@ -201,11 +201,11 @@ void Editor::_Init()
 	_toolPropertyContainer.SetParent(&_sideUI);
 
 	UISplitter* sideSplitter = new UISplitter(&_ui);
-	sideSplitter->ShowSiblingAfter(&_sideUI).SetIsHorizontal(false).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(.75f, 0.f, 5.f, 1.f, -2.5f, 0.f);
+	sideSplitter->ShowSiblingAfter(&_sideUI).SetIsHorizontal(false).SetUseAbsolute(true).SetMin(-1000.f).SetMax(-100.f).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UICoord(1.f, -400.f), 0.f, UICoord(0.f, 5.f), 1.f);
 	sideSplitter->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
 
 	UISplitter* propertySplitterHoriz = new UISplitter(&_sideUI);
-	propertySplitterHoriz->ShowSiblingAfter(propertyRect).ShowSiblingAfter(&_propertyContainer).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(0.f, .5f, 1.f, 5.f, 0.f, -2.5f);
+	propertySplitterHoriz->ShowSiblingAfter(propertyRect).ShowSiblingAfter(&_propertyContainer).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(0.f, UICoord(.5f, -2.5f), 1.f, UICoord(0.f, 5.f));
 	propertySplitterHoriz->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
 
 	//Tool data init
@@ -270,8 +270,6 @@ void Editor::Run()
 
 		Frame();
 	}
-
-	::DeleteObject(_windowBrush);
 
 	_glContext.Delete();
 }
@@ -374,7 +372,7 @@ void Editor::RenderViewport(Viewport& vp)
 	
 	{	//LIT PASS
 		_shaderLit.Use();
-		camera.Use(bounds.x, bounds.y);
+		camera.Use((int)bounds.x, (int)bounds.y);
 		_shaderLit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
 		_shaderLit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
@@ -392,7 +390,7 @@ void Editor::RenderViewport(Viewport& vp)
 
 	//UNLIT PASS
 	_shaderUnlit.Use();
-	camera.Use(bounds.x, bounds.y);
+	camera.Use((int)bounds.x, (int)bounds.y);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
 	_level.RenderAll(_viewports[0].camera, ERenderChannels(_unlitRenderChannels | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE)));
@@ -428,7 +426,7 @@ void Editor::ResizeViews(uint16 w, uint16 h)
 {
 	_uiCamera.SetViewport(w, h);
 	_uiCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
-	_ui.SetBounds(0.f, 0.f, w, h);
+	_ui.SetBounds(0.f, 0.f, UICoord(0.f, w), UICoord(0.f, h));
 
 	if (_running)
 		Render();
@@ -505,7 +503,7 @@ void Editor::RefreshProperties()
 void Editor::SetTool(ETool tool, bool changeToolbar)
 {
 	if (changeToolbar)
-		SendMessage(_toolbar, TB_CHECKBUTTON, (WPARAM)tool, MAKELONG(TRUE, 0));
+		_toolbar.SelectByUserData((uint16)tool);
 
 	ClearProperties();
 	ClearToolProperties();
@@ -963,8 +961,6 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 		break;
 
 	case WM_DESTROY:
-		::ImageList_Destroy(editor->_tbImages);
-
 		editor->_running = false;
 		break;
 

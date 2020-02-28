@@ -3,16 +3,30 @@
 #include "Engine.hpp"
 #include "Event.hpp"
 
-struct RelativeBounds
+struct UICoord
 {
-	float x, y, w, h;
-	float xOffset, yOffset;
-	float wOffset, hOffset;
+	float relative;
+	float absolute;
+
+	UICoord(float relative = 0.f, float absolute = 0.f) : relative(relative), absolute(absolute) {}
+};
+
+struct UIBounds
+{
+	UICoord x;
+	UICoord y;
+	UICoord w;
+	UICoord h;
+
+	UIBounds() : x(0.f), y(0.f), w(1.f), h(1.f) {}
+	UIBounds(const UICoord& x, const UICoord& y, const UICoord& w, const UICoord& h) : x(x), y(y), w(w), h(h) {}
 };
 
 struct AbsoluteBounds
 {
 	float x, y, w, h;
+
+	AbsoluteBounds() : x(0.f), y(0.f), w(0.f), h(0.f) {}
 };
 
 class UIElement
@@ -22,7 +36,7 @@ protected:
 
 	bool _markedForDelete;
 
-	RelativeBounds _relativeBounds;
+	UIBounds _bounds;
 	AbsoluteBounds _absoluteBounds;
 
 	float _z;
@@ -30,7 +44,7 @@ protected:
 	ECursor _cursor;
 
 protected:
-	UIElement(UIElement *parent) : _parent(parent), _relativeBounds{ 0.f, 0.f, 1.f, 1.f }, _cursor(ECursor::DEFAULT)
+	UIElement(UIElement *parent) : _parent(parent), _markedForDelete(false), _z(0.f), _cursor(ECursor::DEFAULT)
 	{ 
 		if (_parent)
 		{
@@ -73,26 +87,24 @@ public:
 	}
 
 	const AbsoluteBounds& GetAbsoluteBounds() const { return _absoluteBounds; }
-	const RelativeBounds& GetRelativeBounds() const { return _relativeBounds; }
+	const UIBounds& GetBounds() const { return _bounds; }
 	float GetZ() const { return _z; }
 	const ECursor& GetCursor() const { return _cursor; }
 
-	UIElement& SetBounds(const RelativeBounds& bounds) { _relativeBounds = bounds; UpdateAbsoluteBounds(); return *this; }
-
-	UIElement& SetBounds(float x, float y, float w, float h, float xOffset = 0.f, float yOffset = 0.f, float wOffset = 0.f, float hOffset = 0.f)
+	UIElement& SetBounds(const UIBounds& bounds) { _bounds = bounds; UpdateAbsoluteBounds(); return *this; }
+	UIElement& SetBounds(const UICoord& x, const UICoord& y, const UICoord& w, const UICoord& h)
 	{
-		_relativeBounds.x = x;
-		_relativeBounds.y = y;
-		_relativeBounds.w = w;
-		_relativeBounds.h = h;
-		_relativeBounds.xOffset = xOffset;
-		_relativeBounds.yOffset = yOffset;
-		_relativeBounds.wOffset = wOffset;
-		_relativeBounds.hOffset = hOffset;
+		_bounds.x = x;
+		_bounds.y = y;
+		_bounds.w = w;
+		_bounds.h = h;
 		UpdateAbsoluteBounds();
 		return *this;
 	}
-
+	UIElement& SetX(const UICoord& x) { _bounds.x = x; UpdateAbsoluteBounds(); return *this; }
+	UIElement& SetY(const UICoord& y) { _bounds.y = y; UpdateAbsoluteBounds(); return *this; }
+	UIElement& SetW(const UICoord& w) { _bounds.w = w; UpdateAbsoluteBounds(); return *this; }
+	UIElement& SetH(const UICoord& h) { _bounds.h = h; UpdateAbsoluteBounds(); return *this; }
 	UIElement& SetZ(float z) { _z = z; UpdateAbsoluteBounds(); return *this; }
 	UIElement& SetCursor(const ECursor& cursor) { _cursor = cursor; return *this; }
 

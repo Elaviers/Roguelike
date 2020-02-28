@@ -15,29 +15,29 @@ void UISplitter::_OnBoundsChanged()
 
 	UIContainer* parent = dynamic_cast<UIContainer*>(_parent);
 
-	if (_parent)
+	if (parent)
 	{
 		if (_isHorizontal)
 		{
-			float y = Maths::Clamp(_relativeBounds.y, 0.f, 1.f);
-			float relH = _absoluteBounds.h / parent->GetAbsoluteBounds().h / 2.f;
+			float relY = Maths::Clamp(_absoluteBounds.y / parent->GetAbsoluteBounds().h, 0.f, 1.f);
 
 			for (size_t i = 0; i < parent->GetChildren().GetSize(); ++i)
 			{
 				UIElement* child = parent->GetChildren()[i];
 				if (child && dynamic_cast<UISplitter*>(child) == nullptr)
 				{
-					RelativeBounds newBounds = child->GetRelativeBounds();
+					UIBounds newBounds = child->GetBounds();
 
 					if (_after.Contains(child))
 					{
-						newBounds.y = y + relH;
-						newBounds.h = 1.f - y - relH;
+						float relH = _absoluteBounds.h / parent->GetAbsoluteBounds().h;
+						newBounds.y = relY + relH;
+						newBounds.h = 1.f - relY - relH;
 					}
 					else
 					{
 						newBounds.y = 0.f;
-						newBounds.h = y - relH;
+						newBounds.h = relY;
 					}
 
 					child->SetBounds(newBounds);
@@ -47,25 +47,25 @@ void UISplitter::_OnBoundsChanged()
 		}
 		else
 		{
-			float x = Maths::Clamp(_relativeBounds.x, 0.f, 1.f);
-			float relW = _absoluteBounds.w / parent->GetAbsoluteBounds().w / 2.f;
+			float relX = Maths::Clamp(_absoluteBounds.x / parent->GetAbsoluteBounds().w, 0.f, 1.f);
 
 			for (size_t i = 0; i < parent->GetChildren().GetSize(); ++i)
 			{
 				UIElement* child = parent->GetChildren()[i];
 				if (child && dynamic_cast<UISplitter*>(child) == nullptr)
 				{
-					RelativeBounds newBounds = child->GetRelativeBounds();
+					UIBounds newBounds = child->GetBounds();
 
 					if (_after.Contains(child))
 					{
-						newBounds.x = x + relW;
-						newBounds.w = 1.f - x - relW;
+						float relW = _absoluteBounds.w / parent->GetAbsoluteBounds().w;
+						newBounds.x = relX + relW;
+						newBounds.w = 1.f - relX - relW;
 					}
 					else
 					{
 						newBounds.x = 0.f;
-						newBounds.w = x - relW;
+						newBounds.w = relX;
 					}
 
 					child->SetBounds(newBounds);
@@ -99,12 +99,32 @@ void UISplitter::OnMouseMove(float mouseX, float mouseY)
 	{
 		if (_isHorizontal)
 		{
-			_relativeBounds.y = (mouseY - _parent->GetAbsoluteBounds().y) / _parent->GetAbsoluteBounds().h;
+			if (_useAbsolute)
+			{
+				_bounds.y.absolute = mouseY - _bounds.y.relative * _parent->GetAbsoluteBounds().h - _absoluteBounds.h / 2.f;
+				_bounds.y.absolute = Maths::Clamp(_bounds.y.absolute, _min, _max);
+			}
+			else
+			{
+				_bounds.y.relative = (mouseY - _parent->GetAbsoluteBounds().y - _bounds.y.absolute - _absoluteBounds.h / 2.f) / _parent->GetAbsoluteBounds().h;
+				_bounds.y.relative = Maths::Clamp(_bounds.y.relative, _min, _max);
+			}
+
 			UpdateAbsoluteBounds();
 		}
 		else
 		{
-			_relativeBounds.x = (mouseX - _parent->GetAbsoluteBounds().x) / _parent->GetAbsoluteBounds().w;
+			if (_useAbsolute)
+			{
+				_bounds.x.absolute = mouseX - _bounds.x.relative * _parent->GetAbsoluteBounds().w - _absoluteBounds.w / 2.f;
+				_bounds.x.absolute = Maths::Clamp(_bounds.x.absolute, _min, _max);
+			}
+			else
+			{
+				_bounds.x.relative = (mouseX - _parent->GetAbsoluteBounds().x - _bounds.x.absolute - _absoluteBounds.w / 2.f) / _parent->GetAbsoluteBounds().w;
+				_bounds.x.relative = Maths::Clamp(_bounds.x.relative, _min, _max);
+			}
+
 			UpdateAbsoluteBounds();
 		}
 	}

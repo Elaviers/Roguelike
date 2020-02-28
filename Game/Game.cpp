@@ -181,7 +181,7 @@ void Game::Run()
 	_Init();
 
 	MenuMain *menu = new MenuMain();
-	menu->SetBounds(0.5f, 0.5f, 512, 512, -256, -256);
+	menu->SetBounds(UICoord(0.5f, -256.f), UICoord(0.5f, -256.f), UICoord(0.f, 512.f), UICoord(0.f, 512.f));
 	menu->Initialise(FunctionPointer<void, const String&>(this, &Game::StartLevel), Callback(this, &Game::ButtonQuit));
 	menu->SetParent(&_ui);
 
@@ -292,7 +292,7 @@ void Game::Resize(uint16 w, uint16 h)
 {
 	GameInstance::Instance().OnResize(w, h);
 
-	_ui.SetBounds(0, 0, w, h);
+	_ui.SetBounds(0, 0, UICoord(0.f, w), UICoord(0.f, h));
 	_uiCamera.SetViewport(w, h);
 	_uiCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
 }

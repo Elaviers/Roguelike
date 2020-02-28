@@ -24,7 +24,7 @@ void UITextbox::_UpdateSelectionBox()
 
 	if (startX > endX) Utilities::Swap(startX, endX);
 
-	_selectionRect.SetBounds(startX - _absoluteBounds.x, 0.f, endX - startX, 1.f);
+	_selectionRect.SetBounds(UICoord(0.f, startX - _absoluteBounds.x), 0.f, UICoord(0.f, endX - startX), 1.f);
 }
 
 void UITextbox::_RemoveSelection()

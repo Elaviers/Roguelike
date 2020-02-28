@@ -104,7 +104,7 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 	const UIColour textShadowColour(Colour(0.f, 0.f, 0.12f));
 	const Vector2 textShadowOffset(2.f, -2.f);
 
-	SetBounds(0.f, 0.f, 1.f, h);
+	SetBounds(0.f, 0.f, 1.f, UICoord(0.f, h));
 
 	SharedPointer<const Font> font = Engine::Instance().pFontManager->Get("arial");
 	SharedPointer<const Material> btnMat = Engine::Instance().pMaterialManager->Get("uibutton1");
@@ -119,7 +119,7 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 		tbWidthOffset = -30.f;
 
 		UITextButton* browse = new UITextButton(this);
-		browse->SetBounds(1.f, 0.f, 30.f, 1.f, -30.f, 0.f);
+		browse->SetBounds(UICoord(1.f, -30.f), 0.f, UICoord(0.f, 30.f), 1.f);
 		browse->SetString("...").SetFont(font)
 			.SetTextColour(textColour).SetTextShadowColour(textShadowColour).SetTextShadowOffset(textShadowOffset)
 			.SetMaterial(btnMat).SetBorderSize(borderSize)
@@ -165,7 +165,7 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 		tbWidthOffset = -h;
 
 		UICheckbox* check = new UICheckbox(this);
-		check->SetBounds(1.f, 0.f, h, h, -h);
+		check->SetBounds(UICoord(1.f, -h), 0.f, UICoord(0.f, h), UICoord(0.f, h));
 		check->SetReadOnly(readOnly).SetTextureTrue(Engine::Instance().pTextureManager->Get("ui/checkmark")).
 			SetMaterial(btnMat).SetBorderSize(borderSize).SetColourFalse(buttonColourInactive).SetColourTrue(buttonColourInactive).SetColourHover(buttonColourHover).SetColourHold(buttonColourHold);
 		
@@ -174,7 +174,7 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 	}
 
 	_textbox = new UITextbox(this);
-	_textbox->SetBounds(.5f, 0.f, .5f, 1.f, 0.f, 0.f, tbWidthOffset, 0.f);
+	_textbox->SetBounds(.5f, 0.f, UICoord(.5f, tbWidthOffset), 1.f);
 	_textbox->SetReadOnly(readOnly).SetMaterial(btnMat).SetBorderSize(borderSize)
 		.SetFont(font).SetTextColour(textColour).SetTextShadowColour(textShadowColour).SetTextShadowOffset(textShadowOffset)
 		.SetString(GetPropertyString(_property, _object)).SetColour(buttonColourInactive);

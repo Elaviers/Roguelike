@@ -5,7 +5,7 @@ void UIListBox::_UpdateLabels()
 	size_t i = 1;
 	for (auto it = _labels.First(); it.IsValid(); ++it)
 	{
-		it->SetBounds(0.f, 1.f, 1.f, _itemHeight, 0.f, i * -_itemHeight);
+		it->SetBounds(0.f, UICoord(1.f, i * -_itemHeight), 1.f, UICoord(0.f, _itemHeight));
 		it->SetFont(_font);
 		it->SetColour(_textColour);
 		it->SetShadowColour(_textShadowColour);
@@ -19,7 +19,7 @@ void UIListBox::Add(const String& item)
 	size_t index = _labels.GetSize() + 1;
 
 	UILabel& newLabel = *_labels.Emplace(this);
-	newLabel.SetBounds(0.f, 1.f, 1.f, _itemHeight, 0.f, index * -_itemHeight);
+	newLabel.SetBounds(0.f, UICoord(1.f, index * -_itemHeight), 1.f, UICoord(0.f, _itemHeight));
 	newLabel.SetFont(_font);
 	newLabel.SetColour(_textColour);
 	newLabel.SetShadowColour(_textShadowColour);
@@ -40,7 +40,7 @@ void UIListBox::OnMouseMove(float x, float y)
 				if (&*it != _selectedLabel)
 				{
 					_selectedLabel = &*it;
-					_selectionBox.SetBounds(_selectedLabel->GetRelativeBounds());
+					_selectionBox.SetBounds(_selectedLabel->GetBounds());
 					onSelectionChanged(*_selectedLabel);
 				}
 

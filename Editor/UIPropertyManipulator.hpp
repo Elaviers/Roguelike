@@ -45,7 +45,7 @@ public:
 		for (size_t i = 0; i < buffer.GetSize(); ++i)
 		{
 			UIPropertyManipulator* p = new UIPropertyManipulator(height, instance, *buffer[i], object, &container);
-			p->SetBounds(0.f, 1.f, 1.f, height, 0.f, -height * (i + 1));
+			p->SetBounds(0.f, UICoord(1.f, -height * (i + 1)), 1.f, UICoord(0.f, height));
 		}
 	}
 

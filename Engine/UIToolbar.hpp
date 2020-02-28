@@ -38,6 +38,8 @@ public:
 
 	void AddButton(const String& name, const SharedPointer<const Texture>& texture, uint16 userData);
 
+	void SelectByUserData(uint16 userData);
+
 	const SharedPointer<const Material> GetButtonMaterial() const { return _material; }
 	float GetButtonBorderSize() const { return _borderSize; }
 	float GetButtonWidth() const { return _buttonW; }

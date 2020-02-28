@@ -32,7 +32,7 @@ public:
 	~EntCamera() {}
 
 	void Use() const;
-	void Use(float vpX, float vpY) const;
+	void Use(int vpX, int vpY) const;
 	static const EntCamera* Current() { return _currentCamera; }
 
 	void SetProjectionType(EProjectionType type)		{ _type = type; UpdateProjectionMatrix(); }

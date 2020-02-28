@@ -29,7 +29,7 @@ public:
 
 	void Initialise(const FunctionPointer<void, const String&> &onLevelChosen);
 
-	void SetBounds(float x, float y, float w, float h, float xOffset = 0.f, float yOffset = 0.f) { UIContainer::SetBounds(x, y, w, h, xOffset, yOffset); }
+	void SetBounds(const UIBounds& bounds) { UIContainer::SetBounds(bounds); }
 	void SetButtonBorderSize(float size) { _buttonBorderSize = size; }
 	void SetButtonColourInactive(const UIColour& colour) { _buttonColourInactive = colour; }
 	void SetButtonColourActive(const UIColour& colour) { _buttonColourActive = colour; }

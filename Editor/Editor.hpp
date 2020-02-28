@@ -58,11 +58,7 @@ private:
 	UIContainer _propertyContainer;
 	UIContainer _toolPropertyContainer;
 
-	UIToolbar _t2oolbar;
-
-	HBRUSH _windowBrush = NULL;
-	HWND _toolbar = NULL;
-	HIMAGELIST _tbImages = NULL;
+	UIToolbar _toolbar;
 
 	Viewport _viewports[VIEWPORTCOUNT];
 
@@ -163,6 +159,8 @@ public:
 	Entity& LevelRef() { return _level; }
 
 	Viewport& GetVP(int index) { return _viewports[index]; }
+
+	void FocusVPArea() { _vpArea.Focus(); }
 
 	static constexpr const float PROPERTY_HEIGHT = 32;
 };

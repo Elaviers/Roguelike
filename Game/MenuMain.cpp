@@ -26,15 +26,15 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	_panel.SetBorderSize(-8.f);
 	
 	_buttonStart.SetParent(this);
-	_buttonStart.SetBounds(0.f, 1.f, .4f, 64.f, 0.f, -64.f);
+	_buttonStart.SetBounds(0.f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f));
 	_buttonStart.onPressed += FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonStart);
 	
 	_buttonQuit.SetParent(this);
-	_buttonQuit.SetBounds(.6f, 1.f, .4f, 64.f, 0.f, -64.f);
+	_buttonQuit.SetBounds(.6f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f));
 	_buttonQuit.onPressed += FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonQuit);
 
 	_buttonSingleLevel.SetParent(this);
-	_buttonSingleLevel.SetBounds(0.f, 0.f, 1.f, 64.f);
+	_buttonSingleLevel.SetBounds(0.f, 0.f, 1.f, UICoord(0.f, 64.f));
 	_buttonSingleLevel.onPressed += FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonSingleLevel);
 
 	_buttonStart.SetMaterial(material);
@@ -67,7 +67,7 @@ void MenuMain::ButtonStart(UIButton&)
 	MarkForDelete();
 
 	MenuStartLevel *levelSelect = new MenuStartLevel();
-	levelSelect->SetBounds(_relativeBounds.x, _relativeBounds.y, _relativeBounds.w, _relativeBounds.h, _relativeBounds.xOffset, _relativeBounds.yOffset);
+	levelSelect->SetBounds(_bounds);
 	levelSelect->SetButtonBorderSize(16.f);
 	levelSelect->SetButtonColourInactive(_buttonStart.GetColour());
 	levelSelect->SetButtonColourActive(_buttonStart.GetColourHold());

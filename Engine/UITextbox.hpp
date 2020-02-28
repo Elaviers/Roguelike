@@ -35,7 +35,7 @@ protected:
 	virtual void _OnBoundsChanged() override;
 
 	void _OnFocusGained(UIElement& element) { _hasFocus = true; }
-	void _OnFocusLost(UIElement& element) { _hasFocus = false; _selectionRect.SetBounds(0.f, 0.f, 0.f, 0.f); }
+	void _OnFocusLost(UIElement& element) { _hasFocus = false; _selectionRect.SetW(0.f); }
 
 	void _ResetCaretBlink();
 	void _UpdateSelectionBox();
@@ -52,7 +52,7 @@ public:
 	{
 		SetCursor(ECursor::IBEAM);
 
-		_selectionRect.SetBounds(0.f, 0.f, 0.f, 0.f);
+		_selectionRect.SetW(0.f);
 		SetSelectionColour(Colour(0.f, .2f, 1.f, .2f));
 
 		UIElement::onFocusGained += FunctionPointer<void, UIElement&>(this, &UITextbox::_OnFocusGained);
