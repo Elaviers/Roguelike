@@ -27,6 +27,8 @@ public:
 	operator Vector4& () { return _data; }
 	operator const Vector4&() const { return _data; }
 
+	Colour Inverse() const { return Colour(1.f-r, 1.f-g, 1.f-b, a); }
+
 	Colour& operator=(const Colour& other)
 	{
 		_data = other._data;

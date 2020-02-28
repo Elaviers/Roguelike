@@ -84,31 +84,111 @@ void FontTTF::_CMD_LoadFont(const Buffer<String>& args)
 	}
 }
 
-float FontTTF::CalculateStringWidth(const char* string, float scaleX) const
+float FontTTF::CalculateStringWidth(const char* string, float scaleX, size_t maxChars) const
 {
-	float width = 0.f;
+	float longestWidth = 0.f;
+	float currentLineW = 0.f;
 
 	float scale = scaleX / (float)_size;
-
+	size_t i = 0;
 	for (const char* c = string; *c != '\0'; ++c)
 	{
-		if (*c == '\t')
+		if (*c == 0x01)
+		{
+			c += 4;
+		}
+		else if (*c == '\t')
 		{
 			const TTFGlyph* space = _charMap.Get(' ');
 			float stopWidth = (space->advance >> 6) * scale * 5.f;
-			float nextStop = Maths::Trunc(width, stopWidth) + stopWidth;
+			float nextStop = Maths::Trunc(currentLineW, stopWidth) + stopWidth;
 
-			width = nextStop;
+			currentLineW = nextStop;
+		}
+		else if (*c == '\n')
+		{
+			if (currentLineW > longestWidth)
+				longestWidth = currentLineW;
+
+			currentLineW = 0.f;
 		}
 		else
 		{
 			const TTFGlyph* glyph = _charMap.Get(*c);
 			if (glyph)
-				width += (glyph->advance >> 6) * scale;
+				currentLineW += (glyph->advance >> 6) * scale;
 		}
+
+		if (++i == maxChars) break;
 	}
 
-	return width;
+	return Maths::Max(longestWidth, currentLineW);
+}
+
+size_t FontTTF::GetPositionOf(float pX, float pY, const char* string, const Transform& transform, float lineHeight) const
+{
+	Vector3 advanceDirection = transform.GetRightVector();
+	Vector3 downDirection = -1.f * transform.GetUpVector();
+
+	float x = transform.GetPosition()[0];
+	float y = transform.GetPosition()[1];
+
+	float scale = (transform.GetScale()[0] / (float)_size);
+
+	float line = 0.f;
+	float currentLineW = 0.f;
+	float currentCharW = 0.f;
+
+	size_t i = 0;
+	for (const char* c = string; *c != '\0'; ++c)
+	{
+		if (*c == 0x01)
+		{
+			c += 4;
+		}
+		else if (*c == '\n' && lineHeight)
+		{
+			++line;
+			currentLineW = 0.f;
+			currentCharW = 0.f;
+
+			float x = transform.GetPosition()[0];
+			float y = transform.GetPosition()[1];
+			x += downDirection[0] * lineHeight * line;
+			y += downDirection[1] * lineHeight * line;
+		}
+		else if (*c == '\t')
+		{
+			const TTFGlyph* space = _charMap.Get(' ');
+			float stopWidth = (space->advance >> 6) * scale * 5.f;
+			float nextStop = Maths::Trunc(currentLineW, stopWidth) + stopWidth;
+			currentCharW = (nextStop - currentLineW);
+		}
+		else
+		{
+			const TTFGlyph* glyph = _charMap.Get(*c);
+			if (glyph)
+			{
+				currentCharW = (glyph->advance >> 6) * scale;
+			}
+		}
+
+		if (x + advanceDirection[0] * currentCharW >= pX)
+		{
+			if (x + advanceDirection[0] * currentCharW / 2.f <= pX)
+				return i + 1;
+
+			return i;
+		}
+
+		x += advanceDirection[0] * currentCharW;
+		y += advanceDirection[1] * currentCharW;
+		currentLineW += currentCharW;
+
+		++i;
+	}
+
+	return StringLength(string);
 }
 
 void FontTTF::RenderString(const char* string, const Transform& transform, float lineHeight) const

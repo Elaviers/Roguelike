@@ -1,6 +1,6 @@
 #pragma once
 #include "UIElement.hpp"
-#include "Colour.hpp"
+#include "UIColour.hpp"
 #include "Font.hpp"
 #include "Transform.hpp"
 
@@ -8,23 +8,34 @@ class UILabel : public UIElement
 {
 	SharedPointer<const Font> _font;
 	String _string;
-	Colour _colour;
+
+	UIColour _colour;
+	UIColour _shadowColour;
 
 	Transform _transform;
+	Transform _shadowTransform;
+
+	Vector2 _shadowOffset;
+
+	void _UpdateShadowTransform();
+	virtual void _OnBoundsChanged() override;
 
 public:
-	UILabel(UIElement *parent) : UIElement(parent), _font(nullptr), _colour(1.f, 1.f, 1.f, 1.f) {}
+	UILabel(UIElement *parent) : UIElement(parent), _font(nullptr), _colour(Colour::White), _shadowOffset(2.f, -2.f), _shadowColour(Colour::Black) {}
 	virtual ~UILabel() {}
 
 	const SharedPointer<const Font>& GetFont() const { return _font; }
 	const String& GetString() const { return _string; }
-	const Colour& GetColour() const { return _colour; }
+	const UIColour& GetColour() const { return _colour; }
+	const Transform& GetRenderTransform() const { return _transform; }
+	const Vector2& GetShadowOffset() const { return _shadowOffset; }
+	const UIColour& GetShadowColour() const { return _shadowColour; }
 
-	void SetFont(const SharedPointer<const Font>& font) { _font = font; }
-	void SetString(const String &string) { _string = string; }
-	void SetColour(const Colour &colour) { _colour = colour; }
+	UILabel& SetFont(const SharedPointer<const Font>& font) { _font = font; _OnBoundsChanged(); return *this; }
+	UILabel& SetString(const String& string) { _string = string; _OnBoundsChanged(); return *this; }
+	UILabel& SetColour(const UIColour& colour) { _colour = colour; return *this; }
+	UILabel& SetShadowOffset(const Vector2& offset) { _shadowOffset = offset; _UpdateShadowTransform(); return *this; }
+	UILabel& SetShadowColour(const UIColour& colour) { _shadowColour = colour; return *this; }
 
 	virtual void Render() const override;
-
-	virtual void OnBoundsChanged() override;
 };

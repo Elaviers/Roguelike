@@ -14,7 +14,7 @@ constexpr const byte currentVersion = LevelVersions::VERSION_2;
 
 namespace LevelMessages
 {
-	enum Enum
+	enum ELevelMessage
 	{
 		STRING = 0,
 	};
@@ -73,7 +73,7 @@ bool LevelIO::Read(Entity &world, const char *filename)
 		{
 			byte id = reader.Read_byte();
 
-			if (id == (byte)EntityID::NONE)
+			if (id == (byte)EEntityID::NONE)
 			{
 				switch (reader.Read_byte())
 				{

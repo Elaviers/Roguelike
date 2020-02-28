@@ -2,7 +2,7 @@
 #include "Asset.hpp"
 #include "Types.hpp"
 
-enum class SoundCategory
+enum class ESoundCategory
 {
 	GENERIC,
 	MUSIC
@@ -28,7 +28,7 @@ public:
 	uint32 dataSize = 0;
 
 	float volume = 0.f;
-	SoundCategory category = SoundCategory::GENERIC;
+	ESoundCategory category = ESoundCategory::GENERIC;
 
 	virtual ~WaveSound() { delete data; }
 

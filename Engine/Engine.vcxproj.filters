@@ -103,6 +103,12 @@
     <Filter Include="Source Files\Entitites">
       <UniqueIdentifier>{b493a4d8-6b89-4099-915d-f6b1e24dba32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Windows">
+      <UniqueIdentifier>{33c27f08-82e3-4cd3-b1a3-7ac3f88004b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Enums">
+      <UniqueIdentifier>{3f29fdca-f13f-4e41-9194-3bcaa180ee91}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Types.hpp">
@@ -218,9 +224,6 @@
     </ClInclude>
     <ClInclude Include="UIPanel.hpp">
       <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Direction2D.hpp">
-      <Filter>Header Files\Classes</Filter>
     </ClInclude>
     <ClInclude Include="Engine.hpp">
       <Filter>Header Files</Filter>
@@ -432,12 +435,6 @@
     <ClInclude Include="EntSkeletal.hpp">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="EntityID.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderChannels.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CollisionShape.hpp">
       <Filter>Header Files\Collision</Filter>
     </ClInclude>
@@ -464,6 +461,45 @@
     </ClInclude>
     <ClInclude Include="StackAllocator.hpp">
       <Filter>Header Files\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityIterator.hpp">
+      <Filter>Header Files\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="UITextbox.hpp">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="EDirection2D.hpp">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="EEntityID.hpp">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="ERenderChannels.hpp">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="UICheckbox.hpp">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIListBox.hpp">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIComboBox.hpp">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UITextButton.hpp">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIColour.hpp">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIToolbar.hpp">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UISplitter.hpp">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="EKeycode.hpp">
+      <Filter>Header Files\Enums</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -736,6 +772,33 @@
     </ClCompile>
     <ClCompile Include="StackAllocator.cpp">
       <Filter>Source Files\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityIterator.cpp">
+      <Filter>Source Files\Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="UITextbox.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine_Win.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="UICheckbox.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIListBox.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIComboBox.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIColour.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIToolbar.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UISplitter.cpp">
+      <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

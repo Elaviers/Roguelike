@@ -6,19 +6,19 @@ void GameInstance::SetupInputs()
 {
 	InputManager& inputManager = *Engine::Instance().pInputManager;
 
-	inputManager.BindAxis(AxisType::MOUSE_Y, &_axisLookUp);
-	inputManager.BindAxis(AxisType::MOUSE_X, &_axisLookRight);
-	inputManager.BindKeyAxis(Keycode::W, &_axisMoveForward, 1.f);
-	inputManager.BindKeyAxis(Keycode::S, &_axisMoveForward, -1.f);
-	inputManager.BindKeyAxis(Keycode::D, &_axisMoveRight, 1.f);
-	inputManager.BindKeyAxis(Keycode::A, &_axisMoveRight, -1.f);
+	inputManager.BindAxis(EAxis::MOUSE_Y, &_axisLookUp);
+	inputManager.BindAxis(EAxis::MOUSE_X, &_axisLookRight);
+	inputManager.BindKeyAxis(EKeycode::W, &_axisMoveForward, 1.f);
+	inputManager.BindKeyAxis(EKeycode::S, &_axisMoveForward, -1.f);
+	inputManager.BindKeyAxis(EKeycode::D, &_axisMoveRight, 1.f);
+	inputManager.BindKeyAxis(EKeycode::A, &_axisMoveRight, -1.f);
 }
 
 void GameInstance::OnResize(uint16 w, uint16 h)
 {
-	_w = w;
-	_h = h;
+	w = w;
+	h = h;
 
 	if (_activeCamera)
-		_activeCamera->SetViewport(_w, _h);
+		_activeCamera->SetViewport(w, h);
 }

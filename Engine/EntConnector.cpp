@@ -5,8 +5,8 @@
 #include "ModelManager.hpp"
 #include "TextureManager.hpp"
 
-void EntConnector::Render(RenderChannels channels) const {
-	if (Engine::Instance().pModelManager && channels & RenderChannels::UNLIT)
+void EntConnector::Render(ERenderChannels channels) const {
+	if (Engine::Instance().pModelManager && channels & ERenderChannels::UNLIT)
 	{
 		Engine::Instance().pTextureManager->White()->Bind(0);
 
@@ -21,23 +21,23 @@ void EntConnector::Render(RenderChannels channels) const {
 
 		switch (direction)
 		{
-		case Direction2D::NORTH:
+		case EDirection2D::NORTH:
 			t.SetPosition(Vector3(c[0], c[1], _max[2]));
 			t.SetScale(Vector3(size[0], size[1], 1.f));
 			break;
 
-		case Direction2D::SOUTH:
+		case EDirection2D::SOUTH:
 			t.SetPosition(Vector3(c[0], c[1], _min[2]));
 			t.SetScale(Vector3(size[0], size[1], 1.f));
 			break;
 
-		case Direction2D::EAST:
+		case EDirection2D::EAST:
 			t.SetPosition(Vector3(_max[0], c[1], c[2]));
 			t.SetScale(Vector3(size[2], size[1], 1.f));
 			t.SetRotation(Vector3(0.f, 90.f, 0.f));
 			break;
 
-		case Direction2D::WEST:
+		case EDirection2D::WEST:
 			t.SetPosition(Vector3(_min[0], c[1], c[2]));
 			t.SetScale(Vector3(size[2], size[1], 1.f));
 			t.SetRotation(Vector3(0.f, 90.f, 0.f));
@@ -65,7 +65,7 @@ void EntConnector::ReadData(BufferReader<byte> &reader, const NumberedSet<String
 {
 	Entity::ReadData(reader, strings);
 
-	direction = (Direction2D)reader.Read_byte();
+	direction = (EDirection2D)reader.Read_byte();
 	_min = reader.Read_vector3();
 	_max = reader.Read_vector3();
 }

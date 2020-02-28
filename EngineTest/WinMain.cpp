@@ -132,11 +132,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (lParam & (1 << 30))
 			break; //Key repeats ignored
 
-		Engine::Instance().pInputManager->KeyDown((Keycode)wParam);
+		Engine::Instance().pInputManager->KeyDown((EKeycode)wParam);
 		break;
 	case WM_KEYUP:
 
-		Engine::Instance().pInputManager->KeyUp((Keycode)wParam);
+		Engine::Instance().pInputManager->KeyUp((EKeycode)wParam);
 		break;
 
 	default:
@@ -213,7 +213,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	window.SetTitle("Manager Init");
 
 	//
-	Engine::Instance().Init(EngineCreateFlags::ALL, nullptr);
+	Engine::Instance().Init(EEngineCreateFlags::ALL, nullptr);
 	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	ModelManager& modelManager = *Engine::Instance().pModelManager;
@@ -224,22 +224,22 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	textureManager.SetRootPath("Data/");
 	Engine::Instance().pFontManager->SetRootPath("Data/");
 
-	inputManager.BindKeyAxis(Keycode::A, &axisX, -1);
-	inputManager.BindKeyAxis(Keycode::D, &axisX, 1);
-	inputManager.BindKeyAxis(Keycode::F, &axisY, -1);
-	inputManager.BindKeyAxis(Keycode::SPACE, &axisY, 1);
-	inputManager.BindKeyAxis(Keycode::S, &axisZ, -1);
-	inputManager.BindKeyAxis(Keycode::W, &axisZ, 1);
+	inputManager.BindKeyAxis(EKeycode::A, &axisX, -1);
+	inputManager.BindKeyAxis(EKeycode::D, &axisX, 1);
+	inputManager.BindKeyAxis(EKeycode::F, &axisY, -1);
+	inputManager.BindKeyAxis(EKeycode::SPACE, &axisY, 1);
+	inputManager.BindKeyAxis(EKeycode::S, &axisZ, -1);
+	inputManager.BindKeyAxis(EKeycode::W, &axisZ, 1);
 
-	inputManager.BindKeyAxis(Keycode::DOWN, &lookX, -1);
-	inputManager.BindKeyAxis(Keycode::UP, &lookX, 1);
-	inputManager.BindKeyAxis(Keycode::LEFT, &lookY, -1);
-	inputManager.BindKeyAxis(Keycode::RIGHT, &lookY, 1);
-	inputManager.BindKeyAxis(Keycode::Q, &lookZ, -1);
-	inputManager.BindKeyAxis(Keycode::E, &lookZ, 1);
+	inputManager.BindKeyAxis(EKeycode::DOWN, &lookX, -1);
+	inputManager.BindKeyAxis(EKeycode::UP, &lookX, 1);
+	inputManager.BindKeyAxis(EKeycode::LEFT, &lookY, -1);
+	inputManager.BindKeyAxis(EKeycode::RIGHT, &lookY, 1);
+	inputManager.BindKeyAxis(EKeycode::Q, &lookZ, -1);
+	inputManager.BindKeyAxis(EKeycode::E, &lookZ, 1);
 
-	inputManager.BindAxis(AxisType::MOUSE_X, &lookY);
-	inputManager.BindAxis(AxisType::MOUSE_Y, &lookX);
+	inputManager.BindAxis(EAxis::MOUSE_X, &lookY);
+	inputManager.BindAxis(EAxis::MOUSE_Y, &lookX);
 
 
 	//
@@ -266,14 +266,14 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 
 	if (ORTHO)
 	{
-		camera.SetProjectionType(ProjectionType::ORTHOGRAPHIC);
+		camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
 		camera.SetZBounds(-100000.f, 100000.f);
 		camera.SetScale(128.f);
 		camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
 	}
 	else
 	{
-		camera.SetProjectionType(ProjectionType::PERSPECTIVE);
+		camera.SetProjectionType(EProjectionType::PERSPECTIVE);
 		camera.SetZBounds(0.001f, 100000.f);
 		camera.SetRelativePosition(Vector3(0.f, 0.f, -5.f));
 	}
@@ -324,7 +324,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	return 0;
 }
 
-enum TextureUnit
+enum ETextureUnit
 {
 	UNIT_CUBEMAP = 0,
 	UNIT_DIFFUSE = 1,
@@ -387,16 +387,16 @@ void Frame()
 		textureManager.Get(texSpecular)->Bind(UNIT_SPECULAR);
 		textureManager.Get(texReflection)->Bind(UNIT_REFLECTION);
 		
-		cube.Render(RenderChannels::SURFACE);
+		cube.Render(ERenderChannels::SURFACE);
 
 		textureManager.NormalDefault()->Bind(UNIT_NORMAL);
 		textureManager.White()->Bind(UNIT_SPECULAR);
 		textureManager.White()->Bind(UNIT_REFLECTION);
-		renderable.Render(RenderChannels::SURFACE);
+		renderable.Render(ERenderChannels::SURFACE);
 		//
 
 		//
-		if (camera.GetProjectionType() == ProjectionType::PERSPECTIVE)
+		if (camera.GetProjectionType() == EProjectionType::PERSPECTIVE)
 		{
 			program_Sky.Use();
 			Mat4 skyView = camera.GetInverseTransformationMatrix();
@@ -413,7 +413,7 @@ void Frame()
 
 		//
 		{
-			float vpScale = camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC ? 1.f : 10.f;
+			float vpScale = camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC ? 1.f : 10.f;
 			float w = 2.f;
 
 			program_Unlit.Use();
@@ -421,21 +421,21 @@ void Frame()
 
 			textureManager.White()->Bind(0);
 
-			light1.Render(RenderChannels::EDITOR);
-			light2.Render(RenderChannels::EDITOR);
-			light3.Render(RenderChannels::EDITOR);
-			light4.Render(RenderChannels::EDITOR);
+			light1.Render(ERenderChannels::EDITOR);
+			light2.Render(ERenderChannels::EDITOR);
+			light3.Render(ERenderChannels::EDITOR);
+			light4.Render(ERenderChannels::EDITOR);
 
 			glDisable(GL_CULL_FACE);
 			
 			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::Red);
-			DrawUtils::DrawGrid(modelManager, camera, Direction::FORWARD, w, 1.f, vpScale);
+			DrawUtils::DrawGrid(modelManager, camera, EDirection::FORWARD, w, 1.f, vpScale);
 
 			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::Green);
-			DrawUtils::DrawGrid(modelManager, camera, Direction::UP, w, 1.f, vpScale);
+			DrawUtils::DrawGrid(modelManager, camera, EDirection::UP, w, 1.f, vpScale);
 
 			program_Unlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::Blue);
-			DrawUtils::DrawGrid(modelManager, camera, Direction::RIGHT, w, 1.f, vpScale);
+			DrawUtils::DrawGrid(modelManager, camera, EDirection::RIGHT, w, 1.f, vpScale);
 
 			glEnable(GL_CULL_FACE);
 

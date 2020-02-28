@@ -4,7 +4,7 @@
 #include "String.hpp"
 #include "PropertyCollection.hpp"
 
-enum AssetID
+enum EAssetID
 {
 	ASSET_TEXTURE			= 1,
 	ASSET_MATERIAL_SURFACE	= 10,

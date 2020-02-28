@@ -1,6 +1,9 @@
 #pragma once
 #include "Types.hpp"
+
+//todo: make these includes go away by doing the conversion functions somewhere less dumb
 #include "Vector.hpp"
+#include "Vector4.hpp"
 
 template<typename T>
 class Buffer;
@@ -96,6 +99,7 @@ public:
 	float ToFloat() const;
 	Vector2 ToVector2() const;
 	Vector3 ToVector3() const;
+	Vector4 ToVector4() const;
 
 	//
 	template<typename T>
@@ -110,6 +114,7 @@ public:
 	static String From(double,			unsigned int minimumDigits = 0, unsigned int maxDecimalDigits = 3, byte base = 10);
 	static String From(const Vector2&,	unsigned int minimumDigits = 0,	unsigned int maxDecimalDigits = 3, byte base = 10);
 	static String From(const Vector3&,	unsigned int minimumDigits = 0,	unsigned int maxDecimalDigits = 3, byte base = 10);
+	static String From(const Vector4&,	unsigned int minimumDigits = 0,	unsigned int maxDecimalDigits = 3, byte base = 10);
 	static String From(const wchar_t *string);
 
 	static String From(bool b) { return b ? String("true") : String("false"); }

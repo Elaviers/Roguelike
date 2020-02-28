@@ -2,12 +2,12 @@
 #include "GLMeshRenderer.hpp"
 #include "IO.hpp"
 
-enum class FileVersion
+enum class EEFileVersion
 {
 	V1 = 1
 };
 
-constexpr byte CURRENT_FILE_VERSION = (byte)FileVersion::V1;
+constexpr byte CURRENT_FILE_VERSION = (byte)EEFileVersion::V1;
 
 void Mesh_Skeletal::_ReadData(BufferReader<byte>& iterator)
 {
@@ -15,7 +15,7 @@ void Mesh_Skeletal::_ReadData(BufferReader<byte>& iterator)
 
 	byte version = iterator.Read_byte();
 
-	if (version == (byte)FileVersion::V1)
+	if (version == (byte)EEFileVersion::V1)
 	{
 		byte bonesPerVertex = iterator.Read_byte();
 		if (bonesPerVertex != VertexSkeletal::BONE_COUNT)

@@ -18,7 +18,7 @@ void EntBrush3D::_OnTransformChanged()
 
 #include "DrawUtils.hpp"
 
-void EntBrush3D::Render(RenderChannels channels) const
+void EntBrush3D::Render(ERenderChannels channels) const
 {
 	ModelManager* modelManager = Engine::Instance().pModelManager;
 
@@ -114,8 +114,8 @@ const PropertyCollection& EntBrush3D::GetProperties()
 
 	cvars.Add(
 		"Material", 
-		MemberGetter<EntBrush<3>, String>(&EntBrush<3>::GetMaterialName), 
-		MemberSetter<EntBrush<3>, String>(&EntBrush<3>::SetMaterial), 
+		MemberGetter<EntBrush3D, String>(&EntBrush3D::GetMaterialName), 
+		MemberSetter<EntBrush3D, String>(&EntBrush3D::SetMaterial), 
 		0,
 		PropertyFlags::MATERIAL);
 		

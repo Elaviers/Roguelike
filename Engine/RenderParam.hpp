@@ -4,7 +4,7 @@
 
 struct RenderParam
 {
-	enum class Type
+	enum class EType
 	{
 		GRID_PARAM //Parameters for a MaterialGrid
 	} type;

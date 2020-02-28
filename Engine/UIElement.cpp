@@ -1,28 +1,56 @@
 #include "UIElement.hpp"
 
+void UIElement::_RequestFocus()
+{
+	if (_parent)
+	{
+		UIElement* root = _parent;
+		while (root->_parent)
+			root = root->_parent;
+
+		root->OnElementRequestFocus(this);
+	}
+}
+
+void UIElement::OnElementRequestFocus(UIElement* element)
+{
+	if (element == this)
+		onFocusGained(*this);
+	else
+		onFocusLost(*this);
+}
+
 void UIElement::UpdateAbsoluteBounds()
 {
 	if (_parent)
 	{
-		if (_bounds.x > 0.f && _bounds.x <= 1.f)	_x = _parent->_x + (_parent->_w * _bounds.x) + _bounds.xOffset;
-		else _x = _parent->_x + _bounds.x + _bounds.xOffset;
+		if (_relativeBounds.x > 0.f && _relativeBounds.x <= 1.f)	
+			_absoluteBounds.x = _parent->_absoluteBounds.x + (_parent->_absoluteBounds.w * _relativeBounds.x) + _relativeBounds.xOffset;
+		else 
+			_absoluteBounds.x = _parent->_absoluteBounds.x + _relativeBounds.x + _relativeBounds.xOffset;
 
-		if (_bounds.y > 0.f && _bounds.y <= 1.f)	_y = _parent->_y + (_parent->_h * _bounds.y) + _bounds.yOffset;
-		else _y = _parent->_y + _bounds.y + _bounds.yOffset;
+		if (_relativeBounds.y > 0.f && _relativeBounds.y <= 1.f)
+			_absoluteBounds.y = _parent->_absoluteBounds.y + (_parent->_absoluteBounds.h * _relativeBounds.y) + _relativeBounds.yOffset;
+		else
+			_absoluteBounds.y = _parent->_absoluteBounds.y + _relativeBounds.y + _relativeBounds.yOffset;
 
-		if (_bounds.w > 0.f && _bounds.w <= 1.f)	_w = _parent->_w * _bounds.w;
-		else _w = _bounds.w;
+		if (_relativeBounds.w > 0.f && _relativeBounds.w <= 1.f)
+			_absoluteBounds.w = _parent->_absoluteBounds.w * _relativeBounds.w + _relativeBounds.wOffset;
+		else 
+			_absoluteBounds.w = _relativeBounds.w + _relativeBounds.wOffset;
 
-		if (_bounds.h > 0.f && _bounds.h <= 1.f)	_h = _parent->_h * _bounds.h;
-		else _h = _bounds.h;
+		if (_relativeBounds.h > 0.f && _relativeBounds.h <= 1.f)
+			_absoluteBounds.h = _parent->_absoluteBounds.h * _relativeBounds.h + _relativeBounds.hOffset;
+		else 
+			_absoluteBounds.h = _relativeBounds.h + _relativeBounds.hOffset;
 	}
 	else
 	{
-		_x = _bounds.x + _bounds.xOffset;
-		_y = _bounds.y + _bounds.yOffset;
-		_w = _bounds.w;
-		_h = _bounds.h;
+		_absoluteBounds.x = _relativeBounds.x + _relativeBounds.xOffset;
+		_absoluteBounds.y = _relativeBounds.y + _relativeBounds.yOffset;
+		_absoluteBounds.w = _relativeBounds.w + _relativeBounds.wOffset;
+		_absoluteBounds.h = _relativeBounds.h + _relativeBounds.hOffset;
 	}
 
-	OnBoundsChanged();
+	_OnBoundsChanged();
 }

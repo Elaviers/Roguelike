@@ -77,7 +77,7 @@ LRESULT HierachyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 		{
 		case TVN_SELCHANGED:
 		{
-			hw->_owner->SetTool(ToolEnum::SELECT);
+			hw->_owner->SetTool(ETool::SELECT);
 
 			LPNMTREEVIEW nmtv = (LPNMTREEVIEW)lparam;
 

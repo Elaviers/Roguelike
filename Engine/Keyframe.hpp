@@ -2,7 +2,7 @@
 #include "Maths.hpp"
 #include "Quaternion.hpp"
 
-enum InterpolationType
+enum EInterpolationType
 {
 	INTERP_NONE = 0,
 	INTERP_LINEAR = 1

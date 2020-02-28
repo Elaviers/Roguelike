@@ -48,15 +48,19 @@ LRESULT CALLBACK Game::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 		game->MouseDown();
 		break;
 
+	case WM_LBUTTONUP:
+		game->MouseUp();
+		break;
+
 	case WM_KEYDOWN:
 		if (lparam& (1 << 30))
 			break; //Key repeats ignored
 
-		game->KeyDown((Keycode)wparam);
+		game->KeyDown((EKeycode)wparam);
 		break;
 
 	case WM_KEYUP:
-		game->KeyUp((Keycode)wparam);
+		game->KeyUp((EKeycode)wparam);
 
 		break;
 
@@ -155,7 +159,7 @@ void Game::_Init()
 		Debug::Error("Raw mouse input registration error!");
 	}
 
-	Engine::Instance().Init(EngineCreateFlags::ALL, nullptr);
+	Engine::Instance().Init(EEngineCreateFlags::ALL, nullptr);
 	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	Engine::Instance().pWorld = &_world;
@@ -165,7 +169,7 @@ void Game::_Init()
 	_consoleIsActive = false;
 	_uiIsActive = true;
 
-	_uiCamera.SetProjectionType(ProjectionType::ORTHOGRAPHIC);
+	_uiCamera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
 	_uiCamera.SetScale(1.f);
 	_uiCamera.SetZBounds(-10.f, 10.f);
 }
@@ -212,13 +216,16 @@ void Game::StartLevel(const String& filename)
 	{
 		_world.DeleteChildren();
 		LevelIO::Read(_world, filename.GetData());
-		
-		EntPlayer* player = EntPlayer::Create();
-		player->SetParent(&_world);
-
-		Transform spawnTransform(Vector3(0, 4.f, 0));
-		player->SetRelativeTransform(spawnTransform);
 	}
+
+	EntPlayer* player = EntPlayer::Create();
+	player->SetParent(&_world);
+
+	EntLight* light = EntLight::Create();
+	light->SetParent(player);
+
+	Transform spawnTransform(Vector3(0, 4.f, 0));
+	player->SetRelativeTransform(spawnTransform);
 
 	_uiIsActive = false;
 }
@@ -235,7 +242,7 @@ void Game::Frame()
 	Engine::Instance().pAudioManager->FillBuffer();
 
 	_world.UpdateAll(_deltaTime);
-	_ui.Update();
+	_ui.Update(_deltaTime);
 
 	Render();
 	_deltaTime = _timer.SecondsSinceStart();
@@ -261,9 +268,9 @@ void Game::Render()
 		_shaderLit.SetInt(DefaultUniformVars::intTextureReflection, 3);
 
 		activeCamera->Use();
-		_world.RenderAll(*activeCamera, RenderChannels::PRE_RENDER);
+		_world.RenderAll(*activeCamera, ERenderChannels::PRE_RENDER);
 		EntLight::FinaliseLightingForFrame();
-		_world.RenderAll(*activeCamera, RenderChannels::SURFACE);
+		_world.RenderAll(*activeCamera, ERenderChannels::SURFACE);
 	}
 
 	_shaderUnlit.Use();
@@ -304,33 +311,49 @@ void Game::MouseMove(uint16 x, uint16 y)
 	}
 }
 
+void Game::MouseUp()
+{
+	if (_uiIsActive)
+	{
+		_ui.OnMouseUp();
+	}
+}
+
 void Game::MouseDown()
 {
 	if (_uiIsActive)
 	{
-		_ui.OnClick();
+		_ui.OnMouseDown();
 	}
 }
 
-void Game::KeyDown(Keycode key)
+void Game::KeyDown(EKeycode key)
 {
+	if (_uiIsActive)
+		_ui.OnKeyDown(key);
+
 	Engine::Instance().pInputManager->KeyDown(key);
 
-	if (key == Keycode::TILDE)
+	if (key == EKeycode::TILDE)
 	{
 		_consoleIsActive = !_consoleIsActive;
 		return;
 	}
 }
 
-void Game::KeyUp(Keycode key)
+void Game::KeyUp(EKeycode key)
 {
+	if (_uiIsActive)
+		_ui.OnKeyUp(key);
+	
 	Engine::Instance().pInputManager->KeyUp(key);
-
 }
 
 void Game::InputChar(char character)
 {
+	if (_uiIsActive)
+		_ui.OnCharInput(character);
+
 	if (_consoleIsActive)
 	{
 		if (character == '`')
@@ -338,7 +361,6 @@ void Game::InputChar(char character)
 
 		Engine::Instance().pConsole->InputChar(character);
 	}
-
 }
 
 void Game::ButtonQuit()

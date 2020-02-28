@@ -1,7 +1,7 @@
 #pragma once
 #include "Types.hpp"
 
-enum class EntityID : byte
+enum class EEntityID : byte
 {
 	NONE = 0,
 

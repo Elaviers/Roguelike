@@ -17,12 +17,12 @@ protected:
 	Colour _colour;
 
 public:
-	Entity_FUNCS(EntBox, EntityID::BOX)
+	Entity_FUNCS(EntBox, EEntityID::BOX)
 
-	EntBox(Flags flags = Flags::NONE) : Entity(flags), _colour(1.f, 1.f, 1.f, 1.f) {}
+	EntBox(EFlags flags = EFlags::NONE) : Entity(flags), _colour(1.f, 1.f, 1.f, 1.f) {}
 	virtual ~EntBox() {}
 
-	virtual void Render(RenderChannels) const override;
+	virtual void Render(ERenderChannels) const override;
 
 	virtual Bounds GetBounds() const override { return Bounds(_min, _max); }
 

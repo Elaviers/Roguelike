@@ -54,7 +54,7 @@ public:
 
 	virtual void Initialise() override;
 
-	virtual void Activate(PropertyWindow& properties, PropertyWindow& toolProperties) override;
+	virtual void Activate(UIContainer& properties, UIContainer& toolProperties) override;
 
 	virtual void Cancel() override;
 
@@ -64,7 +64,7 @@ public:
 	virtual void KeySubmit() override;
 	virtual void KeyDelete() override;
 
-	virtual void Render(RenderChannels) const override;
+	virtual void Render(ERenderChannels) const override;
 
 	void Select(Entity* object);
 	void ClearSelection();

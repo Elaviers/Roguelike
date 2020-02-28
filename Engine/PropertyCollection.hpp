@@ -51,7 +51,7 @@ public:
 	{
 		Property* property = Find(name);
 
-		if (property && property->GetType() == PropertyType::FUNCTION)
+		if (property && property->GetType() == EPropertyType::FUNCTION)
 			return dynamic_cast<FunctionPropertyBase*>(property);
 
 		return nullptr;

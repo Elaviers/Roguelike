@@ -12,10 +12,12 @@
 #include <Engine/EntRenderable.hpp>
 #include <Engine/Mesh_Skeletal.hpp>
 #include <Engine/Ray.hpp>
+#include <Engine/UISplitter.hpp>
 #include "EditorIO.hpp"
 #include "resource.h"
 #include "ResourceSelect.hpp"
 #include "StringSelect.hpp"
+#include "UIPropertyManipulator.hpp"
 
 constexpr int tbImageSize = 32;
 
@@ -45,6 +47,7 @@ void Editor::_Init()
 	HBRUSH _windowBrush = ::CreateSolidBrush(RGB(32, 32, 32));
 
 	LPCTSTR classNameDummy = TEXT("DUMMY");
+	LPCTSTR classNameSide = TEXT("SIDE");
 	LPCTSTR classNameConsole = TEXT("CONSOLE");
 	LPCTSTR classNameWindow = TEXT("MAINWINDOWCLASS");
 	LPCTSTR classNameVPArea = TEXT("VPAREACLASS");
@@ -60,22 +63,19 @@ void Editor::_Init()
 		windowClass.hInstance = ::GetModuleHandle(NULL);
 		::RegisterClassEx(&windowClass);
 
+		windowClass.lpszClassName = classNameVPArea;
+		windowClass.lpfnWndProc = _vpAreaProc;
+		::RegisterClassEx(&windowClass);
+
 		windowClass.lpszClassName = classNameConsole;
 		windowClass.lpfnWndProc = _ConsoleProc;
 		windowClass.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
-		windowClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-		windowClass.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+		windowClass.hIconSm = ::LoadIcon(NULL, IDI_APPLICATION);
 		::RegisterClassEx(&windowClass);
 
 		windowClass.lpszClassName = classNameWindow;
 		windowClass.lpfnWndProc = _WindowProc;
-		windowClass.hbrBackground = _windowBrush;
 		windowClass.lpszMenuName = MAKEINTRESOURCE(IDR_MENU);
-		::RegisterClassEx(&windowClass);
-
-		windowClass.lpszClassName = classNameVPArea;
-		windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-		windowClass.lpfnWndProc = _vpAreaProc;
 		::RegisterClassEx(&windowClass);
 
 		dummy.CreateDummyAndUse(classNameDummy);
@@ -95,72 +95,118 @@ void Editor::_Init()
 	HierachyWindow::Initialise(_windowBrush);
 	_hierachyWindow.Create(&_window);
 
-	PropertyWindow::Initialise(_windowBrush);
-	_propertyWindow.Create(_window);
-
-	ToolWindow::Initialise(_windowBrush);
-	_toolWindow.Create(_window);
-
-	Viewport::Initialise();
-	for (int i = 0; i < VIEWPORTCOUNT; ++i)
-		_viewports[i].Create(_vpArea.GetHwnd(), *this, i);
-
 	//Now we can make a real context
 	dummy.Delete();
 	_InitGL();
 
-	_uiCam.SetProjectionType(ProjectionType::ORTHOGRAPHIC);
-	_uiCam.SetZBounds(-10, 10);
-	_uiCam.SetScale(1.f);
-
-	_consoleCamera.SetProjectionType(ProjectionType::ORTHOGRAPHIC);
-	_consoleCamera.SetZBounds(-100, 100);
-
-	CameraRef(0).SetProjectionType(ProjectionType::PERSPECTIVE);
-	CameraRef(0).SetRelativePosition(Vector3(-5.f, 5.f, -5.f));
-	CameraRef(0).SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
-
-	CameraRef(1).SetProjectionType(ProjectionType::ORTHOGRAPHIC);
-	CameraRef(1).SetScale(32.f);
-	CameraRef(1).SetZBounds(-10000.f, 10000.f);
-	CameraRef(1).SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
-
-	CameraRef(2).SetProjectionType(ProjectionType::ORTHOGRAPHIC);
-	CameraRef(2).SetScale(32.f);
-	CameraRef(2).SetZBounds(-10000.f, 10000.f);
-	CameraRef(2).SetRelativeRotation(Vector3(0.f, 0.f, 0.f));
-
-	CameraRef(3).SetProjectionType(ProjectionType::ORTHOGRAPHIC);
-	CameraRef(3).SetScale(32.f);
-	CameraRef(3).SetZBounds(-10000.f, 10000.f);
-	CameraRef(3).SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
-
 	_fbxManager = FbxManager::Create();
-	Engine::Instance().Init(EngineCreateFlags::ALL, &_level);
+	Engine::Instance().Init(EEngineCreateFlags::ALL, &_level);
 	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	InputManager* inputManager = Engine::Instance().pInputManager;
 
-	inputManager->BindKeyAxis(Keycode::W, &_axisMoveY, 1.f);
-	inputManager->BindKeyAxis(Keycode::S, &_axisMoveY, -1.f);
-	inputManager->BindKeyAxis(Keycode::D, &_axisMoveX, 1.f);
-	inputManager->BindKeyAxis(Keycode::A, &_axisMoveX, -1.f);
-	inputManager->BindKeyAxis(Keycode::SPACE, &_axisMoveZ, 1.f);
-	inputManager->BindKeyAxis(Keycode::SHIFT, &_axisMoveZ, -1.f);
+	inputManager->BindKeyAxis(EKeycode::W, &_axisMoveY, 1.f);
+	inputManager->BindKeyAxis(EKeycode::S, &_axisMoveY, -1.f);
+	inputManager->BindKeyAxis(EKeycode::D, &_axisMoveX, 1.f);
+	inputManager->BindKeyAxis(EKeycode::A, &_axisMoveX, -1.f);
+	inputManager->BindKeyAxis(EKeycode::SPACE, &_axisMoveZ, 1.f);
+	inputManager->BindKeyAxis(EKeycode::SHIFT, &_axisMoveZ, -1.f);
 
-	inputManager->BindKeyAxis(Keycode::UP, &_axisLookY, 1.f);
-	inputManager->BindKeyAxis(Keycode::DOWN, &_axisLookY, -1.f);
-	inputManager->BindKeyAxis(Keycode::RIGHT, &_axisLookX, 1.f);
-	inputManager->BindKeyAxis(Keycode::LEFT, &_axisLookX, -1.f);
+	inputManager->BindKeyAxis(EKeycode::UP, &_axisLookY, 1.f);
+	inputManager->BindKeyAxis(EKeycode::DOWN, &_axisLookY, -1.f);
+	inputManager->BindKeyAxis(EKeycode::RIGHT, &_axisLookX, 1.f);
+	inputManager->BindKeyAxis(EKeycode::LEFT, &_axisLookX, -1.f);
 
-	inputManager->BindKey(Keycode::ENTER, Callback(this, &Editor::KeySubmit));
-	inputManager->BindKey(Keycode::ESCAPE, Callback(this, &Editor::KeyCancel));
-	inputManager->BindKey(Keycode::DEL, Callback(this, &Editor::KeyDelete));
+	inputManager->BindKey(EKeycode::ENTER, Callback(this, &Editor::KeySubmit));
+	inputManager->BindKey(EKeycode::ESCAPE, Callback(this, &Editor::KeyCancel));
+	inputManager->BindKey(EKeycode::DEL, Callback(this, &Editor::KeyDelete));
 
-	inputManager->BindKey(Keycode::TILDE, Callback(this, &Editor::ToggleConsole));
+	inputManager->BindKey(EKeycode::TILDE, Callback(this, &Editor::ToggleConsole));
 
 	_level.onNameChanged +=		Callback(this, &Editor::RefreshLevel);
 	_level.onChildChanged +=	Callback(this, &Editor::RefreshLevel);
+
+	//UI
+	SharedPointer<const Texture> gradient = Engine::Instance().pTextureManager->Get("ui/gradient");
+	SharedPointer<const Texture> radialGradient = Engine::Instance().pTextureManager->Get("ui/radialgrad2");
+	SharedPointer<const Texture> splitterTex = Engine::Instance().pTextureManager->Get("editor/tools/splitter");
+
+	_consoleCamera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
+	_consoleCamera.SetZBounds(-100, 100);
+
+	_uiCamera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
+	_uiCamera.SetZBounds(-100, 100);
+
+	_t2oolbar.SetButtonMaterial(Engine::Instance().pMaterialManager->Get("uibutton1")).SetButtonBorderSize(2.f)
+		.SetButtonColourFalse(Colour::White).SetButtonColourTrue(Colour::Blue).SetButtonColourHover(Colour(.8f, .8f, .7f)).SetButtonColourHold(Colour::Grey)
+		.SetParent(&_ui).SetBounds(0.f, 1.f, 1.f, 64.f, 0.f, -64.f);
+	_t2oolbar.AddButton("Select", Engine::Instance().pTextureManager->Get("editor/tools/select"), (uint16)ETool::SELECT);
+	_t2oolbar.AddButton("Brush2D", Engine::Instance().pTextureManager->Get("editor/tools/brush2d"), (uint16)ETool::BRUSH2D);
+	_t2oolbar.AddButton("Brush3D", Engine::Instance().pTextureManager->Get("editor/tools/brush3d"), (uint16)ETool::BRUSH3D);
+	_t2oolbar.AddButton("Entity", Engine::Instance().pTextureManager->Get("editor/tools/entity"), (uint16)ETool::ENTITY);
+	_t2oolbar.AddButton("Connector", Engine::Instance().pTextureManager->Get("editor/tools/connector"), (uint16)ETool::CONNECTOR);
+	_t2oolbar.onItemSelected += FunctionPointer<void, UIToolbarItem&>(this, &Editor::_OnToolbarItemSelection);
+
+	_sideUI.SetParent(&_ui);
+	_vpAreaUI.SetParent(&_ui);
+
+	UIColour vpColour(Colour::Black, Colour(.1f, .1f, .1f));
+
+	_viewports[0].gridPlane = EDirection::UP;
+	_viewports[0].camera.SetProjectionType(EProjectionType::PERSPECTIVE);
+	_viewports[0].camera.SetRelativePosition(Vector3(-5.f, 5.f, -5.f));
+	_viewports[0].camera.SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
+	_viewports[0].camera.SetZBounds(0.001f, 100.f);
+	_viewports[0].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f);
+
+	_viewports[1].gridPlane = EDirection::UP;
+	_viewports[1].camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
+	_viewports[1].camera.SetScale(32.f);
+	_viewports[1].camera.SetZBounds(-10000.f, 10000.f);
+	_viewports[1].camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
+	_viewports[1].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI);
+
+	_viewports[2].gridPlane = EDirection::FORWARD;
+	_viewports[2].camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
+	_viewports[2].camera.SetScale(32.f);
+	_viewports[2].camera.SetZBounds(-10000.f, 10000.f);
+	_viewports[2].camera.SetRelativeRotation(Vector3(0.f, 0.f, 0.f));
+	_viewports[2].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI);
+
+	_viewports[3].gridPlane = EDirection::RIGHT;
+	_viewports[3].camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
+	_viewports[3].camera.SetScale(32.f);
+	_viewports[3].camera.SetZBounds(-10000.f, 10000.f);
+	_viewports[3].camera.SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
+	_viewports[3].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI);
+
+	UIColour splitterColour(Colour::White, Colour(1.f, 1.f, 1.f, 0.5f));
+	UISplitter* splitterHoriz = new UISplitter(&_vpAreaUI);
+	UISplitter* splitterVert = new UISplitter(&_vpAreaUI);
+
+	splitterHoriz->ShowSiblingAfter(&_viewports[0].ui).ShowSiblingAfter(&_viewports[1].ui).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(0.f, .5f, 1.f, 5.f, 0.f, -2.5f);
+	splitterVert->ShowSiblingAfter(&_viewports[1].ui).ShowSiblingAfter(&_viewports[3].ui).SetIsHorizontal(false).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(.5f, 0.f, 5.f, 1.f, -2.5f, 0.f);
+
+	splitterHoriz->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
+	splitterVert->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
+
+	//This is a laugh
+	UIRect* propertyRect = new UIRect(&_sideUI);
+	propertyRect->SetTexture(gradient).SetColour(UIColour(Colour(.11f, .1f, .1f), Colour(.22f, .2f, .2f))).SetBounds(0.f, .5f, 1.f, .5f);
+	
+	UIRect* toolPropertyRect = new UIRect(&_sideUI);
+	toolPropertyRect->SetTexture(gradient).SetColour(UIColour(Colour(.1f, .1f, .11f), Colour(.2f, .2f, .22f))).SetBounds(0.f, 0.f, 1.f, .5f);
+
+	_propertyContainer.SetParent(&_sideUI);
+	_toolPropertyContainer.SetParent(&_sideUI);
+
+	UISplitter* sideSplitter = new UISplitter(&_ui);
+	sideSplitter->ShowSiblingAfter(&_sideUI).SetIsHorizontal(false).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(.75f, 0.f, 5.f, 1.f, -2.5f, 0.f);
+	sideSplitter->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
+
+	UISplitter* propertySplitterHoriz = new UISplitter(&_sideUI);
+	propertySplitterHoriz->ShowSiblingAfter(propertyRect).ShowSiblingAfter(&_propertyContainer).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(0.f, .5f, 1.f, 5.f, 0.f, -2.5f);
+	propertySplitterHoriz->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
 
 	//Tool data init
 	tools.brush2D.Initialise();
@@ -169,7 +215,7 @@ void Editor::_Init()
 	tools.entity.Initialise();
 	tools.select.Initialise();
 
-	SetTool(ToolEnum::SELECT);
+	SetTool(ETool::SELECT);
 
 
 	Engine::Instance().pConsole->Cvars().Add<uint32>("dbga", dbgIDA);
@@ -209,15 +255,8 @@ void Editor::Run()
 
 	_window.SetTitle("Editor");
 
-	for (int i = 0; i < VIEWPORTCOUNT; ++i)
-		_viewports[i].Show();
-
 	_hierachyWindow.Show();
-
-	_propertyWindow.Show();
-
-	_toolWindow.Show();
-	_toolWindow.PropertyWindow().Show();
+	_vpArea.Focus();
 
 	MSG msg;
 	_running = true;
@@ -247,7 +286,7 @@ void Editor::Frame()
 	if (_deltaTime > .1f) //Do not allow very long time deltas, they screw up the physics
 		_deltaTime = 0.1f;
 
-	EntCamera &perspCam = CameraRef(_activeVP);
+	EntCamera &perspCam = _viewports[_activeVP].camera;
 	perspCam.RelativeMove(
 		perspCam.GetRelativeTransform().GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed
 		+ perspCam.GetRelativeTransform().GetRightVector() * _deltaTime * _axisMoveX * moveSpeed
@@ -256,7 +295,7 @@ void Editor::Frame()
 	perspCam.AddRelativeRotation(Vector3(_deltaTime * _axisLookY * rotSpeed, _deltaTime * _axisLookX * rotSpeed, 0.f));
 
 	Engine::Instance().pDebugManager->Update(_deltaTime);
-	Engine::Instance().pDebugManager->AddToWorld(DebugFrustum::FromCamera(CameraRef(0)));
+	Engine::Instance().pDebugManager->AddToWorld(DebugFrustum::FromCamera(_viewports[0].camera));
 
 
 	Entity* dbgObjA = Engine::Instance().pWorld->FindChildWithUID(dbgIDA);
@@ -279,6 +318,8 @@ void Editor::Frame()
 	}
 
 	_level.UpdateAll(_deltaTime);
+
+	_ui.Update(_deltaTime);
 	Render();
 
 	_deltaTime = _timer.SecondsSinceStart();
@@ -286,19 +327,34 @@ void Editor::Frame()
 
 void Editor::Render()
 {
-	RenderViewport(0, Direction::UP);
-	RenderViewport(1, Direction::UP);
-	RenderViewport(2, Direction::FORWARD);
-	RenderViewport(3, Direction::RIGHT);
+	_glContext.Use(_vpArea);
+
+	glClearColor(0.3f, 0.3f, 0.4f, 1.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDepthFunc(GL_LEQUAL);
+
+	RenderUI();
+
+	for (int i = 0; i < VIEWPORTCOUNT; ++i)
+		RenderViewport(_viewports[i]);
+	
+	_vpArea.SwapBuffers();
 
 	RenderConsole();
+}
+
+void Editor::RenderUI()
+{
+	_shaderUnlit.Use();
+	_uiCamera.Use();
+	_ui.Render();
 }
 
 void Editor::RenderConsole()
 {
 	_glContext.Use(_consoleWindow);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LEQUAL);
 
 	_shaderUnlit.Use();
 	_consoleCamera.Use();
@@ -308,19 +364,17 @@ void Editor::RenderConsole()
 	_consoleWindow.SwapBuffers();
 }
 
-void Editor::RenderViewport(int index, Direction dir)
+void Editor::RenderViewport(Viewport& vp)
 {
-	auto& camera = CameraRef(index);
-	bool persp = camera.GetProjectionType() == ProjectionType::PERSPECTIVE;
+	auto& camera = vp.camera;
+	bool persp = camera.GetProjectionType() == EProjectionType::PERSPECTIVE;
 	float gridLimit = persp ? 100.f : 0.f;
 
-	_glContext.Use(_viewports[index]);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDepthFunc(GL_LEQUAL);
+	const AbsoluteBounds& bounds = vp.ui.GetAbsoluteBounds();
 	
 	{	//LIT PASS
 		_shaderLit.Use();
-		camera.Use();
+		camera.Use(bounds.x, bounds.y);
 		_shaderLit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
 		_shaderLit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
@@ -331,17 +385,17 @@ void Editor::RenderViewport(int index, Direction dir)
 		_shaderLit.SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
 		_shaderLit.SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1, 1));
 
-		_level.RenderAll(CameraRef(0), RenderChannels::PRE_RENDER);
+		_level.RenderAll(_viewports[0].camera, ERenderChannels::PRE_RENDER);
 		EntLight::FinaliseLightingForFrame();
-		_level.RenderAll(CameraRef(0), _litRenderChannels);
+		_level.RenderAll(_viewports[0].camera, _litRenderChannels);
 	}
 
 	//UNLIT PASS
 	_shaderUnlit.Use();
-	camera.Use();
+	camera.Use(bounds.x, bounds.y);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
-	_level.RenderAll(CameraRef(0), RenderChannels(_unlitRenderChannels | (_drawEditorFeatures ? RenderChannels::EDITOR : RenderChannels::NONE)));
+	_level.RenderAll(_viewports[0].camera, ERenderChannels(_unlitRenderChannels | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE)));
 	
 	if (_drawEditorFeatures)
 	{
@@ -351,51 +405,53 @@ void Editor::RenderViewport(int index, Direction dir)
 
 		Engine::Instance().pTextureManager->White()->Bind(0);
 		_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour(.75f, .75f, .75f));
-		DrawUtils::DrawGrid(*Engine::Instance().pModelManager, camera, dir, 1.f, 1.f, gridLimit);
+		DrawUtils::DrawGrid(*Engine::Instance().pModelManager, camera, vp.gridPlane, 1.f, 1.f, gridLimit);
 
 		if (persp) glDepthFunc(GL_LEQUAL);
 		_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour(.5f, .5f, 1.f));
-		DrawUtils::DrawGrid(*Engine::Instance().pModelManager, camera, dir, 1.f, 10.f, gridLimit);
+		DrawUtils::DrawGrid(*Engine::Instance().pModelManager, camera, vp.gridPlane, 1.f, 10.f, gridLimit);
 
 		Engine::Instance().pDebugManager->RenderWorld();
 	}
 
 	Engine::Instance().pTextureManager->White()->Bind(0);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
-	if (_currentTool) _currentTool->Render(RenderChannels::ALL);
+	if (_currentTool) _currentTool->Render(ERenderChannels::ALL);
 
 	glDepthFunc(GL_ALWAYS);
 	_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
-	_level.RenderAll(CameraRef(0), RenderChannels::SPRITE);
+	_level.RenderAll(_viewports[0].camera, ERenderChannels::SPRITE);
 	glDepthFunc(GL_LEQUAL);
-
-	_viewports[index].SwapBuffers();
 }
 
 void Editor::ResizeViews(uint16 w, uint16 h)
 {
-	const uint16 border = 4;
-	uint16 vpW = (w - border) / 2;
-	uint16 vpH = (h - border) / 2;
-
-	_uiCam.SetViewport(w, h);
-
-	_viewports[0].SetSizeAndPos(0, 0, vpW, vpH);
-	_viewports[1].SetSizeAndPos(vpW + border, 0, vpW, vpH);
-	_viewports[2].SetSizeAndPos(0, vpH + border, vpW, vpH);
-	_viewports[3].SetSizeAndPos(vpW + border, vpH + border, vpW, vpH);
+	_uiCamera.SetViewport(w, h);
+	_uiCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
+	_ui.SetBounds(0.f, 0.f, w, h);
 
 	if (_running)
 		Render();
+
+	_RefreshVPs();
+}
+
+void Editor::_RefreshVPs()
+{
+	for (int i = 0; i < VIEWPORTCOUNT; ++i)
+	{
+		const AbsoluteBounds& bounds = _viewports[i].ui.GetAbsoluteBounds();
+		_viewports[i].camera.SetViewport((uint16)bounds.w, (uint16)bounds.h);
+	}
 }
 
 String Editor::SelectMaterialDialog()
 {
-	String string = ResourceSelect::Dialog(*Engine::Instance().pMaterialManager, *Engine::Instance().pModelManager, "Data/Materials/*.txt", _propertyWindow.GetHwnd(),
-		ResourceType::MATERIAL, _glContext, _shaderLit, _shaderUnlit);
+	String string = ResourceSelect::Dialog(*Engine::Instance().pMaterialManager, *Engine::Instance().pModelManager, "Data/Materials/*.txt", _vpArea.GetHwnd(),
+		EResourceType::MATERIAL, _glContext, _shaderLit, _shaderUnlit);
 
 	RECT rect;
-	::GetClientRect(_window.GetHwnd(), &rect);
+	::GetClientRect(_vpArea.GetHwnd(), &rect);
 	ResizeViews((uint16)rect.right, (uint16)rect.bottom);
 
 	return string;
@@ -403,38 +459,74 @@ String Editor::SelectMaterialDialog()
 
 String Editor::SelectModelDialog()
 {
-	String string = ResourceSelect::Dialog(*Engine::Instance().pMaterialManager, *Engine::Instance().pModelManager, "Data/Models/*.txt", _propertyWindow.GetHwnd(),
-		ResourceType::MODEL, _glContext, _shaderLit, _shaderUnlit);
+	String string = ResourceSelect::Dialog(*Engine::Instance().pMaterialManager, *Engine::Instance().pModelManager, "Data/Models/*.txt", _vpArea.GetHwnd(),
+		EResourceType::MODEL, _glContext, _shaderLit, _shaderUnlit);
 
 	RECT rect;
-	::GetClientRect(_window.GetHwnd(), &rect);
+	::GetClientRect(_vpArea.GetHwnd(), &rect);
 	ResizeViews((uint16)rect.right, (uint16)rect.bottom);
 
 	return string;
 }
 
-void Editor::SetTool(ToolEnum tool, bool changeToolbar)
+void* Editor::GetPropertyObject() const
+{
+	for (size_t i = 0; i < _propertyContainer.GetChildren().GetSize(); ++i)
+	{
+		UIPropertyManipulator* property = dynamic_cast<UIPropertyManipulator*>(_propertyContainer.GetChildren()[i]);
+		if (property) return property->GetObject();
+	}
+
+	return nullptr;
+}
+
+void* Editor::GetToolPropertyObject() const
+{
+	for (size_t i = 0; i < _toolPropertyContainer.GetChildren().GetSize(); ++i)
+	{
+		UIPropertyManipulator* property = dynamic_cast<UIPropertyManipulator*>(_toolPropertyContainer.GetChildren()[i]);
+		if (property) return property->GetObject();
+	}
+
+	return nullptr;
+}
+
+void Editor::ChangePropertyEntity(Entity* ent)
+{
+	ClearProperties();
+	UIPropertyManipulator::AddPropertiesToContainer(PROPERTY_HEIGHT, *this, ent->GetProperties(), ent, _propertyContainer);
+}
+
+void Editor::RefreshProperties()
+{
+	UIPropertyManipulator::RefreshPropertiesInContainer(_propertyContainer);
+}
+
+void Editor::SetTool(ETool tool, bool changeToolbar)
 {
 	if (changeToolbar)
 		SendMessage(_toolbar, TB_CHECKBUTTON, (WPARAM)tool, MAKELONG(TRUE, 0));
+
+	ClearProperties();
+	ClearToolProperties();
 
 	Tool* newTool = nullptr;
 
 	switch (tool)
 	{
-	case ToolEnum::SELECT:
+	case ETool::SELECT:
 		newTool = &tools.select;
 		break;
-	case ToolEnum::BRUSH2D:
+	case ETool::BRUSH2D:
 		newTool = &tools.brush2D;
 		break;
-	case ToolEnum::BRUSH3D:
+	case ETool::BRUSH3D:
 		newTool = &tools.brush3D;
 		break;
-	case ToolEnum::ENTITY:
+	case ETool::ENTITY:
 		newTool = &tools.entity;
 		break;
-	case ToolEnum::CONNECTOR:
+	case ETool::CONNECTOR:
 		newTool = &tools.connector;
 		break;
 	}
@@ -443,13 +535,36 @@ void Editor::SetTool(ToolEnum tool, bool changeToolbar)
 		_currentTool->Deactivate();
 
 	_currentTool = newTool;
-	_currentTool->Activate(_propertyWindow, _toolWindow.PropertyWindow());
+	_currentTool->Activate(_propertyContainer, _toolPropertyContainer);
 }
 
 #pragma region Input
 
-void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y)
+void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 {
+	int vpIndex = -1;
+
+	for (int i = 0; i < VIEWPORTCOUNT; ++i)
+	{
+		const AbsoluteBounds& bounds = _viewports[i].ui.GetAbsoluteBounds();
+
+		if (x >= bounds.x && y >= bounds.y &&
+			x <= (bounds.x + bounds.w) &&
+			y <= (bounds.y + bounds.h))
+		{
+			vpIndex = i;
+			break;
+		}
+	}
+
+	if (vpIndex < 0)
+	{
+		_mouseData.viewport = -1;
+		return;
+	}
+
+	const AbsoluteBounds& bounds = _viewports[vpIndex].ui.GetAbsoluteBounds();
+
 	if (_mouseData.viewport != vpIndex)
 	{
 		if (_mouseData.isLeftDown)
@@ -459,11 +574,11 @@ void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y
 			RightMouseUp();
 	}
 
-	EntCamera& camera = CameraRef(vpIndex);
+	EntCamera& camera = _viewports[vpIndex].camera;
 	Vector3 right = camera.GetRelativeTransform().GetRightVector();
 	Vector3 up = camera.GetRelativeTransform().GetUpVector();
 
-	if (camera.GetProjectionType() == ProjectionType::PERSPECTIVE)
+	if (camera.GetProjectionType() == EProjectionType::PERSPECTIVE)
 		_mouseData.rightElement = _mouseData.upElement = _mouseData.forwardElement = 0;
 	else
 	{
@@ -477,14 +592,14 @@ void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y
 	int prevViewport = _mouseData.viewport;
 
 	_mouseData.viewport = vpIndex;
-	_mouseData.x = x - (camera.GetViewport()[0] / 2);
-	_mouseData.y = -(y - (camera.GetViewport()[1] / 2));
+	_mouseData.x = x - (uint16)(bounds.x + (bounds.w / 2.f));
+	_mouseData.y = y - (uint16)(bounds.y + (bounds.h / 2.f));
 	_mouseData.unitX = camera.GetRelativePosition()[_mouseData.rightElement] + (float)_mouseData.x / camera.GetScale();
 	_mouseData.unitY = camera.GetRelativePosition()[_mouseData.upElement] + (float)_mouseData.y / camera.GetScale();
 
 	if (_mouseData.isRightDown && _mouseData.viewport == prevViewport)
 	{
-		if (camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
+		if (camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC)
 		{
 			Vector3 v;
 			v[_mouseData.rightElement] = _mouseData.prevUnitX - _mouseData.unitX;
@@ -504,21 +619,17 @@ void Editor::UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y
 	_mouseData.unitX_rounded = _mouseData.unitX < 0.f ? (int)(_mouseData.unitX - 1.f) : (int)_mouseData.unitX;
 	_mouseData.unitY_rounded = _mouseData.unitY < 0.f ? (int)(_mouseData.unitY - 1.f) : (int)_mouseData.unitY;
 
-	if (camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
+	if (camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC)
 		_window.SetTitle(CSTR(_mouseData.viewport, " Mouse X:", _mouseData.x, " (", _mouseData.unitX, " ) Mouse Y:", _mouseData.y, " (", _mouseData.unitY, ')'));
 	else
 		_window.SetTitle(CSTR(_mouseData.viewport, " Mouse X:", _mouseData.x, " (", _mouseData.unitX, " ) Mouse Y:", _mouseData.y));
 
 	if (_currentTool)
 		_currentTool->MouseMove(_mouseData);
-
-	_propertyWindow.Refresh();
 }
 
 void Editor::LeftMouseDown()
 {
-	::SetFocus(_window.GetHwnd());
-
 	_mouseData.isLeftDown = true;
 	_mouseData.heldUnitX = _mouseData.unitX;
 	_mouseData.heldUnitY = _mouseData.unitY;
@@ -541,7 +652,7 @@ void Editor::RightMouseDown()
 {
 	_mouseData.isRightDown = true;
 
-	if (CameraRef(_mouseData.viewport).GetProjectionType() == ProjectionType::PERSPECTIVE)
+	if (_mouseData.viewport >= 0 && _viewports[_mouseData.viewport].camera.GetProjectionType() == EProjectionType::PERSPECTIVE)
 		_activeVP = _mouseData.viewport;
 }
 
@@ -585,24 +696,28 @@ void Editor::RefreshLevel()
 
 void Editor::Zoom(float amount)
 {
-	EntCamera& camera = CameraRef(_mouseData.viewport);
-
-	if (camera.GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
+	if (_mouseData.viewport >= 0)
 	{
-		float mouseOffsetUnitsX = (float)_mouseData.x / camera.GetScale();
-		float mouseOffsetUnitsY = (float)_mouseData.y / camera.GetScale();
-		float moveX = mouseOffsetUnitsX - ((float)mouseOffsetUnitsX / (float)amount);
-		float moveY = mouseOffsetUnitsY - ((float)mouseOffsetUnitsY / (float)amount);
+		EntCamera& camera = _viewports[_mouseData.viewport].camera;
 
-		camera.SetScale(camera.GetScale() * amount);
-		camera.RelativeMove(camera.GetRelativeTransform().GetRightVector() * moveX + camera.GetRelativeTransform().GetUpVector() * moveY);
+		if (camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC)
+		{
+			float mouseOffsetUnitsX = (float)_mouseData.x / camera.GetScale();
+			float mouseOffsetUnitsY = (float)_mouseData.y / camera.GetScale();
+			float moveX = mouseOffsetUnitsX - ((float)mouseOffsetUnitsX / (float)amount);
+			float moveY = mouseOffsetUnitsY - ((float)mouseOffsetUnitsY / (float)amount);
+
+			camera.SetScale(camera.GetScale() * amount);
+			camera.RelativeMove(camera.GetRelativeTransform().GetRightVector() * moveX + camera.GetRelativeTransform().GetUpVector() * moveY);
+		}
 	}
-
 }
 
 #pragma endregion
 
 #pragma region WindowsProcs
+
+#include <windowsx.h>
 
 LRESULT CALLBACK AboutProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -677,49 +792,6 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 		LPCREATESTRUCT create = (LPCREATESTRUCT)lparam;
 		editor = (Editor*)create->lpCreateParams;
 		::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)editor);
-
-		HINSTANCE instance = ::GetModuleHandle(NULL);
-
-		editor->_tbImages = ::ImageList_Create(tbImageSize, tbImageSize, ILC_COLOR16 | ILC_MASK, 5, 0);
-
-		HBITMAP bmp = ::LoadBitmap(instance, MAKEINTRESOURCE(IDB_TOOLSELECT));
-		::ImageList_AddMasked(editor->_tbImages, bmp, RGB(255, 255, 255));
-		::DeleteObject(bmp);
-
-		bmp = ::LoadBitmap(instance, MAKEINTRESOURCE(IDB_TOOLEDIT));
-		::ImageList_AddMasked(editor->_tbImages, bmp, RGB(255, 255, 255));
-		::DeleteObject(bmp);
-
-		bmp = ::LoadBitmap(instance, MAKEINTRESOURCE(IDB_TOOLBRUSH));
-		ImageList_AddMasked(editor->_tbImages, bmp, RGB(255, 255, 255));
-		::DeleteObject(bmp);
-
-		bmp = ::LoadBitmap(instance, MAKEINTRESOURCE(IDB_TOOLENTITY));
-		::ImageList_AddMasked(editor->_tbImages, bmp, RGB(255, 255, 255));
-		::DeleteObject(bmp);
-
-		bmp = ::LoadBitmap(instance, MAKEINTRESOURCE(IDB_TOOLCONNECTOR));
-		::ImageList_AddMasked(editor->_tbImages, bmp, RGB(255, 255, 255));
-		::DeleteObject(bmp);
-
-		editor->_toolbar = ::CreateWindowEx(0, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_VISIBLE, 0, 0, 0, 0, hwnd, NULL, instance, NULL);
-		::SendMessage(editor->_toolbar, TB_SETIMAGELIST, 0, (LPARAM)editor->_tbImages);
-
-		BYTE btnStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_CHECKGROUP;
-
-		TBBUTTON tbButtons[] =
-		{
-			{0, (int)ToolEnum::SELECT,  TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Select") },
-			{1, (int)ToolEnum::BRUSH2D, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Edit")},
-			{2, (int)ToolEnum::BRUSH3D, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Brush")},
-			{3, (int)ToolEnum::ENTITY, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Entity")},
-			{4, (int)ToolEnum::CONNECTOR, TBSTATE_ENABLED, btnStyle, {0}, 0, (INT_PTR)TEXT("Connector")}
-		};
-
-		SendMessage(editor->_toolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
-		SendMessage(editor->_toolbar, TB_ADDBUTTONS, (WPARAM)5, (LPARAM)&tbButtons);
-
-		SendMessage(editor->_toolbar, TB_AUTOSIZE, 0, 0);
 	}
 	break;
 
@@ -866,28 +938,19 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			break;
 
 			case ID_SHADING_UNLIT:
-				editor->_litRenderChannels = RenderChannels::NONE;
-				editor->_unlitRenderChannels = RenderChannels::SURFACE | RenderChannels::UNLIT;
+				editor->_litRenderChannels = ERenderChannels::NONE;
+				editor->_unlitRenderChannels = ERenderChannels::SURFACE | ERenderChannels::UNLIT;
 				break;
 
 			case ID_SHADING_PHONG:
-				editor->_litRenderChannels = RenderChannels::SURFACE;
-				editor->_unlitRenderChannels = RenderChannels::UNLIT;
+				editor->_litRenderChannels = ERenderChannels::SURFACE;
+				editor->_unlitRenderChannels = ERenderChannels::UNLIT;
 				break;
 
 			case ID_DRAWEDITORFEATURES:
 				editor->_drawEditorFeatures = !editor->_drawEditorFeatures;
 
 				::CheckMenuItem(::GetMenu(hwnd), ID_DRAWEDITORFEATURES, editor->_drawEditorFeatures ? MF_CHECKED : MF_UNCHECKED);
-				break;
-
-
-			case (int)ToolEnum::SELECT:
-			case (int)ToolEnum::BRUSH2D:
-			case (int)ToolEnum::BRUSH3D:
-			case (int)ToolEnum::ENTITY:
-			case (int)ToolEnum::CONNECTOR:
-				editor->SetTool((ToolEnum)LOWORD(wparam), false);
 				break;
 			}
 			break;
@@ -910,30 +973,11 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 		uint16 w = LOWORD(lparam);
 		uint16 h = HIWORD(lparam);
 		const int leftW = 256;
-		const int rightW = 256;
-		const int topH = 64;
-		const int toolWindowH = 256;
 
-		editor->_vpArea.SetSizeAndPos(leftW, topH, w - leftW - rightW, h - topH);
-		editor->_propertyWindow.SetSizeAndPos(w - rightW, topH, rightW, h - topH - toolWindowH);
-		editor->_hierachyWindow.SetSizeAndPos(0, topH, leftW, h - topH);
-		editor->_toolWindow.SetSizeAndPos(w - rightW, h - toolWindowH, rightW, toolWindowH);
-		WindowFunctions::SetHWNDSizeAndPos(editor->_toolbar, 0, 0, w, topH);
+		editor->_vpArea.SetSizeAndPos(leftW, 0, w - leftW, h);
+		editor->_hierachyWindow.SetSizeAndPos(0, 0, leftW, h);
 	}
 	break;
-
-	case WM_SYSKEYDOWN:
-	case WM_KEYDOWN:
-		if (lparam & (1 << 30))
-			break; //Key repeats ignored
-
-		Engine::Instance().pInputManager->KeyDown((Keycode)wparam);
-		break;
-
-	case WM_SYSKEYUP:
-	case WM_KEYUP:
-		Engine::Instance().pInputManager->KeyUp((Keycode)wparam);
-		break;
 
 	default:
 		return ::DefWindowProc(hwnd, msg, wparam, lparam);
@@ -957,6 +1001,7 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 	case WM_SIZE:
 		editor->ResizeViews(LOWORD(lparam), HIWORD(lparam));
+		editor->_RefreshVPs();
 		break;
 
 	case WM_MOUSEWHEEL:
@@ -964,6 +1009,58 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			editor->Zoom(1.25f);
 		else
 			editor->Zoom(.75f);
+		break;
+
+	case WM_MOUSEMOVE:
+	{
+		uint16 x = GET_X_LPARAM(lparam);
+		uint16 y = editor->_uiCamera.GetViewport()[1] - GET_Y_LPARAM(lparam);
+		editor->_ui.OnMouseMove(x, y);
+		editor->UpdateMousePosition(x, y);
+	}
+		break;
+
+	case WM_LBUTTONDOWN:
+		::SetFocus(hwnd);
+		editor->_ui.OnMouseDown();
+		editor->LeftMouseDown();
+		break;
+
+	case WM_LBUTTONUP:
+		editor->_ui.OnMouseUp();
+		editor->LeftMouseUp();
+		break;
+
+	case WM_RBUTTONDOWN:
+		::SetFocus(hwnd);
+		editor->RightMouseDown();
+		break;
+
+	case WM_RBUTTONUP:
+		editor->RightMouseUp();
+		break;
+
+	case WM_CHAR:
+		editor->_ui.OnCharInput((char)wparam);
+		break;
+
+	case WM_SYSKEYDOWN:
+	case WM_KEYDOWN:
+		editor->_ui.OnKeyDown((EKeycode)wparam);
+
+		if (lparam & (1 << 30))
+			break; //Key repeats ignored
+
+		if (editor->_mouseData.viewport >= 0)
+			Engine::Instance().pInputManager->KeyDown((EKeycode)wparam);
+		break;
+
+	case WM_SYSKEYUP:
+	case WM_KEYUP:
+		editor->_ui.OnKeyUp((EKeycode)wparam);
+
+		if (editor->_mouseData.viewport >= 0)
+			Engine::Instance().pInputManager->KeyUp((EKeycode)wparam);
 		break;
 
 	default: return ::DefWindowProc(hwnd, msg, wparam, lparam);

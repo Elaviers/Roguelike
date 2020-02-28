@@ -6,18 +6,19 @@ const String& Property::GetTypeString() const
 {
 	switch (GetType())
 	{
-		TYPESTRINGCASE(PropertyType::FUNCTION,	"Command");
-		TYPESTRINGCASE(PropertyType::UINT16,	"uint16");
-		TYPESTRINGCASE(PropertyType::UINT32,	"uint32");
-		TYPESTRINGCASE(PropertyType::UINT64,	"uint64");
-		TYPESTRINGCASE(PropertyType::INT16,		"int16");
-		TYPESTRINGCASE(PropertyType::INT32,		"int32");
-		TYPESTRINGCASE(PropertyType::INT64,		"int64");
-		TYPESTRINGCASE(PropertyType::BYTE,		"byte");
-		TYPESTRINGCASE(PropertyType::FLOAT,		"float");
-		TYPESTRINGCASE(PropertyType::VECTOR2,	"Vector2");
-		TYPESTRINGCASE(PropertyType::VECTOR3,	"Vector3");
-		TYPESTRINGCASE(PropertyType::STRING,	"String");
+		TYPESTRINGCASE(EPropertyType::FUNCTION,	"Command");
+		TYPESTRINGCASE(EPropertyType::UINT16,	"uint16");
+		TYPESTRINGCASE(EPropertyType::UINT32,	"uint32");
+		TYPESTRINGCASE(EPropertyType::UINT64,	"uint64");
+		TYPESTRINGCASE(EPropertyType::INT16,	"int16");
+		TYPESTRINGCASE(EPropertyType::INT32,	"int32");
+		TYPESTRINGCASE(EPropertyType::INT64,	"int64");
+		TYPESTRINGCASE(EPropertyType::BYTE,		"byte");
+		TYPESTRINGCASE(EPropertyType::FLOAT,	"float");
+		TYPESTRINGCASE(EPropertyType::VECTOR2,	"Vector2");
+		TYPESTRINGCASE(EPropertyType::VECTOR3,	"Vector3");
+		TYPESTRINGCASE(EPropertyType::VECTOR4,	"Vector4");
+		TYPESTRINGCASE(EPropertyType::STRING,	"String");
 	}
 
 	static String unknown = "???";
@@ -29,7 +30,7 @@ void Property::SetAsString(void* obj, const String& value) const
 {
 	switch (GetType())
 	{
-	case PropertyType::FUNCTION:
+	case EPropertyType::FUNCTION:
 	{
 		auto func = dynamic_cast<const FunctionPropertyBase*>(this);
 		if (func)	func->Call(obj, value.Split(" "));
@@ -37,18 +38,19 @@ void Property::SetAsString(void* obj, const String& value) const
 		break;
 	}
 
-		SETSTRINGCASE(PropertyType::STRING, String, value);
-		SETSTRINGCASE(PropertyType::FLOAT, float, value.ToFloat());
-		SETSTRINGCASE(PropertyType::VECTOR2, Vector2, value.ToVector2());
-		SETSTRINGCASE(PropertyType::VECTOR3, Vector3, value.ToVector3());
-		SETSTRINGCASE(PropertyType::BYTE, byte, value.ToInt());
-		SETSTRINGCASE(PropertyType::UINT16, uint16, value.ToInt());
-		SETSTRINGCASE(PropertyType::UINT32, uint32, value.ToInt());
-		SETSTRINGCASE(PropertyType::UINT64, uint64, value.ToInt());
-		SETSTRINGCASE(PropertyType::INT16, int16, value.ToInt());
-		SETSTRINGCASE(PropertyType::INT32, int32, value.ToInt());
-		SETSTRINGCASE(PropertyType::INT64, int64, value.ToInt());
-		SETSTRINGCASE(PropertyType::BOOL, bool, value.ToBool());
+		SETSTRINGCASE(EPropertyType::STRING, String, value);
+		SETSTRINGCASE(EPropertyType::FLOAT, float, value.ToFloat());
+		SETSTRINGCASE(EPropertyType::VECTOR2, Vector2, value.ToVector2());
+		SETSTRINGCASE(EPropertyType::VECTOR3, Vector3, value.ToVector3());
+		SETSTRINGCASE(EPropertyType::VECTOR4, Vector4, value.ToVector4());
+		SETSTRINGCASE(EPropertyType::BYTE, byte, value.ToInt());
+		SETSTRINGCASE(EPropertyType::UINT16, uint16, value.ToInt());
+		SETSTRINGCASE(EPropertyType::UINT32, uint32, value.ToInt());
+		SETSTRINGCASE(EPropertyType::UINT64, uint64, value.ToInt());
+		SETSTRINGCASE(EPropertyType::INT16, int16, value.ToInt());
+		SETSTRINGCASE(EPropertyType::INT32, int32, value.ToInt());
+		SETSTRINGCASE(EPropertyType::INT64, int64, value.ToInt());
+		SETSTRINGCASE(EPropertyType::BOOL, bool, value.ToBool());
 	}
 }
 
@@ -58,19 +60,20 @@ String Property::GetAsString(const void* obj) const
 {
 	switch (GetType())
 	{
-		GETSTRINGCASE(PropertyType::FUNCTION, "(COMMAND)");
-		GETSTRINGCASE(PropertyType::STRING, GETASTYPE(String));
-		GETSTRINGCASE(PropertyType::FLOAT, String::From(GETASTYPE(float)));
-		GETSTRINGCASE(PropertyType::VECTOR2, String::From(GETASTYPE(Vector2)));
-		GETSTRINGCASE(PropertyType::VECTOR3, String::From(GETASTYPE(Vector3)));
-		GETSTRINGCASE(PropertyType::BYTE, String::From((int)GETASTYPE(byte)));
-		GETSTRINGCASE(PropertyType::UINT16, String::From(GETASTYPE(uint16)));
-		GETSTRINGCASE(PropertyType::UINT32, String::From(GETASTYPE(uint32)));
-		GETSTRINGCASE(PropertyType::UINT64, String::From(GETASTYPE(uint64)));
-		GETSTRINGCASE(PropertyType::INT16, String::From(GETASTYPE(int16)));
-		GETSTRINGCASE(PropertyType::INT32, String::From(GETASTYPE(int32)));
-		GETSTRINGCASE(PropertyType::INT64, String::From(GETASTYPE(int64)));
-		GETSTRINGCASE(PropertyType::BOOL, String::From(GETASTYPE(bool)));
+		GETSTRINGCASE(EPropertyType::FUNCTION, "(COMMAND)");
+		GETSTRINGCASE(EPropertyType::STRING, GETASTYPE(String));
+		GETSTRINGCASE(EPropertyType::FLOAT, String::From(GETASTYPE(float)));
+		GETSTRINGCASE(EPropertyType::VECTOR2, String::From(GETASTYPE(Vector2)));
+		GETSTRINGCASE(EPropertyType::VECTOR3, String::From(GETASTYPE(Vector3)));
+		GETSTRINGCASE(EPropertyType::VECTOR4, String::From(GETASTYPE(Vector4)));
+		GETSTRINGCASE(EPropertyType::BYTE, String::From((int)GETASTYPE(byte)));
+		GETSTRINGCASE(EPropertyType::UINT16, String::From(GETASTYPE(uint16)));
+		GETSTRINGCASE(EPropertyType::UINT32, String::From(GETASTYPE(uint32)));
+		GETSTRINGCASE(EPropertyType::UINT64, String::From(GETASTYPE(uint64)));
+		GETSTRINGCASE(EPropertyType::INT16, String::From(GETASTYPE(int16)));
+		GETSTRINGCASE(EPropertyType::INT32, String::From(GETASTYPE(int32)));
+		GETSTRINGCASE(EPropertyType::INT64, String::From(GETASTYPE(int64)));
+		GETSTRINGCASE(EPropertyType::BOOL, String::From(GETASTYPE(bool)));
 	}
 
 	return "UNSUPPORTED";
@@ -84,17 +87,18 @@ void Property::TransferTo(const void* from, void* to) const
 
 	switch (GetType())
 	{
-		TRANSFERCASE(PropertyType::STRING, String);
-		TRANSFERCASE(PropertyType::FLOAT, float);
-		TRANSFERCASE(PropertyType::VECTOR2, Vector2);
-		TRANSFERCASE(PropertyType::VECTOR3, Vector3);
-		TRANSFERCASE(PropertyType::BYTE, byte);
-		TRANSFERCASE(PropertyType::UINT16, uint16);
-		TRANSFERCASE(PropertyType::UINT32, uint32);
-		TRANSFERCASE(PropertyType::UINT64, uint64);
-		TRANSFERCASE(PropertyType::INT16, int16);
-		TRANSFERCASE(PropertyType::INT32, int32);
-		TRANSFERCASE(PropertyType::INT64, int64);
-		TRANSFERCASE(PropertyType::BOOL, bool);
+		TRANSFERCASE(EPropertyType::STRING, String);
+		TRANSFERCASE(EPropertyType::FLOAT, float);
+		TRANSFERCASE(EPropertyType::VECTOR2, Vector2);
+		TRANSFERCASE(EPropertyType::VECTOR3, Vector3);
+		TRANSFERCASE(EPropertyType::VECTOR4, Vector4);
+		TRANSFERCASE(EPropertyType::BYTE, byte);
+		TRANSFERCASE(EPropertyType::UINT16, uint16);
+		TRANSFERCASE(EPropertyType::UINT32, uint32);
+		TRANSFERCASE(EPropertyType::UINT64, uint64);
+		TRANSFERCASE(EPropertyType::INT16, int16);
+		TRANSFERCASE(EPropertyType::INT32, int32);
+		TRANSFERCASE(EPropertyType::INT64, int64);
+		TRANSFERCASE(EPropertyType::BOOL, bool);
 	}
 }

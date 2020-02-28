@@ -54,7 +54,7 @@ namespace DrawUtils
 		}
 	}
 
-	void DrawGrid(const ModelManager &modelManager, const EntCamera &camera, Direction dir, float width, float gap, float limit, float offset)
+	void DrawGrid(const ModelManager &modelManager, const EntCamera &camera, EDirection dir, float width, float gap, float limit, float offset)
 	{
 		Mat4 transformX;
 		Mat4 transformY;
@@ -65,21 +65,21 @@ namespace DrawUtils
 
 		switch (dir)
 		{
-		case Direction::RIGHT:
+		case EDirection::RIGHT:
 			axisX = Z;
 			axisY = Y;
 			axisZ = X;
 			transformX = Matrix::RotationY(90.f);
 			transformY = Matrix::RotationX(90.f);
 			break;
-		case Direction::UP:
+		case EDirection::UP:
 			axisX = X;
 			axisY = Z;
 			axisZ = Y;
 			transformX = Matrix::RotationX(90.f);
 			transformY = Matrix::RotationZ(90.f);
 			break;
-		case Direction::FORWARD:
+		case EDirection::FORWARD:
 			axisX = X;
 			axisY = Y;
 			axisZ = Z;

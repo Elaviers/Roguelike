@@ -7,16 +7,23 @@
 struct LineSegment;
 struct RaycastResult;
 
+enum class EOverlapResult
+{
+	SEPERATE = 0,
+	OVERLAPPING = 1,
+	TOUCHING = 2
+};
+
 class Collider
 {
 	Buffer<CollisionShape*> _shapes;
 
-	CollisionChannels _channels;
+	ECollisionChannels _channels;
 
 public:
-	Collider(CollisionChannels channels, const CollisionShape& shape) : _channels(channels), _shapes(shape.Clone()) {}
+	Collider(ECollisionChannels channels, const CollisionShape& shape) : _channels(channels), _shapes(shape.Clone()) {}
 
-	Collider(CollisionChannels channels, const Buffer<CollisionShape>& shapes = Buffer<CollisionShape>()) : _channels(channels)
+	Collider(ECollisionChannels channels, const Buffer<CollisionShape>& shapes = Buffer<CollisionShape>()) : _channels(channels)
 	{
 		_shapes.SetSize(shapes.GetSize());
 
@@ -64,7 +71,7 @@ public:
 			delete _shapes[i];
 	}
 
-	const CollisionChannels& GetChannels() const { return _channels; }
+	const ECollisionChannels& GetChannels() const { return _channels; }
 
 	template <typename T>
 	T& AddShape(const T& shape)										{ return (T&)*_shapes.Add(shape.Clone()); }
@@ -78,15 +85,15 @@ public:
 		_shapes.RemoveIndex(index);
 	}
 
-	void SetChannels(CollisionChannels channels)					{ _channels = channels; }
-	void AddChannels(CollisionChannels channels)					{ _channels |= channels; }
-	void RemoveChannels(CollisionChannels channels)					{ _channels = (CollisionChannels)(_channels & (~channels)); }
-	bool CanCollideWithChannels(CollisionChannels channels) const	{ return (_channels & channels) != 0; }
+	void SetChannels(ECollisionChannels channels)					{ _channels = channels; }
+	void AddChannels(ECollisionChannels channels)					{ _channels |= channels; }
+	void RemoveChannels(ECollisionChannels channels)					{ _channels = (ECollisionChannels)(_channels & (~channels)); }
+	bool CanCollideWithChannels(ECollisionChannels channels) const	{ return (_channels & channels) != 0; }
 	bool CanCollideWith(const Collider& other) const				{ return CanCollideWithChannels(other._channels); }
 
 	bool IntersectsRay(const Transform& transform, const Ray&, RaycastResult&) const;
 
-	bool Overlaps(
+	EOverlapResult Overlaps(
 		const Transform& transform, 
 		const Collider& other, const Transform& otherTransform, 
 		const LineSegment* lineA, Vector3* out_PenetrationVector) const;

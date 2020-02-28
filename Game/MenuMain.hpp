@@ -1,15 +1,15 @@
 #pragma once
-#include <Engine/UIButton.hpp>
+#include <Engine/UITextButton.hpp>
 #include <Engine/UIContainer.hpp>
 #include <Engine/UIRect.hpp>
 
 class MenuMain : public UIContainer
 {
 	UIPanel _panel;
-	UIButton _buttonStart;
-	UIButton _buttonQuit;
+	UITextButton _buttonStart;
+	UITextButton _buttonQuit;
 
-	UIButton _buttonSingleLevel;
+	UITextButton _buttonSingleLevel;
 
 	FunctionPointer<void, const String&> _onLevelChosen;
 	Callback _onQuit;

@@ -4,7 +4,7 @@
 #include "ModelManager.hpp"
 #include "EntCamera.hpp"
 
-void EntSprite::Render(RenderChannels channels) const
+void EntSprite::Render(ERenderChannels channels) const
 {
 	if (Engine::Instance().pModelManager && EntCamera::Current() && _material && channels & _material->GetRenderChannelss())
 	{

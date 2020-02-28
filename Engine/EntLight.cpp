@@ -47,12 +47,12 @@ void EntLight::Update(float deltaTime)
 	EntLight::_frameLightCounter = 0;
 }
 
-void EntLight::Render(RenderChannels channels) const
+void EntLight::Render(ERenderChannels channels) const
 {
-	if (channels & RenderChannels::PRE_RENDER && EntLight::_frameLightCounter < GLProgram::Current().GetMaxLightCount())
+	if (channels & ERenderChannels::PRE_RENDER && EntLight::_frameLightCounter < GLProgram::Current().GetMaxLightCount())
 		ToShader(EntLight::_frameLightCounter++);
 
-	if (EntLight::drawLightSources && Engine::Instance().pTextureManager && channels & RenderChannels::EDITOR)
+	if (EntLight::drawLightSources && Engine::Instance().pTextureManager && channels & ERenderChannels::EDITOR)
 	{
 		const float colour[4] = { _colour[0], _colour[1], _colour[2], 1.f };
 		Engine::Instance().pTextureManager->White()->Bind(0);

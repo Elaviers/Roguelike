@@ -189,7 +189,6 @@ EXIT 0</Command>
     <ClCompile Include="EntPlayer.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameInstance.cpp" />
-    <ClCompile Include="LevelBag.cpp" />
     <ClCompile Include="LevelGeneration.cpp" />
     <ClCompile Include="MenuMain.cpp" />
     <ClCompile Include="MenuStartLevel.cpp" />
@@ -199,10 +198,10 @@ EXIT 0</Command>
     <ClInclude Include="EntPlayer.h" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameInstance.h" />
-    <ClInclude Include="LevelBag.hpp" />
     <ClInclude Include="LevelGeneration.hpp" />
     <ClInclude Include="MenuMain.hpp" />
     <ClInclude Include="MenuStartLevel.hpp" />
+    <ClInclude Include="RandomBag.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Data\Shaders\Phong.frag">

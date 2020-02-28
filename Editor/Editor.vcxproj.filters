@@ -69,9 +69,6 @@
     <ClCompile Include="GizmoRing.cpp">
       <Filter>Source Files\Tools\Gizmo</Filter>
     </ClCompile>
-    <ClCompile Include="PropertyWindow.cpp">
-      <Filter>Source Files\Windows</Filter>
-    </ClCompile>
     <ClCompile Include="HierachyWindow.cpp">
       <Filter>Source Files\Windows</Filter>
     </ClCompile>
@@ -81,13 +78,10 @@
     <ClCompile Include="StringSelect.cpp">
       <Filter>Source Files\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="ToolWindow.cpp">
-      <Filter>Source Files\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="Viewport.cpp">
-      <Filter>Source Files\Windows</Filter>
-    </ClCompile>
     <ClCompile Include="FbxReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UIPropertyManipulator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,22 +137,19 @@
     <ClInclude Include="HierachyWindow.hpp">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="PropertyWindow.hpp">
-      <Filter>Header Files\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="ResourceSelect.hpp">
-      <Filter>Header Files\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="ToolWindow.hpp">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
     <ClInclude Include="StringSelect.hpp">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="Viewport.hpp">
-      <Filter>Header Files\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="Editor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UIPropertyManipulator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Viewport.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

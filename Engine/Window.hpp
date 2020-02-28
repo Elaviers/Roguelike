@@ -36,6 +36,8 @@ public:
 	void Hide();
 	void SwapBuffers();
 
+	void Focus();
+
 	void SetTitle(const char *title) { ::SetWindowTextA(_hwnd, title); }
 	void SetSizeAndPos(uint16 x, uint16 y, uint16 width, uint16 height)	{ WindowFunctions::SetHWNDSizeAndPos(_hwnd, x, y, width, height); }
 	void SetSize(uint16 width, uint16 height)							{ WindowFunctions::ResizeHWND(_hwnd, width, height); }

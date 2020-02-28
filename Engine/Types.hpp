@@ -11,4 +11,4 @@ typedef uint16_t uint16;
 typedef uint32_t uint32;
 typedef uint64_t uint64;
 
-enum class Direction {RIGHT, UP, FORWARD};
+enum class EDirection {RIGHT, UP, FORWARD};

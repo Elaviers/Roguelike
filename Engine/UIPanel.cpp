@@ -16,12 +16,12 @@ void UIPanel::Render() const
 	if (!_material)
 		return;
 
-	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
+	_colour.ApplyToShader();
 
 	if (dynamic_cast<const MaterialGrid*>(_material.Ptr()))
 	{
 		RenderParam param;
-		param.type = RenderParam::Type::GRID_PARAM;
+		param.type = RenderParam::EType::GRID_PARAM;
 
 		param.gridData.row = param.gridData.column = 0;
 		_material->Apply(&param);
@@ -69,20 +69,22 @@ void UIPanel::Render() const
 		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
 		Engine::Instance().pModelManager->Plane()->Render();
 	}
+
+	GLProgram::Current().SetBool(DefaultUniformVars::boolBlend, false);
 }
 
-void UIPanel::OnBoundsChanged()
+void UIPanel::_OnBoundsChanged()
 {
 	float halfBordersize = (float)_borderSize / 2.f;
-	float x0 = _x + halfBordersize;
-	float y0 = _y + halfBordersize;
-	float centreX = _x + _w / 2.f;
-	float centreY = _y + _h / 2.f;
-	float x2 = _x + _w - halfBordersize;
-	float y2 = _y + _h - halfBordersize;
+	float x0 = _absoluteBounds.x + halfBordersize;
+	float y0 = _absoluteBounds.y + halfBordersize;
+	float centreX = _absoluteBounds.x + _absoluteBounds.w / 2.f;
+	float centreY = _absoluteBounds.y + _absoluteBounds.h / 2.f;
+	float x2 = _absoluteBounds.x + _absoluteBounds.w - halfBordersize;
+	float y2 = _absoluteBounds.y + _absoluteBounds.h - halfBordersize;
 
-	float centreW = _w;
-	float centreH = _h;
+	float centreW = _absoluteBounds.w;
+	float centreH = _absoluteBounds.h;
 	if (_borderSize > 0.f)
 	{
 		centreW -= _borderSize * 2.f;

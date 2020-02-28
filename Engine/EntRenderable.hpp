@@ -18,10 +18,10 @@ protected:
 	virtual void _OnModelChanged() {}
 
 public:
-	Entity_FUNCS(EntRenderable, EntityID::RENDERABLE)
+	Entity_FUNCS(EntRenderable, EEntityID::RENDERABLE)
 	
 	EntRenderable() : 
-		Entity(Flags::SAVEABLE), 
+		Entity(EFlags::SAVEABLE), 
 		_model(nullptr), 
 		_material(nullptr), 
 		_colour(1.f, 1.f, 1.f),
@@ -54,7 +54,7 @@ public:
 
 	bool MaterialIsDefault() const { return _materialIsDefault; }
 
-	virtual void Render(RenderChannels) const override;
+	virtual void Render(ERenderChannels) const override;
 
 	virtual const PropertyCollection& GetProperties() override;
 

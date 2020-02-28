@@ -27,7 +27,7 @@ const PropertyCollection& EntRenderable::GetProperties()
 	return cvars;
 }
 
-void EntRenderable::Render(RenderChannels channels) const
+void EntRenderable::Render(ERenderChannels channels) const
 {
 	if (_model)
 	{

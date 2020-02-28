@@ -5,7 +5,7 @@
 #include <Engine/ModelManager.hpp>
 #include "GameInstance.h"
 
-Collider EntPlayer::_COLLIDER = Collider(CollisionChannels::PLAYER, CollisionCapsule(1.f, .5f));
+Collider EntPlayer::_COLLIDER = Collider(ECollisionChannels::PLAYER, CollisionCapsule(1.f, .5f));
 
 EntPlayer::EntPlayer()
 {
@@ -22,33 +22,12 @@ EntPlayer::EntPlayer()
 	
 	GameInstance::Instance().SetActiveCamera(&_camera);
 
-	Engine::Instance().pInputManager->BindKey(Keycode::SPACE, Callback(this, &EntPlayer::_Jump));
+	Engine::Instance().pInputManager->BindKey(EKeycode::SPACE, Callback(this, &EntPlayer::_Jump));
 }
 
 void EntPlayer::_Jump()
 {
 	_velocity[1] += 5.f;
-}
-
-bool EntPlayer::_TryMovement(const Transform& wt, const Vector3& movement, float testYOffset)
-{
-	Vector3 invMovement(-1.f * movement);
-
-	Transform t = wt;
-	//t.Move(Vector3(0, testYOffset, 0));
-
-	Buffer<Entity*> ents = Engine::Instance().pWorld->FindChildrenOfType<Entity>();
-	for (size_t i = 0; i < ents.GetSize(); ++i)
-		if (ents[i]->GetUID() != GetUID() && !ents[i]->IsChildOf(this) && ents[i]->OverlapsCollider(_COLLIDER, t, invMovement))
-		{
-			if (testYOffset)
-				Debug::PrintLine(CSTR(ents[i]->GetUID()));
-
-			return false;
-		}
-
-	SetWorldPosition(wt.GetPosition() + movement);
-	return true;
 }
 
 void EntPlayer::Update(float deltaTime)
@@ -59,7 +38,7 @@ void EntPlayer::Update(float deltaTime)
 
 	GameInstance& game = GameInstance::Instance();
 
-	_cameraPivot.AddRelativeRotation(Vector3(100.f * deltaTime * game.GetAxisLookUp(), 100.f * deltaTime * game.GetAxisLookRight(), 0));
+	_cameraPivot.AddRelativeRotation(Vector3(.1f * game.GetAxisLookUp(), .1f * game.GetAxisLookRight(), 0));
 
 	Transform worldTransform = GetWorldTransform();
 	Transform cameraT = _camera.GetWorldTransform();
@@ -88,7 +67,9 @@ void EntPlayer::Update(float deltaTime)
 	Vector3 penetration;
 	Buffer<Entity*> ents = Engine::Instance().pWorld->FindChildrenOfType<Entity>();
 	for (size_t i = 0; i < ents.GetSize(); ++i)
-		if (ents[i]->GetUID() != GetUID() && !ents[i]->IsChildOf(this) && ents[i]->OverlapsCollider(_COLLIDER, desiredTransform, Vector3(), &penetration))
+		if (ents[i]->GetUID() != GetUID() && 
+			!ents[i]->IsChildOf(this) && 
+			ents[i]->OverlapsCollider(_COLLIDER, desiredTransform, Vector3(), &penetration) == EOverlapResult::OVERLAPPING)
 		{
 			Pair<Vector3> contacts = ents[i]->GetShallowContactPointsWithCollider(.1f, _COLLIDER, desiredTransform, .1f);
 			Debug::PrintLine(CSTR(contacts.first, "\t", contacts.second));

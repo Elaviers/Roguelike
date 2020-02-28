@@ -1,11 +1,12 @@
 #pragma once
 #include "Bounds.hpp"
 #include "BufferIterator.hpp"
+#include "Collider.hpp"
 #include "Event.hpp"
 #include "Map.hpp"
 #include "NumberedSet.hpp"
-#include "EntityID.hpp"
-#include "RenderChannels.hpp"
+#include "EEntityID.hpp"
+#include "ERenderChannels.hpp"
 #include "PropertyCollection.hpp"
 #include "Transform.hpp"
 #include <cstdlib>
@@ -29,7 +30,7 @@ struct RaycastResult;
 class Entity
 {
 public:
-	enum class Flags : byte
+	enum class EFlags : byte
 	{
 		NONE = 0,
 		SAVEABLE = 0x1,
@@ -57,7 +58,7 @@ protected:
 
 	const uint32 _uid;
 
-	Flags _flags;
+	EFlags _flags;
 	const bool _dynamic;
 
 	Entity *_parent;
@@ -76,9 +77,9 @@ public:
 	Event<> onChildChanged;
 	Event<> onTransformChanged;
 
-	Entity_FUNCS(Entity, EntityID::Entity)
+	Entity_FUNCS(Entity, EEntityID::Entity)
 
-	Entity(Flags flags = Flags::NONE, const String &name = String()) : 
+	Entity(EFlags flags = EFlags::NONE, const String &name = String()) : 
 		_name(name), 
 		_uid(_TakeNextUID()), 
 		_flags(flags), 
@@ -241,14 +242,14 @@ public:
 	const String& GetName() const { return _name; }
 	void SetName(const String& name) { _name = name; onNameChanged(); if (_parent) _parent->_OnChildChanged(); }
 
-	Flags GetFlags() const { return _flags; }
-	void SetFlags(Flags flags) { _flags = flags; }
+	EFlags GetFlags() const { return _flags; }
+	void SetFlags(EFlags flags) { _flags = flags; }
 
 	virtual void Update(float deltaTime) {}
-	virtual void Render(RenderChannels) const {}
+	virtual void Render(ERenderChannels) const {}
 
 	void UpdateAll(float deltaTime);
-	void RenderAll(const EntCamera &camera, RenderChannels) const;
+	void RenderAll(const EntCamera &camera, ERenderChannels) const;
 
 	virtual const PropertyCollection& GetProperties();
 
@@ -263,40 +264,42 @@ public:
 	virtual const Collider* GetCollider() const { return nullptr; }
 
 	//Sweeps this object along the movement vector
-	virtual bool OverlapsCollider(const Collider& other, const Transform& otherTransform, const Vector3& sweep = Vector3(), Vector3* out_Penetration = nullptr) const;
-	virtual float MinimumDistanceToCollider(const Collider& other, const Transform& otherTransform, Vector3& out_PointA, Vector3& out_PointB, const Vector3& sweep = Vector3()) const;
-	virtual Pair<Vector3> GetShallowContactPointsWithCollider(float shrink, const Collider& other, const Transform& otherTransform, float otherShrink) const;
-	virtual bool OverlapsRay(const Ray&, RaycastResult& out_Result) const;
-
-	Buffer<RaycastResult> Raycast(const Ray&);
-	Buffer<Entity*> FindOverlappingChildren(const Collider& other, const Transform& otherTransform = Transform());
-
-	bool Overlaps(const Entity& other, const Vector3& sweep = Vector3(), Vector3* out_Penetration = nullptr) const 
+	EOverlapResult OverlapsCollider(const Collider& other, const Transform& otherTransform, const Vector3& sweep = Vector3(), Vector3* out_Penetration = nullptr) const;
+	EOverlapResult Overlaps(const Entity& other, const Vector3& sweep = Vector3(), Vector3* out_Penetration = nullptr) const
 	{
 		const Collider* collider = other.GetCollider();
-		if (collider)
-			return OverlapsCollider(*collider, other.GetWorldTransform(), sweep, out_Penetration);
-
-		return false;
+		if (collider) return OverlapsCollider(*collider, other.GetWorldTransform(), sweep, out_Penetration);
+		return EOverlapResult::SEPERATE;
 	}
 
+	EOverlapResult AnyPartOverlapsCollider(const Collider& other, const Transform& otherTransform, const Vector3& sweep = Vector3(), Vector3* out_Penetration = nullptr) const;
+	EOverlapResult AnyPartOverlaps(const Entity& other, const Vector3& sweep = Vector3(), Vector3* out_Penetration = nullptr) const
+	{
+		const Collider* collider = other.GetCollider();
+		if (collider) return AnyPartOverlapsCollider(*collider, other.GetWorldTransform(), sweep, out_Penetration);
+		return EOverlapResult::SEPERATE;
+	}
+
+	float MinimumDistanceToCollider(const Collider& other, const Transform& otherTransform, Vector3& out_PointA, Vector3& out_PointB, const Vector3& sweep = Vector3()) const;
 	float MinimumDistanceTo(const Entity& other, Vector3& out_PointA, Vector3& out_PointB, const Vector3& sweep = Vector3()) const
 	{
 		const Collider* collider = other.GetCollider();
-		if (collider)
-			return MinimumDistanceToCollider(*collider, other.GetWorldTransform(), out_PointA, out_PointB, sweep);
-
+		if (collider) return MinimumDistanceToCollider(*collider, other.GetWorldTransform(), out_PointA, out_PointB, sweep);
 		return -1.f;;
 	}
 
+	Pair<Vector3> GetShallowContactPointsWithCollider(float shrink, const Collider& other, const Transform& otherTransform, float otherShrink) const;
 	Pair<Vector3> GetShallowContactPoints(float shrink, const Entity& other, float otherShrink) const
 	{
 		const Collider* collider = other.GetCollider();
-		if (collider)
-			return GetShallowContactPointsWithCollider(shrink, *collider, other.GetWorldTransform(), otherShrink);
-
+		if (collider) return GetShallowContactPointsWithCollider(shrink, *collider, other.GetWorldTransform(), otherShrink);
 		return Pair<Vector3>();
 	}
+
+	bool OverlapsRay(const Ray&, RaycastResult& out_Result) const;
+
+	Buffer<RaycastResult> Raycast(const Ray&);
+	Buffer<Entity*> FindOverlappingChildren(const Collider& other, const Transform& otherTransform = Transform());
 
 	//Operators
 	Entity& operator=(const Entity&) = delete;
@@ -310,7 +313,7 @@ public:
 	Bounds GetWorldBounds(bool noTranslation = false) const;
 
 	template<typename T>
-	bool IsType() { return dynamic_cast<T*>(this) != nullptr; }
+	bool IsType() const { return dynamic_cast<const T*>(this) != nullptr; }
 
 	//Commands
 	void CMD_List(const Buffer<String>& args);
@@ -323,10 +326,10 @@ protected:
 		Entity *go = new T(other);
 		const_cast<bool&>(go->_dynamic) = true;
 		go->SetParent(other._parent);
-		const_cast<Flags&>(go->_flags) = other._flags;
+		const_cast<EFlags&>(go->_flags) = other._flags;
 		return dynamic_cast<T*>(go);
 	}
 };
 
 #include "MacroUtilities.hpp"
-DEFINE_BITMASK_FUNCS(Entity::Flags, byte)
+DEFINE_BITMASK_FUNCS(Entity::EFlags, byte)

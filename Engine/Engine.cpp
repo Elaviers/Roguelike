@@ -27,7 +27,7 @@ Engine::~Engine()
 
 #define CREATE(CONDITION, PTR) (CONDITION) ? (PTR) : nullptr 
 
-void Engine::Init(EngineCreateFlags flags, Entity *world)
+void Engine::Init(EEngineCreateFlags flags, Entity *world)
 {
 	pWorld = world;
 
@@ -36,16 +36,16 @@ void Engine::Init(EngineCreateFlags flags, Entity *world)
 	
 	registry.RegisterEngineObjects();
 
-	pConsole =			CREATE(flags & EngineCreateFlags::CONSOLE,		new Console());
-	pAnimationManager = CREATE(flags & EngineCreateFlags::ANIMATIONMGR,	new AnimationManager());
-	pAudioManager =		CREATE(flags & EngineCreateFlags::AUDIOMGR,		new AudioManager());
-	pDebugManager =		CREATE(flags & EngineCreateFlags::DEBUGMGR,		new DebugManager());
-	pFontManager =		CREATE(flags & EngineCreateFlags::FONTMGR,		new FontManager());
-	pInputManager =		CREATE(flags & EngineCreateFlags::INPUTMGR,		new InputManager());
-	pMaterialManager =	CREATE(flags & EngineCreateFlags::MATERIALMGR,	new MaterialManager());
-	pModelManager =		CREATE(flags & EngineCreateFlags::MODELMGR,		new ModelManager());
-	pTextureManager =	CREATE(flags & EngineCreateFlags::TEXTUREMGR,	new TextureManager());
-	pObjectTracker =	CREATE(flags & EngineCreateFlags::OBJTRACKER,	new Tracker<Entity>());
+	pConsole =			CREATE(flags & EEngineCreateFlags::CONSOLE,		new Console());
+	pAnimationManager = CREATE(flags & EEngineCreateFlags::ANIMATIONMGR,	new AnimationManager());
+	pAudioManager =		CREATE(flags & EEngineCreateFlags::AUDIOMGR,		new AudioManager());
+	pDebugManager =		CREATE(flags & EEngineCreateFlags::DEBUGMGR,		new DebugManager());
+	pFontManager =		CREATE(flags & EEngineCreateFlags::FONTMGR,		new FontManager());
+	pInputManager =		CREATE(flags & EEngineCreateFlags::INPUTMGR,		new InputManager());
+	pMaterialManager =	CREATE(flags & EEngineCreateFlags::MATERIALMGR,	new MaterialManager());
+	pModelManager =		CREATE(flags & EEngineCreateFlags::MODELMGR,		new ModelManager());
+	pTextureManager =	CREATE(flags & EEngineCreateFlags::TEXTUREMGR,	new TextureManager());
+	pObjectTracker =	CREATE(flags & EEngineCreateFlags::OBJTRACKER,	new Tracker<Entity>());
 
 	if (pConsole)
 	{

@@ -2,13 +2,35 @@
 
 void UIButton::OnMouseMove(float mouseX, float mouseY)
 {
-	_active = mouseX >= _x && mouseX <= (_x + _w) && mouseY >= _y && mouseY <= (_y + _h);
+	_hover = OverlapsPoint(mouseX, mouseY);
 
-	_panel.SetColour(_active ? _colourActive : _colourInactive);
+	if (!_hover && _hold)
+	{
+		_hold = false;
+	}
+
+	if (!_hold)
+	{
+		_panel.SetColour(_hover ? _colourHover : _colour);
+	}
 }
 
-void UIButton::OnClick()
+void UIButton::OnMouseUp()
 {
-	if (_active)
-		_callback(*this);
+	if (_hold)
+	{
+		_hold = false;
+		onPressed(*this);
+
+		_panel.SetColour(_colourHover);
+	}
+}
+
+void UIButton::OnMouseDown()
+{
+	if (_hover)
+	{
+		_hold = true;
+		_panel.SetColour(_colourHold);
+	}
 }

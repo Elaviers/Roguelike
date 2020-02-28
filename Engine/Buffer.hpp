@@ -134,6 +134,13 @@ public:
 		return *new (_elements + _size - 1) T(std::move(item));
 	}
 
+	template <typename... Args>
+	T& Emplace(Args... args)
+	{
+		SetSize(_size + 1);
+		return *new (_elements + _size - 1) T(args...);
+	}
+
 	void Clear() { SetSize(0); }
 
 	void Append(size_t elements) { SetSize(_size + elements); }
@@ -260,7 +267,7 @@ public:
 		return true;
 	}
 
-	int IndexOf(const T& item)
+	int IndexOf(const T& item) const
 	{
 		for (size_t i = 0; i < _size; ++i)
 			if (_elements[i] == item)

@@ -21,6 +21,10 @@ namespace DefaultUniformVars
 	constexpr const char *intTextureSpecular = "T_Specular";
 	constexpr const char *intTextureReflection = "T_Reflection";
 
+	constexpr const char *boolBlend = "Blend";
+	constexpr const char *vec4BlendFrom = "BlendFrom";
+	constexpr const char *vec4BlendTo = "BlendTo";
+
 	constexpr const char *intCubemap = "Cubemap";
 
 	constexpr const char *boolIsFont = "IsFont";

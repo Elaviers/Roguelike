@@ -52,10 +52,11 @@ public:
 
 	void MouseInput(short x, short y);
 	void MouseMove(uint16 x, uint16 y);
+	void MouseUp();
 	void MouseDown();
 
-	void KeyDown(Keycode key);
-	void KeyUp(Keycode key);
+	void KeyDown(EKeycode key);
+	void KeyUp(EKeycode key);
 	void InputChar(char character);
 
 	void ButtonQuit();

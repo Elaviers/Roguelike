@@ -1,6 +1,7 @@
 #include "ToolConnector.hpp"
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
+#include "UIPropertyManipulator.hpp"
 #include <Engine/MacroUtilities.hpp>
 
 const PropertyCollection& ToolConnector::_GetProperties()
@@ -12,7 +13,7 @@ const PropertyCollection& ToolConnector::_GetProperties()
 		"Direction",
 		MemberGetter<ToolConnector, String>(&ToolConnector::GetConnectorDirection),
 		MemberSetter<ToolConnector, String>(&ToolConnector::SetConnectorDirection),
-		PropertyFlags::DIRECTION)
+		0, PropertyFlags::DIRECTION)
 	);
 
 	return properties;
@@ -22,11 +23,11 @@ String ToolConnector::GetConnectorDirection() const
 {
 	switch (_connector.direction)
 	{
-	case Direction2D::NORTH:
+	case EDirection2D::NORTH:
 		return "north";
-	case Direction2D::EAST:
+	case EDirection2D::EAST:
 		return "east";
-	case Direction2D::WEST:
+	case EDirection2D::SOUTH:
 		return "south";
 	default:
 		return "west";
@@ -36,13 +37,13 @@ String ToolConnector::GetConnectorDirection() const
 void ToolConnector::SetConnectorDirection(const String &dir)
 {
 	if (dir == "north")
-		_connector.direction = Direction2D::NORTH;
+		_connector.direction = EDirection2D::NORTH;
 	else if (dir == "east")
-		_connector.direction = Direction2D::EAST;
+		_connector.direction = EDirection2D::EAST;
 	else if (dir == "south")
-		_connector.direction = Direction2D::SOUTH;
+		_connector.direction = EDirection2D::SOUTH;
 	else
-		_connector.direction = Direction2D::WEST;
+		_connector.direction = EDirection2D::WEST;
 }
 
 void ToolConnector::Initialise()
@@ -50,9 +51,9 @@ void ToolConnector::Initialise()
 	_connector.SetRenderColour(Colour(0.f, 1.f, 0.f, .5f));
 }
 
-void ToolConnector::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
+void ToolConnector::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
-	toolProperties.SetCvars(_GetProperties(), this);
+	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
 }
 
 void ToolConnector::Cancel()
@@ -62,7 +63,7 @@ void ToolConnector::Cancel()
 
 void ToolConnector::MouseMove(const MouseData &mouseData)
 {
-	if (_owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
+	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC)
 	{
 		if (mouseData.isLeftDown)
 		{
@@ -100,7 +101,7 @@ void ToolConnector::MouseMove(const MouseData &mouseData)
 
 void ToolConnector::MouseDown(const MouseData &mouseData)
 {
-	if (_owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::ORTHOGRAPHIC) _placing = true;
+	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
 }
 
 void ToolConnector::KeySubmit()
@@ -115,7 +116,7 @@ void ToolConnector::KeySubmit()
 	_connector.SetMax(Vector3());
 }
 
-void ToolConnector::Render(RenderChannels channels) const
+void ToolConnector::Render(ERenderChannels channels) const
 {
 	glLineWidth(3);
 	_connector.Render(channels);

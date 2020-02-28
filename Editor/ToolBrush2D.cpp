@@ -1,6 +1,7 @@
 #include "ToolBrush2D.hpp"
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
+#include "UIPropertyManipulator.hpp"
 #include <Engine/MacroUtilities.hpp>
 
 const PropertyCollection& ToolBrush2D::_GetProperties()
@@ -10,8 +11,8 @@ const PropertyCollection& ToolBrush2D::_GetProperties()
 	DO_ONCE_BEGIN;
 	properties.Add(
 		"Material",
-		MemberGetter<EntBrush<2>, String>(&EntBrush<2>::GetMaterialName),
-		MemberSetter<EntBrush<2>, String>(&EntBrush<2>::SetMaterial),
+		MemberGetter<EntBrush2D, String>(&EntBrush2D::GetMaterialName),
+		MemberSetter<EntBrush2D, String>(&EntBrush2D::SetMaterial),
 		offsetof(ToolBrush2D, _object),
 		PropertyFlags::MATERIAL);
 
@@ -29,10 +30,10 @@ void ToolBrush2D::Initialise()
 	_object.SetMaterial("bricks");
 }
 
-void ToolBrush2D::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
+void ToolBrush2D::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
-	properties.SetObject(&_object, true);
-	toolProperties.SetCvars(_GetProperties(), this);
+	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _object.GetProperties(), &_object, properties);
+	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
 }
 
 void ToolBrush2D::Cancel()
@@ -51,11 +52,13 @@ void ToolBrush2D::MouseMove(const MouseData &mouseData)
 
 			_object.SetPoint1(p1);
 			_object.SetPoint2(p2);
+			_owner.RefreshProperties();
 		}
 		else
 		{
 			_object.SetPoint1(Vector2((float)mouseData.unitX_rounded, (float)mouseData.unitY_rounded));
 			_object.SetPoint2(Vector2((float)(mouseData.unitX_rounded + 1), (float)(mouseData.unitY_rounded + 1)));
+			_owner.RefreshProperties();
 		}
 	}
 }
@@ -76,7 +79,7 @@ void ToolBrush2D::MouseUp(const MouseData &mouseData)
 	}
 }
 
-void ToolBrush2D::Render(RenderChannels channels) const
+void ToolBrush2D::Render(ERenderChannels channels) const
 {
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(.8f, .8f, .8f, .5f));
 	_object.Render(channels);

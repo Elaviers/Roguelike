@@ -4,7 +4,7 @@
 class _DummyProperty : public Property
 {
 public:
-	_DummyProperty(const String& name, PropertyType type, byte flags = 0) : Property(name, type, flags) {}
+	_DummyProperty(const String& name, EPropertyType type, byte flags = 0) : Property(name, type, flags) {}
 	virtual ~_DummyProperty() {}
 };
 
@@ -20,7 +20,7 @@ public:
 	virtual ~RigidProperty() {}
 
 	byte GetFlags() const { return _baseProperty.GetFlags(); }
-	PropertyType GetType() const { return _baseProperty.GetType(); }
+	EPropertyType GetType() const { return _baseProperty.GetType(); }
 	const String& GetName() const { return _baseProperty.GetName(); }
 	const String& GetDescription() const { return _baseProperty.GetDescription(); }
 

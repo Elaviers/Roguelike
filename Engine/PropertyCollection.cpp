@@ -10,7 +10,7 @@ String PropertyCollection::HandleCommand(void* obj, const Buffer<String>& tokens
 
 		if (property)
 		{
-			if (property->GetType() == PropertyType::FUNCTION)
+			if (property->GetType() == EPropertyType::FUNCTION)
 			{
 				Buffer<String> newTokens(&tokens[1], tokens.GetSize() - 1);
 				

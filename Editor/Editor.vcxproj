@@ -195,7 +195,6 @@ EXIT 0</Command>
     <ClCompile Include="GizmoPlane.cpp" />
     <ClCompile Include="GizmoRing.cpp" />
     <ClCompile Include="HierachyWindow.cpp" />
-    <ClCompile Include="PropertyWindow.cpp" />
     <ClCompile Include="ResourceSelect.cpp" />
     <ClCompile Include="StringSelect.cpp" />
     <ClCompile Include="ToolBrush2D.cpp" />
@@ -203,8 +202,7 @@ EXIT 0</Command>
     <ClCompile Include="ToolConnector.cpp" />
     <ClCompile Include="ToolEntity.cpp" />
     <ClCompile Include="ToolSelect.cpp" />
-    <ClCompile Include="ToolWindow.cpp" />
-    <ClCompile Include="Viewport.cpp" />
+    <ClCompile Include="UIPropertyManipulator.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -219,7 +217,7 @@ EXIT 0</Command>
     <ClInclude Include="GizmoRing.hpp" />
     <ClInclude Include="HierachyWindow.hpp" />
     <ClInclude Include="MouseData.hpp" />
-    <ClInclude Include="PropertyWindow.hpp" />
+    <ClInclude Include="Viewport.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceSelect.hpp" />
     <ClInclude Include="StringSelect.hpp" />
@@ -229,8 +227,7 @@ EXIT 0</Command>
     <ClInclude Include="ToolConnector.hpp" />
     <ClInclude Include="ToolEntity.hpp" />
     <ClInclude Include="ToolSelect.hpp" />
-    <ClInclude Include="ToolWindow.hpp" />
-    <ClInclude Include="Viewport.hpp" />
+    <ClInclude Include="UIPropertyManipulator.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

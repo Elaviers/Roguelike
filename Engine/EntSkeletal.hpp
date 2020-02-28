@@ -14,13 +14,13 @@ class EntSkeletal : public EntRenderable
 	virtual void _OnModelChanged() override;
 
 public:
-	Entity_FUNCS(EntSkeletal, EntityID::SKELETAL);
+	Entity_FUNCS(EntSkeletal, EEntityID::SKELETAL);
 
 	EntSkeletal() : _currentTime(0.f) {}
 	virtual ~EntSkeletal() {}
 
 	virtual void Update(float deltaTime) override;
-	virtual void Render(RenderChannels) const override;
+	virtual void Render(ERenderChannels) const override;
 
 	virtual PropertyCollection& GetProperties() override;
 

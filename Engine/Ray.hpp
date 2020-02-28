@@ -7,8 +7,8 @@ struct Ray
 	Vector3 origin;
 	Vector3 direction;
 
-	CollisionChannels channels;
+	ECollisionChannels channels;
 
-	Ray() : channels(CollisionChannels::ALL) {}
-	Ray(Vector3 origin, Vector3 direction, CollisionChannels channels) : origin(origin), direction(direction), channels(channels) {}
+	Ray() : channels(ECollisionChannels::ALL) {}
+	Ray(Vector3 origin, Vector3 direction, ECollisionChannels channels) : origin(origin), direction(direction), channels(channels) {}
 };

@@ -1,16 +1,16 @@
-#include "Direction2D.hpp"
+#include "EDirection2D.hpp"
 
 namespace Direction2DFuncs
 {
-	int GetAngleOf(Direction2D dir)
+	int GetAngleOf(EDirection2D dir)
 	{
 		switch (dir)
 		{
-		case Direction2D::NORTH:
+		case EDirection2D::NORTH:
 			return 90;
-		case Direction2D::SOUTH:
+		case EDirection2D::SOUTH:
 			return -90;
-		case Direction2D::WEST:
+		case EDirection2D::WEST:
 			return 180;
 		default:
 			return 0;

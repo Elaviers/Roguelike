@@ -4,7 +4,7 @@
 #include "Types.hpp"
 #include "Vector.hpp"
 
-enum class PropertyType
+enum class EPropertyType
 {
 	FUNCTION,
 
@@ -16,6 +16,7 @@ enum class PropertyType
 
 	VECTOR2,
 	VECTOR3,
+	VECTOR4,
 	STRING,
 
 	NONE = 0
@@ -23,7 +24,7 @@ enum class PropertyType
 
 namespace PropertyFlags
 {
-	enum Enum
+	enum ELevelMessage
 	{
 		READONLY = 0x01,
 		MODEL = 0x02,
@@ -33,37 +34,38 @@ namespace PropertyFlags
 	};
 }
 
-template <typename T> inline PropertyType TypenameToEnum() { return PropertyType::NONE; }
-template<> inline PropertyType TypenameToEnum<CommandPtr>() { return PropertyType::FUNCTION; }
-template<> inline PropertyType TypenameToEnum<bool>() { return PropertyType::BOOL; }
-template<> inline PropertyType TypenameToEnum<float>() { return PropertyType::FLOAT; }
-template<> inline PropertyType TypenameToEnum<byte>() { return PropertyType::BYTE; }
-template<> inline PropertyType TypenameToEnum<uint16>() { return PropertyType::UINT16; }
-template<> inline PropertyType TypenameToEnum<uint32>() { return PropertyType::UINT32; }
-template<> inline PropertyType TypenameToEnum<uint64>() { return PropertyType::UINT64; }
-template<> inline PropertyType TypenameToEnum<int16>() { return PropertyType::INT16; }
-template<> inline PropertyType TypenameToEnum<int32>() { return PropertyType::INT32; }
-template<> inline PropertyType TypenameToEnum<int64>() { return PropertyType::INT64; }
-template<> inline PropertyType TypenameToEnum<Vector2>() { return PropertyType::VECTOR2; }
-template<> inline PropertyType TypenameToEnum<Vector3>() { return PropertyType::VECTOR3; }
-template<> inline PropertyType TypenameToEnum<String>() { return PropertyType::STRING; }
+template <typename T> inline EPropertyType TypenameToEnum() { return EPropertyType::NONE; }
+template<> inline EPropertyType TypenameToEnum<CommandPtr>() { return EPropertyType::FUNCTION; }
+template<> inline EPropertyType TypenameToEnum<bool>() { return EPropertyType::BOOL; }
+template<> inline EPropertyType TypenameToEnum<float>() { return EPropertyType::FLOAT; }
+template<> inline EPropertyType TypenameToEnum<byte>() { return EPropertyType::BYTE; }
+template<> inline EPropertyType TypenameToEnum<uint16>() { return EPropertyType::UINT16; }
+template<> inline EPropertyType TypenameToEnum<uint32>() { return EPropertyType::UINT32; }
+template<> inline EPropertyType TypenameToEnum<uint64>() { return EPropertyType::UINT64; }
+template<> inline EPropertyType TypenameToEnum<int16>() { return EPropertyType::INT16; }
+template<> inline EPropertyType TypenameToEnum<int32>() { return EPropertyType::INT32; }
+template<> inline EPropertyType TypenameToEnum<int64>() { return EPropertyType::INT64; }
+template<> inline EPropertyType TypenameToEnum<Vector2>() { return EPropertyType::VECTOR2; }
+template<> inline EPropertyType TypenameToEnum<Vector3>() { return EPropertyType::VECTOR3; }
+template<> inline EPropertyType TypenameToEnum<Vector4>() { return EPropertyType::VECTOR4; }
+template<> inline EPropertyType TypenameToEnum<String>() { return EPropertyType::STRING; }
 
 class Property
 {
 	String _name;
 	String _description;
 	
-	PropertyType _type;
+	EPropertyType _type;
 	byte _flags;
 
 protected:
-	Property(const String& name, PropertyType type, byte flags) : _name(name), _type(type), _flags(flags) {}
+	Property(const String& name, EPropertyType type, byte flags) : _name(name), _type(type), _flags(flags) {}
 
 public:
 	virtual ~Property() {}
 
 	byte GetFlags() const { return _flags; }
-	PropertyType GetType() const { return _type; }
+	EPropertyType GetType() const { return _type; }
 	const String& GetName() const { return _name; }
 	const String& GetDescription() const { return _description; }
 
@@ -81,7 +83,7 @@ public:
 class FunctionPropertyBase : public Property
 {
 protected:
-	FunctionPropertyBase(const String& name) : Property(name, PropertyType::FUNCTION, 0) {}
+	FunctionPropertyBase(const String& name) : Property(name, EPropertyType::FUNCTION, 0) {}
 public:
 	virtual ~FunctionPropertyBase() {}
 	

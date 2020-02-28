@@ -1,20 +1,20 @@
 #pragma once
 #include "EntBox.hpp"
 #include "BufferIterator.hpp"
-#include "Direction2D.hpp"
+#include "EDirection2D.hpp"
 
 class EntConnector : public EntBox
 {
 public:
-	Entity_FUNCS(EntConnector, EntityID::LEVEL_CONNECTOR)
+	Entity_FUNCS(EntConnector, EEntityID::LEVEL_CONNECTOR)
 
-	Direction2D direction;
+	EDirection2D direction;
 	bool connected;
 
-	EntConnector() : EntBox(Flags::SAVEABLE), direction(Direction2D::NORTH), connected(false) { }
+	EntConnector() : EntBox(EFlags::SAVEABLE), direction(EDirection2D::NORTH), connected(false) { }
 	virtual ~EntConnector() {}
 
-	virtual void Render(RenderChannels) const;
+	virtual void Render(ERenderChannels) const;
 
 	virtual void WriteData(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;
 	virtual void ReadData(BufferReader<byte> &buffer, const NumberedSet<String> &strings) override;

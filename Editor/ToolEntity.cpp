@@ -1,5 +1,6 @@
 #include "ToolEntity.hpp"
 #include "Editor.hpp"
+#include "UIPropertyManipulator.hpp"
 #include <Engine/EntBrush.hpp>
 #include <Engine/EntRenderable.hpp>
 #include <Engine/MacroUtilities.hpp>
@@ -31,18 +32,17 @@ void ToolEntity::_SetClassID(const byte &id)
 
 	_placement = Engine::Instance().pObjectTracker->Track(Engine::Instance().registry.GetNode(_classID)->New());
 
-	_owner.PropertyWindowRef().SetObject(_placement.Ptr());
+	_owner.ChangePropertyEntity(_placement.Ptr());
 }
 
 void ToolEntity::Initialise()
 {
-	_classID = (byte)EntityID::RENDERABLE;
+	_classID = (byte)EEntityID::RENDERABLE;
 }
 
-void ToolEntity::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
+void ToolEntity::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
-	properties.Clear();
-	toolProperties.SetCvars(_GetProperties(), this);
+	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
 
 	//Creates the placement object
 	_SetClassID((byte)_classID);
@@ -60,12 +60,10 @@ void ToolEntity::Deactivate()
 
 void ToolEntity::MouseMove(const MouseData& mouseData)
 {
-	if (_placement && _owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::PERSPECTIVE)
+	if (mouseData.viewport >= 0 && _placement && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::PERSPECTIVE)
 	{
-		EntCamera& camera = _owner.CameraRef(mouseData.viewport);
-		RECT windowDims;
-		::GetClientRect(_owner.ViewportRef(mouseData.viewport).GetHwnd(), &windowDims);
-		Ray r = camera.ScreenCoordsToRay(Vector2((float)mouseData.x / (float)windowDims.right, (float)mouseData.y / (float)windowDims.bottom));
+		EntCamera& camera = _owner.GetVP(mouseData.viewport).camera;
+		Ray r = camera.ScreenCoordsToRay(Vector2((float)mouseData.x / camera.GetViewport()[1], (float)mouseData.y / camera.GetViewport()[0]));
 		Buffer<RaycastResult> results = _owner.LevelRef().Raycast(r);
 
 		if (results.GetSize() > 0)
@@ -74,6 +72,8 @@ void ToolEntity::MouseMove(const MouseData& mouseData)
 			pos[1] -= _placement->GetWorldBounds(true).min[1];
 			_placement->SetRelativePosition(pos);
 		
+			_owner.RefreshProperties();
+
 			_readyToPlace = true;
 			return;
 		}
@@ -89,12 +89,16 @@ void ToolEntity::MouseDown(const MouseData &mouseData)
 		Entity* newObj = Engine::Instance().registry.GetNode(_classID)->New();
 		newObj->SetParent(&_owner.LevelRef());
 
-		const PropertyCollection& cvars = newObj->GetProperties();
-		_owner.PropertyWindowRef().GetProperties()->Transfer(_placement.Ptr(), newObj);
+		Entity* from = (Entity*)(_owner.GetPropertyObject());
+		if (from)
+		{
+			const PropertyCollection& cvars = newObj->GetProperties();
+			cvars.Transfer(from, newObj);
+		}
 	}
 }
 
-void ToolEntity::Render(RenderChannels channels) const
+void ToolEntity::Render(ERenderChannels channels) const
 {
 	if (_placement && _readyToPlace)
 	{

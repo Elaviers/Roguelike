@@ -30,9 +30,6 @@
     <ClCompile Include="MenuMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LevelBag.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LevelGeneration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -56,13 +53,13 @@
     <ClInclude Include="LevelGeneration.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LevelBag.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EntPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomBag.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

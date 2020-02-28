@@ -1,56 +1,106 @@
 #include "LevelGeneration.hpp"
-#include "LevelBag.hpp"
+#include "RandomBag.hpp"
 #include <Engine/Entity.hpp>
+#include <Engine/EntityIterator.hpp>
 #include <Engine/LevelIO.hpp>
 #include <Engine/Random.hpp>
 #include <Engine/String.hpp>
 
-EntConnector* GetRandomConnector(const Buffer<Entity*> &objects, Random &random)
+inline RandomBag<const EntConnector*> GetConnectors(const Entity& root, Random &random)
 {
-	Buffer<uint32> indices;
+	RandomBag<const EntConnector*> result;
 
-	for (uint32 i = 0; i < objects.GetSize(); ++i)
-		if (objects[i]->IsType<EntConnector>())
-			indices.Add(i);
+	for (ConstEntityIterator it(&root); it.IsValid(); ++it)
+		if (it->IsType<EntConnector>())
+			result.Add(dynamic_cast<const EntConnector*>(&*it), 1.f);
 
-	if (indices.GetSize() == 0)
-		return nullptr;
-
-	return dynamic_cast<EntConnector*>(objects[indices[random.Next((uint32)indices.GetSize())]]);
+	return result;
 }
 
-Entity* CreateConnectedSegment(const EntConnector &connector, const LevelBag &bag, Random &random, int depth)
+Vector3 um(const Vector3& extent, const EDirection2D& dir)
 {
-	const Entity &level = bag.GetNextLevel(random);
-	const EntConnector *otherConnector = GetRandomConnector(level.Children(), random);
+	//return Vector3();
 
-	if (!otherConnector)
-		return nullptr;
-
-	int angle = Direction2DFuncs::GetAngleOf(otherConnector->direction) - Direction2DFuncs::GetAngleOf(connector.direction);
-
-	Vector3 levelMin, levelMax;
-
-	for (uint32 i = 0; i < level.Children().GetSize(); ++i)
+	switch (dir)
 	{
-		Bounds bounds = level.Children()[i]->GetWorldBounds();
-
-		if (bounds.min[0] < levelMin[0] || bounds.min[1] < levelMin[1] || bounds.min[2] < levelMin[2])
-			levelMin = bounds.min; 
-		if (bounds.max[0] > levelMax[0] || bounds.max[1] > levelMax[1] || bounds.max[2] > levelMax[2])
-			levelMax = bounds.max;
+	case EDirection2D::NORTH:
+		return Vector3(0.f, 0.f, extent[2]);
+		break;
+	case EDirection2D::EAST:
+		return Vector3(extent[0], 0.f, 0.f);
+		break;
+	case EDirection2D::SOUTH:
+		return Vector3(0.f, 0.f, -extent[2]);
+		break;
 	}
 
-	Vector3 centre = levelMax - levelMin;
-
-	Entity *newSegment = Entity::Create();
-	newSegment->SetRelativePosition(centre);
-	newSegment->CloneChildrenFrom(level);
-	return newSegment;
+	return Vector3(-extent[0], 0.f, 0.f);
 }
 
-void GenerateConnectedSegments(Entity &world, const Entity &src, const LevelBag &bag, Random &random, int depth)
+Entity* CreateConnectedSegment(Entity& world, const EntConnector &parentConnector, RandomBag<const Entity*>& bag, Random &random)
 {
+	Transform pcWt = parentConnector.GetWorldTransform();
+	Vector3 pcExtent = parentConnector.GetMax() - parentConnector.GetMin();
+	Vector3 pcCentre = ((parentConnector.GetMin() + parentConnector.GetMax() + um(pcExtent, parentConnector.direction)) / 2.f) * pcWt.GetTransformationMatrix();
+
+	while (bag.GetTotalWeight() > 0.f)
+	{
+		const Entity* level = bag.TakeNext(random);
+		RandomBag<const EntConnector*> connectors = GetConnectors(*level, random);
+
+		while (connectors.GetTotalWeight() > 0.f)
+		{
+			const EntConnector* connector = connectors.TakeNext(random);
+
+			Vector3 extent = connector->GetMax() - connector->GetMin();
+			if (extent == pcExtent || extent == Vector3(pcExtent[2], pcExtent[1], pcExtent[0]))
+			{
+				float angle = 180.f - Direction2DFuncs::GetAngleOf(connector->direction) - Direction2DFuncs::GetAngleOf(parentConnector.direction);
+				Transform levelWt = level->GetWorldTransform();
+				levelWt.AddRotation(Vector3(0.f, angle, 0.f));
+
+				Vector3 centre = 
+					((connector->GetMin() + connector->GetMax() + um(extent, connector->direction)) / 2.f) * 
+					(
+					connector->GetRelativeTransform().GetTransformationMatrix() * levelWt.GetTransformationMatrix());
+
+				levelWt.Move(centre - pcCentre);
+
+				bool cannotFit = false;
+				for (ConstEntityIterator it(level); it.IsValid(); ++it)
+				{
+					Transform t = it->GetRelativeTransform();
+
+					for (const Entity* e = it->GetParent(); e && e != level; e = e->GetParent())
+						t = e->GetRelativeTransform() * t;
+
+					t = levelWt * t;
+
+					if (it->GetCollider() && world.AnyPartOverlapsCollider(*it->GetCollider(), t) == EOverlapResult::OVERLAPPING)
+					{
+						cannotFit = true;
+						break;
+					}
+				}
+					
+				if (cannotFit) continue;
+				
+				Entity* newSegment = Entity::Create();
+				newSegment->SetParent(&world);
+				newSegment->SetWorldTransform(levelWt);
+				newSegment->CloneChildrenFrom(*level);
+				return newSegment;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+void GenerateConnectedSegments(Entity &world, const Entity &src, RandomBag<const Entity*> &bag, Random &random, unsigned int depth)
+{
+	if (depth <= 0) return;
+
 	for (uint32 i = 0; i < src.Children().GetSize(); ++i)
 	{
 		if (src.Children()[i]->IsType<EntConnector>())
@@ -58,9 +108,10 @@ void GenerateConnectedSegments(Entity &world, const Entity &src, const LevelBag 
 			const EntConnector *connector = reinterpret_cast<const EntConnector*>(src.Children()[i]);
 			if (!connector->connected)
 			{
-				Entity *newSeg = CreateConnectedSegment(*connector, bag, random, depth - 1);
-				if (newSeg)
-					newSeg->SetParent(&world);
+				RandomBag<const Entity*> bagClone = bag;
+				Entity* newSegment = CreateConnectedSegment(world, *connector, bagClone, random);
+				if (newSegment)
+					GenerateConnectedSegments(world, *newSegment, bag, random, depth - 1);
 			}
 		}
 	}
@@ -70,8 +121,8 @@ bool LevelGeneration::GenerateLevel(Entity& root, const String &string)
 {
 	Random random;
 
-	int depth = 10;
-	LevelBag bag;
+	unsigned int depth = 10;
+	RandomBag<const Entity*> bag;
 
 	Buffer<String> lines = string.Split("\r\n");
 	for (uint32 i = 0; i < lines.GetSize(); ++i)
@@ -91,7 +142,7 @@ bool LevelGeneration::GenerateLevel(Entity& root, const String &string)
 					{
 						Entity *level = Entity::Create();
 						if (LevelIO::Read(*level, CSTR(ROOT_DIR, tokens[1])))
-							bag.AddLevel(*level, 1);
+							bag.Add(level, 1);
 						else
 							level->Delete();
 					}
@@ -99,11 +150,11 @@ bool LevelGeneration::GenerateLevel(Entity& root, const String &string)
 		}
 	}
 
-	const Entity &lvl = bag.GetNextLevel(random);
+	const Entity *lvl = bag.GetNext(random);
 	Entity *seg1 = Entity::Create();
-	seg1->CloneChildrenFrom(lvl);
+	seg1->CloneChildrenFrom(*lvl);
 	
-	GenerateConnectedSegments(root, *seg1, bag, random, depth);
+	GenerateConnectedSegments(root, *seg1, bag, random, 3);
 
 	return true;
 }

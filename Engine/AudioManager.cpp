@@ -20,7 +20,7 @@ WaveSound* AudioManager::_CreateResource(const String& name, const String& data)
 {
 	String filename;
 	float volume = 1.f;
-	SoundCategory category = SoundCategory::GENERIC;
+	ESoundCategory category = ESoundCategory::GENERIC;
 
 	Buffer<String> lines = data.ToLower().Split("\r\n");
 
@@ -35,7 +35,7 @@ WaveSound* AudioManager::_CreateResource(const String& name, const String& data)
 		else if (tokens[0] == "category")
 		{
 			if (tokens[1] == "music")
-				category = SoundCategory::MUSIC;
+				category = ESoundCategory::MUSIC;
 		}
 	}
 

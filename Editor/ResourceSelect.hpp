@@ -7,7 +7,7 @@ class GLProgram;
 class MaterialManager;
 class ModelManager;
 
-enum class ResourceType
+enum class EResourceType
 {
 	MATERIAL, MODEL
 };
@@ -16,5 +16,5 @@ namespace ResourceSelect
 {
 	void Initialise();
 
-	String Dialog(MaterialManager&, ModelManager&, const char *searchDir, HWND parent, ResourceType type, const GLContext &context, GLProgram& programLit, const GLProgram& programUnlit);
+	String Dialog(MaterialManager&, ModelManager&, const char *searchDir, HWND parent, EResourceType type, const GLContext &context, GLProgram& programLit, const GLProgram& programUnlit);
 };

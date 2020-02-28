@@ -29,7 +29,7 @@ public:
 	GizmoAxis(const Colour& colour, const Setter<const Vector3&>& move) : 
 		GizmoComponent(colour),
 		_length(1.f), 
-		_collider(CollisionChannels::EDITOR),
+		_collider(ECollisionChannels::EDITOR),
 		_move(move)
 	{
 		_collisionBox = &_collider.AddShape(CollisionBox(Transform(Vector3(0.f, 0.5f, 0.f), Rotation(), Vector3(0.1f, 1.f, 0.1f))));

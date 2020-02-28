@@ -17,7 +17,7 @@ protected:
 
 	virtual void _OnTransformChanged() = 0;
 
-	EntBrush() : Entity(Flags::SAVEABLE), _material(nullptr) { }
+	EntBrush() : Entity(EFlags::SAVEABLE), _material(nullptr) { }
 	virtual ~EntBrush() {}
 
 public:
@@ -37,7 +37,7 @@ public:
 
 	virtual const Collider* GetCollider() const override 
 	{
-		static Collider collider(CollisionChannels::SURFACE, CollisionBox(Box(Vector3(), Vector3(.5f, .5f, .5f))));
+		static Collider collider(ECollisionChannels::SURFACE, CollisionBox(Box(Vector3(), Vector3(.5f, .5f, .5f))));
 		return &collider;
 	}
 	

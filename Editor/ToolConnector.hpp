@@ -15,7 +15,7 @@ public:
 
 	virtual void Initialise();
 
-	virtual void Activate(PropertyWindow &properties, PropertyWindow &toolProperties) override;
+	virtual void Activate(UIContainer& properties, UIContainer& toolProperties) override;
 
 	virtual void Cancel() override;
 
@@ -23,7 +23,7 @@ public:
 	virtual void MouseDown(const MouseData&) override;
 	virtual void KeySubmit() override;
 
-	virtual void Render(RenderChannels) const override;
+	virtual void Render(ERenderChannels) const override;
 
 	String GetConnectorDirection() const;
 	void SetConnectorDirection(const String &dir);

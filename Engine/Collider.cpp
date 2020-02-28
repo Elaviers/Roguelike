@@ -29,7 +29,7 @@ constexpr const int GJK_MAX_ITERATIONS = 50;
 constexpr const int EPA_MAX_ITERATIONS = 250;
 
 //GJK will terminate if the dot product between a point and an edge normal is lower than this
-constexpr const float GJK_EDGE_TOLERANCE = 0.001f;
+constexpr const float GJK_TOUCH_TOLERANCE = 0.001f;
 
 //GJKDist will terminate if a the dot product between an existing point and the direction and the dot product between the new point and the direction is lower than this
 constexpr const double GJK_TOLERANCE = 1e-10;
@@ -249,7 +249,7 @@ Vector3 EPA(
 	return closestFaces.First()->closestPointToOrigin;
 }
 
-bool GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShape& shapeB, const Transform& tB, const LineSegment* pLineA, Vector3* out_PenetrationVector)
+EOverlapResult GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShape& shapeB, const Transform& tB, const LineSegment* pLineA, Vector3* out_PenetrationVector)
 {
 	//The simplex is a tetrahedron inside the minkowski difference
 	Vector3 simplex[4];
@@ -310,6 +310,10 @@ bool GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShape
 
 			Vector3 bcd = Vector3::Cross(dc, db);
 			float dot = Vector3::Dot(bcd, d);
+
+			if (Maths::AlmostEqual(dot, 0.f, GJK_TOUCH_TOLERANCE))
+				return EOverlapResult::TOUCHING;
+
 			if (dot <= 0.f)
 			{
 				//Remove point A (0)
@@ -326,6 +330,10 @@ bool GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShape
 
 			Vector3 abd = Vector3::Cross(db, da);
 			dot = Vector3::Dot(abd, d);
+
+			if (Maths::AlmostEqual(dot, 0.f, GJK_TOUCH_TOLERANCE))
+				return EOverlapResult::TOUCHING;
+
 			if (dot <= 0.f)
 			{
 				//Remove point C (2)
@@ -338,6 +346,10 @@ bool GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShape
 
 			Vector3 acd = Vector3::Cross(da, dc);
 			dot = Vector3::Dot(acd, d);
+
+			if (Maths::AlmostEqual(dot, 0.f, GJK_TOUCH_TOLERANCE))
+				return EOverlapResult::TOUCHING;
+
 			if (dot <= 0.f)
 			{
 				//Remove point B (1)
@@ -352,7 +364,7 @@ bool GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShape
 			if (out_PenetrationVector)
 				*out_PenetrationVector = EPA(simplex, shapeA, tA, shapeB, tB, pLineA);
 
-			return true;
+			return EOverlapResult::OVERLAPPING;
 		}
 		}
 
@@ -361,24 +373,32 @@ bool GJK(const CollisionShape& shapeA, const Transform& tA, const CollisionShape
 
 		//Fail if the new point did not go past the origin
 		if (Vector3::Dot(simplex[i], dir) < 0.f)
-			return false;
+			return EOverlapResult::SEPERATE;
 
 		++i;
 	}
 
 	//Failsafe
-	return true;
+	return EOverlapResult::OVERLAPPING;
 }
 
-bool Collider::Overlaps(const Transform& transform, const Collider& other, const Transform& otherTransform, const LineSegment* lineA, Vector3* out_PenetrationVector) const
+EOverlapResult Collider::Overlaps(const Transform& transform, const Collider& other, const Transform& otherTransform, const LineSegment* lineA, Vector3* out_PenetrationVector) const
 {
+	bool isTouching = false;
+
 	if (CanCollideWith(other))
 		for (size_t i = 0; i < GetShapeCount(); ++i)
 			for (size_t j = 0; j < GetShapeCount(); ++j)
-				if (GJK(GetShape(i), transform, other.GetShape(j), otherTransform, lineA, out_PenetrationVector))
-					return true;
+			{
+				EOverlapResult result = GJK(GetShape(i), transform, other.GetShape(j), otherTransform, lineA, out_PenetrationVector);
+				if (result == EOverlapResult::OVERLAPPING)
+					return EOverlapResult::OVERLAPPING;
+				
+				if (!isTouching && result == EOverlapResult::TOUCHING)
+					isTouching = true;
+			}
 
-	return false;
+	return isTouching ? EOverlapResult::TOUCHING : EOverlapResult::SEPERATE;
 }
 
 inline Vector2 Cartesian2Barycentric(const Vector3& p, const Vector3& a, const Vector3& b)

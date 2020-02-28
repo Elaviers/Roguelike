@@ -1,7 +1,7 @@
 #pragma once
 #include <Engine/UIContainer.hpp>
 #include <Engine/Buffer.hpp>
-#include <Engine/UIButton.hpp>
+#include <Engine/UITextButton.hpp>
 #include <Engine/UIPanel.hpp>
 #include <Engine/Vector.hpp>
 
@@ -14,8 +14,8 @@ protected:
 	FunctionPointer<void, const String&> _onLevelChosen;
 
 	float _buttonBorderSize = 1.f;
-	Colour _buttonColourInactive;
-	Colour _buttonColourActive;
+	UIColour _buttonColourInactive;
+	UIColour _buttonColourActive;
 	SharedPointer<const Font> _buttonFont;
 	SharedPointer<const Material> _buttonMaterial;
 
@@ -31,8 +31,8 @@ public:
 
 	void SetBounds(float x, float y, float w, float h, float xOffset = 0.f, float yOffset = 0.f) { UIContainer::SetBounds(x, y, w, h, xOffset, yOffset); }
 	void SetButtonBorderSize(float size) { _buttonBorderSize = size; }
-	void SetButtonColourInactive(const Colour& colour) { _buttonColourInactive = colour; }
-	void SetButtonColourActive(const Colour& colour) { _buttonColourActive = colour; }
+	void SetButtonColourInactive(const UIColour& colour) { _buttonColourInactive = colour; }
+	void SetButtonColourActive(const UIColour& colour) { _buttonColourActive = colour; }
 	void SetButtonFont(const SharedPointer<const Font>& font) { _buttonFont = font; }
 	void SetButtonMaterial(const SharedPointer<const Material>& material) { _buttonMaterial = material; }
 	void SetParent(UIElement *parent) { UIContainer::SetParent(parent); }

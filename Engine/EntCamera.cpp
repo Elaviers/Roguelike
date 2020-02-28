@@ -12,14 +12,22 @@ void EntCamera::Use() const
 	GLProgram::Current().SetMat4(DefaultUniformVars::mat4View, GetInverseTransformationMatrix());
 }
 
+void EntCamera::Use(float vpX, float vpY) const
+{
+	_currentCamera = this;
+	glViewport(vpX, vpY, _viewport[0], _viewport[1]);
+	GLProgram::Current().SetMat4(DefaultUniformVars::mat4Projection, _projection);
+	GLProgram::Current().SetMat4(DefaultUniformVars::mat4View, GetInverseTransformationMatrix());
+}
+
 void EntCamera::UpdateProjectionMatrix()
 {
 	switch (_type)
 	{
-	case ProjectionType::PERSPECTIVE:
+	case EProjectionType::PERSPECTIVE:
 		_projection = Matrix::Perspective(_fov, _near, _far, (float)_viewport[0] / (float)_viewport[1]);
 		break;
-	case ProjectionType::ORTHOGRAPHIC:
+	case EProjectionType::ORTHOGRAPHIC:
 		_projection = Matrix::Ortho(_viewport[0] / -2.f, _viewport[0] / 2.f, _viewport[1] / -2.f, _viewport[1] / 2.f, _near, _far, _scale);
 		break;
 	}
@@ -35,12 +43,12 @@ Vector2 EntCamera::GetZPlaneDimensions() const
 
 Ray EntCamera::ScreenCoordsToRay(const Vector2 &coords) const
 {
-	if (_type == ProjectionType::PERSPECTIVE)
+	if (_type == EProjectionType::PERSPECTIVE)
 	{
 		Vector2 scale = GetZPlaneDimensions();
 		Vector3 pointOnPlane = GetWorldRotation().GetQuat().Transform(Vector3(coords[0] * scale[0], coords[1] * scale[1], 1.f));
 		pointOnPlane.Normalise();
-		return Ray(GetWorldPosition(), pointOnPlane, CollisionChannels::ALL);
+		return Ray(GetWorldPosition(), pointOnPlane, ECollisionChannels::ALL);
 	}
 	else
 	{
@@ -49,7 +57,7 @@ Ray EntCamera::ScreenCoordsToRay(const Vector2 &coords) const
 		return Ray(GetWorldPosition() + 
 			wt.GetRightVector() * ((_viewport[0] * coords[0]) / _scale) + 
 			wt.GetUpVector() * ((_viewport[1] * coords[1]) / _scale), 
-			wt.GetForwardVector(), CollisionChannels::ALL);
+			wt.GetForwardVector(), ECollisionChannels::ALL);
 	}
 }
 
@@ -61,7 +69,7 @@ bool EntCamera::FrustumOverlaps(const Bounds &b) const
 
 	float clipRadius;
 
-	if (_type == ProjectionType::PERSPECTIVE)
+	if (_type == EProjectionType::PERSPECTIVE)
 	{
 		//Yeah, just return true for now because the W and Z components of the clip space vector are stinky for some reason
 		//todo: not this please
@@ -102,7 +110,7 @@ void EntCamera::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& 
 {
 	Entity::ReadData(reader, strings);
 
-	_type = ProjectionType(reader.Read_byte());
+	_type = EProjectionType(reader.Read_byte());
 	_fov = reader.Read_float();
 	_scale = reader.Read_float();
 	_near = reader.Read_float();

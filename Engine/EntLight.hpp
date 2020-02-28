@@ -15,9 +15,9 @@ class EntLight : public Entity
 
 	static Vector3 _editorBoxExtent;
 public:
-	Entity_FUNCS(EntLight, EntityID::LIGHT)
+	Entity_FUNCS(EntLight, EEntityID::LIGHT)
 
-	EntLight() : Entity(Flags::SAVEABLE), _radius(-1.f), _colour(1.f, 1.f, 1.f) { }
+	EntLight() : Entity(EFlags::SAVEABLE), _radius(-1.f), _colour(1.f, 1.f, 1.f) { }
 	virtual ~EntLight() {}
 
 	static bool drawLightSources;
@@ -33,7 +33,7 @@ public:
 	void ToShader(int glArrayIndex) const;
 
 	void Update(float deltaTime) override;
-	void Render(RenderChannels) const override;
+	void Render(ERenderChannels) const override;
 
 	virtual const PropertyCollection& GetProperties() override;
 
@@ -45,7 +45,7 @@ public:
 
 	virtual const Collider* GetCollider() const 
 	{
-		static Collider editorCollider(CollisionChannels::EDITOR, CollisionBox(Box(_editorBoxExtent)));
+		static Collider editorCollider(ECollisionChannels::EDITOR, CollisionBox(Box(_editorBoxExtent)));
 		return &editorCollider;
 	}
 

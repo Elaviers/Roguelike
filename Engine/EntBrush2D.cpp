@@ -16,7 +16,7 @@ void EntBrush2D::_OnTransformChanged()
 	SetRelativeScale(Vector3(w, h, 0.f));
 }
 
-void EntBrush2D::Render(RenderChannels channels) const
+void EntBrush2D::Render(ERenderChannels channels) const
 {
 	if (Engine::Instance().pModelManager && _material && channels & _material->GetRenderChannelss())
 	{
@@ -65,16 +65,16 @@ const PropertyCollection& EntBrush2D::GetProperties()
 
 	cvars.Add(
 		"Material",
-		MemberGetter<EntBrush<2>, String>(&EntBrush<2>::GetMaterialName),
-		MemberSetter<EntBrush<2>, String>(&EntBrush<2>::SetMaterial),
+		MemberGetter<EntBrush2D, String>(&EntBrush2D::GetMaterialName),
+		MemberSetter<EntBrush2D, String>(&EntBrush2D::SetMaterial),
 		0,
 		PropertyFlags::MATERIAL);
 
-	cvars.Add<Vector3>(
+	cvars.Add<Vector2>(
 		"Point1",
 		offsetof(EntBrush2D, _point1));
 
-	cvars.Add<Vector3>(
+	cvars.Add<Vector2>(
 		"Point2",
 		offsetof(EntBrush2D, _point2));
 

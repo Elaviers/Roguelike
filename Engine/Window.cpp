@@ -70,3 +70,8 @@ void Window::SwapBuffers()
 {
 	::SwapBuffers(_hdc);
 }
+
+void Window::Focus()
+{
+	::SetFocus(_hwnd);
+}

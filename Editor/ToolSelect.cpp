@@ -1,6 +1,7 @@
 #include "ToolSelect.hpp"
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
+#include "UIPropertyManipulator.hpp"
 #include <Engine/DrawUtils.hpp>
 #include <Engine/InputManager.hpp>
 #include <Engine/MacroUtilities.hpp>
@@ -106,10 +107,9 @@ void ToolSelect::Initialise()
 	_gizmoIsLocal = false;
 }
 
-void ToolSelect::Activate(PropertyWindow& properties, PropertyWindow& toolProperties)
+void ToolSelect::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
-	toolProperties.SetCvars(_GetProperties(), this);
-	_owner.PropertyWindowRef().Clear();
+	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
 }
 
 void ToolSelect::Cancel()
@@ -123,7 +123,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 {
 	_hoverObjectIsSelected = false;
 
-	if (_owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
+	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC)
 	{
 		if (mouseData.isLeftDown)
 		{
@@ -156,7 +156,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 					_hoverObjectIsSelected = true;
 					_selectedObjects.SetSize(1);
 					_selectedObjects[0] = _hoverObject;
-					_owner.PropertyWindowRef().SetObject(_selectedObjects[0].Ptr());
+					_owner.ChangePropertyEntity(_selectedObjects[0].Ptr());
 				}
 
 				float deltaX = mouseData.unitX - mouseData.heldUnitX;
@@ -180,6 +180,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 				}
 
 				_hoverObject->SetWorldPosition(newPos);
+				_owner.RefreshProperties();
 			}
 		}
 		else if (!_placing)
@@ -217,17 +218,14 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 		}
 	}
 
-	if (!_placing)
+	if (!_placing && mouseData.viewport >= 0)
 	{
-		EntCamera& camera = _owner.CameraRef(mouseData.viewport);
+		EntCamera& camera = _owner.GetVP(mouseData.viewport).camera;
 
-		if (camera.GetProjectionType() == ProjectionType::PERSPECTIVE)
+		if (camera.GetProjectionType() == EProjectionType::PERSPECTIVE)
 		{
-			RECT windowDims;
-			::GetClientRect(_owner.ViewportRef(mouseData.viewport).GetHwnd(), &windowDims);
-
-			Ray r(camera.ScreenCoordsToRay(Vector2((float)mouseData.x / (float)windowDims.right, (float)mouseData.y / (float)windowDims.bottom)));
-			r.channels = CollisionChannels::ALL;
+			Ray r(camera.ScreenCoordsToRay(Vector2((float)mouseData.x / camera.GetViewport()[0], (float)mouseData.y / camera.GetViewport()[1])));
+			r.channels = ECollisionChannels::ALL;
 
 			//Gizmo
 			if (_selectedObjects.GetSize())
@@ -238,6 +236,8 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 				if (t < INFINITY)
 					::SetCursor(::LoadCursor(NULL, IDC_HAND));
 			}
+
+			_owner.RefreshProperties();
 
 			//Update hoverobject
 			Buffer<RaycastResult> results = _owner.LevelRef().Raycast(r);
@@ -259,26 +259,29 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 {
 	if (_gizmo.MouseDown()) return;
 
-	if (_owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::PERSPECTIVE)
+	if (mouseData.viewport >= 0)
 	{
-		_placing = false;
+		if (_owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::PERSPECTIVE)
+		{
+			_placing = false;
 
-		if (_hoverObject && !_hoverObjectIsSelected)
-			Select(_hoverObject.Ptr());
-		else if (!Engine::Instance().pInputManager->IsKeyDown(Keycode::CTRL))
-			ClearSelection();
+			if (_hoverObject && !_hoverObjectIsSelected)
+				Select(_hoverObject.Ptr());
+			else if (!Engine::Instance().pInputManager->IsKeyDown(EKeycode::CTRL))
+				ClearSelection();
+		}
+		else if (_hoverObject)
+		{
+			if (Engine::Instance().pInputManager->IsKeyDown(EKeycode::ALT))
+				_shouldCopy = true;
+
+			Vector3 objPos = _hoverObject->GetWorldPosition();
+
+			_origObjectX = objPos[mouseData.rightElement];
+			_origObjectY = objPos[mouseData.upElement];
+		}
+		else _placing = true;
 	}
-	else if (_hoverObject) 
-	{
-		if (Engine::Instance().pInputManager->IsKeyDown(Keycode::ALT))
-			_shouldCopy = true;
-
-		Vector3 objPos = _hoverObject->GetWorldPosition();
-
-		_origObjectX = objPos[mouseData.rightElement];
-		_origObjectY = objPos[mouseData.upElement];
-	}
-	else _placing = true;
 }
 
 void ToolSelect::MouseUp(const MouseData& mouseData)
@@ -291,7 +294,7 @@ void ToolSelect::KeySubmit()
 	_placing = false;
 	ClearSelection();
 
-	Buffer<Entity*> result = _owner.LevelRef().FindOverlappingChildren(Collider(CollisionChannels::ALL, CollisionBox(Box::FromMinMax(_box.GetMin(), _box.GetMax()))));
+	Buffer<Entity*> result = _owner.LevelRef().FindOverlappingChildren(Collider(ECollisionChannels::ALL, CollisionBox(Box::FromMinMax(_box.GetMin(), _box.GetMax()))));
 
 	_selectedObjects.SetSize(result.GetSize());
 
@@ -307,7 +310,7 @@ void ToolSelect::KeyDelete()
 	ClearSelection();
 }
 
-void ToolSelect::Render(RenderChannels channels) const
+void ToolSelect::Render(ERenderChannels channels) const
 {
 	glLineWidth(3);
 	
@@ -319,7 +322,7 @@ void ToolSelect::Render(RenderChannels channels) const
 		glDepthFunc(GL_LESS);
 	}
 	
-	if (_selectedObjects.GetSize() > 0 && EntCamera::Current()->GetProjectionType() == ProjectionType::PERSPECTIVE)
+	if (_selectedObjects.GetSize() > 0 && EntCamera::Current()->GetProjectionType() == EProjectionType::PERSPECTIVE)
 	{
 		glDepthFunc(GL_ALWAYS);
 		_gizmo.Draw();
@@ -344,13 +347,13 @@ void ToolSelect::Select(Entity* object)
 		return;
 	}
 
-	if (Engine::Instance().pInputManager->IsKeyDown(Keycode::CTRL))
+	if (Engine::Instance().pInputManager->IsKeyDown(EKeycode::CTRL))
 		_selectedObjects.Add(Engine::Instance().pObjectTracker->Track(object));
 	else
 	{
 		_selectedObjects.SetSize(1);
 		_selectedObjects[0] = Engine::Instance().pObjectTracker->Track(object);
-		_owner.PropertyWindowRef().SetObject(_selectedObjects[0].Ptr());
+		_owner.ChangePropertyEntity(_selectedObjects[0].Ptr());
 	}
 	
 	_selectedObjects.Last()->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoPos);
@@ -363,7 +366,7 @@ void ToolSelect::ClearSelection()
 		if (_selectedObjects[i])
 			_selectedObjects[i]->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoPos);
 
-	_owner.PropertyWindowRef().Clear();
+	_owner.ClearProperties();
 	_selectedObjects.SetSize(0);
 	_hoverObject.Clear();
 }

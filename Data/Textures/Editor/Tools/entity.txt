@@ -1,0 +1,5 @@
+min nearest
+mag nearest
+mips 0
+aniso 0
+img editor/tools/entity.png

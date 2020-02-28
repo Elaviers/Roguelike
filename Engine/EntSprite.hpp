@@ -15,7 +15,7 @@ class EntSprite : public Entity
 	bool _fixedYaw;
 
 public:
-	Entity_FUNCS(EntSprite, EntityID::SPRITE)
+	Entity_FUNCS(EntSprite, EEntityID::SPRITE)
 
 	EntSprite(const MaterialSprite *material = nullptr, float size = 1.f) : 
 		_material(material), 
@@ -31,12 +31,12 @@ public:
 	void SetSize(float size) { _size = size; SetWorldScale(Vector3(size, size, size)); }
 	void SetColour(const Colour& colour) { _colour = colour; }
 
-	virtual void Render(RenderChannels) const override;
+	virtual void Render(ERenderChannels) const override;
 
 	virtual Bounds GetBounds() const override { return Bounds(_size / 2.f); }
 	virtual const Collider* GetCollider() const override 
 	{ 
-		static Collider editorCollider(CollisionChannels::EDITOR, CollisionSphere(0.5f)); 
+		static Collider editorCollider(ECollisionChannels::EDITOR, CollisionSphere(0.5f)); 
 		return &editorCollider;
 	}
 

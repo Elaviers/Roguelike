@@ -20,7 +20,7 @@ protected:
 
 public:
 	//This is stupid. The model is responsible for deletion of the mesh, so don't delete them it using this!
-	Model(Mesh *mesh = nullptr, const Collider& collider = Collider(CollisionChannels::ALL)) : _mesh(mesh), _collider(collider) {}
+	Model(Mesh *mesh = nullptr, const Collider& collider = Collider(ECollisionChannels::ALL)) : _mesh(mesh), _collider(collider) {}
 
 	void Delete()
 	{

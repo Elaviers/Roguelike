@@ -3,7 +3,7 @@
 #include "Collision.hpp"
 #include "Types.hpp"
 
-enum class ProjectionType
+enum class EProjectionType
 {
 	PERSPECTIVE,
 	ORTHOGRAPHIC
@@ -16,7 +16,7 @@ private:
 
 	Mat4 _projection;
 
-	ProjectionType _type;
+	EProjectionType _type;
 
 	float _fov;		//Used for perspective
 	float _scale;	//Pixels per unit in ortho mode
@@ -26,21 +26,22 @@ private:
 
 	void UpdateProjectionMatrix();
 public:
-	Entity_FUNCS(EntCamera, EntityID::CAMERA)
+	Entity_FUNCS(EntCamera, EEntityID::CAMERA)
 
-	EntCamera() : _type(ProjectionType::PERSPECTIVE), _fov(90.f), _scale(1.f), _near(.001f), _far(100.f) { }
+	EntCamera() : _type(EProjectionType::PERSPECTIVE), _fov(90.f), _scale(1.f), _near(.001f), _far(100.f) { }
 	~EntCamera() {}
 
 	void Use() const;
+	void Use(float vpX, float vpY) const;
 	static const EntCamera* Current() { return _currentCamera; }
 
-	void SetProjectionType(ProjectionType type)		{ _type = type; UpdateProjectionMatrix(); }
+	void SetProjectionType(EProjectionType type)		{ _type = type; UpdateProjectionMatrix(); }
 	void SetFOV(float fieldOfView)					{ _fov = fieldOfView; UpdateProjectionMatrix(); }
 	void SetScale(float scale)						{ _scale = scale; UpdateProjectionMatrix(); }
 	void SetZBounds(float n, float f)				{ _near = n; _far = f; UpdateProjectionMatrix(); }
 	void SetViewport(uint16 width, uint16 height)	{ _viewport[0] = width; _viewport[1] = height;	UpdateProjectionMatrix(); }
 
-	ProjectionType GetProjectionType() const		{ return _type; }
+	EProjectionType GetProjectionType() const		{ return _type; }
 	float GetFOV() const							{ return _fov; }
 	float GetFOVHorizontal() const					{ return _fov * (float)_viewport[0] / (float)_viewport[1]; }
 	float GetScale() const							{ return _scale; }

@@ -5,22 +5,22 @@
 #include <Engine/LevelIO.hpp>
 #include <Engine/Timer.hpp>
 #include <Engine/Window.hpp>
+#include <Engine/UIToolbar.hpp>
+#include <Engine/UISplitter.hpp>
 #include "FbxSdk.hpp"
 #include "HierachyWindow.hpp"
 #include "MouseData.hpp"
-#include "PropertyWindow.hpp"
 #include "ToolBrush2D.hpp"
 #include "ToolBrush3D.hpp"
 #include "ToolConnector.hpp"
 #include "ToolEntity.hpp"
 #include "ToolSelect.hpp"
-#include "ToolWindow.hpp"
 #include "Viewport.hpp"
 #include <CommCtrl.h>
 
 #define VIEWPORTCOUNT 4
 
-enum class ToolEnum
+enum class ETool
 {
 	SELECT = 0,
 	BRUSH2D = 1,
@@ -43,6 +43,7 @@ private:
 	//Console
 	Window _consoleWindow;
 	EntCamera _consoleCamera;
+	EntCamera _uiCamera;
 	SharedPointer<const Font> _consoleFont;
 	bool _consoleIsActive = false;
 
@@ -50,14 +51,18 @@ private:
 	Window _window;
 	Window _vpArea;
 	HierachyWindow _hierachyWindow;
-	PropertyWindow _propertyWindow;
-	ToolWindow _toolWindow;
+
+	UIContainer _ui;
+	UIContainer _vpAreaUI;
+	UIContainer _sideUI;
+	UIContainer _propertyContainer;
+	UIContainer _toolPropertyContainer;
+
+	UIToolbar _t2oolbar;
 
 	HBRUSH _windowBrush = NULL;
 	HWND _toolbar = NULL;
 	HIMAGELIST _tbImages = NULL;
-
-	EntCamera _uiCam;
 
 	Viewport _viewports[VIEWPORTCOUNT];
 
@@ -69,8 +74,8 @@ private:
 	//Editor
 	bool _drawEditorFeatures = true;
 
-	RenderChannels _litRenderChannels = RenderChannels::NONE;
-	RenderChannels _unlitRenderChannels = RenderChannels(RenderChannels::SURFACE | RenderChannels::UNLIT);
+	ERenderChannels _litRenderChannels = ERenderChannels::NONE;
+	ERenderChannels _unlitRenderChannels = ERenderChannels(ERenderChannels::SURFACE | ERenderChannels::UNLIT);
 
 	Entity _level;
 
@@ -94,6 +99,11 @@ private:
 	void _Init();
 	void _InitGL();
 
+	void _OnSplitterDragged(UISplitter&) { _RefreshVPs(); }
+	void _RefreshVPs();
+
+	void _OnToolbarItemSelection(UIToolbarItem& item) { SetTool((ETool)item.GetUserData(), false); }
+
 public:
 	struct _EditorTools
 	{
@@ -106,18 +116,20 @@ public:
 		_EditorTools(Editor& editor) : select(editor), brush2D(editor), brush3D(editor), entity(editor), connector(editor) {}
 	} tools;
 
-	Editor() : _fbxManager(nullptr), _hierachyWindow(this), _propertyWindow(this), _toolWindow(this), tools(*this), _level(Entity::Flags::NONE, "Level") {}
+	Editor() : _fbxManager(nullptr), _hierachyWindow(this), tools(*this), _level(Entity::EFlags::NONE, "Level") {}
 	~Editor();
 
 	void Run();
 	void Frame();
 	void Render();
+	void RenderUI();
 	void RenderConsole();
-	void RenderViewport(int index, Direction side);
+	void RenderViewport(Viewport& vp);
 
 	void Zoom(float);
 
-	void UpdateMousePosition(int vpIndex, unsigned short x, unsigned short y);
+	//0, 0 = bottom-left of vpArea
+	void UpdateMousePosition(unsigned short x, unsigned short y);
 	void LeftMouseDown();
 	void LeftMouseUp();
 	void RightMouseDown();
@@ -135,11 +147,22 @@ public:
 	String SelectMaterialDialog();
 	String SelectModelDialog();
 
-	void SetTool(ToolEnum tool, bool changeToolbarSelection = true);
+	void* GetPropertyObject() const;
+	void* GetToolPropertyObject() const;
+
+	void ChangePropertyEntity(Entity* ent);
+
+	void RefreshProperties();
+
+	void ClearProperties() { _propertyContainer.Clear(); }
+	void ClearToolProperties() { _toolPropertyContainer.Clear(); }
+
+	void SetTool(ETool tool, bool changeToolbarSelection = true);
 
 	//For Tools
 	Entity& LevelRef() { return _level; }
-	Viewport& ViewportRef(int id) { return _viewports[id]; }
-	EntCamera& CameraRef(int id) { return _viewports[id].CameraRef(); }
-	PropertyWindow& PropertyWindowRef() { return _propertyWindow; }
+
+	Viewport& GetVP(int index) { return _viewports[index]; }
+
+	static constexpr const float PROPERTY_HEIGHT = 32;
 };

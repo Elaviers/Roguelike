@@ -1,6 +1,6 @@
 #pragma once
-#include "PropertyWindow.hpp"
-#include <Engine/RenderChannels.hpp>
+#include <Engine/ERenderChannels.hpp>
+#include <Engine/UIContainer.hpp>
 
 class Editor;
 struct MouseData;
@@ -16,7 +16,7 @@ public:
 
 	virtual void Initialise() {}
 
-	virtual void Activate(PropertyWindow &properties, PropertyWindow &toolProperties) { properties.Clear(); toolProperties.Clear(); }
+	virtual void Activate(UIContainer &properties, UIContainer& toolProperties) { }
 	virtual void Deactivate() {}
 
 	//Input
@@ -27,6 +27,6 @@ public:
 	virtual void KeySubmit()					{}
 	virtual void KeyDelete()					{}
 
-	virtual void Render(RenderChannels) const	{}
+	virtual void Render(ERenderChannels) const	{}
 };
 

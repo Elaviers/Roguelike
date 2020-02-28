@@ -1,6 +1,7 @@
 #pragma once
+#include "Types.hpp"
 
-enum class RenderChannels : byte
+enum class ERenderChannels : byte
 {
 	PRE_RENDER = 0x80,
 
@@ -14,4 +15,4 @@ enum class RenderChannels : byte
 };
 
 #include "MacroUtilities.hpp"
-DEFINE_BITMASK_FUNCS(RenderChannels, byte)
+DEFINE_BITMASK_FUNCS(ERenderChannels, byte)

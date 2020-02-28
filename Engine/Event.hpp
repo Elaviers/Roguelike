@@ -36,6 +36,6 @@ public:
 	void operator()(Args... args) const 
 	{
 		for (auto it = _list.First(); it.IsValid(); ++it)
-			it->TryCall();
+			it->TryCall(args...);
 	}
 };

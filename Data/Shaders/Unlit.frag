@@ -1,5 +1,10 @@
 #version 410
 uniform vec4 Colour;
+
+uniform bool Blend;
+uniform vec4 BlendFrom;
+uniform vec4 BlendTo;
+
 uniform sampler2D T_Diffuse;
 uniform bool IsFont;
 
@@ -12,18 +17,23 @@ void main()
 {
 	vec4 tex = texture(T_Diffuse, UV);
 
-	if (IsFont)
+	if (Blend) 
+		OutColour = mix(BlendFrom, BlendTo, tex.r) * vec4(1, 1, 1, tex.a);
+	else
 	{
-		float alpha = tex.r;
-
-		if (alpha > 0)
+		if (IsFont)
 		{
-			OutColour = Colour * VertexColour;
-			OutColour.a *= alpha;
+			float alpha = tex.r;
+
+			if (alpha > 0)
+			{
+				OutColour = Colour * VertexColour;
+				OutColour.a *= alpha;
+			}
+			else
+				OutColour = vec4(0);
 		}
 		else
-			OutColour = vec4(0);
+			OutColour = Colour * VertexColour * tex;
 	}
-	else
-		OutColour = Colour * VertexColour * tex;
 }

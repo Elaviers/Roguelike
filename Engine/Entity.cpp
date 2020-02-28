@@ -1,4 +1,5 @@
 #include "Entity.hpp"
+#include "EntityIterator.hpp"
 #include "Collider.hpp"
 #include "Engine.hpp"
 #include "EntCamera.hpp"
@@ -71,9 +72,9 @@ void Entity::UpdateAll(float deltaTime)
 		_children[i]->UpdateAll(deltaTime);
 }
 
-void Entity::RenderAll(const EntCamera &camera, RenderChannels channels) const
+void Entity::RenderAll(const EntCamera &camera, ERenderChannels channels) const
 {
-	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags & Flags::DBG_ALWAYS_DRAW)
+	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags & EFlags::DBG_ALWAYS_DRAW)
 		Render(channels);
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
@@ -122,13 +123,13 @@ Entity* Entity::FindChildWithName(const String& name)
 	if (_name == name)
 		return this;
 
-	for (size_t i = 0; i < _children.GetSize(); ++i)
-	{
-		Entity* result = _children[i]->FindChildWithName(name);
-		if (result) return result;
-	}
+for (size_t i = 0; i < _children.GetSize(); ++i)
+{
+	Entity* result = _children[i]->FindChildWithName(name);
+	if (result) return result;
+}
 
-	return nullptr;
+return nullptr;
 }
 
 Entity* Entity::FindChildWithUID(uint32 uid)
@@ -150,9 +151,9 @@ Entity* Entity::FindChildWithUID(uint32 uid)
 
 //File IO
 
-void Entity::WriteAllToFile(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const
+void Entity::WriteAllToFile(BufferWriter<byte>& buffer, NumberedSet<String>& strings) const
 {
-	if (_flags & Flags::SAVEABLE)
+	if (_flags & EFlags::SAVEABLE)
 	{
 		byte id = GetTypeID();
 		if (id != 0)
@@ -173,7 +174,7 @@ Entity* Entity::CreateFromData(BufferReader<byte>& reader, const NumberedSet<Str
 	Entity* obj = Engine::Instance().registry.GetNode(id)->New();
 	if (obj)
 		obj->ReadData(reader, strings);
-	else 
+	else
 		Debug::Error(CSTR("Cannot create Entity with ID ", (int)id));
 
 	return obj;
@@ -193,7 +194,7 @@ void Entity::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& str
 
 //Collision
 
-bool Entity::OverlapsRay(const Ray &ray, RaycastResult &result) const
+bool Entity::OverlapsRay(const Ray& ray, RaycastResult& result) const
 {
 	const Collider* collider = GetCollider();
 	if (collider)
@@ -202,7 +203,7 @@ bool Entity::OverlapsRay(const Ray &ray, RaycastResult &result) const
 	return false;
 }
 
-bool Entity::OverlapsCollider(const Collider &other, const Transform &otherTransform, const Vector3& sweep, Vector3* out_Penetration) const
+EOverlapResult Entity::OverlapsCollider(const Collider& other, const Transform& otherTransform, const Vector3& sweep, Vector3* out_Penetration) const
 {
 	const Collider* collider = GetCollider();
 	if (collider)
@@ -211,9 +212,26 @@ bool Entity::OverlapsCollider(const Collider &other, const Transform &otherTrans
 			return collider->Overlaps(GetWorldTransform(), other, otherTransform, nullptr, out_Penetration);
 
 		collider->Overlaps(GetWorldTransform(), other, otherTransform, &LineSegment(Vector3(), sweep), out_Penetration);
-	}	
+	}
 
-	return false;
+	return EOverlapResult::SEPERATE;
+}
+
+EOverlapResult Entity::AnyPartOverlapsCollider(const Collider& other, const Transform& otherTransform, const Vector3& sweep, Vector3* out_Penetration) const
+{
+	bool isTouching = false;
+
+	for (ConstEntityIterator it = ConstEntityIterator(this); it.IsValid(); ++it)
+	{
+		EOverlapResult result = it->OverlapsCollider(other, otherTransform, sweep, out_Penetration);
+		if (result == EOverlapResult::OVERLAPPING)
+			return EOverlapResult::OVERLAPPING;
+
+		if (!isTouching && result == EOverlapResult::TOUCHING)
+			isTouching = true;
+	}
+
+	return isTouching ? EOverlapResult::TOUCHING : EOverlapResult::SEPERATE;
 }
 
 float Entity::MinimumDistanceToCollider(const Collider& other, const Transform& otherTransform, Vector3& out_PointA, Vector3& out_PointB, const Vector3& sweep) const
@@ -266,7 +284,7 @@ Buffer<Entity*> Entity::FindOverlappingChildren(const Collider &collider, const 
 	Buffer<Entity*> results;
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
-		if (_children[i]->OverlapsCollider(collider, _transform, Vector3(), nullptr))
+		if (_children[i]->OverlapsCollider(collider, _transform, Vector3(), nullptr) == EOverlapResult::OVERLAPPING)
 			results.Add(_children[i]);
 
 	return results;

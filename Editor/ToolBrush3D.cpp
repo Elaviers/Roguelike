@@ -1,6 +1,7 @@
 #include "ToolBrush3D.hpp"
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
+#include "UIPropertyManipulator.hpp"
 #include <Engine/MacroUtilities.hpp>
 
 const PropertyCollection& ToolBrush3D::_GetProperties()
@@ -10,8 +11,8 @@ const PropertyCollection& ToolBrush3D::_GetProperties()
 	DO_ONCE(
 		properties.Add(
 		"Material",
-		MemberGetter<EntBrush<3>, String>(&EntBrush<3>::GetMaterialName),
-		MemberSetter<EntBrush<3>, String>(&EntBrush<3>::SetMaterial),
+		MemberGetter<EntBrush3D, String>(&EntBrush3D::GetMaterialName),
+		MemberSetter<EntBrush3D, String>(&EntBrush3D::SetMaterial),
 		offsetof(ToolBrush3D, _object),
 		PropertyFlags::MATERIAL)
 	);
@@ -25,10 +26,10 @@ void ToolBrush3D::Initialise()
 	_object.SetMaterial("alt");
 }
 
-void ToolBrush3D::Activate(PropertyWindow &properties, PropertyWindow &toolProperties)
+void ToolBrush3D::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
-	properties.SetObject(&_object, true);
-	toolProperties.SetCvars(_GetProperties(), this);
+	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _object.GetProperties(), &_object, properties);
+	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
 }
 
 void ToolBrush3D::Cancel()
@@ -38,7 +39,7 @@ void ToolBrush3D::Cancel()
 
 void ToolBrush3D::MouseMove(const MouseData &mouseData)
 {
-	if (_owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::ORTHOGRAPHIC)
+	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC)
 	{
 		if (mouseData.isLeftDown)
 		{
@@ -55,6 +56,7 @@ void ToolBrush3D::MouseMove(const MouseData &mouseData)
 
 			_object.SetPoint1(p13d);
 			_object.SetPoint2(p23d);
+			_owner.RefreshProperties();
 		}
 		else if (!_placing)
 		{
@@ -70,13 +72,14 @@ void ToolBrush3D::MouseMove(const MouseData &mouseData)
 
 			_object.SetPoint1(p1);
 			_object.SetPoint2(p2);
+			_owner.RefreshProperties();
 		}
 	}
 }
 
 void ToolBrush3D::MouseDown(const MouseData &mouseData)
 {
-	if (_owner.CameraRef(mouseData.viewport).GetProjectionType() == ProjectionType::ORTHOGRAPHIC) _placing = true;
+	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
 }
 
 void ToolBrush3D::KeySubmit()
@@ -86,7 +89,7 @@ void ToolBrush3D::KeySubmit()
 	_object.Clone()->SetParent(&_owner.LevelRef());
 }
 
-void ToolBrush3D::Render(RenderChannels channels) const
+void ToolBrush3D::Render(ERenderChannels channels) const
 {
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(.8f, .8f, .8f, .5f));
 	_object.Render(channels);

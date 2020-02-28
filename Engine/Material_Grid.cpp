@@ -83,7 +83,7 @@ void MaterialGrid::Apply(const RenderParam *param) const
 	int r = 0;
 	int c = 0;
 
-	if (param && param->type == RenderParam::Type::GRID_PARAM)
+	if (param && param->type == RenderParam::EType::GRID_PARAM)
 	{
 		r = param->gridData.row;
 		c = param->gridData.column;

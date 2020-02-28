@@ -2,9 +2,9 @@
 #include "String.hpp"
 #include <Windows.h>
 
-#define KEYNAME(KEY, NAME) {Keycode::KEY, #NAME}
+#define KEYNAME(KEY, NAME) {EKeycode::KEY, #NAME}
 
-const struct KeyName { Keycode key; String name; } keyNames[] =
+const struct KeyName { EKeycode key; String name; } keyNames[] =
 {
 	KEYNAME(A, a), KEYNAME(B, b), KEYNAME(C, c), KEYNAME(D, d), KEYNAME(E, e), KEYNAME(F, f), KEYNAME(G, g), KEYNAME(H, h), KEYNAME(I, i), KEYNAME(J, j), KEYNAME(K, k), KEYNAME(L, l), KEYNAME(M, m),
 	KEYNAME(N, n), KEYNAME(O, o), KEYNAME(P, p), KEYNAME(Q, q), KEYNAME(R, r), KEYNAME(S, s), KEYNAME(T, t), KEYNAME(U, u), KEYNAME(V, v), KEYNAME(W, w), KEYNAME(X, x), KEYNAME(Y, y), KEYNAME(Z, z),
@@ -28,9 +28,9 @@ const struct KeyName { Keycode key; String name; } keyNames[] =
 	KEYNAME(SQBRACKETLEFT, [),
 	KEYNAME(BACKSLASH, \\),
 	KEYNAME(SQBRACKETRIGHT, ]),
-	{ Keycode::APOSTROPHE, "\'" },
-	{ Keycode::COMMA, ","},
-	{ Keycode::PERIOD, '.'},
+	{ EKeycode::APOSTROPHE, "\'" },
+	{ EKeycode::COMMA, ","},
+	{ EKeycode::PERIOD, '.'},
 
 	KEYNAME(INSERT, insert), KEYNAME(HOME, home), KEYNAME(PAGEUP, pageup),
 	KEYNAME(DEL, delete), KEYNAME(END, end), KEYNAME(PAGEDOWN, pagedown),
@@ -40,7 +40,7 @@ const struct KeyName { Keycode key; String name; } keyNames[] =
 
 const uint16 keyCount = sizeof(keyNames) / sizeof(KeyName);
 
-String KeyToString(Keycode key)
+String KeyToString(EKeycode key)
 {
 	for (uint16 i = 0; i < keyCount; ++i)
 		if (keyNames[i].key == key)
@@ -49,7 +49,7 @@ String KeyToString(Keycode key)
 	return "";
 }
 
-Keycode StringToKey(const char *string)
+EKeycode StringToKey(const char *string)
 {
 	size_t length = StringLength(string);
 
@@ -57,19 +57,19 @@ Keycode StringToKey(const char *string)
 		if (StringsEqual(string, keyNames[i].name.GetData()))
 			return keyNames[i].key;
 
-	return Keycode::NONE;
+	return EKeycode::NONE;
 }
 
 InputManager::~InputManager()
 {
-	_keyBinds.ForEach( [](const Keycode&, KeyBind* &keyBind)
+	_keyBinds.ForEach( [](const EKeycode&, KeyBind* &keyBind)
 	{
 		delete keyBind;
 	}
 	);
 }
 
-void InputManager::KeyDown(Keycode key)
+void InputManager::KeyDown(EKeycode key)
 {
 	_keyStates[(byte)key] = 1;
 
@@ -79,7 +79,7 @@ void InputManager::KeyDown(Keycode key)
 		(*keyBind)->KeyDown();
 }
 
-void InputManager::KeyUp(Keycode key)
+void InputManager::KeyUp(EKeycode key)
 {
 	_keyStates[(byte)key] = 0;
 
@@ -91,8 +91,8 @@ void InputManager::KeyUp(Keycode key)
 
 void InputManager::SetMouseAxes(short x, short y)
 {
-	auto mouseX = _axisBinds.Get(AxisType::MOUSE_X);
-	auto mouseY = _axisBinds.Get(AxisType::MOUSE_Y);
+	auto mouseX = _axisBinds.Get(EAxis::MOUSE_X);
+	auto mouseY = _axisBinds.Get(EAxis::MOUSE_Y);
 
 	if (mouseX)
 		**mouseX = (float)x;

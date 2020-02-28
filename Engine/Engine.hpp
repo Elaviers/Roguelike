@@ -15,7 +15,7 @@ class MaterialManager;
 class ModelManager;
 class TextureManager;
 
-enum class EngineCreateFlags : uint16
+enum class EEngineCreateFlags : uint16
 {
 	CONSOLE = 0x1,
 	ANIMATIONMGR = 0x2,
@@ -32,8 +32,18 @@ enum class EngineCreateFlags : uint16
 	ALL = 0xFFFF
 };
 
+enum class ECursor
+{
+	DEFAULT,
+	HAND,
+	ARROWS_VERTICAL,
+	ARROWS_HORIZONTAL,
+	ARROWS_QUAD,
+	IBEAM
+};
+
 #include "MacroUtilities.hpp"
-DEFINE_BITMASK_FUNCS(EngineCreateFlags, uint16)
+DEFINE_BITMASK_FUNCS(EEngineCreateFlags, uint16)
 
 class Engine
 {
@@ -64,5 +74,9 @@ public:
 
 	FT_Library GetFTLibrary() { return _ftLib; }
 
-	void Init(EngineCreateFlags, Entity* world);
+	void Init(EEngineCreateFlags, Entity* world);
+
+
+	///
+	static void UseCursor(ECursor cursor);
 };

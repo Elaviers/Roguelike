@@ -28,7 +28,8 @@ public:
 
 	virtual const PropertyCollection& GetProperties() override;
 
-	virtual float CalculateStringWidth(const char* string, float scaleX) const override;
+	virtual float CalculateStringWidth(const char* string, float scaleX, size_t maxChars = 0) const override;
+	virtual size_t GetPositionOf(float x, float y, const char* string, const Transform& transform, float lineHeight = 0.f) const override;
 
 	virtual void RenderString(const char* string, const Transform & transform, float lineHeight) const override;
 

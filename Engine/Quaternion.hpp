@@ -13,10 +13,10 @@ class Quaternion
 {
 	Vector4 _data;
 
-	float& _x = _data[0];
-	float& _y = _data[1];
+	float& x = _data[0];
+	float& y = _data[1];
 	float& _z = _data[2];
-	float& _w = _data[3];
+	float& w = _data[3];
 
 	static Quaternion _FromAxisW(const Vector3 &axis, float w) { return Quaternion(Vector4(axis[0], axis[1], axis[2], w)); }
 
@@ -45,7 +45,7 @@ public:
 
 	Quaternion Inverse() const
 	{ 
-		return Quaternion(Vector4(-1.f * _x, -1.f * _y, -1.f * _z, _w));
+		return Quaternion(Vector4(-1.f * x, -1.f * y, -1.f * _z, w));
 	}
 
 	Quaternion& operator=(const Quaternion& other)
@@ -61,7 +61,7 @@ public:
 	{
 		Quaternion result = Inverse() * Quaternion(Vector4(point[0], point[1], point[2], 0.f)) * *this;
 
-		return Vector3(result._x, result._y, result._z);
+		return Vector3(result.x, result.y, result._z);
 	}
 
 	Vector3 GetForwardVector() const

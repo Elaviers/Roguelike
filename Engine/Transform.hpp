@@ -14,12 +14,12 @@ class Transform
 	Callback _onChanged;
 	void _Update()
 	{
-		_matrixStatus = MatrixStatus::EMPTY;
+		_matrixStatus = EMatrixStatus::EMPTY;
 		_onChanged.TryCall();
 	}
 
 	Mat4 _matrix;
-	enum class MatrixStatus
+	enum class EMatrixStatus
 	{
 		EMPTY,
 		TRANSFORM,
@@ -35,7 +35,7 @@ public:
 		_rotation(rotation), 
 		_scale(scale), 
 		_onChanged(callback), 
-		_matrixStatus(MatrixStatus::EMPTY) 
+		_matrixStatus(EMatrixStatus::EMPTY) 
 	{
 		_onChanged.TryCall();
 	}

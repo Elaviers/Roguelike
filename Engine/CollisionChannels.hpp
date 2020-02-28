@@ -1,7 +1,7 @@
 #pragma once
 #include "Types.hpp"
 
-enum class CollisionChannels : byte
+enum class ECollisionChannels : byte
 {
 	ALL =		0xFF,
 	STATIC =	0x01,		//Static Geometry
@@ -14,4 +14,4 @@ enum class CollisionChannels : byte
 };
 
 #include "MacroUtilities.hpp"
-DEFINE_BITMASK_FUNCS(CollisionChannels, byte)
+DEFINE_BITMASK_FUNCS(ECollisionChannels, byte)

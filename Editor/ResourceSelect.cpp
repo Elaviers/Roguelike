@@ -80,7 +80,7 @@ public:
 
 		_camera.SetParent(&_cameraRoot);
 
-		_camera.SetProjectionType(ProjectionType::PERSPECTIVE);
+		_camera.SetProjectionType(EProjectionType::PERSPECTIVE);
 		_camera.SetFOV(90.f);
 		_camera.SetRelativePosition(Vector3(0.f, 0.f, 1.f));
 		_camera.SetRelativeRotation(Vector3(0.f, 180.f, 0.f));
@@ -137,7 +137,7 @@ public:
 
 			_light.ToShader(0);
 
-			_object.Render(RenderChannels::SURFACE);
+			_object.Render(ERenderChannels::SURFACE);
 		}
 
 		programUnlit->Use();
@@ -155,7 +155,7 @@ public:
 		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(0.f, 0.f, -1.f), Vector3(0.f, 0.f, 1.f));
 
 		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
-		_sprite.Render(RenderChannels::SPRITE);
+		_sprite.Render(ERenderChannels::SPRITE);
 
 		::SwapBuffers(viewportDC);
 	};
@@ -362,10 +362,10 @@ void ResourceSelect::Initialise()
 	::RegisterClassEx(&windowClass);
 }
 
-String ResourceSelect::Dialog(MaterialManager &materialManager, ModelManager &modelManager, const char *search, HWND parent, ResourceType type, const GLContext &context, GLProgram &programLit, const GLProgram &programUnlit)
+String ResourceSelect::Dialog(MaterialManager &materialManager, ModelManager &modelManager, const char *search, HWND parent, EResourceType type, const GLContext &context, GLProgram &programLit, const GLProgram &programUnlit)
 {
 	RSDialog rs(context, programLit, programUnlit, materialManager, modelManager);
-	rs.isModelSelect = type == ResourceType::MODEL;
+	rs.isModelSelect = type == EResourceType::MODEL;
 
 	if (::DialogBoxParam(NULL, MAKEINTRESOURCE(IDD_RES_SELECT), parent, (DLGPROC)RSDialog::DialogProc, (LPARAM)&rs) == 1)
 		return rs.currentName;

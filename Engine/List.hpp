@@ -10,12 +10,13 @@ class List
 
 	class Node;
 
-	Node* _NewNode(const T& value, Node* next) const
+	template <typename... Args>
+	Node* _NewNode(Node* next, Args... args) const
 	{
 		if (_handlerNew.IsCallable())
-			return new (_handlerNew(sizeof(Node))) Node(value, next);
+			return new (_handlerNew(sizeof(Node))) Node(next, args...);
 
-		return new Node(value, next);
+		return new Node(next, args...);
 	}
 
 	void _DeleteNode(Node* node) const
@@ -36,7 +37,8 @@ class List
 		Node* _next;
 
 	public:
-		Node(const T& value, Node* next = nullptr) : _value(value), _next(next) {}
+		template<typename... Args>
+		Node(Node* next, Args... args) : _value(args...), _next(next) {}
 		~Node() {}
 
 		T& Value()					{ return _value; }
@@ -51,7 +53,7 @@ class List
 			Node* dest = GetDeepestNode();
 			while (src)
 			{
-				dest = dest->_next = list._NewNode(src->_value, nullptr);
+				dest = dest->_next = list._NewNode(nullptr, src->_value);
 				src = src->_next;
 			}
 		}
@@ -114,7 +116,13 @@ class List
 
 		Node* Add(const T& value, const List& list)
 		{
-			return GetDeepestNode()->_next = list._NewNode(value, nullptr);
+			return GetDeepestNode()->_next = list._NewNode(nullptr, value);
+		}
+
+		template<typename... Args>
+		Node* Emplace(const List& list, Args... args)
+		{
+			return GetDeepestNode()->_next = list._NewNode(nullptr, args...);
 		}
 
 		//Depth must be greater than 0
@@ -127,7 +135,7 @@ class List
 					return nullptr;
 
 			Node* next = node->_next;
-			return node->_next = list._NewNode(value, next);
+			return node->_next = list._NewNode(next, value);
 		}
 
 		Node* InsertChildBefore(const T& value, const Node* before, const List& list)
@@ -137,7 +145,7 @@ class List
 			while (next)
 			{
 				if (next == before)
-					return current->_next = list._NewNode(value, next->_next);
+					return current->_next = list._NewNode(next->_next, value);
 
 				current = next;
 				next = current->_next;
@@ -344,7 +352,7 @@ public:
 	{
 		if (other._first)
 		{
-			_first = _NewNode(other._first->Value(), nullptr);
+			_first = _NewNode(nullptr, other._first->Value());
 			_first->CopyChildrenFrom(other._first, *this);
 			_last = _first->GetDeepestNode();
 		}
@@ -380,7 +388,7 @@ public:
 
 		if (other._first)
 		{
-			_first = _NewNode(other._first->Value(), nullptr);
+			_first = _NewNode(nullptr, other._first->Value());
 			_first->CopyChildrenFrom(other._first, *this);
 			_last = _first->GetDeepestNode();
 		}
@@ -415,7 +423,14 @@ public:
 	Iterator Add(const T& value)
 	{
 		if (_first) return Iterator(_last = _first->Add(value, *this));
-		return Iterator(_first = _last = _NewNode(value, nullptr));
+		return Iterator(_first = _last = _NewNode(nullptr, value));
+	}
+
+	template <typename... Args>
+	Iterator Emplace(Args... args)
+	{
+		if (_first) return Iterator(_last = _first->Emplace(*this, args...));
+		return Iterator(_first = _last = _NewNode(nullptr, args...));
 	}
 
 	Iterator Insert(const T& value, Iterator before)
@@ -424,7 +439,7 @@ public:
 		{
 			Node* node = before._node;
 
-			if (node == _first) return Iterator(_first = _NewNode(value, _first));
+			if (node == _first) return Iterator(_first = _NewNode(_first, value));
 
 			return Iterator(_first->InsertChildBefore(value, node, *this));
 		}
@@ -437,7 +452,7 @@ public:
 		if (index == 0)
 		{
 			Node* oldFirst = _first;
-			return _first = _NewNode(value, oldFirst);
+			return _first = _NewNode(oldFirst, value);
 		}
 		else if (_first)
 		{

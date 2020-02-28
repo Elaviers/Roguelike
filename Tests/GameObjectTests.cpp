@@ -25,7 +25,7 @@ namespace EngineTests
 	{
 		TEST_CLASS_INITIALIZE(ClassInit)
 		{
-			Engine::Instance().Init(EngineCreateFlags(0), nullptr); //Registry only
+			Engine::Instance().Init(EEngineCreateFlags(0), nullptr); //Registry only
 			auto materialManager = Engine::Instance().pMaterialManager = new MaterialManager();
 			auto modelManager = Engine::Instance().pModelManager = new ModelManager();
 
@@ -142,7 +142,7 @@ namespace EngineTests
 
 #define SRC(TYPE) \
 		TYPE src;									\
-		src.SetFlags(Entity::Flags::SAVEABLE);		\
+		src.SetFlags(Entity::EFlags::SAVEABLE);		\
 		src.SetRelativeTransform(t);				\
 		src.SetName(name);
 		TEST_METHOD(TestReadWrite)
@@ -171,7 +171,7 @@ namespace EngineTests
 
 			{
 				SRC(EntCamera);
-				src.SetProjectionType(ProjectionType::PERSPECTIVE);
+				src.SetProjectionType(EProjectionType::PERSPECTIVE);
 				src.SetFOV(110.f);
 				src.SetScale(69.f);
 				src.SetZBounds(33.f, 66.f);
@@ -181,7 +181,7 @@ namespace EngineTests
 
 			{
 				SRC(EntConnector);
-				src.direction = Direction2D::SOUTH;
+				src.direction = EDirection2D::SOUTH;
 				src.connected = true;
 				CheckRW(src);
 			}
