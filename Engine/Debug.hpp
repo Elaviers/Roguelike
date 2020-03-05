@@ -9,6 +9,8 @@ namespace Debug
 	void Error(const char *message);
 	void FatalError(const char *message);
 
+	void Message(const char *message, const char *title);
+
 #ifdef _DEBUG
 	inline void Assert(bool condition, const char *message = "Assertion Failed")
 	{

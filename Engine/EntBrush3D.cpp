@@ -5,6 +5,19 @@
 
 void EntBrush3D::_OnTransformChanged()
 {
+	if (!_updatingTransform)
+	{
+		float hw = GetRelativeScale()[0] / 2.f;
+		float hh = GetRelativeScale()[1] / 2.f;
+		float hd = GetRelativeScale()[2] / 2.f;
+
+		_point1 = Vector3(GetRelativePosition()[0] - hw, GetRelativePosition()[1] - hh, GetRelativePosition()[2] - hd);
+		_point2 = Vector3(GetRelativePosition()[0] + hw, GetRelativePosition()[1] + hh, GetRelativePosition()[2] + hd);
+	}
+}
+
+void EntBrush3D::_OnPointChanged()
+{
 	float x = (_point1[0] + _point2[0]) / 2.f;
 	float y = (_point1[1] + _point2[1]) / 2.f;
 	float z = (_point1[2] + _point2[2]) / 2.f;
@@ -12,8 +25,10 @@ void EntBrush3D::_OnTransformChanged()
 	float h = Maths::Abs(_point1[1] - _point2[1]);
 	float d = Maths::Abs(_point1[2] - _point2[2]);
 
+	_updatingTransform = true;
 	SetRelativePosition(Vector3(x, y, z));
 	SetRelativeScale(Vector3(w, h, d));
+	_updatingTransform = false;
 }
 
 #include "DrawUtils.hpp"
@@ -119,13 +134,16 @@ const PropertyCollection& EntBrush3D::GetProperties()
 		0,
 		PropertyFlags::MATERIAL);
 		
-	cvars.Add<Vector3>(
+	cvars.Add(
 		"Point1", 
-		offsetof(EntBrush3D, _point1));
+		MemberGetter<EntBrush3D, const Vector3&>(&EntBrush3D::GetPoint1),
+		MemberSetter<EntBrush3D, Vector3>(&EntBrush3D::SetPoint1));
 
-	cvars.Add<Vector3>(
-		"Point2", 
-		offsetof(EntBrush3D, _point2));
+	cvars.Add(
+		"Point2",
+		MemberGetter<EntBrush3D, const Vector3&>(&EntBrush3D::GetPoint2),
+		MemberSetter<EntBrush3D, Vector3>(&EntBrush3D::SetPoint2));
+
 	DO_ONCE_END;
 
 	return cvars;

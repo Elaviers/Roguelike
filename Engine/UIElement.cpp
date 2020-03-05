@@ -1,6 +1,6 @@
 #include "UIElement.hpp"
 
-void UIElement::_RequestFocus()
+void UIElement::RequestFocus()
 {
 	if (_parent)
 	{
@@ -8,11 +8,11 @@ void UIElement::_RequestFocus()
 		while (root->_parent)
 			root = root->_parent;
 
-		root->OnElementRequestFocus(this);
+		root->FocusElement(this);
 	}
 }
 
-void UIElement::OnElementRequestFocus(UIElement* element)
+void UIElement::FocusElement(UIElement* element)
 {
 	if (element == this)
 		onFocusGained(*this);
@@ -38,4 +38,30 @@ void UIElement::UpdateAbsoluteBounds()
 	}
 
 	_OnBoundsChanged();
+}
+
+bool UIElement::OnMouseDown()
+{
+	if (_focusOnClick && _hover)
+	{
+		RequestFocus();
+		return true;
+	}
+
+	return false;
+}
+
+bool UIElement::OnMouseUp()
+{
+	return _focusOnClick && _hover;
+}
+
+void UIElement::OnMouseMove(float x, float y)
+{
+	bool hover = OverlapsPoint(x, y);
+	if (hover != _hover)
+	{
+		_hover = hover;
+		_hover ? OnHoverStart() : OnHoverStop();
+	}
 }

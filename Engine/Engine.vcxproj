@@ -230,7 +230,6 @@
     <ClInclude Include="Bounds.hpp" />
     <ClInclude Include="Property.hpp" />
     <ClInclude Include="List.hpp" />
-    <ClInclude Include="EntBox.hpp" />
     <ClInclude Include="EntBrush.hpp" />
     <ClInclude Include="EntBrush2D.hpp" />
     <ClInclude Include="EntBrush3D.hpp" />
@@ -246,7 +245,6 @@
     <ClInclude Include="DebugManager.hpp" />
     <ClInclude Include="DebugObject.hpp" />
     <ClInclude Include="DebugString.hpp" />
-    <ClInclude Include="EDirection2D.hpp" />
     <ClInclude Include="DrawUtils.hpp" />
     <ClInclude Include="Engine.hpp" />
     <ClInclude Include="Debug.hpp" />
@@ -352,7 +350,6 @@
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Bounds.cpp" />
     <ClCompile Include="Property.cpp" />
-    <ClCompile Include="EntBox.cpp" />
     <ClCompile Include="EntBrush2D.cpp" />
     <ClCompile Include="EntBrush3D.cpp" />
     <ClCompile Include="EntCamera.cpp" />
@@ -364,7 +361,6 @@
     <ClCompile Include="DebugManager.cpp" />
     <ClCompile Include="DebugObject.cpp" />
     <ClCompile Include="DebugString.cpp" />
-    <ClCompile Include="Direction2D.cpp" />
     <ClCompile Include="DrawUtils.cpp" />
     <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -419,6 +415,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debug.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

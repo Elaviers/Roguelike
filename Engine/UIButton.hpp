@@ -8,7 +8,6 @@
 class UIButton : public UIElement
 {
 protected:
-	bool _hover;
 	bool _hold;
 
 	UIColour _colour;
@@ -25,7 +24,7 @@ protected:
 public:
 	Event<UIButton&> onPressed;
 
-	UIButton(UIElement* parent = nullptr) : UIElement(parent), _hover(false), _hold(false), _panel(this) { }
+	UIButton(UIElement* parent = nullptr) : UIElement(parent), _hold(false), _panel(this) { }
 
 	virtual ~UIButton() {}
 
@@ -59,9 +58,11 @@ public:
 	}
 	UIButton& SetMaterial(const SharedPointer<const Material>& material) { _panel.SetMaterial(material); return *this; }
 
-	virtual void OnMouseMove(float mouseX, float mouseY) override;
-	virtual void OnMouseUp() override;
-	virtual void OnMouseDown() override;
+	virtual bool OnMouseUp() override;
+	virtual bool OnMouseDown() override;
+
+	virtual void OnHoverStart() override;
+	virtual void OnHoverStop() override;
 
 	virtual void Render() const override
 	{

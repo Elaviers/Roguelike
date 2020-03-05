@@ -41,7 +41,7 @@ namespace Maths
 		int32 asInt = (int32)x;
 		float dec = x - asInt;
 
-		return dec >= .5f ? (float)asInt + 1.f : (float)asInt;
+		return dec >= .5f ? ((float)asInt + 1.f) : (float)asInt;
 	}
 
 	inline float Round(float x, float nearest)

@@ -79,6 +79,8 @@ public:
 	void KeyDown(EKeycode);
 	void KeyUp(EKeycode);
 
+	void Reset();
+
 	//xDelta and yDelta are in pixels
 	void SetMouseAxes(short xDelta, short yDelta);
 };

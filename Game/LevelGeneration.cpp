@@ -17,31 +17,9 @@ inline RandomBag<const EntConnector*> GetConnectors(const Entity& root, Random &
 	return result;
 }
 
-Vector3 um(const Vector3& extent, const EDirection2D& dir)
-{
-	//return Vector3();
-
-	switch (dir)
-	{
-	case EDirection2D::NORTH:
-		return Vector3(0.f, 0.f, extent[2]);
-		break;
-	case EDirection2D::EAST:
-		return Vector3(extent[0], 0.f, 0.f);
-		break;
-	case EDirection2D::SOUTH:
-		return Vector3(0.f, 0.f, -extent[2]);
-		break;
-	}
-
-	return Vector3(-extent[0], 0.f, 0.f);
-}
-
 Entity* CreateConnectedSegment(Entity& world, const EntConnector &parentConnector, RandomBag<const Entity*>& bag, Random &random)
 {
 	Transform pcWt = parentConnector.GetWorldTransform();
-	Vector3 pcExtent = parentConnector.GetMax() - parentConnector.GetMin();
-	Vector3 pcCentre = ((parentConnector.GetMin() + parentConnector.GetMax() + um(pcExtent, parentConnector.direction)) / 2.f) * pcWt.GetTransformationMatrix();
 
 	while (bag.GetTotalWeight() > 0.f)
 	{
@@ -52,29 +30,29 @@ Entity* CreateConnectedSegment(Entity& world, const EntConnector &parentConnecto
 		{
 			const EntConnector* connector = connectors.TakeNext(random);
 
-			Vector3 extent = connector->GetMax() - connector->GetMin();
-			if (extent == pcExtent || extent == Vector3(pcExtent[2], pcExtent[1], pcExtent[0]))
+			Transform connectorWt = connector->GetWorldTransform();
+			if (connectorWt.GetScale() == pcWt.GetScale())
 			{
-				float angle = 180.f - Direction2DFuncs::GetAngleOf(connector->direction) - Direction2DFuncs::GetAngleOf(parentConnector.direction);
+				float angle = (pcWt.GetRotationEuler()[1] - connectorWt.GetRotationEuler()[1]) - 180.f;
 				Transform levelWt = level->GetWorldTransform();
+
+				Vector3 connectorPosAfterSegmentRotation = VectorMaths::RotateAbout(connectorWt.GetPosition(), levelWt.GetPosition(), Vector3(0.f, angle, 0.f));
+
 				levelWt.AddRotation(Vector3(0.f, angle, 0.f));
-
-				Vector3 centre = 
-					((connector->GetMin() + connector->GetMax() + um(extent, connector->direction)) / 2.f) * 
-					(
-					connector->GetRelativeTransform().GetTransformationMatrix() * levelWt.GetTransformationMatrix());
-
-				levelWt.Move(centre - pcCentre);
+				levelWt.Move(pcWt.GetPosition() - connectorPosAfterSegmentRotation);
 
 				bool cannotFit = false;
 				for (ConstEntityIterator it(level); it.IsValid(); ++it)
 				{
 					Transform t = it->GetRelativeTransform();
 
-					for (const Entity* e = it->GetParent(); e && e != level; e = e->GetParent())
-						t = e->GetRelativeTransform() * t;
+					//Use slightly smaller version
+					t.SetScale(t.GetScale() * .95f);
 
-					t = levelWt * t;
+					for (const Entity* e = it->GetParent(); e && e != level; e = e->GetParent())
+						t = t * e->GetRelativeTransform();
+
+					t = t * levelWt;
 
 					if (it->GetCollider() && world.AnyPartOverlapsCollider(*it->GetCollider(), t) == EOverlapResult::OVERLAPPING)
 					{
@@ -105,9 +83,10 @@ void GenerateConnectedSegments(Entity &world, const Entity &src, RandomBag<const
 	{
 		if (src.Children()[i]->IsType<EntConnector>())
 		{
-			const EntConnector *connector = reinterpret_cast<const EntConnector*>(src.Children()[i]);
+			EntConnector *connector = reinterpret_cast<EntConnector*>(src.Children()[i]);
 			if (!connector->connected)
 			{
+				connector->connected = true;
 				RandomBag<const Entity*> bagClone = bag;
 				Entity* newSegment = CreateConnectedSegment(world, *connector, bagClone, random);
 				if (newSegment)
@@ -152,9 +131,10 @@ bool LevelGeneration::GenerateLevel(Entity& root, const String &string)
 
 	const Entity *lvl = bag.GetNext(random);
 	Entity *seg1 = Entity::Create();
+	seg1->SetParent(&root);
 	seg1->CloneChildrenFrom(*lvl);
 	
-	GenerateConnectedSegments(root, *seg1, bag, random, 3);
+	GenerateConnectedSegments(root, *seg1, bag, random, depth);
 
 	return true;
 }

@@ -22,16 +22,21 @@ namespace Debug
 	void Error(const char *string)
 	{
 		PrintLine(CSTR("ERROR: ", string));
-		::MessageBoxA(NULL, string, "Error", MB_OK);
+		Message(string, "Error");
 	}
 
 	void FatalError(const char *string)
 	{
 		PrintLine(CSTR("FATAL ERROR! ", '\"', string, '\"'));
-		::MessageBoxA(NULL, string, "Fatal Error", MB_OK);
+		Message(string, "Fatal Error");
 
 		Break();
 
 		::ExitProcess(1);
+	}
+
+	void Message(const char* message, const char* title)
+	{
+		::MessageBoxA(NULL, message, title, MB_OK);
 	}
 }

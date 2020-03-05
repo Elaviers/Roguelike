@@ -408,9 +408,6 @@
     <ClInclude Include="Entity.hpp">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="EntBox.hpp">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="EntBrush.hpp">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -467,9 +464,6 @@
     </ClInclude>
     <ClInclude Include="UITextbox.hpp">
       <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="EDirection2D.hpp">
-      <Filter>Header Files\Enums</Filter>
     </ClInclude>
     <ClInclude Include="EEntityID.hpp">
       <Filter>Header Files\Enums</Filter>
@@ -592,9 +586,6 @@
     </ClCompile>
     <ClCompile Include="UIPanel.cpp">
       <Filter>Source Files\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Direction2D.cpp">
-      <Filter>Source Files\Classes</Filter>
     </ClCompile>
     <ClCompile Include="Bounds.cpp">
       <Filter>Source Files\Classes</Filter>
@@ -725,9 +716,6 @@
     <ClCompile Include="Entity.cpp">
       <Filter>Source Files\Entitites</Filter>
     </ClCompile>
-    <ClCompile Include="EntBox.cpp">
-      <Filter>Source Files\Entitites</Filter>
-    </ClCompile>
     <ClCompile Include="EntBrush2D.cpp">
       <Filter>Source Files\Entitites</Filter>
     </ClCompile>
@@ -800,5 +788,8 @@
     <ClCompile Include="UISplitter.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

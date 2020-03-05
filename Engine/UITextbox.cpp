@@ -69,7 +69,7 @@ void UITextbox::Update(float deltaTime)
 	}
 }
 
-void UITextbox::OnKeyDown(EKeycode key)
+bool UITextbox::OnKeyDown(EKeycode key)
 {
 	if (_hasFocus && !_readOnly)
 	{
@@ -91,10 +91,19 @@ void UITextbox::OnKeyDown(EKeycode key)
 			onStringSubmitted(*this);
 			break;
 		}
+
+		return true;
 	}
+
+	return false;
 }
 
-void UITextbox::OnCharInput(char c)
+bool UITextbox::OnKeyUp(EKeycode kc)
+{
+	return _hasFocus && !_readOnly;
+}
+
+bool UITextbox::OnCharInput(char c)
 {
 	if (_hasFocus && !_readOnly)
 	{
@@ -126,12 +135,16 @@ void UITextbox::OnCharInput(char c)
 
 			onStringChanged(*this);
 		}
+
+		return true;
 	}
+
+	return false;
 }
 
 void UITextbox::OnMouseMove(float x, float y)
 {
-	_hover = OverlapsPoint(x, y);
+	UIElement::OnMouseMove(x, y);
 
 	if (_hover)
 	{
@@ -148,16 +161,18 @@ void UITextbox::OnMouseMove(float x, float y)
 	}
 }
 
-void UITextbox::OnMouseUp()
+bool UITextbox::OnMouseUp()
 {
 	_selecting = false;
+
+	return _hover;
 }
 
-void UITextbox::OnMouseDown()
+bool UITextbox::OnMouseDown()
 {
 	if (_hover)
 	{
-		_RequestFocus();
+		RequestFocus();
 		
 		_caretPos = _label.GetFont()->GetPositionOf(_lastMouseX, _lastMouseY, _label.GetString().GetData(), _label.GetRenderTransform());
 
@@ -167,5 +182,9 @@ void UITextbox::OnMouseDown()
 
 		_ResetCaretBlink();
 		_UpdateSelectionBox();
+
+		return true;
 	}
+
+	return false;
 }

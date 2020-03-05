@@ -15,14 +15,14 @@ protected:
 	
 	SharedPointer<const Material> _material;
 
-	virtual void _OnTransformChanged() = 0;
+	virtual void _OnPointChanged() = 0;
 
 	EntBrush() : Entity(EFlags::SAVEABLE), _material(nullptr) { }
 	virtual ~EntBrush() {}
 
 public:
-	void SetPoint1(const Vector<float, SIZE> &position) { _point1 = position; _OnTransformChanged(); }
-	void SetPoint2(const Vector<float, SIZE> &position) { _point2 = position; _OnTransformChanged(); }
+	void SetPoint1(const Vector<float, SIZE> &position) { _point1 = position; _OnPointChanged(); }
+	void SetPoint2(const Vector<float, SIZE> &position) { _point2 = position; _OnPointChanged(); }
 	void SetMaterial(const SharedPointer<const Material>& material) { _material = material; }
 	void SetMaterial(const String &name) { if (Engine::Instance().pMaterialManager) _material = Engine::Instance().pMaterialManager->Get(name); }
 	

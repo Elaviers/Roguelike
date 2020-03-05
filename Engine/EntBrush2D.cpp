@@ -7,13 +7,27 @@
 
 void EntBrush2D::_OnTransformChanged()
 {
+	if (!_updatingTransform)
+	{
+		float hw = GetRelativeScale()[0] / 2.f;
+		float hh = GetRelativeScale()[1] / 2.f;
+
+		_point1 = Vector2(GetRelativePosition()[0] - hw, GetRelativePosition()[2] - hh);
+		_point2 = Vector2(GetRelativePosition()[0] + hh, GetRelativePosition()[2] + hh);
+	}
+}
+
+void EntBrush2D::_OnPointChanged()
+{
 	float x = (_point1[0] + _point2[0]) / 2.f;
 	float z = (_point1[1] + _point2[1]) / 2.f;
 	float w = Maths::Abs(_point1[0] - _point2[0]);
 	float h = Maths::Abs(_point1[1] - _point2[1]);
 
+	_updatingTransform = true;
 	SetRelativePosition(Vector3(x, level, z));
 	SetRelativeScale(Vector3(w, h, 0.f));
+	_updatingTransform = false;
 }
 
 void EntBrush2D::Render(ERenderChannels channels) const
@@ -70,13 +84,15 @@ const PropertyCollection& EntBrush2D::GetProperties()
 		0,
 		PropertyFlags::MATERIAL);
 
-	cvars.Add<Vector2>(
+	cvars.Add(
 		"Point1",
-		offsetof(EntBrush2D, _point1));
+		MemberGetter<EntBrush2D, const Vector2&>(&EntBrush2D::GetPoint1),
+		MemberSetter<EntBrush2D, Vector2>(&EntBrush2D::SetPoint1));
 
-	cvars.Add<Vector2>(
+	cvars.Add(
 		"Point2",
-		offsetof(EntBrush2D, _point2));
+		MemberGetter<EntBrush2D, const Vector2&>(&EntBrush2D::GetPoint2),
+		MemberSetter<EntBrush2D, Vector2>(&EntBrush2D::SetPoint2));
 
 	cvars.Add<float>(
 		"Level",

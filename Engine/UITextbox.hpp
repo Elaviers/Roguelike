@@ -17,8 +17,6 @@ private:
 	size_t _selectionEnd = 0;
 
 protected:
-	bool _hover;
-	bool _hasFocus;
 	bool _selecting;
 
 	bool _readOnly;
@@ -34,8 +32,7 @@ protected:
 
 	virtual void _OnBoundsChanged() override;
 
-	void _OnFocusGained(UIElement& element) { _hasFocus = true; }
-	void _OnFocusLost(UIElement& element) { _hasFocus = false; _selectionRect.SetW(0.f); }
+	void _OnFocusLost(UIElement& element) { _selectionRect.SetW(0.f); }
 
 	void _ResetCaretBlink();
 	void _UpdateSelectionBox();
@@ -47,7 +44,7 @@ public:
 
 	UITextbox(UIElement* parent = nullptr) : UIElement(parent),
 		_panel(this), _label(this), _selectionRect(this),
-		_hover(false), _hasFocus(false), _selecting(false), _readOnly(false),
+		_selecting(false), _readOnly(false),
 		_caretWidth(2.f), _caretOffset(0.f), _caretPeriod(0.33f), _caretColour(Colour::Black)
 	{
 		SetCursor(ECursor::IBEAM);
@@ -55,7 +52,6 @@ public:
 		_selectionRect.SetW(0.f);
 		SetSelectionColour(Colour(0.f, .2f, 1.f, .2f));
 
-		UIElement::onFocusGained += FunctionPointer<void, UIElement&>(this, &UITextbox::_OnFocusGained);
 		UIElement::onFocusLost += FunctionPointer<void, UIElement&>(this, &UITextbox::_OnFocusLost);
 	}
 
@@ -92,9 +88,11 @@ public:
 	virtual void Render() const override;
 	virtual void Update(float deltaTime) override;
 
-	virtual void OnKeyDown(EKeycode) override;
-	virtual void OnCharInput(char) override;
+	virtual bool OnKeyDown(EKeycode) override;
+	virtual bool OnKeyUp(EKeycode) override;
+	virtual bool OnCharInput(char) override;
+	virtual bool OnMouseUp() override;
+	virtual bool OnMouseDown() override;
+
 	virtual void OnMouseMove(float x, float y) override;
-	virtual void OnMouseUp() override;
-	virtual void OnMouseDown() override;
 };

@@ -1,6 +1,7 @@
 #include "UIContainer.hpp"
 
-#define PASSTOEACHCHILD(FUNC_CALL) for (uint32 i = 0; i < _children.GetSize(); ++i) _children[i]->FUNC_CALL
+#define PASSTOEACHCHILD(FUNC_CALL) for (size_t i = 0; i < _children.GetSize(); ++i) _children[i]->FUNC_CALL
+#define PASSTOEACHCHILD_RETURNIFTRUE(FUNC_CALL) for (size_t ti = _children.GetSize(); ti > 0; --ti) if (_children[ti - 1]->FUNC_CALL) return true;
 
 void UIContainer::_OnChildGained(UIElement *child)
 {
@@ -30,58 +31,39 @@ void UIContainer::Clear()
 		_children[0]->SetParent(nullptr); 
 }
 
-void UIContainer::OnElementRequestFocus(UIElement* element) { PASSTOEACHCHILD(OnElementRequestFocus(element)); }
-void UIContainer::Render() const { PASSTOEACHCHILD(Render()); }
-void UIContainer::_OnBoundsChanged() { PASSTOEACHCHILD(UpdateAbsoluteBounds());}
-void UIContainer::OnKeyUp(EKeycode key) { PASSTOEACHCHILD(OnKeyUp(key));}
-void UIContainer::OnKeyDown(EKeycode key){ PASSTOEACHCHILD(OnKeyDown(key));}
-void UIContainer::OnCharInput(char c) { PASSTOEACHCHILD(OnCharInput(c)); }
-void UIContainer::OnMouseUp() { PASSTOEACHCHILD(OnMouseUp()); }
-void UIContainer::OnMouseDown() { PASSTOEACHCHILD(OnMouseDown()); }
+void UIContainer::FocusElement(UIElement* element)			{ PASSTOEACHCHILD(FocusElement(element)); }
+void UIContainer::Render() const							{ PASSTOEACHCHILD(Render()); }
+void UIContainer::_OnBoundsChanged()						{ PASSTOEACHCHILD(UpdateAbsoluteBounds()); }
 
-UIElement* UIContainer::GetLastOverlappingElement(float x, float y, ECursor& out_Cursor) const
-{
-	UIElement* last = nullptr;
+//TODO: Z-order is NOT taken into account for all of these functions, only render order!!! Kind of dumb!!!
+bool UIContainer::OnKeyUp(EKeycode key)						{ PASSTOEACHCHILD_RETURNIFTRUE(OnKeyUp(key));	return false; }
+bool UIContainer::OnKeyDown(EKeycode key)					{ PASSTOEACHCHILD_RETURNIFTRUE(OnKeyDown(key));	return false; }
+bool UIContainer::OnCharInput(char c)						{ PASSTOEACHCHILD_RETURNIFTRUE(OnCharInput(c)); return false; }
+bool UIContainer::OnMouseDown()								{ PASSTOEACHCHILD_RETURNIFTRUE(OnMouseDown());  return false; }
+bool UIContainer::OnMouseUp()								{ PASSTOEACHCHILD_RETURNIFTRUE(OnMouseUp());  return false; }
+
+//todo: ditto
+void UIContainer::OnMouseMove(float mouseX, float mouseY) 
+{ 
+	_hover = false;
+
+	_cursor = ECursor::DEFAULT;
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
 	{
-		UIContainer* container = dynamic_cast<UIContainer*>(_children[i]);
-		if (container)
-		{
-			ECursor cursor = ECursor::DEFAULT;
-			UIElement* element = container->GetLastOverlappingElement(x, y, cursor);
-			if (element)
-			{
-				last = element;
-			
-				if ((out_Cursor == ECursor::ARROWS_HORIZONTAL && cursor == ECursor::ARROWS_VERTICAL) ||
-					(out_Cursor == ECursor::ARROWS_VERTICAL && cursor == ECursor::ARROWS_HORIZONTAL))
-					out_Cursor = ECursor::ARROWS_QUAD;
-				else
-					out_Cursor = cursor;
-			}
-		}
-		else if (_children[i]->OverlapsPoint(x, y))
-		{
-			last = _children[i];
+		_children[i]->OnMouseMove(mouseX, mouseY);
 
-			if ((out_Cursor == ECursor::ARROWS_HORIZONTAL && _children[i]->GetCursor() == ECursor::ARROWS_VERTICAL) ||
-				(out_Cursor == ECursor::ARROWS_VERTICAL && _children[i]->GetCursor() == ECursor::ARROWS_HORIZONTAL))
-				out_Cursor = ECursor::ARROWS_QUAD;
+		if (_children[i]->GetHover())
+		{
+			_hover = true;
+
+			if ((_cursor == ECursor::ARROWS_HORIZONTAL && _children[i]->GetCursor() == ECursor::ARROWS_VERTICAL) ||
+				(_cursor == ECursor::ARROWS_VERTICAL && _children[i]->GetCursor() == ECursor::ARROWS_HORIZONTAL))
+				_cursor = ECursor::ARROWS_QUAD;
 			else
-				out_Cursor = _children[i]->GetCursor();
+				_cursor = _children[i]->GetCursor();
 		}
 	}
 
-	return last;
-}
-
-void UIContainer::OnMouseMove(float mouseX, float mouseY) 
-{ 
-	PASSTOEACHCHILD(OnMouseMove(mouseX, mouseY)); 
-
-	ECursor cursor = ECursor::DEFAULT;
-	UIElement* element = GetLastOverlappingElement(mouseX, mouseY, cursor);
-	if (element)
-		Engine::UseCursor(cursor);
+	_cursor = _cursor;
 }

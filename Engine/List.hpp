@@ -187,10 +187,18 @@ class List
 					current->_next = next->_next;
 					list._DeleteNode(next);
 					success = true;
-				}
 
-				current = next;
-				next = current->_next;
+					if (current->_next == nullptr)
+						return true;
+
+					current = current->_next;
+					next = current->_next;
+				}
+				else
+				{
+					current = next;
+					next = current->_next;
+				}
 			}
 
 			return success;

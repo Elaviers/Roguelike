@@ -16,8 +16,8 @@ void GameInstance::SetupInputs()
 
 void GameInstance::OnResize(uint16 w, uint16 h)
 {
-	w = w;
-	h = h;
+	_w = w;
+	_h = h;
 
 	if (_activeCamera)
 		_activeCamera->SetViewport(w, h);

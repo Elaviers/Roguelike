@@ -4,7 +4,6 @@
 
 class UISplitter : public UIRect
 {
-	bool _hover;
 	bool _drag;
 
 	bool _isHorizontal;
@@ -23,7 +22,7 @@ public:
 	Event<UISplitter&> onDragged;
 
 	UISplitter(UIElement* parent = nullptr) : UIRect(parent), 
-		_hover(false), _drag(false), _isHorizontal(false), _textureTileSize(32.f), _min(0.1f), _max(0.9f), _useAbsolute(false) 
+		_drag(false), _isHorizontal(false), _textureTileSize(32.f), _min(0.1f), _max(0.9f), _useAbsolute(false) 
 	{ SetCursor(ECursor::ARROWS_HORIZONTAL); }
 	virtual ~UISplitter() {}
 
@@ -61,7 +60,8 @@ public:
 
 	virtual void Render() const override;
 
+	virtual bool OnMouseUp() override;
+	virtual bool OnMouseDown() override;
+
 	virtual void OnMouseMove(float x, float y) override;
-	virtual void OnMouseUp() override;
-	virtual void OnMouseDown() override;
 }; 

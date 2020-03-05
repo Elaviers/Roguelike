@@ -10,7 +10,7 @@
 #include "EntRenderable.hpp"
 
 constexpr const char *levelPrefix = "POO";
-constexpr const byte currentVersion = LevelVersions::VERSION_2;
+constexpr const byte currentVersion = LevelVersions::VERSION_3;
 
 namespace LevelMessages
 {
@@ -63,7 +63,8 @@ bool LevelIO::Read(Entity &world, const char *filename)
 			return false;
 		}
 
-		if (reader.Read_byte() != currentVersion)
+		byte version = reader.Read_byte();
+		if (version != LevelVersions::VERSION_2 && version != LevelVersions::VERSION_3)
 		{
 			Debug::Error("Unsupported level version");
 			return false;
@@ -87,13 +88,33 @@ bool LevelIO::Read(Entity &world, const char *filename)
 			}
 			else
 			{
-				Entity *obj = Engine::Instance().registry.GetNode(id)->New();
-				if (obj)
+				if (version == LevelVersions::VERSION_2)
 				{
-					obj->SetParent(&world);
-					obj->ReadData(reader, strings);
+					if (id == (byte)EEntityID::LEVEL_CONNECTOR)
+					{
+						reader.IncrementIndex(9*4); //TRANSFORM (9 floats)
+						reader.Read_string();
+						reader.IncrementIndex(1 + 6*4); // 1 byte + 6 floats
+						Debug::Message("This is a version 2 level, so a level connector has been removed", "Hey");
+						continue;
+					}
 				}
-				else Debug::Error("Unsupported object ID");
+
+				RegistryNodeBase* node = Engine::Instance().registry.GetNode(id);
+				if (node)
+				{
+					Entity* obj = Engine::Instance().registry.GetNode(id)->New();
+					if (obj)
+					{
+						obj->SetParent(&world);
+						obj->ReadData(reader, strings);
+					}
+					else Debug::Error("Could not create a new object");
+				}
+				else
+				{
+					Debug::Error(CSTR("Unsupported object ID : ", id));
+				}
 			}
 		}
 

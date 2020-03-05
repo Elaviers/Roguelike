@@ -83,19 +83,21 @@ public:
 		_lastMouseY = mouseY;
 	}
 
-	virtual void OnMouseUp() override
+	virtual bool OnMouseUp() override
 	{
 		if (_readOnly)
-			return;
+			return false;
 
 		if (_selecting)
 		{
 			if (_listBox.OverlapsPoint(_lastMouseX, _lastMouseY))
-				_listBox.OnMouseUp();
+				return _listBox.OnMouseUp();
 			else
 				_StopSelecting();
 		}
 		else
-			UITextButton::OnMouseUp();
+			return UITextButton::OnMouseUp();
+
+		return false;
 	}
 };

@@ -144,9 +144,10 @@ class Map
 			if (right)	right->AddTo(buffer);
 		}
 
-		void ForEach(void (*function)(const K&, V&))
+		template <typename Function>
+		void ForEach(Function function)
 		{
-			function(key, value);
+			function((const K&)key, (V&)value);
 			if (left)	left->ForEach(function);
 			if (right)	right->ForEach(function);
 		}
@@ -258,7 +259,9 @@ public:
 		return buffer;
 	}
 
-	void ForEach(void (*function)(const K&, V&))
+	//args must be (const K&, V&)
+	template <typename Function>
+	void ForEach(Function function)
 	{
 		if (_data) _data->ForEach(function);
 	}

@@ -100,3 +100,13 @@ void InputManager::SetMouseAxes(short x, short y)
 	if (mouseY)
 		**mouseY = (float)-y;
 }
+
+void InputManager::Reset()
+{
+	byte* keystates = _keyStates;
+	_keyBinds.ForEach([&keystates](const EKeycode& kc, KeyBind*& keybind) { if (keystates[(size_t)kc] != 0) keybind->KeyUp(); });
+	_axisBinds.ForEach([](const EAxis&, float*& axis) { *axis = 0.f; });
+
+	for (int i = 0; i < 256; ++i)
+		_keyStates[i] = 0;
+}

@@ -49,6 +49,5 @@ namespace EngineTests
 
 			Assert::IsTrue((Vector3(1, 0, 0) * m).AlmostEqual(Vector3(0, 1, 2), .1f));
 		}
-
 	};
 }

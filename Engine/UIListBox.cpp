@@ -29,7 +29,7 @@ void UIListBox::Add(const String& item)
 
 void UIListBox::OnMouseMove(float x, float y)
 {
-	_hover = OverlapsPoint(x, y);
+	UIElement::OnMouseMove(x, y);
 
 	if (_hover)
 	{
@@ -50,10 +50,12 @@ void UIListBox::OnMouseMove(float x, float y)
 	}
 }
 
-void UIListBox::OnMouseUp()
+bool UIListBox::OnMouseUp()
 {
 	if (_hover && _selectedLabel)
 	{
 		onSelectionSubmitted(*_selectedLabel);
 	}
+
+	return _hover;
 }

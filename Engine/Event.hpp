@@ -27,9 +27,14 @@ public:
 	}
 
 
-	Event& operator-=(const FunctionPointer<void, Args...>& function) 
-	{ 
-		_list.Remove(function);
+	bool Remove(const FunctionPointer<void, Args...>& function)
+	{
+		return _list.Remove(function);
+	}
+
+	Event& operator-=(const FunctionPointer<void, Args...>& function)
+	{
+		Remove(function);
 		return *this;
 	}
 

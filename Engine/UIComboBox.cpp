@@ -9,7 +9,7 @@ void UIComboBox::_StopSelecting()
 
 void UIComboBox::_OnPressed(UIButton& button)
 {
-	_RequestFocus();
+	RequestFocus();
 
 	_hover = false;
 	_panel.SetColour(_colourHold);

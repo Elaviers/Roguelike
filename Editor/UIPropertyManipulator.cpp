@@ -32,26 +32,29 @@ String ClassIDToString(byte id)
 
 void UIPropertyManipulator::_OnPressed(UIButton& button)
 {
-	String string;
-	if (_property.GetFlags() & PropertyFlags::MATERIAL)
+	if (!_refreshing)
 	{
-		string = _editorInstance.SelectMaterialDialog();
-	}
-	else
-	{
-		string = _editorInstance.SelectModelDialog();
-	}
+		String string;
+		if (_property.GetFlags() & PropertyFlags::MATERIAL)
+		{
+			string = _editorInstance.SelectMaterialDialog();
+		}
+		else
+		{
+			string = _editorInstance.SelectModelDialog();
+		}
 
-	if (string.GetLength() > 0)
-	{
-		_property.SetAsString(_object, string);
-		_textbox->SetString(string);
+		if (string.GetLength() > 0)
+		{
+			_property.SetAsString(_object, string);
+			_textbox->SetString(string);
+		}
 	}
 }
 
 void UIPropertyManipulator::_OnStateChanged(UICheckbox& checkbox)
 {
-	if (_property.GetType() == EPropertyType::BOOL)
+	if (!_refreshing && _property.GetType() == EPropertyType::BOOL)
 	{
 		VariableProperty<bool>& boolProperty = dynamic_cast<VariableProperty<bool>&>(_property);
 		boolProperty.Set(_object, checkbox.GetState());
@@ -83,16 +86,18 @@ void SetPropertyString(Property& property, void* object, const String& string)
 
 void UIPropertyManipulator::_OnStringChanged(UITextbox& textbox)
 {
-	SetPropertyString(_property, _object, textbox.GetString());
+	if (!_refreshing)
+		SetPropertyString(_property, _object, textbox.GetString());
 }
 
 void UIPropertyManipulator::_OnStringChanged(UIComboBox& combobox)
 {
-	SetPropertyString(_property, _object, combobox.GetString());
+	if (!_refreshing)
+		SetPropertyString(_property, _object, combobox.GetString());
 }
 
 UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property& property, void* object, UIElement* parent) : 
-	UIContainer(parent), _editorInstance(instance), _label(this), _object(object), _property(property), _textbox(nullptr), _checkbox(nullptr), _combobox(nullptr)
+	UIContainer(parent), _editorInstance(instance), _label(this), _object(object), _property(property), _textbox(nullptr), _checkbox(nullptr), _combobox(nullptr), _refreshing(false)
 {
 	bool readOnly = property.GetFlags() & PropertyFlags::READONLY;
 
@@ -185,6 +190,8 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 
 void UIPropertyManipulator::Refresh()
 {
+	_refreshing = true;
+
 	if (_textbox)
 	{
 		_textbox->SetString(GetPropertyString(_property, _object));
@@ -201,4 +208,6 @@ void UIPropertyManipulator::Refresh()
 	{
 		_combobox->SetString(GetPropertyString(_property, _object));
 	}
+
+	_refreshing = false;
 }

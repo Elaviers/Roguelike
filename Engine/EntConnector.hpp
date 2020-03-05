@@ -1,29 +1,25 @@
 #pragma once
-#include "EntBox.hpp"
-#include "BufferIterator.hpp"
-#include "EDirection2D.hpp"
+#include "Entity.hpp"
 
-class EntConnector : public EntBox
+class EntConnector : public Entity
 {
+	static Collider COLLIDER;
+
 public:
 	Entity_FUNCS(EntConnector, EEntityID::LEVEL_CONNECTOR)
 
-	EDirection2D direction;
 	bool connected;
 
-	EntConnector() : EntBox(EFlags::SAVEABLE), direction(EDirection2D::NORTH), connected(false) { }
+	EntConnector() : Entity(EFlags::SAVEABLE), connected(false) { }
 	virtual ~EntConnector() {}
 
 	virtual void Render(ERenderChannels) const;
 
-	virtual void WriteData(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;
-	virtual void ReadData(BufferReader<byte> &buffer, const NumberedSet<String> &strings) override;
-
 	virtual Bounds GetBounds() const override {
-
-		return Bounds();
-
+		return Bounds(Vector3(.5f, .5f, 0.f), Vector3(-.5f, -.5f, 0.f));
 	}
 
-	bool IsCompatibleWith(const EntConnector &other) const;
+	virtual const Collider* GetCollider() const override {
+		return &COLLIDER;
+	}
 };

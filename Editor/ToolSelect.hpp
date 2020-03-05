@@ -1,7 +1,6 @@
 #pragma once
 #include "Tool.hpp"
 #include "Gizmo.hpp"
-#include <Engine/EntBox.hpp>
 #include <Engine/Buffer.hpp>
 #include <Engine/Entity.hpp>
 #include <Engine/SharedPointer.hpp>
@@ -10,8 +9,6 @@ class ToolSelect : public Tool
 {
 	bool _placing;
 	bool _shouldCopy;
-
-	EntBox _box;
 
 	EntityPointer _hoverObject;
 	bool _hoverObjectIsSelected;
@@ -27,6 +24,9 @@ class ToolSelect : public Tool
 
 	Gizmo _gizmo;
 
+	Vector3 _sbPoint1;
+	Vector3 _sbPoint2;
+
 	const PropertyCollection& _GetProperties();
 
 	void _GizmoMove(const Vector3& delta);
@@ -34,6 +34,8 @@ class ToolSelect : public Tool
 	void _UpdateGizmoPos();
 
 	void _SetHoverObject(Entity*);
+
+	void _CloneSelection();
 
 public:
 	ToolSelect(Editor& level) : Tool(level),

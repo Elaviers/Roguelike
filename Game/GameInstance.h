@@ -10,7 +10,7 @@ class GameInstance
 	float _axisLookUp;
 	float _axisLookRight;
 
-	uint16 w, h;
+	uint16 _w, _h;
 
 public:
 	static GameInstance& Instance()
@@ -19,7 +19,7 @@ public:
 		return instance;
 	}
 
-	GameInstance() : _activeCamera(nullptr), _axisMoveForward(0.f), _axisMoveRight(0.f), _axisLookUp(0.f), _axisLookRight(0.f), w(0), h(0) {}
+	GameInstance() : _activeCamera(nullptr), _axisMoveForward(0.f), _axisMoveRight(0.f), _axisLookUp(0.f), _axisLookRight(0.f), _w(0), _h(0) {}
 
 	void SetupInputs();
 
@@ -29,7 +29,7 @@ public:
 	{ 
 		_activeCamera = camera; 
 		if (_activeCamera)
-			OnResize(w, h);
+			OnResize(_w, _h);
 	}
 
 	const EntCamera* GetActiveCamera() const	{ return _activeCamera; }

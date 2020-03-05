@@ -93,7 +93,7 @@ void UISplitter::Render() const
 
 void UISplitter::OnMouseMove(float mouseX, float mouseY)
 {
-	_hover = OverlapsPoint(mouseX, mouseY);
+	UIRect::OnMouseMove(mouseX, mouseY);
 
 	if (_drag)
 	{
@@ -130,13 +130,24 @@ void UISplitter::OnMouseMove(float mouseX, float mouseY)
 	}
 }
 
-void UISplitter::OnMouseUp()
+bool UISplitter::OnMouseUp()
 {
-	_drag = false;
+	if (_drag)
+	{
+		_drag = false;
+		return true;
+	}
+
+	return false;
 }
 
-void UISplitter::OnMouseDown()
+bool UISplitter::OnMouseDown()
 {
 	if (_hover)
+	{
 		_drag = true;
+		return true;
+	}
+
+	return false;
 }

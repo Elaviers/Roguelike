@@ -7,8 +7,6 @@
 
 class UIListBox : public UIElement
 {
-	bool _hover;
-
 	UIPanel _panel;
 	List<UILabel> _labels;
 
@@ -75,6 +73,7 @@ public:
 			_selectionBox.Render();
 	}
 
+	virtual bool OnMouseUp() override;
+
 	virtual void OnMouseMove(float mouseX, float mouseY) override;
-	virtual void OnMouseUp() override;
 };

@@ -31,10 +31,17 @@ struct AbsoluteBounds
 
 class UIElement
 {
+	void _SetFocus(UIElement& element) { _hasFocus = true; }
+	void _ClearFocus(UIElement& element) { _hasFocus = false; }
+
 protected:
 	UIElement *_parent;
 
 	bool _markedForDelete;
+	bool _hasFocus;
+	bool _hover;
+
+	bool _focusOnClick;
 
 	UIBounds _bounds;
 	AbsoluteBounds _absoluteBounds;
@@ -43,9 +50,16 @@ protected:
 
 	ECursor _cursor;
 
+public:
+	Event<UIElement&> onFocusGained;
+	Event<UIElement&> onFocusLost;
+
 protected:
-	UIElement(UIElement *parent) : _parent(parent), _markedForDelete(false), _z(0.f), _cursor(ECursor::DEFAULT)
+	UIElement(UIElement *parent) : _parent(parent), _markedForDelete(false), _hasFocus(false), _focusOnClick(true), _hover(false), _z(0.f), _cursor(ECursor::DEFAULT)
 	{ 
+		onFocusGained += FunctionPointer<void, UIElement&>(this, &UIElement::_SetFocus);
+		onFocusLost += FunctionPointer<void, UIElement&>(this, &UIElement::_ClearFocus);
+
 		if (_parent)
 		{
 			UpdateAbsoluteBounds();
@@ -53,17 +67,14 @@ protected:
 		}
 	}
 
+	UIElement(const UIElement& other) = delete;
+
 	virtual void _OnBoundsChanged() {}
 	
 	virtual void _OnChildGained(UIElement *child) {}
 	virtual void _OnChildLost(UIElement *child) {}
 
-	void _RequestFocus();
-
 public:
-	Event<UIElement&> onFocusGained;
-	Event<UIElement&> onFocusLost;
-
 	virtual ~UIElement() 
 	{
 		if (_parent)
@@ -86,11 +97,6 @@ public:
 		return *this;
 	}
 
-	const AbsoluteBounds& GetAbsoluteBounds() const { return _absoluteBounds; }
-	const UIBounds& GetBounds() const { return _bounds; }
-	float GetZ() const { return _z; }
-	const ECursor& GetCursor() const { return _cursor; }
-
 	UIElement& SetBounds(const UIBounds& bounds) { _bounds = bounds; UpdateAbsoluteBounds(); return *this; }
 	UIElement& SetBounds(const UICoord& x, const UICoord& y, const UICoord& w, const UICoord& h)
 	{
@@ -107,9 +113,21 @@ public:
 	UIElement& SetH(const UICoord& h) { _bounds.h = h; UpdateAbsoluteBounds(); return *this; }
 	UIElement& SetZ(float z) { _z = z; UpdateAbsoluteBounds(); return *this; }
 	UIElement& SetCursor(const ECursor& cursor) { _cursor = cursor; return *this; }
-
+	UIElement& SetFocusOnClick(bool focusOnClick) { _focusOnClick = focusOnClick; return *this; }
 	void MarkForDelete() { _markedForDelete = true; }
+
+	const AbsoluteBounds& GetAbsoluteBounds() const { return _absoluteBounds; }
+	const UIBounds& GetBounds() const { return _bounds; }
+	float GetZ() const { return _z; }
+	const ECursor& GetCursor() const { return _cursor; }
 	bool IsMarkedForDelete() const { return _markedForDelete; }
+	bool HasFocus() const { return _hasFocus; }
+	bool GetFocusOnClick() const { return _focusOnClick; }
+
+	//True if mouse is currently hovering over the element
+	bool GetHover() const { return _hover; }
+
+	void RequestFocus();
 
 	virtual bool OverlapsPoint(float x, float y) const
 	{
@@ -119,15 +137,20 @@ public:
 			y <= (_absoluteBounds.y + _absoluteBounds.h);
 	}
 
-	virtual void OnElementRequestFocus(UIElement* child);
+	virtual void FocusElement(UIElement* child);
 
 	virtual void Render() const {}
 	virtual void Update(float deltaTime) {}
 
-	virtual void OnKeyUp(EKeycode) {}
-	virtual void OnKeyDown(EKeycode) {}
-	virtual void OnCharInput(char) {}
-	virtual void OnMouseMove(float mouseX, float mouseY) {}
-	virtual void OnMouseUp() {}
-	virtual void OnMouseDown() {}
+	//These functions return true if they 'consume' the input
+	virtual bool OnKeyUp(EKeycode) { return false; }
+	virtual bool OnKeyDown(EKeycode) { return false; }
+	virtual bool OnCharInput(char) { return false; }
+	virtual bool OnMouseUp();
+	virtual bool OnMouseDown();
+
+	virtual void OnMouseMove(float mouseX, float mouseY);
+
+	virtual void OnHoverStart() {}
+	virtual void OnHoverStop() {}
 };

@@ -1,6 +1,5 @@
 #include "Registry.hpp"
 #include "EEntityID.hpp"
-#include "EntBox.hpp"
 #include "EntBrush2D.hpp"
 #include "EntBrush3D.hpp"
 #include "EntConnector.hpp"
@@ -20,6 +19,5 @@ void Registry::RegisterEngineObjects()
 	RegisterObjectClass<EntLight>		("Light");
 	RegisterObjectClass<EntSprite>		("Sprite");
 	RegisterObjectClass<EntConnector>	("Level Connector");
-	RegisterObjectClass<EntBox>			("Box");
 	RegisterObjectClass<EntCamera>		("Camera");
 }

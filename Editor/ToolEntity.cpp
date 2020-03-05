@@ -63,7 +63,7 @@ void ToolEntity::MouseMove(const MouseData& mouseData)
 	if (mouseData.viewport >= 0 && _placement && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::PERSPECTIVE)
 	{
 		EntCamera& camera = _owner.GetVP(mouseData.viewport).camera;
-		Ray r = camera.ScreenCoordsToRay(Vector2((float)mouseData.x / camera.GetViewport()[1], (float)mouseData.y / camera.GetViewport()[0]));
+		Ray r = camera.ScreenCoordsToRay(Vector2((float)mouseData.x / camera.GetViewport()[0], (float)mouseData.y / camera.GetViewport()[1]));
 		Buffer<RaycastResult> results = _owner.LevelRef().Raycast(r);
 
 		if (results.GetSize() > 0)

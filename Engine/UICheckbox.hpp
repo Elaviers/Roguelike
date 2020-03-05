@@ -86,9 +86,10 @@ public:
 			_image.Render();
 	}
 
-	virtual void OnMouseMove(float x, float y) { if (!_readOnly) _button.OnMouseMove(x, y); }
-	virtual void OnMouseUp() { if (!_readOnly) _button.OnMouseUp(); }
-	virtual void OnMouseDown() { if (!_readOnly) _button.OnMouseDown(); }
+	virtual bool OnMouseUp() override { return _readOnly ? false : _button.OnMouseUp(); }
+	virtual bool OnMouseDown() override  { return _readOnly ? false : _button.OnMouseDown(); }
+
+	virtual void OnMouseMove(float x, float y) override { if (!_readOnly) _button.OnMouseMove(x, y); }
 
 	void Toggle()
 	{

@@ -20,17 +20,16 @@ public:
 
 	void Clear();
 
-	virtual void OnElementRequestFocus(UIElement*) override;
+	virtual void FocusElement(UIElement*) override;
 
 	virtual void Render() const override;
 	virtual void Update(float deltaTime) override;
 	
-	virtual void OnKeyUp(EKeycode);
-	virtual void OnKeyDown(EKeycode);
-	virtual void OnCharInput(char);
-	virtual void OnMouseMove(float mouseX, float mouseY);
-	virtual void OnMouseUp();
-	virtual void OnMouseDown();
+	virtual bool OnKeyUp(EKeycode) override;
+	virtual bool OnKeyDown(EKeycode) override;
+	virtual bool OnCharInput(char) override;
+	virtual bool OnMouseUp() override;
+	virtual bool OnMouseDown() override;
 
-	UIElement* GetLastOverlappingElement(float x, float y, ECursor& out_Cursor) const;
+	virtual void OnMouseMove(float mouseX, float mouseY) override;
 };

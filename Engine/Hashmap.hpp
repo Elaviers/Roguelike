@@ -172,10 +172,11 @@ class Hashmap
 			if (right)	right->AddTo(buffer, depth, currentDepth + 1);
 		}
 
-		void ForEach(void (*function)(const K&, V&))
+		template <typename Function>
+		void ForEach(Function function)
 		{
 			for (auto it = keys.First(); it.IsValid(); ++it)
-				function(it->first, it->second);
+				function((const K&)it->first, (V&)it->second);
 			
 			if (left)	left->ForEach(function);
 			if (right)	right->ForEach(function);
@@ -316,7 +317,9 @@ public:
 		return buffer;
 	}
 
-	void ForEach(void (*function)(const K&, V&))
+	//Function args must be (const K&, V&)
+	template <typename Function>
+	void ForEach(Function function)
 	{
 		if (_data) _data->ForEach(function);
 	}

@@ -24,8 +24,5 @@ public:
 	virtual void KeySubmit() override;
 
 	virtual void Render(ERenderChannels) const override;
-
-	String GetConnectorDirection() const;
-	void SetConnectorDirection(const String &dir);
 };
 

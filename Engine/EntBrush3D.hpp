@@ -4,12 +4,24 @@
 class EntBrush3D : public EntBrush<3>
 {
 protected:
-	virtual void _OnTransformChanged() override;
+	void _OnTransformChanged();
+	virtual void _OnPointChanged() override;
+
+	bool _updatingTransform;
 
 public:
-	Entity_FUNCS(EntBrush3D, EEntityID::BRUSH)
+	Entity_FUNCS(EntBrush3D, EEntityID::BRUSH);
 
-	EntBrush3D() {}
+	EntBrush3D() : _updatingTransform(false)
+	{ 
+		onTransformChanged += FunctionPointer<void>(this, &EntBrush3D::_OnTransformChanged);
+	}
+
+	EntBrush3D(const EntBrush3D& other) : EntBrush<3>(other), _updatingTransform(false)
+	{
+		onTransformChanged += FunctionPointer<void>(this, &EntBrush3D::_OnTransformChanged);
+	}
+
 	virtual ~EntBrush3D() {}
 
 	virtual void Render(ERenderChannels) const override;

@@ -90,14 +90,6 @@ namespace EngineTests
 		}
 
 		template<>
-		void AssertEqual(const EntConnector& a, const EntConnector& b)
-		{
-			AssertEqual<Entity>(a, b);
-
-			Assert::IsTrue(a.direction == b.direction, L"Directions are not equal");
-		}
-
-		template<>
 		void AssertEqual(const EntLight& a, const EntLight& b)
 		{
 			AssertEqual<Entity>(a, b);
@@ -176,13 +168,6 @@ namespace EngineTests
 				src.SetScale(69.f);
 				src.SetZBounds(33.f, 66.f);
 				src.SetViewport(300, 301);
-				CheckRW(src);
-			}
-
-			{
-				SRC(EntConnector);
-				src.direction = EDirection2D::SOUTH;
-				src.connected = true;
 				CheckRW(src);
 			}
 

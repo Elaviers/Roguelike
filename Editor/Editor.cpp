@@ -137,16 +137,6 @@ void Editor::_Init()
 	_uiCamera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
 	_uiCamera.SetZBounds(-100, 100);
 
-	_toolbar.SetButtonMaterial(Engine::Instance().pMaterialManager->Get("uibutton1")).SetButtonBorderSize(2.f)
-		.SetButtonColourFalse(Colour::White).SetButtonColourTrue(Colour::Blue).SetButtonColourHover(Colour(.8f, .8f, .7f)).SetButtonColourHold(Colour::Grey)
-		.SetParent(&_ui).SetBounds(0.f, UICoord(1.f, -64.f), 1.f, UICoord(0.f, 64.f));
-	_toolbar.AddButton("Select", Engine::Instance().pTextureManager->Get("editor/tools/select"), (uint16)ETool::SELECT);
-	_toolbar.AddButton("Brush2D", Engine::Instance().pTextureManager->Get("editor/tools/brush2d"), (uint16)ETool::BRUSH2D);
-	_toolbar.AddButton("Brush3D", Engine::Instance().pTextureManager->Get("editor/tools/brush3d"), (uint16)ETool::BRUSH3D);
-	_toolbar.AddButton("Entity", Engine::Instance().pTextureManager->Get("editor/tools/entity"), (uint16)ETool::ENTITY);
-	_toolbar.AddButton("Connector", Engine::Instance().pTextureManager->Get("editor/tools/connector"), (uint16)ETool::CONNECTOR);
-	_toolbar.onItemSelected += FunctionPointer<void, UIToolbarItem&>(this, &Editor::_OnToolbarItemSelection);
-
 	_sideUI.SetParent(&_ui);
 	_vpAreaUI.SetParent(&_ui);
 
@@ -157,28 +147,39 @@ void Editor::_Init()
 	_viewports[0].camera.SetRelativePosition(Vector3(-5.f, 5.f, -5.f));
 	_viewports[0].camera.SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
 	_viewports[0].camera.SetZBounds(0.001f, 100.f);
-	_viewports[0].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f);
+	_viewports[0].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f).SetFocusOnClick(false);
 
 	_viewports[1].gridPlane = EDirection::UP;
 	_viewports[1].camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
 	_viewports[1].camera.SetScale(32.f);
 	_viewports[1].camera.SetZBounds(-10000.f, 10000.f);
 	_viewports[1].camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
-	_viewports[1].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI);
+	_viewports[1].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f).SetFocusOnClick(false);
 
 	_viewports[2].gridPlane = EDirection::FORWARD;
 	_viewports[2].camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
 	_viewports[2].camera.SetScale(32.f);
 	_viewports[2].camera.SetZBounds(-10000.f, 10000.f);
 	_viewports[2].camera.SetRelativeRotation(Vector3(0.f, 0.f, 0.f));
-	_viewports[2].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI);
+	_viewports[2].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f).SetFocusOnClick(false);
 
 	_viewports[3].gridPlane = EDirection::RIGHT;
 	_viewports[3].camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
 	_viewports[3].camera.SetScale(32.f);
 	_viewports[3].camera.SetZBounds(-10000.f, 10000.f);
 	_viewports[3].camera.SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
-	_viewports[3].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI);
+	_viewports[3].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f).SetFocusOnClick(false);
+
+	//Note: toolbar is added after the viewport background ui because containers pass events to last elements first
+	_toolbar.SetButtonMaterial(Engine::Instance().pMaterialManager->Get("uibutton1")).SetButtonBorderSize(2.f)
+		.SetButtonColourFalse(Colour::White).SetButtonColourTrue(Colour::Blue).SetButtonColourHover(Colour(.8f, .8f, .7f)).SetButtonColourHold(Colour::Grey)
+		.SetParent(&_ui).SetBounds(0.f, UICoord(1.f, -64.f), 1.f, UICoord(0.f, 64.f));
+	_toolbar.AddButton("Select", Engine::Instance().pTextureManager->Get("editor/tools/select"), (uint16)ETool::SELECT);
+	_toolbar.AddButton("Brush2D", Engine::Instance().pTextureManager->Get("editor/tools/brush2d"), (uint16)ETool::BRUSH2D);
+	_toolbar.AddButton("Brush3D", Engine::Instance().pTextureManager->Get("editor/tools/brush3d"), (uint16)ETool::BRUSH3D);
+	_toolbar.AddButton("Entity", Engine::Instance().pTextureManager->Get("editor/tools/entity"), (uint16)ETool::ENTITY);
+	//_toolbar.AddButton("Connector", Engine::Instance().pTextureManager->Get("editor/tools/connector"), (uint16)ETool::CONNECTOR);
+	_toolbar.onItemSelected += FunctionPointer<void, UIToolbarItem&>(this, &Editor::_OnToolbarItemSelection);
 
 	UIColour splitterColour(Colour::White, Colour(1.f, 1.f, 1.f, 0.5f));
 	UISplitter* splitterHoriz = new UISplitter(&_vpAreaUI);
@@ -283,6 +284,21 @@ void Editor::Frame()
 
 	if (_deltaTime > .1f) //Do not allow very long time deltas, they screw up the physics
 		_deltaTime = 0.1f;
+
+	POINT cursorPos;
+	if (::GetCursorPos(&cursorPos))
+	{
+		RECT client;
+		if (::GetWindowRect(_vpArea.GetHwnd(), &client))
+		{
+			uint16 x = cursorPos.x - client.left;
+			uint16 y = _uiCamera.GetViewport()[1] - (cursorPos.y - client.top);
+			_ui.OnMouseMove(x, y);
+			Engine::UseCursor(_ui.GetCursor());
+
+			UpdateMousePosition(x, y);
+		}
+	}
 
 	EntCamera &perspCam = _viewports[_activeVP].camera;
 	perspCam.RelativeMove(
@@ -628,6 +644,8 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 
 void Editor::LeftMouseDown()
 {
+	_ui.FocusElement(nullptr);
+
 	_mouseData.isLeftDown = true;
 	_mouseData.heldUnitX = _mouseData.unitX;
 	_mouseData.heldUnitY = _mouseData.unitY;
@@ -640,6 +658,8 @@ void Editor::LeftMouseDown()
 
 void Editor::LeftMouseUp()
 {
+	_ui.FocusElement(nullptr);
+
 	_mouseData.isLeftDown = false;
 
 	if (_currentTool)
@@ -1007,24 +1027,16 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			editor->Zoom(.75f);
 		break;
 
-	case WM_MOUSEMOVE:
-	{
-		uint16 x = GET_X_LPARAM(lparam);
-		uint16 y = editor->_uiCamera.GetViewport()[1] - GET_Y_LPARAM(lparam);
-		editor->_ui.OnMouseMove(x, y);
-		editor->UpdateMousePosition(x, y);
-	}
-		break;
-
 	case WM_LBUTTONDOWN:
 		::SetFocus(hwnd);
-		editor->_ui.OnMouseDown();
-		editor->LeftMouseDown();
+		if (!editor->_ui.OnMouseDown())
+			editor->LeftMouseDown();
+
 		break;
 
 	case WM_LBUTTONUP:
-		editor->_ui.OnMouseUp();
-		editor->LeftMouseUp();
+		if (!editor->_ui.OnMouseUp())
+			editor->LeftMouseUp();
 		break;
 
 	case WM_RBUTTONDOWN:
@@ -1042,21 +1054,25 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 	case WM_SYSKEYDOWN:
 	case WM_KEYDOWN:
-		editor->_ui.OnKeyDown((EKeycode)wparam);
+		if (!editor->_ui.OnKeyDown((EKeycode)wparam))
+		{
+			if (lparam & (1 << 30))
+				break; //Key repeats ignored
 
-		if (lparam & (1 << 30))
-			break; //Key repeats ignored
-
-		if (editor->_mouseData.viewport >= 0)
 			Engine::Instance().pInputManager->KeyDown((EKeycode)wparam);
+		}
+
 		break;
 
 	case WM_SYSKEYUP:
 	case WM_KEYUP:
-		editor->_ui.OnKeyUp((EKeycode)wparam);
-
-		if (editor->_mouseData.viewport >= 0)
+		if (!editor->_ui.OnKeyUp((EKeycode)wparam))
 			Engine::Instance().pInputManager->KeyUp((EKeycode)wparam);
+
+		break;
+
+	case WM_KILLFOCUS:
+		Engine::Instance().pInputManager->Reset();
 		break;
 
 	default: return ::DefWindowProc(hwnd, msg, wparam, lparam);
@@ -1066,43 +1082,3 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 }
 
 #pragma endregion
-
-/*
-	//UNUSED: HASHMAP TESTER
-
-	Hashmap<String, int> test;
-
-	String alph = IO::ReadFileString("file.txt");
-	Buffer<String> lines = alph.Split("\r\n");
-
-	int inc = 0;
-	for (size_t i = 0; i < lines.GetSize(); ++i)
-		test[lines[i]] = inc++;
-
-	int d = 0;
-	while (true)
-	{
-		auto b = test.ToKVBuffer(d);
-
-		if (b.GetSize() == 0)
-			break;
-
-
-		Debug::Print(CSTR("\nDepth " + String::FromInt(d) + " : "));
-
-		for (int i = 0; i < b.GetSize(); ++i)
-		{
-			auto keys = b[i];
-
-			Debug::Print(CSTR(String::FromInt(Hasher<uint32>::Hash<String>(keys->First()->obj.first)) + ": {"));
-
-			for (auto node = keys->First(); node; node = node->next)
-			{
-				Debug::Print(CSTR('\'' + node->obj.first + "' : " + String::FromInt(node->obj.second) + "  "));
-			}
-
-			Debug::Print("} ");
-		}
-		++d;
-	}
-	*/

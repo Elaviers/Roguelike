@@ -14,6 +14,8 @@ class UIPropertyManipulator : public UIContainer
 {
 	Editor& _editorInstance;
 
+	bool _refreshing;
+
 	void* _object;
 	Property& _property;
 	

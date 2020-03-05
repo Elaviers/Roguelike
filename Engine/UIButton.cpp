@@ -1,21 +1,17 @@
 #include "UIButton.hpp"
 
-void UIButton::OnMouseMove(float mouseX, float mouseY)
+void UIButton::OnHoverStart()
 {
-	_hover = OverlapsPoint(mouseX, mouseY);
-
-	if (!_hover && _hold)
-	{
-		_hold = false;
-	}
-
-	if (!_hold)
-	{
-		_panel.SetColour(_hover ? _colourHover : _colour);
-	}
+	_panel.SetColour(_colourHover);
 }
 
-void UIButton::OnMouseUp()
+void UIButton::OnHoverStop()
+{
+	_panel.SetColour(_colour);
+	_hold = false;
+}
+
+bool UIButton::OnMouseUp()
 {
 	if (_hold)
 	{
@@ -23,14 +19,22 @@ void UIButton::OnMouseUp()
 		onPressed(*this);
 
 		_panel.SetColour(_colourHover);
+
+		return true;
 	}
+
+	return false;
 }
 
-void UIButton::OnMouseDown()
+bool UIButton::OnMouseDown()
 {
 	if (_hover)
 	{
 		_hold = true;
 		_panel.SetColour(_colourHold);
+
+		return true;
 	}
+
+	return false;
 }
