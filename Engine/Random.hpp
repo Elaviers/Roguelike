@@ -8,6 +8,8 @@ class Random
 	static constexpr uint32 _m = 2147483647;
 	static constexpr uint32 _mEx = _m + 1;
 
+	uint32 _PeekNext() const;
+
 public:
 	Random();
 	Random(uint32 seed) : _rand(seed) {}

@@ -154,7 +154,7 @@ class List
 			return nullptr;
 		}
 
-		//Returns node before the removed one
+		//Returns node after the removed one
 		Node* RemoveChild(const Node* node, const List& list)
 		{
 			Node* current = this;
@@ -165,11 +165,31 @@ class List
 				{
 					current->_next = next->_next;
 					list._DeleteNode(next);
-					return current;
+					return current->_next;
 				}
 
 				current = next;
 				next = current->_next;
+			}
+
+			return nullptr;
+		}
+
+		//Returns node after the removed one
+		Node* RemoveChildAtDepth(size_t depth, const List& list)
+		{
+			Node* node = this;
+			size_t prev = depth - 1;
+			for (size_t i = 0; i < prev; ++i)
+				if ((node = node->_next) == nullptr)
+					return nullptr;
+
+			if (node->_next)
+			{
+				Node* next = node->_next->_next;
+				list._DeleteNode(node->_next);
+				node->_next = next;
+				return node->_next;
 			}
 
 			return nullptr;
@@ -202,26 +222,6 @@ class List
 			}
 
 			return success;
-		}
-
-		//Returns node before the removed one
-		Node* RemoveChildAtDepth(size_t depth, const List& list)
-		{
-			Node* node = this;
-			size_t prev = depth - 1;
-			for (size_t i = 0; i < prev; ++i)
-				if ((node = node->_next) == nullptr)
-					return nullptr;
-
-			if (node->_next)
-			{
-				Node* next = node->_next->_next;
-				list._DeleteNode(node->_next);
-				node->_next = next;
-				return node;
-			}
-
-			return nullptr;
 		}
 
 		const Node* GetNodeBeforeChild(const Node* node) const	{ return (const Node*)(const_cast<Node*>(this)->GetNodeBeforeChild(node)); }
@@ -306,6 +306,7 @@ private:
 
 	Node* _FindLast() { return _first ? _first->GetDeepestNode() : nullptr; }
 
+	//Returns iterator pointing to next node
 	Iterator _RemoveNode(const Node* node)
 	{
 		if (_first == nullptr) return Iterator(nullptr);
@@ -315,7 +316,7 @@ private:
 			{
 				_DeleteNode(_first);
 				_first = _last = nullptr;
-				return Iterator(_first);
+				return Iterator(nullptr);
 			}
 
 			Node* next = _first->Next();
@@ -324,16 +325,12 @@ private:
 			return Iterator(_first);
 		}
 
-		Node* before = _first->RemoveChild(node, *this);
-		if (before)
-		{
-			if (_last == node)
-				_last = _FindLast();
+		Node* after = _first->RemoveChild(node, *this);
+		
+		if (after == nullptr)
+			_last = _FindLast();
 
-			return Iterator(before);
-		}
-
-		return Iterator(nullptr);
+		return Iterator(after);
 	}
 
 public:
@@ -494,8 +491,37 @@ public:
 	bool Contains(const Iterator& iterator) const		{ return _first ? _first->ContainsNode(iterator._node) : false; }
 	bool Contains(const ConstIterator& iterator) const	{ return _first ? _first->ContainsNode(iterator._node) : false; }
 
+	//Returns iterator pointing to the element after the removed one
 	Iterator Remove(const Iterator& iterator)		{ return _RemoveNode(iterator._node); }
+	
+	//Returns iterator pointing to the element after the removed one
 	Iterator Remove(const ConstIterator& iterator)	{ return _RemoveNode(iterator._node); }
+
+	//Returns iterator pointing to the element after the removed one
+	Iterator RemoveIndex(size_t index)
+	{
+		if (_first)
+		{
+			if (index == 0)
+			{
+				Node* next = _first->Next();
+				_DeleteNode(_first);
+				_first = next;
+
+				if (_first == nullptr) _last = nullptr;
+
+				return Iterator(_first);
+			}
+
+			Node* after = _first->RemoveChildAtDepth(index, *this);
+			if (after == nullptr)
+				_last = _FindLast();
+
+			return Iterator(after);
+		}
+
+		return Iterator(nullptr);
+	}
 
 	bool Remove(const T& value)
 	{
@@ -516,30 +542,5 @@ public:
 		bool success = _first->RemoveChildrenWithValue(value, *this);
 		_last = _FindLast();
 		return success;
-	}
-
-	Iterator RemoveIndex(size_t index)
-	{
-		if (_first)
-		{
-			if (index == 0)
-			{
-				Node* next = _first->Next();
-				_DeleteNode(_first);
-				_first = next;
-
-				if (_first == nullptr) _last = nullptr;
-
-				return Iterator(_first);
-			}
-
-			Node* before = _first->RemoveChildAtDepth(index, *this);
-			if (before->Next() == nullptr)
-				_last = before;
-
-			return Iterator(before);
-		}
-
-		return Iterator(nullptr);
 	}
 };

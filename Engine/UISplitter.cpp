@@ -135,10 +135,10 @@ bool UISplitter::OnMouseUp()
 	if (_drag)
 	{
 		_drag = false;
-		return true;
 	}
 
 	return false;
+	//Always return false to allow pass through to multiple splitters
 }
 
 bool UISplitter::OnMouseDown()
@@ -146,8 +146,8 @@ bool UISplitter::OnMouseDown()
 	if (_hover)
 	{
 		_drag = true;
-		return true;
 	}
 
 	return false;
+	//Always return false to allow pass through to multiple splitters
 }

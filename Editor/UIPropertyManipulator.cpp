@@ -171,7 +171,7 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 
 		UICheckbox* check = new UICheckbox(this);
 		check->SetBounds(UICoord(1.f, -h), 0.f, UICoord(0.f, h), UICoord(0.f, h));
-		check->SetReadOnly(readOnly).SetTextureTrue(Engine::Instance().pTextureManager->Get("ui/checkmark")).
+		check->SetState(dynamic_cast<VariableProperty<bool>&>(_property).Get(_object)).SetReadOnly(readOnly).SetTextureTrue(Engine::Instance().pTextureManager->Get("ui/checkmark")).
 			SetMaterial(btnMat).SetBorderSize(borderSize).SetColourFalse(buttonColourInactive).SetColourTrue(buttonColourInactive).SetColourHover(buttonColourHover).SetColourHold(buttonColourHold);
 		
 		if (!readOnly)

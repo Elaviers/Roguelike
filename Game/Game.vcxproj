@@ -190,6 +190,7 @@ EXIT 0</Command>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameInstance.cpp" />
     <ClCompile Include="LevelGeneration.cpp" />
+    <ClCompile Include="LevelSegmentPicker.cpp" />
     <ClCompile Include="MenuMain.cpp" />
     <ClCompile Include="MenuStartLevel.cpp" />
     <ClCompile Include="WinMain.cpp" />
@@ -199,6 +200,7 @@ EXIT 0</Command>
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameInstance.h" />
     <ClInclude Include="LevelGeneration.hpp" />
+    <ClInclude Include="LevelSegmentPicker.hpp" />
     <ClInclude Include="MenuMain.hpp" />
     <ClInclude Include="MenuStartLevel.hpp" />
     <ClInclude Include="RandomBag.hpp" />

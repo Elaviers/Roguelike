@@ -1,6 +1,18 @@
+//bag <totalWeightOverride=0> <minimumDepth=0> <maximumDepth=0>		designate bag of segments to be used within depth range. By default the total weight is the sum of all weights of entries added to the bag
+//ebag <totalWeightOverride=0> <minimumDepth=0> <maximumDepth=0>	designate bag of segments that generator will try to ensure always gets emptied
+//segment <filename> <weight=1>
+
 depth 10
-segment CTR_Quad.lvl
-segment CTR_T.lvl
-segment CTR_Straight.lvl
-segment CTR_Corner.lvl
-segment CTR_Ramp.lvl
+
+ebag 1 10 10
+segment CTR_Start.lvl
+
+ebag 1 1 1
+segment CTR_End.lvl
+
+bag
+segment CTR_Quad.lvl 10000
+segment CTR_T.lvl 10000
+segment CTR_Straight.lvl 10000
+segment CTR_Corner.lvl 10000
+segment CTR_Ramp.lvl 10000

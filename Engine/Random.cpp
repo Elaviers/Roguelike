@@ -5,7 +5,7 @@ Random::Random() : _rand(Time::GetRandSeed())
 {
 }
 
-uint32 Random::Next()
+uint32 Random::_PeekNext() const
 {
 	//Minimal random number generator
 	//_m = 2147483647
@@ -15,15 +15,22 @@ uint32 Random::Next()
 	constexpr uint32 mask = 6942;
 
 	//Mask to avoid rand being zero or a simple pattern
-	_rand ^= mask;
-	uint32 k = _rand / q;
-	int32 newRand = a * (_rand - k * q) - r * k;
-	
-	if (newRand < 0) 
+	uint32 newRand = _rand ^ mask;
+	uint32 k = newRand / q;
+	newRand = a * (newRand - k * q) - r * k;
+
+	if (newRand < 0)
 		newRand += _m;
-	
-	_rand = newRand;
-	_rand ^= mask;
+
+	return newRand;
+}
+
+uint32 Random::Next()
+{
+	constexpr uint32 mask = 6942;
+
+	uint32 newRand = _PeekNext();
+	_rand = newRand ^ mask;
 	return newRand;
 }
 

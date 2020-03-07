@@ -229,7 +229,7 @@ Vector3 EPA(
 		List<Pair<Vector3>> edges(NewHandler(&pool, &PoolType::NewArray), DeleteHandler(&pool, &PoolType::DeleteHandler));
 
 		//Remove any faces that the new point is in front of
-		for (auto it = closestFaces.First(); it.IsValid(); ++it)
+		for (auto it = closestFaces.First(); it.IsValid();)
 		{
 			//Point on iterator face -> new point . iterator normal
 			if (Vector3::Dot(newPoint - it->a, it->normal) > 0.f)
@@ -240,6 +240,8 @@ Vector3 EPA(
 
 				it = closestFaces.Remove(it);
 			}
+			else
+				++it;
 		}
 
 		for (auto it = edges.First(); it.IsValid(); ++it)

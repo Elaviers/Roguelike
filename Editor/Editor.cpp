@@ -1031,12 +1031,17 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 		::SetFocus(hwnd);
 		if (!editor->_ui.OnMouseDown())
 			editor->LeftMouseDown();
+		else
+			Engine::Instance().pInputManager->Reset();
 
 		break;
 
 	case WM_LBUTTONUP:
 		if (!editor->_ui.OnMouseUp())
 			editor->LeftMouseUp();
+		else
+			Engine::Instance().pInputManager->Reset();
+		
 		break;
 
 	case WM_RBUTTONDOWN:
