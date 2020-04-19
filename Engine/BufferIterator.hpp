@@ -129,27 +129,27 @@ public:
 	Vector2 Read_vector2()
 	{
 		Vector2 v;
-		v[0] = Read_float();
-		v[1] = Read_float();
+		v.x = Read_float();
+		v.y = Read_float();
 		return v;
 	}
 
 	Vector3 Read_vector3()
 	{
 		Vector3 v;
-		v[0] = Read_float();
-		v[1] = Read_float();
-		v[2] = Read_float();
+		v.x = Read_float();
+		v.y = Read_float();
+		v.z = Read_float();
 		return v;
 	}
 
 	Vector4 Read_vector4()
 	{
 		Vector4 v;
-		v[0] = Read_float();
-		v[1] = Read_float();
-		v[2] = Read_float();
-		v[3] = Read_float();
+		v.x = Read_float();
+		v.y = Read_float();
+		v.z = Read_float();
+		v.w = Read_float();
 		return v;
 	}
 };
@@ -288,22 +288,22 @@ public:
 
 	void Write_vector2(const Vector2& v)
 	{
-		Write_float(v[0]);
-		Write_float(v[1]);
+		Write_float(v.x);
+		Write_float(v.y);
 	}
 
 	void Write_vector3(const Vector3& v)
 	{
-		Write_float(v[0]);
-		Write_float(v[1]);
-		Write_float(v[2]);
+		Write_float(v.x);
+		Write_float(v.y);
+		Write_float(v.z);
 	}
 
 	void Write_vector4(const Vector4& v)
 	{
-		Write_float(v[0]);
-		Write_float(v[1]);
-		Write_float(v[2]);
-		Write_float(v[3]);
+		Write_float(v.x);
+		Write_float(v.y);
+		Write_float(v.z);
+		Write_float(v.w);
 	}
 };

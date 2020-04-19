@@ -18,6 +18,8 @@ public:
 	float GetHalfHeight() const { return _halfHeight; }
 	float GetRadius() const { return _radius; }
 
+	virtual float GetMaximumScaledRadius() const override { return (_halfHeight + _radius) * Maths::Min(GetTransform().GetScale().GetData(), 3); }
+
 	virtual bool IntersectsRay(const Ray&, RaycastResult&, const Transform & = Transform()) const override;
 	virtual Vector3 GetNormalForPoint(const Vector3& point, const Transform& transform) const override;
 	virtual Vector3 GetFarthestPointInDirection(const Vector3& axis, const Transform&) const override;

@@ -10,12 +10,10 @@ private:
 	void _CMD_tex(const Buffer<String>& args);
 public:
 	MaterialSurface(
-		const SharedPointer<const Texture>& diffuse = SharedPointer<const Texture>(), 
-		const SharedPointer<const Texture>& normal = SharedPointer<const Texture>(), 
-		const SharedPointer<const Texture>& specular = SharedPointer<const Texture>(), 
-		const SharedPointer<const Texture>& reflection = SharedPointer<const Texture>())
-		: Material(ERenderChannels::SURFACE), _diffuse(diffuse), _normal(normal), _specular(specular), _reflection(reflection)
-	{}
+		const SharedPointer<const Texture>& diffuse = SharedPointer<const Texture>(),
+		const SharedPointer<const Texture>& normal = SharedPointer<const Texture>(),
+		const SharedPointer<const Texture>& specular = SharedPointer<const Texture>(),
+		const SharedPointer<const Texture>& reflection = SharedPointer<const Texture>());
 	
 	virtual ~MaterialSurface() {}
 

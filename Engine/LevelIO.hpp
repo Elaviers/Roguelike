@@ -1,7 +1,6 @@
 #pragma once
 #include "BufferIterator.hpp"
 #include "Types.hpp"
-#include "Vector.hpp"
 #include "Entity.hpp"
 
 namespace LevelVersions

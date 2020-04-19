@@ -1,6 +1,6 @@
 #pragma once
 #include "CollisionChannels.hpp"
-#include "Vector.hpp"
+#include "Vector3.hpp"
 
 struct Ray
 {
@@ -10,5 +10,5 @@ struct Ray
 	ECollisionChannels channels;
 
 	Ray() : channels(ECollisionChannels::ALL) {}
-	Ray(Vector3 origin, Vector3 direction, ECollisionChannels channels) : origin(origin), direction(direction), channels(channels) {}
+	Ray(const Vector3& origin, const Vector3& direction, ECollisionChannels channels) : origin(origin), direction(direction), channels(channels) {}
 };

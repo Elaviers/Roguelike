@@ -15,9 +15,11 @@ protected:
 public:
 	virtual ~CollisionShape() {}
 
+	const Transform& GetTransform() const { return _transform; }
+
 	virtual CollisionShape* Clone() const = 0;
 
-	const Transform& GetTransform() const { return _transform; }
+	virtual float GetMaximumScaledRadius() const = 0;
 
 	virtual bool IntersectsRay(const Ray&, RaycastResult&, const Transform& transform) const = 0;
 	virtual Vector3 GetNormalForPoint(const Vector3& point, const Transform& transform) const = 0;

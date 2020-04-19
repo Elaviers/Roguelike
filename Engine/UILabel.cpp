@@ -4,14 +4,14 @@
 void UILabel::_UpdateShadowTransform()
 {
 	_shadowTransform = _transform;
-	_shadowTransform.Move(Vector3(_shadowOffset[0], _shadowOffset[1], 0.f));
+	_shadowTransform.Move(Vector3(_shadowOffset.x, _shadowOffset.y, 0.f));
 }
 
 void UILabel::Render() const
 {
 	if (_font)
 	{
-		if (_shadowOffset[0] != 0.f && _shadowOffset[1] != 0.f)
+		if (_shadowOffset.x != 0.f && _shadowOffset.y != 0.f)
 		{
 			_shadowColour.ApplyToShader();
 			_font->RenderString(_string.GetData(), _shadowTransform);

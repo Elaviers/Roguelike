@@ -19,9 +19,9 @@ namespace Collision
 		const Vector3& min2, const Vector3& max2)
 	{
 		Vector3 closestPoint = Vector3(
-			Maths::Clamp(t1.GetPosition()[0], min2[0], max2[0]),
-			Maths::Clamp(t1.GetPosition()[1], min2[1], max2[1]),
-			Maths::Clamp(t1.GetPosition()[2], min2[2], max2[2]));
+			Maths::Clamp(t1.GetPosition().x, min2.x, max2.x),
+			Maths::Clamp(t1.GetPosition().y, min2.y, max2.y),
+			Maths::Clamp(t1.GetPosition().z, min2.z, max2.z));
 
 		float dist = (t1.GetPosition() - closestPoint).LengthSquared();
 		if (dist <= r1 * r1)
@@ -60,19 +60,19 @@ namespace Collision
 		//EDGE AXES
 		for (int i = 0; i < 3; ++i)
 			for (int j = 0; j < 3; ++j)
-				axes[i * 3 + j + 6] = Vector3::Cross(axes[i], axes[3 + j]);
+				axes[i * 3 + j + 6] = axes[i].Cross(axes[3 + j]);
 
 		for (int i = 0; i < 15; ++i)
 		{
-			float pDelta = Maths::Abs(Vector3::Dot(axes[i], t2.GetPosition() - t1.GetPosition()));
+			float pDelta = Maths::Abs(axes[i].Dot(t2.GetPosition() - t1.GetPosition()));
 
 			float total =
-				Maths::Abs(Vector3::Dot(axes[i], rv1 * e1[0])) +
-				Maths::Abs(Vector3::Dot(axes[i], uv1 * e1[1])) +
-				Maths::Abs(Vector3::Dot(axes[i], fv1 * e1[2])) +
-				Maths::Abs(Vector3::Dot(axes[i], rv2 * e2[0])) +
-				Maths::Abs(Vector3::Dot(axes[i], uv2 * e2[1])) +
-				Maths::Abs(Vector3::Dot(axes[i], fv2 * e2[2]));
+				Maths::Abs(axes[i].Dot(rv1 * e1.x)) +
+				Maths::Abs(axes[i].Dot(uv1 * e1.y)) +
+				Maths::Abs(axes[i].Dot(fv1 * e1.z)) +
+				Maths::Abs(axes[i].Dot(rv2 * e2.x)) +
+				Maths::Abs(axes[i].Dot(uv2 * e2.y)) +
+				Maths::Abs(axes[i].Dot(fv2 * e2.z));
 
 			if (pDelta > total)
 				return false;
@@ -83,10 +83,10 @@ namespace Collision
 
 	float IntersectRayPlane(const Ray& r, const Vector3& planePoint, const Vector3& planeNormal)
 	{
-		float denominator = Vector3::Dot(r.direction, planeNormal);
+		float denominator = r.direction.Dot(planeNormal);
 		if (denominator == 0.f) return 0.f;	//Axes are perpendicular
 
-		float t = Vector3::Dot(planePoint - r.origin, planeNormal) / denominator;
+		float t = (planePoint - r.origin).Dot(planeNormal) / denominator;
 		return t;
 	}
 
@@ -127,8 +127,8 @@ namespace Collision
 			float halfWidthSq = w.LengthSquared();
 			float halfHeightSq = h.LengthSquared();
 
-			float rightExtent = Vector3::Dot(w * w, delta) / halfWidthSq;
-			float upExtent = Vector3::Dot(h * h, delta) / halfHeightSq;
+			float rightExtent = (w * w).Dot(delta) / halfWidthSq;
+			float upExtent = (h * h).Dot(delta) / halfHeightSq;
 
 			if (rightExtent * rightExtent > halfWidthSq || upExtent * upExtent > halfHeightSq)
 				return 0.f;	//Outside

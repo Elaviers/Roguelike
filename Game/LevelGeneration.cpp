@@ -40,7 +40,7 @@ Entity* CreateConnectedSegment(Entity& world, const EntConnector &parentConnecto
 			Transform connectorWt = connector->GetWorldTransform();
 			if (connectorWt.GetScale() == pcWt.GetScale())
 			{
-				float angle = (pcWt.GetRotationEuler()[1] - connectorWt.GetRotationEuler()[1]) - 180.f;
+				float angle = (pcWt.GetRotationEuler().y - connectorWt.GetRotationEuler().y) - 180.f;
 				Transform segWt = segment->GetWorldTransform();
 
 				Vector3 connectorPosAfterSegmentRotation = VectorMaths::RotateAbout(connectorWt.GetPosition(), segWt.GetPosition(), Vector3(0.f, angle, 0.f));
@@ -81,7 +81,7 @@ Entity* CreateConnectedSegment(Entity& world, const EntConnector &parentConnecto
 				for (EntityIterator it(newSegment); it.IsValid(); ++it)
 				{
 					EntConnector* newConnector = dynamic_cast<EntConnector*>(&*it);
-					if (newConnector && newConnector->GetWorldPosition().AlmostEqual(pcWt.GetPosition(), .1f))
+					if (newConnector && newConnector->GetWorldPosition().AlmostEquals(pcWt.GetPosition(), .1f))
 						newConnector->connected = true;
 				}
 

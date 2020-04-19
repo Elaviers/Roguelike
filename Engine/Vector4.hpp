@@ -1,17 +1,27 @@
 #pragma once
-#include "Vector.hpp"
+#include "Vector3.hpp"
 #include <xmmintrin.h>
 
-class Vector4
+union Vector4
 {
 	_declspec(align(16)) float _data[4];
 
 public:
+	struct
+	{
+		float x;
+		float y;
+		float z;
+		float w;
+	};
+
 	Vector4(float x, float y, float z, float w = 1.f) : _data {x, y, z, w} {}
 	Vector4(float a = 0.f) : Vector4(a, a, a) {}
-	Vector4(const Vector3 &v3, float w = 1.f) : Vector4(v3[0], v3[1], v3[2], w) {}
+	Vector4(const Vector3 &v3, float w = 1.f) : Vector4(v3.x, v3.y, v3.z, w) {}
 
 	Vector4(__m128 simd) { _mm_store_ps(_data, simd); }
+
+	const float* GetData() const { return _data; }
 	
 	Vector4& operator=(__m128 simd)
 	{
@@ -21,10 +31,10 @@ public:
 
 	Vector4& operator=(const Vector4 &other)
 	{
-		_data[0] = other._data[0];
-		_data[1] = other._data[1];
-		_data[2] = other._data[2];
-		_data[3] = other._data[3];
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		w = other.w;
 		return *this;
 	}
 
@@ -42,29 +52,29 @@ public:
 	Vector4 operator*(const Vector4 &other) const { return Vector4(_mm_mul_ps(LoadSIMD(), other.LoadSIMD())); }
 	Vector4 operator/(const Vector4 &other) const { return Vector4(_mm_div_ps(LoadSIMD(), other.LoadSIMD())); }
 
-	Vector4& operator*=(float f) { _data[0] *= f; _data[1] *= f; _data[2] *= f; _data[3] *= f; return *this; }
-	Vector4& operator/=(float f) { _data[0] /= f; _data[1] /= f; _data[2] /= f; _data[3] /= f; return *this; }
+	Vector4& operator*=(float f) { x *= f; y *= f; z *= f; w *= f; return *this; }
+	Vector4& operator/=(float f) { x /= f; y /= f; z /= f; w /= f; return *this; }
 	Vector4 operator*(float f) { Vector4 v(*this); return v *= f; }
 	Vector4 operator/(float f) { Vector4 v(*this); return v /= f; }
 
 	bool operator!=(const Vector4& other) const
 	{
-		return _data[0] != other._data[0] || _data[1] != other._data[1] || _data[2] != other._data[2] || _data[3] != other._data[3];
+		return x != other.x || y != other.y || z != other.z || w != other.w;
 	}
 
 	bool operator==(const Vector4& other) const 
 	{ 
-		return _data[0] == other._data[0] && _data[1] == other._data[1] && _data[2] == other._data[2] && _data[3] == other._data[3];
+		return x == other.x && y == other.y && z == other.z && w == other.w;
 	}
 
-	bool AlmostEqual(const Vector4& other, float tolerance) const
+	bool AlmostEquals(const Vector4& other, float tolerance) const
 	{
 		return ((*this - other).LengthSquared() <= tolerance * tolerance);
 	}
 
 	float LengthSquared() const
 	{
-		return _data[0] * _data[0] + _data[1] * _data[1] + _data[2] * _data[2] + _data[3] * _data[3];
+		return x * x + y * y + z * z + w * w;
 	}
 
 	float Length() const
@@ -80,5 +90,5 @@ public:
 
 inline Vector4 operator-(float f, const Vector4& v)
 {
-	return Vector4(f - v[0], f - v[1], f - v[2], f - v[3]);
+	return Vector4(f - v.x, f - v.y, f - v.z, f - v.w);
 }

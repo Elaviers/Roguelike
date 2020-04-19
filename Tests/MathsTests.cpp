@@ -2,7 +2,9 @@
 
 #include <Engine/Random.hpp>
 #include <Engine/Rotation.hpp>
-#include <Engine/Vector.hpp>
+#include <Engine/Vector2.hpp>
+#include <Engine/Vector3.hpp>
+#include <Engine/Vector4.hpp>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -30,7 +32,7 @@ namespace EngineTests
 
 		TEST_METHOD(TestVectors)
 		{
-			Assert::IsTrue(Vector3::Dot(Vector3(1, 2, 3), Vector3(10, 9, 8)) == 52.f, L"Vector3::Dot is wrong");
+			Assert::IsTrue(Vector3(1, 2, 3).Dot(Vector3(10, 9, 8)) == 52.f, L"Vector3::Dot is wrong");
 
 			Vector3 v1(1, 2, 3), v2(v1);
 			Assert::IsTrue(v1 + v2 == Vector3(2, 4, 6));
@@ -38,16 +40,16 @@ namespace EngineTests
 
 		TEST_METHOD(TestRotations)
 		{
-			Assert::IsTrue(Quaternion(VectorMaths::V3X, 45.f).ToEuler().AlmostEqual(Vector3(45.f, 0.f, 0.f), .1f));
-			Assert::IsTrue(Quaternion(VectorMaths::V3Y, 45.f).ToEuler().AlmostEqual(Vector3(0.f, -45.f, 0.f), .1f));
-			Assert::IsTrue(Quaternion(VectorMaths::V3Z, 45.f).ToEuler().AlmostEqual(Vector3(0.f, 0.f, 45.f), .1f));
+			Assert::IsTrue(Quaternion(VectorMaths::V3X, 45.f).ToEuler().AlmostEquals(Vector3(45.f, 0.f, 0.f), .1f));
+			Assert::IsTrue(Quaternion(VectorMaths::V3Y, 45.f).ToEuler().AlmostEquals(Vector3(0.f, -45.f, 0.f), .1f));
+			Assert::IsTrue(Quaternion(VectorMaths::V3Z, 45.f).ToEuler().AlmostEquals(Vector3(0.f, 0.f, 45.f), .1f));
 		}
 
 		TEST_METHOD(TestMatrices)
 		{
 			Mat4 m = Matrix::Transformation(Vector3(0.f, 1.f, 0.f), Quaternion(Vector3(0, 1, 0), 90.f), Vector3(2, 2, 2));
 
-			Assert::IsTrue((Vector3(1, 0, 0) * m).AlmostEqual(Vector3(0, 1, 2), .1f));
+			Assert::IsTrue((Vector3(1, 0, 0) * m).AlmostEquals(Vector3(0, 1, 2), .1f));
 		}
 	};
 }

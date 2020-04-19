@@ -34,9 +34,9 @@ void ToolSelect::_GizmoMove(const Vector3& delta)
 
 	if (!_snapToWorld && _gridSnap)
 	{
-		d[0] = Maths::Trunc(d[0], _gridSnap);
-		d[1] = Maths::Trunc(d[1], _gridSnap);
-		d[2] = Maths::Trunc(d[2], _gridSnap);
+		d.x = Maths::Trunc(d.x, _gridSnap);
+		d.y = Maths::Trunc(d.y, _gridSnap);
+		d.z = Maths::Trunc(d.z, _gridSnap);
 	}
 
 	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
@@ -46,9 +46,9 @@ void ToolSelect::_GizmoMove(const Vector3& delta)
 
 		if (_snapToWorld && _gridSnap)
 		{
-			endPos[0] = Maths::Trunc(endPos[0], _gridSnap);
-			endPos[1] = Maths::Trunc(endPos[1], _gridSnap);
-			endPos[2] = Maths::Trunc(endPos[2], _gridSnap);
+			endPos.x = Maths::Trunc(endPos.x, _gridSnap);
+			endPos.y = Maths::Trunc(endPos.y, _gridSnap);
+			endPos.z = Maths::Trunc(endPos.z, _gridSnap);
 		}
 
 		if (_shouldCopy && (endPos != startPos))

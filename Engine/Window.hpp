@@ -1,7 +1,6 @@
 #pragma once
 #include "GL.hpp"
 #include "Types.hpp"
-#include "Vector.hpp"
 #include <Windows.h>
 
 namespace WindowFunctions

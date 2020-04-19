@@ -51,8 +51,8 @@ bool CollisionBox::IntersectsRay(const Ray &ray, RaycastResult &result, const Tr
 
 	float minT, maxT;
 	float minT_y, maxT_y;
-	FindT(origin[0], dir[0], scaledMin[0], scaledMax[0], minT, maxT);
-	FindT(origin[1], dir[1], scaledMin[1], scaledMax[1], minT_y, maxT_y);
+	FindT(origin.x, dir.x, scaledMin.x, scaledMax.x, minT, maxT);
+	FindT(origin.y, dir.y, scaledMin.y, scaledMax.y, minT_y, maxT_y);
 
 	if (minT > maxT_y || minT_y > maxT)
 		return false;
@@ -61,7 +61,7 @@ bool CollisionBox::IntersectsRay(const Ray &ray, RaycastResult &result, const Tr
 	maxT = Maths::Min(maxT, maxT_y);
 
 	float minT_z, maxT_z;
-	FindT(origin[2], dir[2], scaledMin[2], scaledMax[2], minT_z, maxT_z);
+	FindT(origin.z, dir.z, scaledMin.z, scaledMax.z, minT_z, maxT_z);
 
 	if (minT > maxT_z || minT_z > maxT)
 		return false;
@@ -87,19 +87,19 @@ Vector3 CollisionBox::GetNormalForPoint(const Vector3& point, const Transform& w
 {
 	Vector3 p = point * (_transform * worldTransform).GetInverseTransformationMatrix();
 
-	float x = Maths::Abs(point[0]), y = Maths::Abs(point[1]), z = Maths::Abs(point[2]);
+	float x = Maths::Abs(point.x), y = Maths::Abs(point.y), z = Maths::Abs(point.z);
 
 	if (x > y)
 	{
 		if (x > z)
-			return Vector3(point[0] > 0 ? 1.f : -1.f, 0.f, 0.f);
+			return Vector3(point.x > 0 ? 1.f : -1.f, 0.f, 0.f);
 		else
-			return Vector3(0.f, 0.f, point[2] > 0 ? 1.f : -1.f);
+			return Vector3(0.f, 0.f, point.z > 0 ? 1.f : -1.f);
 	}
 
-	if (y > z) return Vector3(0.f, point[1] > 0 ? 1.f : -1.f, 0.f);
+	if (y > z) return Vector3(0.f, point.y > 0 ? 1.f : -1.f, 0.f);
 
-	return Vector3(0.f, 0.f, point[2] > 0 ? 1.f : -1.f);
+	return Vector3(0.f, 0.f, point.z > 0 ? 1.f : -1.f);
 }
 
 Vector3 CollisionBox::GetFarthestPointInDirection(const Vector3& axis, const Transform& worldTransform) const
@@ -123,7 +123,7 @@ Vector3 CollisionBox::GetFarthestPointInDirection(const Vector3& axis, const Tra
 	{
 		points[i] = points[i] * fullTransform;
 		
-		float dot = Vector3::Dot(points[i], axis);
+		float dot = points[i].Dot(axis);
 		if (dot > maxDot || index < 0)
 		{
 			index = i;

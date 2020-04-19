@@ -130,10 +130,10 @@ size_t FontTTF::GetPositionOf(float pX, float pY, const char* string, const Tran
 	Vector3 advanceDirection = transform.GetRightVector();
 	Vector3 downDirection = -1.f * transform.GetUpVector();
 
-	float x = transform.GetPosition()[0];
-	float y = transform.GetPosition()[1];
+	float x = transform.GetPosition().x;
+	float y = transform.GetPosition().y;
 
-	float scale = (transform.GetScale()[0] / (float)_size);
+	float scale = (transform.GetScale().x / (float)_size);
 
 	float line = 0.f;
 	float currentLineW = 0.f;
@@ -152,10 +152,10 @@ size_t FontTTF::GetPositionOf(float pX, float pY, const char* string, const Tran
 			currentLineW = 0.f;
 			currentCharW = 0.f;
 
-			float x = transform.GetPosition()[0];
-			float y = transform.GetPosition()[1];
-			x += downDirection[0] * lineHeight * line;
-			y += downDirection[1] * lineHeight * line;
+			float x = transform.GetPosition().x;
+			float y = transform.GetPosition().y;
+			x += downDirection.x * lineHeight * line;
+			y += downDirection.y * lineHeight * line;
 		}
 		else if (*c == '\t')
 		{
@@ -173,16 +173,16 @@ size_t FontTTF::GetPositionOf(float pX, float pY, const char* string, const Tran
 			}
 		}
 
-		if (x + advanceDirection[0] * currentCharW >= pX)
+		if (x + advanceDirection.x * currentCharW >= pX)
 		{
-			if (x + advanceDirection[0] * currentCharW / 2.f <= pX)
+			if (x + advanceDirection.x * currentCharW / 2.f <= pX)
 				return i + 1;
 
 			return i;
 		}
 
-		x += advanceDirection[0] * currentCharW;
-		y += advanceDirection[1] * currentCharW;
+		x += advanceDirection.x * currentCharW;
+		y += advanceDirection.y * currentCharW;
 		currentLineW += currentCharW;
 
 		++i;
@@ -200,7 +200,7 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 
 	t.SetPosition(transform.GetPosition());
 
-	float scale = (transform.GetScale()[0] / (float)_size);
+	float scale = (transform.GetScale().x / (float)_size);
 
 	float line = 0.f;
 	float currentLineW = 0.f;
@@ -248,9 +248,9 @@ void FontTTF::RenderString(const char* string, const Transform& transform, float
 			{
 				glBindTexture(GL_TEXTURE_2D, glyph->texID);
 
-				t.SetScale(Vector3(glyph->size[0] * scale, glyph->size[1] * scale, 1.f));
+				t.SetScale(Vector3(glyph->size.x * scale, glyph->size.y * scale, 1.f));
 
-				Vector3 v = t.GetPosition() + (advanceDirection * (glyph->bearing[0] + glyph->size[0] / 2.f) * scale) + (downDirection * (glyph->size[1] / 2.f - glyph->bearing[1]) * scale);
+				Vector3 v = t.GetPosition() + (advanceDirection * (glyph->bearing.x + glyph->size.x / 2.f) * scale) + (downDirection * (glyph->size.y / 2.f - glyph->bearing.y) * scale);
 
 				GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model,
 					Matrix::Transformation(v, t.GetRotation().GetQuat(), t.GetScale()));

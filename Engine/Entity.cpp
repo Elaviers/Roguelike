@@ -314,12 +314,12 @@ Bounds Entity::GetWorldBounds(bool noTranslation) const
 	Vector3 testPoints[8] = {
 		b.min * wt,
 		b.max * wt,
-		Vector3(b.min[0], b.min[1], b.max[2]) * wt,
-		Vector3(b.min[0], b.max[1], b.min[2]) * wt,
-		Vector3(b.min[0], b.max[1], b.max[2]) * wt,
-		Vector3(b.max[0], b.min[1], b.min[2]) * wt,
-		Vector3(b.max[0], b.min[1], b.max[2]) * wt,
-		Vector3(b.max[0], b.max[1], b.min[2]) * wt
+		Vector3(b.min.x, b.min.y, b.max.z) * wt,
+		Vector3(b.min.x, b.max.y, b.min.z) * wt,
+		Vector3(b.min.x, b.max.y, b.max.z) * wt,
+		Vector3(b.max.x, b.min.y, b.min.z) * wt,
+		Vector3(b.max.x, b.min.y, b.max.z) * wt,
+		Vector3(b.max.x, b.max.y, b.min.z) * wt
 	};
 
 	Vector3 min = testPoints[0];
@@ -327,8 +327,8 @@ Bounds Entity::GetWorldBounds(bool noTranslation) const
 
 	for (int i = 0; i < 8; ++i)
 	{
-		min = Vector3(Maths::Min(min[0], testPoints[i][0]), Maths::Min(min[1], testPoints[i][1]), Maths::Min(min[2], testPoints[i][2]));
-		max = Vector3(Maths::Max(max[0], testPoints[i][0]), Maths::Max(max[1], testPoints[i][1]), Maths::Max(max[2], testPoints[i][2]));
+		min = Vector3(Maths::Min(min.x, testPoints[i].x), Maths::Min(min.y, testPoints[i].y), Maths::Min(min.z, testPoints[i].z));
+		max = Vector3(Maths::Max(max.x, testPoints[i].x), Maths::Max(max.y, testPoints[i].y), Maths::Max(max.z, testPoints[i].z));
 	}
 
 	return Bounds(min, max);

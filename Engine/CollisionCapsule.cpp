@@ -3,10 +3,10 @@
 //Basically just the ray intersection test from CollisionSphere.cpp :/
 inline bool SphereRayEntryTime(Vector3 rayStart, const Vector3& rayDir, float sphereRadius, float sphereTranslationY, float &outT)
 {
-    rayStart[1] -= sphereTranslationY;
+    rayStart.y -= sphereTranslationY;
 
     float distanceSq = rayStart.LengthSquared() - sphereRadius * sphereRadius;
-    float dot = Vector3::Dot(rayStart, rayDir);
+    float dot = rayStart.Dot(rayDir);
 
     if (distanceSq > 0.f && dot > 0.f)
         return false;
@@ -37,18 +37,18 @@ bool CollisionCapsule::IntersectsRay(const Ray& ray, RaycastResult& result, cons
     Mat4 inv = (_transform * worldTransform).GetInverseTransformationMatrix();
     Vector3 transformedRayOrigin = ray.origin * inv;
     Vector4 transformedRayDirection4 = Vector4(ray.direction, 0.f) * inv;
-    Vector3 transformedRayDirection = Vector3(transformedRayDirection4[0], transformedRayDirection4[1], transformedRayDirection4[2]);
+    Vector3 transformedRayDirection = Vector3(transformedRayDirection4.x, transformedRayDirection4.y, transformedRayDirection4.z);
     transformedRayDirection.Normalise();
 
     //The transformed space has the capsule at the origin with its radius and half height
-    float dot = Vector3::Dot(transformedRayOrigin, transformedRayDirection);
+    float dot = transformedRayOrigin.Dot(transformedRayDirection);
 
     if (transformedRayOrigin.LengthSquared() > _halfHeight * _halfHeight && dot > 0.f) 
         return false;   //We are not close enough to the capsule and are not facing it
 
-    float dot_S_D_2D = transformedRayOrigin[0] * transformedRayDirection[0] + transformedRayOrigin[2] * transformedRayDirection[2];
-    float dot_S_S_2D = transformedRayOrigin[0] * transformedRayOrigin[0] + transformedRayOrigin[2] * transformedRayOrigin[2];
-    float dot_D_D_2D = transformedRayDirection[0] * transformedRayDirection[0] + transformedRayDirection[2] * transformedRayDirection[2];
+    float dot_S_D_2D = transformedRayOrigin.x * transformedRayDirection.x + transformedRayOrigin.z * transformedRayDirection.z;
+    float dot_S_S_2D = transformedRayOrigin.x * transformedRayOrigin.x + transformedRayOrigin.z * transformedRayOrigin.z;
+    float dot_D_D_2D = transformedRayDirection.x * transformedRayDirection.x + transformedRayDirection.z * transformedRayDirection.z;
 
     //(S.D)^2 - (D.D)(S.S - R^2)
     float cylinderDiscriminant = dot_S_D_2D * dot_S_D_2D - dot_D_D_2D * (dot_S_S_2D - _radius * _radius);
@@ -56,7 +56,7 @@ bool CollisionCapsule::IntersectsRay(const Ray& ray, RaycastResult& result, cons
         return false;   //Ray does not intersect infinite cylinder
 
     float cylinderEntry = (-dot_S_D_2D - Maths::SquareRoot(cylinderDiscriminant)) / dot_D_D_2D;
-    float cylinderEntryY = transformedRayOrigin[1] + cylinderEntry * transformedRayDirection[1];
+    float cylinderEntryY = transformedRayOrigin.y + cylinderEntry * transformedRayDirection.y;
     float cylinderHalfHeight = _halfHeight - _radius;
 
     if (cylinderEntryY > cylinderHalfHeight)
@@ -95,7 +95,7 @@ inline Vector3 SphereRayExitPoint(float startY, const Vector3& dir,  float radiu
     //t = -S.D +|- sqrt( (S.D)^2 - (S.S - R^2) )
 
     Vector3 rayStart(0.f, startY, 0.f);
-    float dot = Vector3::Dot(rayStart, dir);
+    float dot = rayStart.Dot(dir);
     float sphereDiscriminant = dot * dot - (rayStart.LengthSquared() - radius * radius);
 
     Debug::Assert(sphereDiscriminant >= 0.f);
@@ -108,7 +108,7 @@ Vector3 CollisionCapsule::GetFarthestPointInDirection(const Vector3& axisIn, con
 {
     Vector3 axis = axisIn.Normalised() * worldTransform.GetRotation().GetQuat().Inverse().ToMatrix();
 
-    if (axis[1] > 0.f)
+    if (axis.y > 0.f)
         return (Vector3(0.f, _halfHeight - _radius, 0.f) + _radius * axis) * (_transform * worldTransform).GetTransformationMatrix();
     
     return (Vector3(0.f, -_halfHeight + _radius, 0.f) + _radius * axis) * (_transform * worldTransform).GetTransformationMatrix();

@@ -21,7 +21,7 @@ bool Collider::IntersectsRay(const Transform& transform, const Ray& ray, Raycast
 */
 Vector3 TripleCross(const Vector3& a, const Vector3& b, const Vector3& c)
 {
-	return Vector3::Dot(c, a) * b - Vector3::Dot(c, b) * a;
+	return c.Dot(a) * b - c.Dot(b) * a;
 }
 
 constexpr const int GJK_MAX_ITERATIONS = 50;
@@ -50,9 +50,9 @@ __forceinline void MathematicaDebugState(const Vector3& a, const Vector3& b, con
 
 inline Vector3 ClosestPointToOriginOnPlane(const Vector3& planePoint, const Vector3& planeNormal)
 {
-	//Debug::Assert(Maths::AlmostEqual(planeNormal.LengthSquared(), 1.f, .001f), "ClosestPointToOriginOnPlane requires a normalised normal vector...");
+	//Debug::Assert(Maths::AlmostEquals(planeNormal.LengthSquared(), 1.f, .001f), "ClosestPointToOriginOnPlane requires a normalised normal vector...");
 
-	return Vector3::Dot(planePoint, planeNormal) * planeNormal;
+	return planePoint.Dot(planeNormal) * planeNormal;
 }
 
 inline Vector3 ClosestPointToOriginOnLineSegment(const Vector3& a, const Vector3& ab)
@@ -63,7 +63,7 @@ inline Vector3 ClosestPointToOriginOnLineSegment(const Vector3& a, const Vector3
 		return a;
 
 	Vector3 d = ab / length;
-	float dot = Vector3::Dot(-a, d);
+	float dot = (-a).Dot( d);
 
 	if (dot <= 0.f) return a;
 	if (dot >= length) return a + ab;
@@ -80,17 +80,17 @@ Vector3 ClosestPointToOriginOnTriangle(const Vector3& a, const Vector3& b, const
 	Vector3 ca = a - c;
 
 	//A.-N[AB]
-	if (Vector3::Dot(a, TripleCross(ab, ca, ab)) <= 0.f)
+	if ((a).Dot( TripleCross(ab, ca, ab)) <= 0.f)
 	{
-		if (Vector3::Dot(a, -ab) <= 0.f)				//A.BA (outside a on ab)
+		if ((a).Dot( -ab) <= 0.f)				//A.BA (outside a on ab)
 		{
-			if (Vector3::Dot(a, ca) <= 0.f) return a;	//A.CA (outside a on ca)
+			if ((a).Dot( ca) <= 0.f) return a;	//A.CA (outside a on ca)
 			return ClosestPointToOriginOnLineSegment(c, ca);
 		}
 
-		if (Vector3::Dot(b, ab) <= 0.f)					//B.AB (outside b on ab)
+		if ((b).Dot( ab) <= 0.f)					//B.AB (outside b on ab)
 		{
-			if (Vector3::Dot(b, -bc) <= 0.f) return b;	//B.CB (outside b on bc)
+			if ((b).Dot( -bc) <= 0.f) return b;	//B.CB (outside b on bc)
 			return ClosestPointToOriginOnLineSegment(b, bc);
 		}
 
@@ -98,13 +98,13 @@ Vector3 ClosestPointToOriginOnTriangle(const Vector3& a, const Vector3& b, const
 	}
 
 	//B.-N[BC]
-	if (Vector3::Dot(b, TripleCross(bc, ab, bc)) <= 0.f)
+	if ((b).Dot( TripleCross(bc, ab, bc)) <= 0.f)
 	{
-		if (Vector3::Dot(b, -bc) <= 0.f) return b;		//B.CB (outside b on bc)
+		if ((b).Dot( -bc) <= 0.f) return b;		//B.CB (outside b on bc)
 
-		if (Vector3::Dot(c, bc) <= 0.f)					//B.BC (outside c on bc)
+		if ((c).Dot( bc) <= 0.f)					//B.BC (outside c on bc)
 		{
-			if (Vector3::Dot(c, -ca) <= 0.f) return c;	//C.AC (outside c on ca)
+			if ((c).Dot( -ca) <= 0.f) return c;	//C.AC (outside c on ca)
 
 			return ClosestPointToOriginOnLineSegment(c, ca);
 		}
@@ -113,22 +113,22 @@ Vector3 ClosestPointToOriginOnTriangle(const Vector3& a, const Vector3& b, const
 	}
 
 	//C.-N[CA]
-	if (Vector3::Dot(c, TripleCross(ca, -ab, ca)) <= 0.f)
+	if ((c).Dot( TripleCross(ca, -ab, ca)) <= 0.f)
 	{
-		if (Vector3::Dot(a, ca) <= 0.f) return a;		//A.CA (outside a on ca)
-		if (Vector3::Dot(c, -ca) <= 0.f) return c;		//C.AC (outside c on ca)
+		if ((a).Dot( ca) <= 0.f) return a;		//A.CA (outside a on ca)
+		if ((c).Dot( -ca) <= 0.f) return c;		//C.AC (outside c on ca)
 		return ClosestPointToOriginOnLineSegment(c, ca);
 	}
 
-	return ClosestPointToOriginOnPlane(a, Vector3::Cross(ab, bc).Normalised());
+	return ClosestPointToOriginOnPlane(a, (ab).Cross( bc).Normalised());
 }
 
 //Returns vector perpendicular to the two sides in the direction of dir
 inline Vector3 GetNormalForFace(const Vector3& side1, const Vector3& side2, const Vector3& dir)
 {
-	Vector3 result = Vector3::Cross(side1, side2);
+	Vector3 result = (side1).Cross( side2);
 
-	if (Vector3::Dot(result, dir) < 0.f)
+	if ((result).Dot( dir) < 0.f)
 		return -result;
 
 	return result;
@@ -186,7 +186,7 @@ inline Vector3 Support(
 {
 	if (pLineA)
 	{
-		Vector3 farthestLinePoint = Vector3::Dot(dir, pLineA->end - pLineA->start) > 0.f ? pLineA->end : pLineA->start;
+		Vector3 farthestLinePoint = (dir).Dot( pLineA->end - pLineA->start) > 0.f ? pLineA->end : pLineA->start;
 		return (farthestLinePoint + shapeA.GetFarthestPointInDirection(dir, tA)) - shapeB.GetFarthestPointInDirection(-dir, tB);
 	}
 	
@@ -219,8 +219,8 @@ Vector3 EPA(
 
 		Vector3 newPoint = Support(shapeA, tA, shapeB, tB, pLineA, dir);
 
-		double newDot = Vector<double, 3>::Dot(dir, newPoint);
-		double oldDot = Vector<double, 3>::Dot(dir, closestFace.a);
+		double newDot = ((Vector3T<double>)dir).Dot(newPoint);
+		double oldDot = ((Vector3T<double>)dir).Dot(closestFace.a);
 		if (newDot - oldDot <= EPA_TOLERANCE)
 		{
 			return closestFace.closestPointToOrigin;
@@ -232,7 +232,7 @@ Vector3 EPA(
 		for (auto it = closestFaces.First(); it.IsValid();)
 		{
 			//Point on iterator face -> new point . iterator normal
-			if (Vector3::Dot(newPoint - it->a, it->normal) > 0.f)
+			if ((newPoint - it->a).Dot( it->normal) > 0.f)
 			{
 				AddEdge(edges, it->a, it->b);
 				AddEdge(edges, it->b, it->c);
@@ -292,10 +292,10 @@ EOverlapResult GJK(const CollisionShape& shapeA, const Transform& tA, const Coll
 			//The simplex is a triangle that contains the origin in its respective space
 			//Look for the fourth support along the normal which is facing the origin
 
-			dir = Vector3::Cross(b - c, a - c);
+			dir = (b - c).Cross( a - c);
 
 			//If cross product is not facing origin, flip it
-			if (Vector3::Dot(dir, -c) < 0.f)
+			if ((dir).Dot( -c) < 0.f)
 				dir *= -1.f;
 
 			break;
@@ -310,10 +310,10 @@ EOverlapResult GJK(const CollisionShape& shapeA, const Transform& tA, const Coll
 			Vector3 dc = c - d;
 			Vector3 db = b - d;
 
-			Vector3 bcd = Vector3::Cross(dc, db);
-			float dot = Vector3::Dot(bcd, d);
+			Vector3 bcd = (dc).Cross( db);
+			float dot = (bcd).Dot( d);
 
-			if (Maths::AlmostEqual(dot, 0.f, GJK_TOUCH_TOLERANCE))
+			if (Maths::AlmostEquals(dot, 0.f, GJK_TOUCH_TOLERANCE))
 				return EOverlapResult::TOUCHING;
 
 			if (dot <= 0.f)
@@ -330,10 +330,10 @@ EOverlapResult GJK(const CollisionShape& shapeA, const Transform& tA, const Coll
 
 			Vector3 da = simplex[0] - simplex[3];
 
-			Vector3 abd = Vector3::Cross(db, da);
-			dot = Vector3::Dot(abd, d);
+			Vector3 abd = (db).Cross( da);
+			dot = (abd).Dot( d);
 
-			if (Maths::AlmostEqual(dot, 0.f, GJK_TOUCH_TOLERANCE))
+			if (Maths::AlmostEquals(dot, 0.f, GJK_TOUCH_TOLERANCE))
 				return EOverlapResult::TOUCHING;
 
 			if (dot <= 0.f)
@@ -346,10 +346,10 @@ EOverlapResult GJK(const CollisionShape& shapeA, const Transform& tA, const Coll
 				break;
 			}
 
-			Vector3 acd = Vector3::Cross(da, dc);
-			dot = Vector3::Dot(acd, d);
+			Vector3 acd = (da).Cross( dc);
+			dot = (acd).Dot( d);
 
-			if (Maths::AlmostEqual(dot, 0.f, GJK_TOUCH_TOLERANCE))
+			if (Maths::AlmostEquals(dot, 0.f, GJK_TOUCH_TOLERANCE))
 				return EOverlapResult::TOUCHING;
 
 			if (dot <= 0.f)
@@ -374,7 +374,7 @@ EOverlapResult GJK(const CollisionShape& shapeA, const Transform& tA, const Coll
 		simplex[i] = Support(shapeA, tA, shapeB, tB, pLineA, dir);
 
 		//Fail if the new point did not go past the origin
-		if (Vector3::Dot(simplex[i], dir) < 0.f)
+		if ((simplex[i]).Dot( dir) < 0.f)
 			return EOverlapResult::SEPERATE;
 
 		++i;
@@ -390,14 +390,24 @@ EOverlapResult Collider::Overlaps(const Transform& transform, const Collider& ot
 
 	if (CanCollideWith(other))
 		for (size_t i = 0; i < GetShapeCount(); ++i)
-			for (size_t j = 0; j < GetShapeCount(); ++j)
+			for (size_t j = 0; j < other.GetShapeCount(); ++j)
 			{
-				EOverlapResult result = GJK(GetShape(i), transform, other.GetShape(j), otherTransform, lineA, out_PenetrationVector);
-				if (result == EOverlapResult::OVERLAPPING)
-					return EOverlapResult::OVERLAPPING;
-				
-				if (!isTouching && result == EOverlapResult::TOUCHING)
-					isTouching = true;
+				const CollisionShape& shape = GetShape(i);
+				const CollisionShape& otherShape = other.GetShape(j);
+
+				float distanceSq = ((shape.GetTransform().GetPosition() + transform.GetPosition()) - (otherShape.GetTransform().GetPosition() + otherTransform.GetPosition())).LengthSquared();
+				float shapeRadius = shape.GetMaximumScaledRadius() * Maths::Min(transform.GetScale().GetData(), 3);
+				float otherShapeRadius = otherShape.GetMaximumScaledRadius() * Maths::Min(otherTransform.GetScale().GetData(), 3);
+				float combinedRadii = shapeRadius + otherShapeRadius;
+				if (true)
+				{
+					EOverlapResult result = GJK(GetShape(i), transform, other.GetShape(j), otherTransform, lineA, out_PenetrationVector);
+					if (result == EOverlapResult::OVERLAPPING)
+						return EOverlapResult::OVERLAPPING;
+
+					if (!isTouching && result == EOverlapResult::TOUCHING)
+						isTouching = true;
+				}
 			}
 
 	return isTouching ? EOverlapResult::TOUCHING : EOverlapResult::SEPERATE;
@@ -406,8 +416,8 @@ EOverlapResult Collider::Overlaps(const Transform& transform, const Collider& ot
 inline Vector2 Cartesian2Barycentric(const Vector3& p, const Vector3& a, const Vector3& b)
 {
 	Vector2 result;
-	result[0] = (p - b).Length() / (a - b).Length();
-	result[1] = 1.f - result[0];
+	result.x = (p - b).Length() / (a - b).Length();
+	result.y = 1.f - result.x;
 	return result;
 }
 
@@ -416,33 +426,33 @@ Vector3 Cartesian2Barycentric(const Vector3& p, const Vector3& a, const Vector3&
 	if (a == b)
 	{
 		Vector2 bary2D = Cartesian2Barycentric(p, a, c);
-		return Vector3(bary2D[0], 0.f, bary2D[1]);
+		return Vector3(bary2D.x, 0.f, bary2D.y);
 	}
 
 	if (a == c || b == c)
 	{
 		Vector2 bary2D = Cartesian2Barycentric(p, a, b);
-		return Vector3(0.f, bary2D[0], bary2D[1]);
+		return Vector3(0.f, bary2D.x, bary2D.y);
 	}
 
 	Vector3 result;
 	Vector3 ab = b - a, ac = c - a, ap = p - a;
-	float ab_ab = Vector3::Dot(ab, ab);
-	float ab_ac = Vector3::Dot(ab, ac);
-	float ac_ac = Vector3::Dot(ac, ac);
-	float ap_ab = Vector3::Dot(ap, ab);
-	float ap_ac = Vector3::Dot(ap, ac);
+	float ab_ab = (ab).Dot( ab);
+	float ab_ac = (ab).Dot( ac);
+	float ac_ac = (ac).Dot( ac);
+	float ap_ab = (ap).Dot( ab);
+	float ap_ac = (ap).Dot( ac);
 	float denom = ab_ab * ac_ac - ab_ac * ab_ac;
 
 	if (denom == 0.f)
 	{
 		Vector2 bary2D = Cartesian2Barycentric(p, a, b);
-		return Vector3(bary2D[0], bary2D[1], 0.f);
+		return Vector3(bary2D.x, bary2D.y, 0.f);
 	}
 
-	result[1] = (ac_ac * ap_ab - ab_ac * ap_ac) / denom;
-	result[2] = (ab_ab * ap_ac - ab_ac * ap_ab) / denom;
-	result[0] = 1.0f - result[1] - result[2];
+	result.y = (ac_ac * ap_ab - ab_ac * ap_ac) / denom;
+	result.z = (ab_ab * ap_ac - ab_ac * ap_ab) / denom;
+	result.x = 1.0f - result.y - result.z;
 	return result;
 }
 
@@ -512,10 +522,10 @@ float GJKDist(
 			closestPoint = ClosestPointToOriginOnTriangle(mA, mB, mC);
 
 			////
-			dir = Vector3::Cross(mB - mC, mA - mC);
+			dir = (mB - mC).Cross( mA - mC);
 
 			//If cross product is not facing origin, flip it
-			if (Vector3::Dot(dir, -mC) < 0.f)
+			if ((dir).Dot( -mC) < 0.f)
 				dir *= -1.f;
 			break;
 		}
@@ -527,10 +537,10 @@ float GJKDist(
 				Vector3 dc = mC - mD;
 				//I did have a more efficient way of doing this but it is way uglier and has a small issue so it is not used here, see UnusedCollider.txt
 
-				if (Vector3::Dot(mD, GetNormalForFace(da, db, -dc)) > 0.f &&	//Inside DAB
-					Vector3::Dot(mD, GetNormalForFace(db, dc, -da)) > 0.f &&	//Inside DBC
-					Vector3::Dot(mD, GetNormalForFace(dc, da, -db)) > 0.f &&	//Inside DCA
-					Vector3::Dot(mA, GetNormalForFace(mB - mA, mC - mA, da)) > 0.f)//Inside ABC
+				if ((mD).Dot( GetNormalForFace(da, db, -dc)) > 0.f &&	//Inside DAB
+					(mD).Dot( GetNormalForFace(db, dc, -da)) > 0.f &&	//Inside DBC
+					(mD).Dot( GetNormalForFace(dc, da, -db)) > 0.f &&	//Inside DCA
+					(mA).Dot( GetNormalForFace(mB - mA, mC - mA, da)) > 0.f)//Inside ABC
 				{
 					//Inside all faces of tetrahedron
 					return 0.f;
@@ -583,7 +593,7 @@ float GJKDist(
 		//Find new support point
 		if (pLineA)
 		{
-			Vector3 farthestLinePoint = Vector3::Dot(dir, pLineA->end - pLineA->start) > 0.f ? pLineA->end : pLineA->start;
+			Vector3 farthestLinePoint = (dir).Dot( pLineA->end - pLineA->start) > 0.f ? pLineA->end : pLineA->start;
 
 			simplex[i] = SimplexPoint(farthestLinePoint + shapeA.GetFarthestPointInDirection(dir, tA), shapeB.GetFarthestPointInDirection(-dir, tB));
 		}
@@ -606,10 +616,10 @@ float GJKDist(
 		{
 			bool stopIterating = false;
 
-			double dotD = Vector<double, 3>::Dot(dir, simplex[i].difference);
+			double dotD = ((Vector3T<double>)dir).Dot(simplex[i].difference);
 			for (int j = 0; j < i; ++j)
 			{
-				double dotP = Vector<double, 3>::Dot(dir, simplex[j].difference);
+				double dotP = ((Vector3T<double>)dir).Dot(simplex[j].difference);
 
 				if (dotD - dotP <= GJK_TOLERANCE)
 				{
@@ -635,16 +645,16 @@ float GJKDist(
 	case 2:
 	{
 		Vector2 bary = Cartesian2Barycentric(closestPoint, mA, mB);
-		pointA = a.aSupport * bary[0] + b.aSupport * bary[1];
-		pointB = a.bSupport * bary[0] + b.bSupport * bary[1];
+		pointA = a.aSupport * bary.x + b.aSupport * bary.y;
+		pointB = a.bSupport * bary.x + b.bSupport * bary.y;
 		break;
 	}
 	case 3:
 	case 4:
 	{
 		Vector3 bary = Cartesian2Barycentric(closestPoint, mA, mB, mC);
-		pointA = a.aSupport * bary[0] + b.aSupport * bary[1] + c.aSupport * bary[2];
-		pointB = a.bSupport * bary[0] + b.bSupport * bary[1] + c.bSupport * bary[2];
+		pointA = a.aSupport * bary.x + b.aSupport * bary.y + c.aSupport * bary.z;
+		pointB = a.bSupport * bary.x + b.bSupport * bary.y + c.bSupport * bary.z;
 		break;
 	}
 	}
@@ -691,9 +701,9 @@ float Collider::MinimumDistanceTo(
 inline Vector3 ScaleRelativeToPoint(const Vector3& x, const Vector3& point, float scale)
 {
 	return Vector3(
-		((x[0] - point[0]) * scale) + point[0],
-		((x[1] - point[1]) * scale) + point[1],
-		((x[2] - point[2]) * scale) + point[2]
+		((x.x - point.x) * scale) + point.x,
+		((x.y - point.y) * scale) + point.y,
+		((x.z - point.z) * scale) + point.z
 	);
 }
 

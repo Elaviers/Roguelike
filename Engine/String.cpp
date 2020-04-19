@@ -370,9 +370,9 @@ Vector2 String::ToVector2() const
 	Vector2 result;
 
 	if (tokens.GetSize() >= 1)
-		result[0] = tokens[0].ToFloat();
+		result.x = tokens[0].ToFloat();
 	if (tokens.GetSize() >= 2)
-		result[1] = tokens[1].ToFloat();
+		result.y = tokens[1].ToFloat();
 
 	return result;
 }
@@ -383,11 +383,11 @@ Vector3 String::ToVector3() const
 	Vector3 result;
 
 	if (tokens.GetSize() >= 1)
-		result[0] = tokens[0].ToFloat();
+		result.x = tokens[0].ToFloat();
 	if (tokens.GetSize() >= 2)
-		result[1] = tokens[1].ToFloat();
+		result.y = tokens[1].ToFloat();
 	if (tokens.GetSize() >= 3)
-		result[2] = tokens[2].ToFloat();
+		result.z = tokens[2].ToFloat();
 
 	return result;
 }
@@ -398,13 +398,13 @@ Vector4 String::ToVector4() const
 	Vector4 result;
 
 	if (tokens.GetSize() >= 1)
-		result[0] = tokens[0].ToFloat();
+		result.x = tokens[0].ToFloat();
 	if (tokens.GetSize() >= 2)
-		result[1] = tokens[1].ToFloat();
+		result.y = tokens[1].ToFloat();
 	if (tokens.GetSize() >= 3)
-		result[2] = tokens[2].ToFloat();
+		result.z = tokens[2].ToFloat();
 	if (tokens.GetSize() >= 4)
-		result[3] = tokens[3].ToFloat();
+		result.w = tokens[3].ToFloat();
 
 	return result;
 }
@@ -498,19 +498,19 @@ String String::From(double number, unsigned int minimum, unsigned int maxDecimal
 String String::From(const Vector2 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
 {
 	const char *seperator = ", ";
-	return From(vector[0], minimum, maxDecimal, base) + seperator + From(vector[1], minimum, maxDecimal, base);
+	return From(vector.x, minimum, maxDecimal, base) + seperator + From(vector.y, minimum, maxDecimal, base);
 }
 
 String String::From(const Vector3 &vector, unsigned int minimum, unsigned int maxDecimal, byte base)
 {
 	const char *seperator = ", ";
-	return From(vector[0], minimum, maxDecimal, base) + seperator + From(vector[1], minimum, maxDecimal, base) + seperator + From(vector[2], minimum, maxDecimal, base);
+	return From(vector.x, minimum, maxDecimal, base) + seperator + From(vector.y, minimum, maxDecimal, base) + seperator + From(vector.z, minimum, maxDecimal, base);
 }
 
 String String::From(const Vector4& vector, unsigned int minimum, unsigned int maxDecimal, byte base)
 {
 	const char* seperator = ", ";
-	return From(vector[0], minimum, maxDecimal, base) + seperator + From(vector[1], minimum, maxDecimal, base) + seperator + From(vector[2], minimum, maxDecimal, base) + seperator + From(vector[3], minimum, maxDecimal, base);
+	return From(vector.x, minimum, maxDecimal, base) + seperator + From(vector.y, minimum, maxDecimal, base) + seperator + From(vector.z, minimum, maxDecimal, base) + seperator + From(vector.w, minimum, maxDecimal, base);
 }
 
 String String::From(const wchar_t *string)

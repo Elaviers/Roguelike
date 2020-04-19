@@ -210,7 +210,7 @@ namespace DrawUtils
 
 		Vector3 dir = (b - a).Normalise();
 
-		t.SetRotation(Vector3(90 + Maths::ArcSineDegrees(dir[1]), Maths::ArcTangentDegrees2(dir[0], dir[2]), 0.f));
+		t.SetRotation(Vector3(90 + Maths::ArcSineDegrees(dir.y), Maths::ArcTangentDegrees2(dir.x, dir.z), 0.f));
 
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix());
 		modelManager.Line()->Render();
@@ -218,21 +218,21 @@ namespace DrawUtils
 
 	void DrawBox(const ModelManager &modelManager, const Vector3 &p1, const Vector3 &p2)
 	{
-		DrawLine(modelManager, p1, Vector3(p2[0], p1[1], p1[2]));
-		DrawLine(modelManager, p1, Vector3(p1[0], p2[1], p1[2]));
-		DrawLine(modelManager, p1, Vector3(p1[0], p1[1], p2[2]));
+		DrawLine(modelManager, p1, Vector3(p2.x, p1.y, p1.z));
+		DrawLine(modelManager, p1, Vector3(p1.x, p2.y, p1.z));
+		DrawLine(modelManager, p1, Vector3(p1.x, p1.y, p2.z));
 
-		DrawLine(modelManager, p2, Vector3(p1[0], p2[1], p2[2]));
-		DrawLine(modelManager, p2, Vector3(p2[0], p1[1], p2[2]));
-		DrawLine(modelManager, p2, Vector3(p2[0], p2[1], p1[2]));
+		DrawLine(modelManager, p2, Vector3(p1.x, p2.y, p2.z));
+		DrawLine(modelManager, p2, Vector3(p2.x, p1.y, p2.z));
+		DrawLine(modelManager, p2, Vector3(p2.x, p2.y, p1.z));
 
-		DrawLine(modelManager, Vector3(p1[0], p2[1], p1[2]), Vector3(p2[0], p2[1], p1[2]));
-		DrawLine(modelManager, Vector3(p1[0], p2[1], p1[2]), Vector3(p1[0], p2[1], p2[2]));
-		DrawLine(modelManager, Vector3(p2[0], p1[1], p2[2]), Vector3(p2[0], p1[1], p1[2]));
-		DrawLine(modelManager, Vector3(p2[0], p1[1], p2[2]), Vector3(p1[0], p1[1], p2[2]));
+		DrawLine(modelManager, Vector3(p1.x, p2.y, p1.z), Vector3(p2.x, p2.y, p1.z));
+		DrawLine(modelManager, Vector3(p1.x, p2.y, p1.z), Vector3(p1.x, p2.y, p2.z));
+		DrawLine(modelManager, Vector3(p2.x, p1.y, p2.z), Vector3(p2.x, p1.y, p1.z));
+		DrawLine(modelManager, Vector3(p2.x, p1.y, p2.z), Vector3(p1.x, p1.y, p2.z));
 
-		DrawLine(modelManager, Vector3(p2[0], p1[1], p1[2]), Vector3(p2[0], p2[1], p1[2]));
-		DrawLine(modelManager, Vector3(p1[0], p1[1], p2[2]), Vector3(p1[0], p2[1], p2[2]));
+		DrawLine(modelManager, Vector3(p2.x, p1.y, p1.z), Vector3(p2.x, p2.y, p1.z));
+		DrawLine(modelManager, Vector3(p1.x, p1.y, p2.z), Vector3(p1.x, p2.y, p2.z));
 	}
 
 	void DrawRing(const ModelManager& modelManager, const Vector3& centre, const Vector3& normal, float radius, int segments)
@@ -240,7 +240,7 @@ namespace DrawUtils
 		const float angStep = 2.f * Maths::PI_F / (float)segments;
 
 		Vector3 r = VectorMaths::GetPerpendicularVector(normal);
-		Vector3 u = Vector3::Cross(normal, r).Normalise();
+		Vector3 u = normal.Cross(r).Normalise();
 
 		r *= radius;
 		u *= radius;

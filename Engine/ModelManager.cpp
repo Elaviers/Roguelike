@@ -3,7 +3,7 @@
 #include "Debug.hpp"
 #include "IO.hpp"
 #include "Utilities.hpp"
-#include "Vector.hpp"
+#include "Vector3.hpp"
 
 ModelManager::ModelManager() : AssetManager()
 {

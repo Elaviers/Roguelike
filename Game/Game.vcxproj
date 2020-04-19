@@ -186,9 +186,12 @@ EXIT 0</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EntPlayer.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameInstance.cpp" />
+    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="ItemWeapon.cpp" />
     <ClCompile Include="LevelGeneration.cpp" />
     <ClCompile Include="LevelSegmentPicker.cpp" />
     <ClCompile Include="MenuMain.cpp" />
@@ -196,9 +199,12 @@ EXIT 0</Command>
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EntPlayer.h" />
+    <ClInclude Include="Enemy.hpp" />
+    <ClInclude Include="EntPlayer.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameInstance.h" />
+    <ClInclude Include="Item.hpp" />
+    <ClInclude Include="ItemWeapon.hpp" />
     <ClInclude Include="LevelGeneration.hpp" />
     <ClInclude Include="LevelSegmentPicker.hpp" />
     <ClInclude Include="MenuMain.hpp" />

@@ -3,7 +3,6 @@
 #include <Engine/Buffer.hpp>
 #include <Engine/UITextButton.hpp>
 #include <Engine/UIPanel.hpp>
-#include <Engine/Vector.hpp>
 
 class Font;
 class Material;

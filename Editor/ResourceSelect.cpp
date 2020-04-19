@@ -81,7 +81,7 @@ public:
 		_camera.SetParent(&_cameraRoot);
 
 		_camera.SetProjectionType(EProjectionType::PERSPECTIVE);
-		_camera.SetFOV(90.f);
+		_camera.SetPerspFOV(90.f);
 		_camera.SetRelativePosition(Vector3(0.f, 0.f, 1.f));
 		_camera.SetRelativeRotation(Vector3(0.f, 180.f, 0.f));
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "Quaternion.hpp"
-#include "Vector.hpp"
+#include "Vector3.hpp"
 
 class Rotation
 {

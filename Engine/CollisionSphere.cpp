@@ -53,7 +53,7 @@ ___________________________________________________________________
 	float distanceSq = transformedRayOrigin.LengthSquared() - _radius * _radius;	//The distance from the surface of the sphere to the ray's origin
 	
 	//Equivalent to transformedRayOrigin.LengthSquared() * cos(theta)
-	float dot = Vector3::Dot(transformedRayOrigin, transformedRayDirection);
+	float dot = transformedRayOrigin.Dot(transformedRayDirection);
 
 	if (distanceSq > 0.f && dot > 0.f)
 		return false;	//Ray does not start inside or does not face sphere

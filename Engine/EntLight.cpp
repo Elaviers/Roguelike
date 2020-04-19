@@ -38,7 +38,7 @@ void EntLight::ToShader(int glArrayIndex) const
 
 	String arrayElemName = String("Lights[") + String::From(glArrayIndex) + ']';
 	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Position")),	1, worldTransform[3]);
-	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Colour")),	1, &_colour[0]);
+	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Colour")),	1, _colour.GetData());
 	glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Radius")),	1, &_radius);
 }
 
@@ -54,7 +54,7 @@ void EntLight::Render(ERenderChannels channels) const
 
 	if (EntLight::drawLightSources && Engine::Instance().pTextureManager && channels & ERenderChannels::EDITOR)
 	{
-		const float colour[4] = { _colour[0], _colour[1], _colour[2], 1.f };
+		const float colour[4] = { _colour.x, _colour.y, _colour.z, 1.f };
 		Engine::Instance().pTextureManager->White()->Bind(0);
 		glUniform4fv(GLProgram::Current().GetUniformLocation("Colour"), 1, colour);
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, Matrix::Scale(_editorBoxExtent * 2.f) * GetTransformationMatrix());

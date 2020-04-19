@@ -8,7 +8,7 @@
 #include <Engine/LevelIO.hpp>
 #include <Engine/IO.hpp>
 #include <windowsx.h>
-#include "EntPlayer.h"
+#include "EntPlayer.hpp"
 #include "GameInstance.h"
 #include "LevelGeneration.hpp"
 #include "MenuMain.hpp"
@@ -16,7 +16,6 @@
 LRESULT CALLBACK Game::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	Game *game = (Game*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
-
 
 	switch (msg)
 	{
@@ -170,7 +169,7 @@ void Game::_Init()
 	_uiIsActive = true;
 
 	_uiCamera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
-	_uiCamera.SetScale(1.f);
+	_uiCamera.SetOrthoPixelsPerUnit(1.f);
 	_uiCamera.SetZBounds(-10.f, 10.f);
 }
 
@@ -307,7 +306,7 @@ void Game::MouseMove(uint16 x, uint16 y)
 {
 	if (_uiIsActive)
 	{
-		_ui.OnMouseMove((float)x, (float)(_uiCamera.GetViewport()[1] - y));
+		_ui.OnMouseMove((float)x, (float)(_uiCamera.GetViewport().y - y));
 	}
 }
 

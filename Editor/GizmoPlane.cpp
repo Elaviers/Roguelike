@@ -38,13 +38,13 @@ void GizmoPlane::Update(const Ray& ray, float& minT)
 	}
 	else
 	{
-		Vector3 cv = transform.GetRightVector() * transform.GetScale()[0] + transform.GetUpVector() * transform.GetScale()[1];
+		Vector3 cv = transform.GetRightVector() * transform.GetScale().x + transform.GetUpVector() * transform.GetScale().y;
 
 		float t = Collision::IntersectRayRect(ray, 
 			transform.GetPosition(), 
 			transform.GetForwardVector(), 
-			transform.GetRightVector() * (transform.GetScale()[0] / 2.f),
-			transform.GetUpVector() * (transform.GetScale()[1] / 2.f));
+			transform.GetRightVector() * (transform.GetScale().x / 2.f),
+			transform.GetUpVector() * (transform.GetScale().y / 2.f));
 
 		if (t && t < minT)
 		{

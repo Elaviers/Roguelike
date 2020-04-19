@@ -2,7 +2,8 @@
 #include "Types.hpp"
 
 //todo: make these includes go away by doing the conversion functions somewhere less dumb
-#include "Vector.hpp"
+#include "Vector2.hpp"
+#include "Vector3.hpp"
 #include "Vector4.hpp"
 
 template<typename T>

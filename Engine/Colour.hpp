@@ -3,15 +3,19 @@
 #include "Types.hpp"
 #include "Vector4.hpp"
 
-class Colour
+union Colour
 {
+private:
 	Vector4 _data;
 
 public:
-	float& r = _data[0];
-	float& g = _data[1];
-	float& b = _data[2];
-	float& a = _data[3];
+	struct
+	{
+		float r;
+		float g;
+		float b;
+		float a;
+	};
 
 	Colour() : _data(0, 0, 0, 1) {}
 	Colour(const Vector4& data) : _data(data) {}
@@ -43,3 +47,4 @@ public:
 
 	static Colour Black, Grey, White, Red, Green, Blue, Yellow, Pink, Cyan;
 };
+	

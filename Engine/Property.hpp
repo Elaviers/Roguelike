@@ -2,7 +2,9 @@
 #include "FunctionPointer.hpp"
 #include "String.hpp"
 #include "Types.hpp"
-#include "Vector.hpp"
+#include "Vector2.hpp"
+#include "Vector3.hpp"
+#include "Vector4.hpp"
 
 enum class EPropertyType
 {

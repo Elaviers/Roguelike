@@ -14,6 +14,27 @@ const PropertyCollection& MaterialSurface::GetProperties()
 	return properties;
 }
 
+MaterialSurface::MaterialSurface(const SharedPointer<const Texture>& diffuse, 
+	const SharedPointer<const Texture>& normal, 
+	const SharedPointer<const Texture>& specular, 
+	const SharedPointer<const Texture>& reflection) : Material(ERenderChannels::SURFACE), _diffuse(diffuse), _normal(normal), _specular(specular), _reflection(reflection)
+{
+	if (Engine::Instance().pTextureManager)
+	{
+		if (!_diffuse)
+			_diffuse = Engine::Instance().pTextureManager->White();
+
+		if (!_normal)
+			_normal = Engine::Instance().pTextureManager->NormalDefault();
+
+		if (!_specular)
+			_specular = Engine::Instance().pTextureManager->Grey();
+
+		if (!_reflection)
+			_reflection = Engine::Instance().pTextureManager->Black();
+	}
+}
+
 void MaterialSurface::_CMD_tex(const Buffer<String>& args)
 {
 	if (args.GetSize() >= 2)

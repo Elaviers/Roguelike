@@ -33,7 +33,7 @@ public:
 
 	virtual void RenderString(const char* string, const Transform & transform, float lineHeight) const override;
 
-	void RenderString(const char* string, const Transform& transform) const { RenderString(string, transform, -transform.GetScale()[1]); }
+	void RenderString(const char* string, const Transform& transform) const { RenderString(string, transform, -transform.GetScale().y); }
 
 	void BindTexture() const { if (_texture) _texture->Bind(0); }
 };

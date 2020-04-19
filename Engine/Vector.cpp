@@ -1,4 +1,4 @@
-#include "Vector.hpp"
+#include "Vector3.hpp"
 #include "Matrix.hpp"
 #include "Rotation.hpp"
 #include <cmath>
@@ -15,11 +15,11 @@ namespace VectorMaths
 	{
 		static const Vector3 axes[3] = { Vector3(1,0,0), Vector3(0,1,0), Vector3(0,0,1) };
 
-		float smallestDot = Vector3::Dot(axes[0], v);
+		float smallestDot = axes[0].Dot(v);
 		int axis = 0;
 		for (int i = 1; i < 3; ++i)
 		{
-			float dot = Vector3::Dot(axes[i], v);
+			float dot = axes[i].Dot(v);
 			if (dot < smallestDot)
 			{
 				smallestDot = dot;

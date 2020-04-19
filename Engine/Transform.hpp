@@ -1,7 +1,7 @@
 #pragma once
 #include "BufferIterator.hpp"
 #include "FunctionPointer.hpp"
-#include "Vector.hpp"
+#include "Vector3.hpp"
 #include "Matrix.hpp"
 #include "Rotation.hpp"
 

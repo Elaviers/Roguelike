@@ -1,5 +1,5 @@
 #pragma once
-#include "Vector.hpp"
+#include "Vector3.hpp"
 
 struct Ray;
 class Rotation;

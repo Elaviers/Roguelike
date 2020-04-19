@@ -56,7 +56,7 @@ namespace EngineTests
 			Assert::IsTrue(a.GetRelativePosition() == b.GetRelativePosition(), L"Positions are not equal");
 			Assert::IsTrue(a.GetRelativeScale() == b.GetRelativeScale(), L"Scales are not equal");
 			Assert::IsTrue(
-				a.GetRelativeRotation().GetEuler().AlmostEqual(b.GetRelativeRotation().GetEuler(), 0.1f),
+				a.GetRelativeRotation().GetEuler().AlmostEquals(b.GetRelativeRotation().GetEuler(), 0.1f),
 				L"Rotations are not similar");
 		}
 
@@ -82,8 +82,8 @@ namespace EngineTests
 			AssertEqual<Entity>(a, b);
 
 			Assert::IsTrue(a.GetProjectionType() == b.GetProjectionType(), L"Projection types are not equal");
-			Assert::IsTrue(a.GetFOV() == b.GetFOV(), L"Fields of view are not equal");
-			Assert::IsTrue(a.GetScale() == b.GetScale(), L"Ortho scales are not equal");
+			Assert::IsTrue(a.GetPerspFOV() == b.GetPerspFOV(), L"Fields of view are not equal");
+			Assert::IsTrue(a.GetOrthoPixelsPerUnit() == b.GetOrthoPixelsPerUnit(), L"Ortho scales are not equal");
 			Assert::IsTrue(a.GetNear() == b.GetNear(), L"Near clips are not equal");
 			Assert::IsTrue(a.GetFar() == b.GetFar(), L"Far clips are not equal");
 			Assert::IsTrue(a.GetViewport() == b.GetViewport(), L"Viewports are not equal");
@@ -164,8 +164,8 @@ namespace EngineTests
 			{
 				SRC(EntCamera);
 				src.SetProjectionType(EProjectionType::PERSPECTIVE);
-				src.SetFOV(110.f);
-				src.SetScale(69.f);
+				src.SetPerspFOV(110.f);
+				src.SetOrthoPixelsPerUnit(69.f);
 				src.SetZBounds(33.f, 66.f);
 				src.SetViewport(300, 301);
 				CheckRW(src);

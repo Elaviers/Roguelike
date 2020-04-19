@@ -330,8 +330,8 @@ public:
 						dest.normal = src.normal;
 						dest.uv = src.uv;
 
-						boundsMin = Vector3(Maths::Min(boundsMin[0], src.pos[0]), Maths::Min(boundsMin[1], src.pos[1]), Maths::Min(boundsMin[2], src.pos[2]));
-						boundsMax = Vector3(Maths::Max(boundsMax[0], src.pos[0]), Maths::Max(boundsMax[1], src.pos[1]), Maths::Max(boundsMax[2], src.pos[2]));
+						boundsMin = Vector3(Maths::Min(boundsMin.x, src.pos.x), Maths::Min(boundsMin.y, src.pos.y), Maths::Min(boundsMin.z, src.pos.z));
+						boundsMax = Vector3(Maths::Max(boundsMax.x, src.pos.x), Maths::Max(boundsMax.y, src.pos.y), Maths::Max(boundsMax.z, src.pos.z));
 					}
 
 					//Bounds
@@ -396,8 +396,8 @@ public:
 						dest.normal = src.normal;
 						dest.uv = src.uv;
 
-						boundsMin = Vector3(Maths::Min(boundsMin[0], src.pos[0]), Maths::Min(boundsMin[1], src.pos[1]), Maths::Min(boundsMin[2], src.pos[2]));
-						boundsMax = Vector3(Maths::Max(boundsMax[0], src.pos[0]), Maths::Max(boundsMax[1], src.pos[1]), Maths::Max(boundsMax[2], src.pos[2]));
+						boundsMin = Vector3(Maths::Min(boundsMin.x, src.pos.x), Maths::Min(boundsMin.y, src.pos.y), Maths::Min(boundsMin.z, src.pos.z));
+						boundsMax = Vector3(Maths::Max(boundsMax.x, src.pos.x), Maths::Max(boundsMax.y, src.pos.y), Maths::Max(boundsMax.z, src.pos.z));
 					}
 
 					//Bounds
@@ -477,8 +477,8 @@ public:
 									FbxSpaceToEngineSpace(transform);
 
 									Vector3 fbxRotation = FbxVector4ToVector3(transform.GetR());
-									fbxRotation[1] *= -1.f;
-									fbxRotation[2] *= -1.f;
+									fbxRotation.y *= -1.f;
+									fbxRotation.z *= -1.f;
 
 									_result->GetTranslationTrack(name).	AddKey(t, FbxVector4ToVector3(transform.GetT()));
 									_result->GetRotationTrack(name).	AddKey(t, Quaternion::FromEulerZYX(fbxRotation));

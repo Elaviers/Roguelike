@@ -1,4 +1,5 @@
 #pragma once
+#include "Debug.hpp"
 #include "Types.hpp"
 
 class Quaternion;
@@ -15,6 +16,32 @@ namespace Maths
 
 	template <typename T>
 	T Lerp(const T& from, const T& to, float alpha) { return (T)((from * (1.f - alpha)) + (to * alpha)); }
+
+	template <typename T>
+	inline const T& Min(const T* elements, size_t size)
+	{
+		Debug::Assert(size > 0, "Maths::Min called with 0 size");
+
+		const T* min = &elements[0];
+		for (size_t i = 1; i < size; ++i)
+			if (elements[i] < *min)
+				min = &elements[i];
+
+		return *min;
+	}
+
+	template <typename T>
+	inline const T& Max(const T* elements, size_t size)
+	{
+		Debug::Assert(size > 0, "Maths::Max called with 0 size");
+
+		const T* max = &elements[0];
+		for (size_t i = 1; i < size; ++i)
+			if (elements[i] > *max)
+				max = &elements[i];
+
+		return *max;
+	}
 
 	template <typename T>
 	inline T Min(const T& a, const T& b) { return a < b ? a : b; }
@@ -127,7 +154,7 @@ namespace Maths
 	}
 
 	template<typename T>
-	inline bool AlmostEqual(const T& a, const T& b, const T& tolerance)
+	inline bool AlmostEquals(const T& a, const T& b, const T& tolerance)
 	{
 		return (a >= b - tolerance && a <= b + tolerance);
 	}

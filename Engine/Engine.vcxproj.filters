@@ -300,9 +300,6 @@
     <ClInclude Include="Matrix.hpp">
       <Filter>Header Files\Maths</Filter>
     </ClInclude>
-    <ClInclude Include="Vector.hpp">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
     <ClInclude Include="Maths.hpp">
       <Filter>Header Files\Maths</Filter>
     </ClInclude>
@@ -408,9 +405,6 @@
     <ClInclude Include="Entity.hpp">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="EntBrush.hpp">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="EntBrush2D.hpp">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -494,6 +488,12 @@
     </ClInclude>
     <ClInclude Include="EKeycode.hpp">
       <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.hpp">
+      <Filter>Header Files\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2.hpp">
+      <Filter>Header Files\Maths</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

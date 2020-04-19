@@ -136,20 +136,20 @@ void Console::Render(const Font &font, float deltaTime)
 			linesNeeded = Maths::Min((int)lc, linesToDraw);
 		}
 
-		transform.SetPosition(Vector3(0, yOffset + linesNeeded * transform.GetScale()[1], 0));
+		transform.SetPosition(Vector3(0, yOffset + linesNeeded * transform.GetScale().y, 0));
 
-		font.RenderString(&_charBuffer[startIndex], transform, transform.GetScale()[1]);
+		font.RenderString(&_charBuffer[startIndex], transform, transform.GetScale().y);
 	}
 
 	transform.SetPosition(Vector3(0, 0, 0));
 
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(1.f, .2f, 0.f));
 	font.RenderString(&_prePrompt[0], transform);
-	transform.Move(Vector3(font.CalculateStringWidth(&_prePrompt[0], transform.GetScale()[0]), 0.f, 0.f));
+	transform.Move(Vector3(font.CalculateStringWidth(&_prePrompt[0], transform.GetScale().x), 0.f, 0.f));
 
 	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Vector4(0.2f, 1.f, 0.2f));
 	font.RenderString(&_prompt[0], transform);
-	transform.Move(Vector3(font.CalculateStringWidth(&_prompt[0], transform.GetScale()[0]), 0.f, 0.f));
+	transform.Move(Vector3(font.CalculateStringWidth(&_prompt[0], transform.GetScale().x), 0.f, 0.f));
 
 	if (_showCursor)
 		font.RenderString("|", transform);

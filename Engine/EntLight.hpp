@@ -2,7 +2,7 @@
 #include "Entity.hpp"
 #include "Collider.hpp"
 #include "CollisionBox.hpp"
-#include "Vector.hpp"
+#include "Vector3.hpp"
 
 class ModelManager;
 

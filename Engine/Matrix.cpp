@@ -23,7 +23,7 @@ namespace Matrix
 			1.f, 0.f, 0.f, 0.f,
 			0.f, 1.f, 0.f, 0.f,
 			0.f, 0.f, 1.f, 0.f,
-			t[0],t[1],t[2],1.f
+			t.x, t.y, t.z, 1.f
 		);
 	}
 
@@ -69,35 +69,35 @@ namespace Matrix
 	Mat4 Scale(const Vector3 &s)
 	{
 		RETURNMAT4(
-			s[0],	0.f,	0.f,	0.f,
-			0.f,	s[1],	0.f,	0.f,
-			0.f,	0.f,	s[2],	0.f,
+			s.x,	0.f,	0.f,	0.f,
+			0.f,	s.y,	0.f,	0.f,
+			0.f,	0.f,	s.z,	0.f,
 			0.f,	0.f,	0.f,	1.f
 		);
 	}
 
 	Mat4 Transformation(const Vector3 &translation, const Vector3 &rotation, const Vector3 &scale)
 	{
-		float sinRX = SineDegrees(rotation[0]);
+		float sinRX = SineDegrees(rotation.x);
 		float nsinRX = -sinRX;
-		float sinRY = SineDegrees(rotation[1]);
+		float sinRY = SineDegrees(rotation.y);
 		float nsinRY = -sinRY;
-		float sinRZ = SineDegrees(rotation[2]);
-		float cosRX = CosineDegrees(rotation[0]);
-		float cosRY = CosineDegrees(rotation[1]);
-		float cosRZ = CosineDegrees(rotation[2]);
+		float sinRZ = SineDegrees(rotation.z);
+		float cosRX = CosineDegrees(rotation.x);
+		float cosRY = CosineDegrees(rotation.y);
+		float cosRZ = CosineDegrees(rotation.z);
 
-		float f1 = scale[0] * cosRZ;
-		float f2 = scale[0] * -sinRZ;
-		float f3 = scale[1] * sinRZ;
-		float f4 = scale[1] * cosRZ;
-		float f5 = scale[2] * cosRX;
+		float f1 = scale.x * cosRZ;
+		float f2 = scale.x * -sinRZ;
+		float f3 = scale.y * sinRZ;
+		float f4 = scale.y * cosRZ;
+		float f5 = scale.z * cosRX;
 
 		RETURNMAT4(
 			f1 * cosRY + f2 * nsinRX * sinRY, 			f2 * cosRX,			f1 * nsinRY + f2 * nsinRX * cosRY,					0.f,
 			f3 * cosRY + f4 * nsinRX *sinRY,			f4 * cosRX,			f3 * nsinRY + f4 * nsinRX * cosRY, 					0.f,
-			f5 * sinRY,									scale[2] * sinRX,	f5 * cosRY,											0.f,
-			translation[0],								translation[1],		translation[2],										1.f
+			f5 * sinRY,									scale.z * sinRX,	f5 * cosRY,											0.f,
+			translation.x,								translation.y,		translation.z,										1.f
 		);
 	}
 

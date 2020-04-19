@@ -16,7 +16,7 @@ void EntSprite::Render(ERenderChannels channels) const
 			Vector3 delta = pos - EntCamera::Current()->GetWorldPosition();
 			delta.Normalise();
 
-			float y = Maths::ArcTangentDegrees2(delta[0], delta[2]);
+			float y = Maths::ArcTangentDegrees2(delta.x, delta.z);
 			Vector3 e = Vector3(0, y, 0);
 			t = Matrix::Transformation(pos, e, Vector3(_size, _size, _size));
 		}

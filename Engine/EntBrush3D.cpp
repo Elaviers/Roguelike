@@ -7,23 +7,23 @@ void EntBrush3D::_OnTransformChanged()
 {
 	if (!_updatingTransform)
 	{
-		float hw = GetRelativeScale()[0] / 2.f;
-		float hh = GetRelativeScale()[1] / 2.f;
-		float hd = GetRelativeScale()[2] / 2.f;
+		float hw = GetRelativeScale().x / 2.f;
+		float hh = GetRelativeScale().y / 2.f;
+		float hd = GetRelativeScale().z / 2.f;
 
-		_point1 = Vector3(GetRelativePosition()[0] - hw, GetRelativePosition()[1] - hh, GetRelativePosition()[2] - hd);
-		_point2 = Vector3(GetRelativePosition()[0] + hw, GetRelativePosition()[1] + hh, GetRelativePosition()[2] + hd);
+		_point1 = Vector3(GetRelativePosition().x - hw, GetRelativePosition().y - hh, GetRelativePosition().z - hd);
+		_point2 = Vector3(GetRelativePosition().x + hw, GetRelativePosition().y + hh, GetRelativePosition().z + hd);
 	}
 }
 
 void EntBrush3D::_OnPointChanged()
 {
-	float x = (_point1[0] + _point2[0]) / 2.f;
-	float y = (_point1[1] + _point2[1]) / 2.f;
-	float z = (_point1[2] + _point2[2]) / 2.f;
-	float w = Maths::Abs(_point1[0] - _point2[0]);
-	float h = Maths::Abs(_point1[1] - _point2[1]);
-	float d = Maths::Abs(_point1[2] - _point2[2]);
+	float x = (_point1.x + _point2.x) / 2.f;
+	float y = (_point1.y + _point2.y) / 2.f;
+	float z = (_point1.z + _point2.z) / 2.f;
+	float w = Maths::Abs(_point1.x - _point2.x);
+	float h = Maths::Abs(_point1.y - _point2.y);
+	float d = Maths::Abs(_point1.z - _point2.z);
 
 	_updatingTransform = true;
 	SetRelativePosition(Vector3(x, y, z));
@@ -45,45 +45,45 @@ void EntBrush3D::Render(ERenderChannels channels) const
 
 		Transform t;
 
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale()[0], GetRelativeScale()[1]));
+		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale().x, GetRelativeScale().y));
 		//Front
-		t.SetScale(Vector3(GetRelativeScale()[0], GetRelativeScale()[1], 1.f));
-		t.SetPosition(GetRelativePosition() + Vector3(0.f, 0.f, -GetRelativeScale()[2] / 2.f));
+		t.SetScale(Vector3(GetRelativeScale().x, GetRelativeScale().y, 1.f));
+		t.SetPosition(GetRelativePosition() + Vector3(0.f, 0.f, -GetRelativeScale().z / 2.f));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		modelManager->Plane()->Render();
 
 		//Back
 		t.SetRotation(Vector3(0.f, 180.f, 0.f));
-		t.Move(Vector3(0.f, 0.f, GetRelativeScale()[2]));
+		t.Move(Vector3(0.f, 0.f, GetRelativeScale().z));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		modelManager->Plane()->Render();
 
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale()[2], GetRelativeScale()[1]));
+		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale().z, GetRelativeScale().y));
 		//Left
-		t.SetScale(Vector3(GetRelativeScale()[2], GetRelativeScale()[1], 1.f));
+		t.SetScale(Vector3(GetRelativeScale().z, GetRelativeScale().y, 1.f));
 		t.SetRotation(Vector3(0.f, 90.f, 0.f));
-		t.SetPosition(Vector3(GetRelativePosition() - Vector3(GetRelativeScale()[0] / 2.f, 0.f, 0.f)));
+		t.SetPosition(Vector3(GetRelativePosition() - Vector3(GetRelativeScale().x / 2.f, 0.f, 0.f)));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		modelManager->Plane()->Render();
 
 		//Right
 		t.SetRotation(Vector3(0.f, -90.f, 0.f));
-		t.Move(Vector3(GetRelativeScale()[0], 0.f, 0.f));
+		t.Move(Vector3(GetRelativeScale().x, 0.f, 0.f));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		modelManager->Plane()->Render();
 
 
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale()[0], GetRelativeScale()[2]));
+		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale().x, GetRelativeScale().z));
 		//Bottom
-		t.SetScale(Vector3(GetRelativeScale()[0], GetRelativeScale()[2], 1.f));
+		t.SetScale(Vector3(GetRelativeScale().x, GetRelativeScale().z, 1.f));
 		t.SetRotation(Vector3(90.f, 0.f, 0.f));
-		t.SetPosition(GetRelativePosition() - Vector3(0.f, GetRelativeScale()[1] / 2.f, 0.f));
+		t.SetPosition(GetRelativePosition() - Vector3(0.f, GetRelativeScale().y / 2.f, 0.f));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		modelManager->Plane()->Render();
 
 		//Top
 		t.SetRotation(Vector3(-90.f, 0.f, 0.f));
-		t.Move(Vector3(0.f, GetRelativeScale()[1], 0.f));
+		t.Move(Vector3(0.f, GetRelativeScale().y, 0.f));
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
 		modelManager->Plane()->Render();
 
@@ -112,12 +112,12 @@ void EntBrush3D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> 
 	if (materialName)
 		SetMaterial(*materialName);
 
-	_point1[0] = GetRelativePosition()[0] - GetRelativeScale()[0] / 2.f;
-	_point1[1] = GetRelativePosition()[1] - GetRelativeScale()[1] / 2.f;
-	_point1[2] = GetRelativePosition()[2] - GetRelativeScale()[2] / 2.f;
-	_point2[0] = GetRelativePosition()[0] + GetRelativeScale()[0] / 2.f;
-	_point2[1] = GetRelativePosition()[1] + GetRelativeScale()[1] / 2.f;
-	_point2[2] = GetRelativePosition()[2] + GetRelativeScale()[2] / 2.f;
+	_point1.x = GetRelativePosition().x - GetRelativeScale().x / 2.f;
+	_point1.y = GetRelativePosition().y - GetRelativeScale().y / 2.f;
+	_point1.z = GetRelativePosition().z - GetRelativeScale().z / 2.f;
+	_point2.x = GetRelativePosition().x + GetRelativeScale().x / 2.f;
+	_point2.y = GetRelativePosition().y + GetRelativeScale().y / 2.f;
+	_point2.z = GetRelativePosition().z + GetRelativeScale().z / 2.f;
 }
 
 const PropertyCollection& EntBrush3D::GetProperties()

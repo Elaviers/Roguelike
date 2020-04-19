@@ -1,0 +1,1187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="lodepng::State" Collapsed="true">
+    <Position X="31.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgBBAAAAA=</HashCode>
+      <FileName>lodepng.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Animation" Collapsed="true">
+    <Position X="6" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAgIACgAAyAggAAAAAEAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Animation.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AnimationManager" Collapsed="true">
+    <Position X="5.5" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAACEAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AnimationManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AnimationTrack&lt;T&gt;" Collapsed="true">
+    <Position X="28.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAIAAAAEAAAEgQIAAAAAAAAAAAAIAAEAAA=</HashCode>
+      <FileName>AnimationTrack.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Asset" Collapsed="true">
+    <Position X="12.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgCAAAAEAAAAACAAAAAAgAAAAAIIAIAAAgIAAAAAA=</HashCode>
+      <FileName>Asset.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AssetManager&lt;T&gt;" Collapsed="true">
+    <Position X="6.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABIQAAAQgAACAYBAkAEQAAAAAAAYAAEACEBCAAACQAA=</HashCode>
+      <FileName>AssetManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AudioManager" Collapsed="true">
+    <Position X="7.75" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAIAQAAAAGQAAgAAAAIAAAAAAMAgRCAQAA=</HashCode>
+      <FileName>AudioManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Buffer&lt;T&gt;" Collapsed="true">
+    <Position X="30" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEJAAEAAAAAAABCAAAAIBQAAAAEAARAAABAzAEJQQCA=</HashCode>
+      <FileName>Buffer.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BufferReader&lt;T&gt;" Collapsed="true">
+    <Position X="31.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAgAAgAQQAAAAEgICAgQCAAAAAAAgAADAEAAAA=</HashCode>
+      <FileName>BufferIterator.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BufferWriter&lt;T&gt;" Collapsed="true">
+    <Position X="33.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAEAAgAAgAAAAAAAEgAAAAQCAAAACBAPECDAAAAAA=</HashCode>
+      <FileName>BufferIterator.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Collider" Collapsed="true">
+    <Position X="35.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AECAIBFAAAAAAEABAACAAEAEAAAAABAQBAAoAAQAAEA=</HashCode>
+      <FileName>Collider.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CollisionBox" Collapsed="true">
+    <Position X="10.75" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAACAAAAAggAAAAAAgQBAQg=</HashCode>
+      <FileName>CollisionBox.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CollisionCapsule" Collapsed="true">
+    <Position X="13" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CEIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAiBABg=</HashCode>
+      <FileName>CollisionCapsule.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CollisionShape" Collapsed="true">
+    <Position X="13" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAgAAAAAAAAAAAAAQBAAAAAAAgAAAAAAAAAAAABABg=</HashCode>
+      <FileName>CollisionShape.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CollisionSphere" Collapsed="true">
+    <Position X="15.25" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CEAAAAAAAAAAAAAAIAAAAAAAAAAAAgEAAAAAAAiBABg=</HashCode>
+      <FileName>CollisionSphere.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Colour" Collapsed="true">
+    <Position X="37" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAGAABAFAAAAgAAABIABSAABAAAAAgoAQAhBDAAAAA=</HashCode>
+      <FileName>Colour.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Console" Collapsed="true">
+    <Position X="38.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gECAAAAgBAAAgAiAAAAwABAAEIIAAAAAABAAABCUAAA=</HashCode>
+      <FileName>Console.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ConstEntityIterator" Collapsed="true">
+    <Position X="26.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAIAAAAAAQAgAAgAAAAAAACAAAAAgEAAABAA=</HashCode>
+      <FileName>EntityIterator.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DebugFrustum" Collapsed="true">
+    <Position X="17.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAIAAAAAAAAAAAAQAAAAAAAAAAIBIAAAAAAAA=</HashCode>
+      <FileName>DebugFrustum.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DebugLine" Collapsed="true">
+    <Position X="20" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQACAAABAIAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>DebugLine.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DebugManager" Collapsed="true">
+    <Position X="28.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABQAAABQAAAAAAAAIgAAAACAAACAAEEAAAAAAABAAAI=</HashCode>
+      <FileName>DebugManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DebugObject" Collapsed="true">
+    <Position X="20" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQEAAAAACAAAAQCAAAAABBAAAAggAAAABAAAAAABEA=</HashCode>
+      <FileName>DebugObject.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DebugString" Collapsed="true">
+    <Position X="22.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAGAAAAAABQAAAACAAA=</HashCode>
+      <FileName>DebugString.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="_DummyProperty" Collapsed="true">
+    <Position X="0.75" Y="18.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAACAAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RigidProperty.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Engine" Collapsed="true">
+    <Position X="30" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAACUUAAAAAAAAAAAAAYIAA0AERAACAAkAAAA=</HashCode>
+      <FileName>Engine.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntBox" Collapsed="true">
+    <Position X="3.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CBAAIAAAAggAAAABABAAQAEEAAAAgASAEBBAABAAAAA=</HashCode>
+      <FileName>EntBox.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntBrush&lt;SIZE&gt;" Collapsed="true">
+    <Position X="6.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIEADAghAAAAAABACAAAQAAAAAAAEGAAAAAAAAAA=</HashCode>
+      <FileName>EntBrush.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntBrush2D" Collapsed="true">
+    <Position X="5.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAABAEIAABAAAAAAAAEgAAAAABAAAAAAAAA=</HashCode>
+      <FileName>EntBrush2D.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntBrush3D" Collapsed="true">
+    <Position X="7.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAABAEQAABAAAAAAAAAgAAAAABAAAAAAAAA=</HashCode>
+      <FileName>EntBrush3D.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntCamera" Collapsed="true">
+    <Position X="10" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACIAEBACAABAAQIAACAAQCAASAkAI4EJIIAggYAACA=</HashCode>
+      <FileName>EntCamera.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntConnector" Collapsed="true">
+    <Position X="3.25" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAABAAAgBIAAAAAAAAAAAAAAggAAAABAAAAIAAAA=</HashCode>
+      <FileName>EntConnector.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Entity" Collapsed="true">
+    <Position X="7.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>1ISRLFCABYgBYEAIExAGBVIwBKMoxBFABFBoYgRhFgw=</HashCode>
+      <FileName>Entity.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntityIterator" Collapsed="true">
+    <Position X="31.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAIAAAAAAQAgAAgAAAAAAAAAAAAEgEAAIAAA=</HashCode>
+      <FileName>EntityIterator.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntLight" Collapsed="true">
+    <Position X="12.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAQAGAAAAAgBAEAAAAAAQAAwARAgwAAAABAAAIiAAAI=</HashCode>
+      <FileName>EntLight.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntRenderable" Collapsed="true">
+    <Position X="14.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAikAACAiBABAAAgAAAAQQARAggAAEGJAAAAAAAAA=</HashCode>
+      <FileName>EntRenderable.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntSkeletal" Collapsed="true">
+    <Position X="14.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAQgiAAAAAAAgAAAAAAQAAQAgQAgAAAAABAAAAAAAAA=</HashCode>
+      <FileName>EntSkeletal.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntSprite" Collapsed="true">
+    <Position X="1" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACEAAAAhBAACAAAAIQAAQARAggAAEGBAACQIAAAA=</HashCode>
+      <FileName>EntSprite.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Event&lt;...Args&gt;" Collapsed="true">
+    <Position X="33.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAQAAAgAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>Event.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Font" Collapsed="true">
+    <Position X="2.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAAAAAAIAAACAAAAACABE=</HashCode>
+      <FileName>Font.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FontManager" Collapsed="true">
+    <Position X="3.25" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAEAQAAgAAABAA=</HashCode>
+      <FileName>FontManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FontTexture" Collapsed="true">
+    <Position X="1.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgCAAAAQAABAAAMAAAAAAABAAAIAAAAiAAAAIBQBA=</HashCode>
+      <FileName>Font_Texture.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FontTTF" Collapsed="true">
+    <Position X="3.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAoBAAAAAERAAAAAAAACAAAAIggBA=</HashCode>
+      <FileName>Font_TTF.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FptrProperty&lt;T, V&gt;" Collapsed="true">
+    <Position X="3" Y="20.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQBABAIAAAAAAAAgAAAAABAAAAAAgACAA=</HashCode>
+      <FileName>Property.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FunctionPointer&lt;RETURNTYPE, ...Args&gt;" Collapsed="true">
+    <Position X="35.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgEBAAAQAAAAAAAAAAAEAgAAIQQAA=</HashCode>
+      <FileName>FunctionPointer.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FunctionProperty&lt;T&gt;" Collapsed="true">
+    <Position X="7.5" Y="20.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAQAAAAAAIAAAAIAAAAAAAAAAAEAAAAAAAAAAACAA=</HashCode>
+      <FileName>Property.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FunctionPropertyBase" Collapsed="true">
+    <Position X="7.5" Y="18.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Property.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GLContext" Collapsed="true">
+    <Position X="37" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACQhAAAAAAAEEAEAAAAAAAgAAAAA=</HashCode>
+      <FileName>GLContext.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GLCubemap" Collapsed="true">
+    <Position X="38.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAABBAAAAAAAAAAEIAAAAAAAAAAAA=</HashCode>
+      <FileName>GLCubemap.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GLDepthMap" Collapsed="true">
+    <Position X="26.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAgAAEAQAAAAAAAAACA=</HashCode>
+      <FileName>GLDepthMap.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GLMeshRenderer" Collapsed="true">
+    <Position X="28.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAgAAAAAAAAAABgAAQBAAAEAAEAEABCAAAAIAAA=</HashCode>
+      <FileName>GLMeshRenderer.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GLProgram" Collapsed="true">
+    <Position X="30" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAgCgAAAAAAiAIAADQiCAAAgAEAEAAAAAgAAg4AAA=</HashCode>
+      <FileName>GLProgram.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GLTexture" Collapsed="true">
+    <Position X="31.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAgAAAAAAAAAAAAAhAAAAAAAEAAUAAAAAEAAIAAAA=</HashCode>
+      <FileName>GLTexture.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hasher&lt;T&gt;" Collapsed="true">
+    <Position X="33.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Hashmap.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hashmap&lt;K, V, H_TYPE&gt;" Collapsed="true">
+    <Position X="35.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABACAAABAAABgDAAAAAAAAAAAEAAIAAgAAlQEBAQAA=</HashCode>
+      <FileName>Hashmap.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InputManager" Collapsed="true">
+    <Position X="37" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BQAAEAAAACAAgAAAAAgACAAAAAAAAAEAAAAAZAAAAAA=</HashCode>
+      <FileName>InputManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Joint" Collapsed="true">
+    <Position X="38.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAARAgAAQAAAEAgAAAAAAAAQAAAA=</HashCode>
+      <FileName>Joint.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KeyBind" Collapsed="true">
+    <Position X="19.75" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAiAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>InputManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KeyBind_Axis" Collapsed="true">
+    <Position X="18.5" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAiAAAAAgAAAAAABAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>InputManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KeyBind_Callback" Collapsed="true">
+    <Position X="20.75" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAQgQAAAAAAAAA=</HashCode>
+      <FileName>InputManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="List&lt;T&gt;" Collapsed="true">
+    <Position X="26.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAJAAEABAAAAARDAgAAABgAAAAAAAIAAQAgjQEBQAAI=</HashCode>
+      <FileName>List.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Map&lt;K, V&gt;" Collapsed="true">
+    <Position X="28.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABACAAABBAABgDAAAAAAAAAAAEAAIAAgAApQEBAQAA=</HashCode>
+      <FileName>Map.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Material" Collapsed="true">
+    <Position X="21.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAABAECABAAAAAAAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>Material.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaterialGrid" Collapsed="true">
+    <Position X="19.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAACAAABRAAAgAAAAAAAIAAAIAIIAAAAACAAAAIAAA=</HashCode>
+      <FileName>Material_Grid.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaterialManager" Collapsed="true">
+    <Position X="1" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAIAQAA=</HashCode>
+      <FileName>MaterialManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaterialSprite" Collapsed="true">
+    <Position X="21.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAACABAAAAAAAQAAAIAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>Material_Sprite.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaterialSurface" Collapsed="true">
+    <Position X="24" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAgAAhAAAACAAQgAAaAAgAAAAAAABAAEBAAAAAA=</HashCode>
+      <FileName>Material_Surface.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MemberFunctionPointer&lt;T, RETURNTYPE, ...Args&gt;" Collapsed="true">
+    <Position X="30" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAEAAAAAAAAAQAAAAAAAAAAgAgAAAAAAAA=</HashCode>
+      <FileName>FunctionPointer.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mesh" Collapsed="true">
+    <Position X="9.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAAQAAgAAAAAAAAAEAAAAQACAAAAAAA=</HashCode>
+      <FileName>Mesh.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mesh_Skeletal" Collapsed="true">
+    <Position X="8.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAABATAAgAAAgAAAAQAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Mesh_Skeletal.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mesh_Static" Collapsed="true">
+    <Position X="10.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABASAAgAAAkAAAAQQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mesh_Static.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Model" Collapsed="true">
+    <Position X="12.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAIAAAgBAAAICAAAAQAQhAEIAAAAABgAAIAAAAA=</HashCode>
+      <FileName>Model.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModelManager" Collapsed="true">
+    <Position X="10" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAgAAAIQQAAQBERAAAAAAAAAAAAAAIAAIEDBAA=</HashCode>
+      <FileName>ModelManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MultiPool&lt;T, SIZE&gt;" Collapsed="true">
+    <Position X="31.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAACAAAABAAAAAgAAAAACAAAAAAABAAEA=</HashCode>
+      <FileName>Pool.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NumberedSet&lt;T&gt;" Collapsed="true">
+    <Position X="33.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAgAAAABABBAAAAAAAAEAAAAAgEAAAAAAABA=</HashCode>
+      <FileName>NumberedSet.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OffsetProperty&lt;V&gt;" Collapsed="true">
+    <Position X="5.25" Y="20.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAADABAIAAAAAACAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Property.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Pool&lt;T, SIZE&gt;" Collapsed="true">
+    <Position X="35.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQBEAAACAAAAAAAAAAggAACAAIAAAAAABIAEA=</HashCode>
+      <FileName>Pool.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Property" Collapsed="true">
+    <Position X="4" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAIACIAAAAAAQEKAACAAAAAAAAAIEIAAAgQQAABAA=</HashCode>
+      <FileName>Property.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PropertyCollection" Collapsed="true">
+    <Position X="37" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACIAAAAAAAAABABCAAQAAQAAAIAIAICAAgCAAABAAAA=</HashCode>
+      <FileName>PropertyCollection.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="_PtrData" Collapsed="true">
+    <Position X="26.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAAQAAAAAAAEAAAAAAAAAAEAA=</HashCode>
+      <FileName>FunctionPointer.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Quaternion" Collapsed="true">
+    <Position X="38.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAQAFAIIAAAAAAIAAQQAAAQAQIAAhAhwAAAQIAA=</HashCode>
+      <FileName>Quaternion.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Random" Collapsed="true">
+    <Position X="26.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAQAAAAAAAAAAAAAAAAAAACAAABAAAAAJIAAAACAA=</HashCode>
+      <FileName>Random.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Registry" Collapsed="true">
+    <Position X="28.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAgAAAAAAAACAIEBAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Registry.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RegistryNode&lt;T&gt;" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Registry.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RegistryNodeBase" Collapsed="true">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAACAAAAAAAACAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Registry.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RigidFptrProperty&lt;T&gt;" Collapsed="true">
+    <Position X="18" Y="17.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAQFABAAAIAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>RigidProperty.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RigidProperty" Collapsed="true">
+    <Position X="18" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hAAAAAAIAEAAAQAAIAACAAAAAAAAAIEAAAAgQACABAA=</HashCode>
+      <FileName>RigidProperty.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RigidPropertyCollection" Collapsed="true">
+    <Position X="30" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAABABAAAAAAAAAAIAIAICAAgABAABAAAg=</HashCode>
+      <FileName>RigidPropertyCollection.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RigidReferenceProperty&lt;T&gt;" Collapsed="true">
+    <Position X="20.25" Y="17.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>GAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RigidProperty.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RigidValueProperty&lt;T&gt;" Collapsed="true">
+    <Position X="15.75" Y="17.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>RigidProperty.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RigidVariableProperty&lt;T&gt;" Collapsed="true">
+    <Position X="18" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABABAAAAAAAAAABAAAAAAAAAAAAYAAAA=</HashCode>
+      <FileName>RigidProperty.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Rotation" Collapsed="true">
+    <Position X="31.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABGAgAAAAAAIAAhIIACQAAAAQAAAAACAAgAAAQAAA=</HashCode>
+      <FileName>Rotation.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sampler" Collapsed="true">
+    <Position X="33.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAgBAAAAQAAAAAAQACEQQAAAAAgCAAAA=</HashCode>
+      <FileName>Sampler.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharedPointer&lt;T&gt;" Collapsed="true">
+    <Position X="35.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEIAEEABAAAAAAEgAAAAwAAQAAAAAAAQAAgAgBAAAA=</HashCode>
+      <FileName>SharedPointer.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SharedPointerData&lt;T&gt;" Collapsed="true">
+    <Position X="37" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAQAQAAAAAAEJCAAAAAAIEAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SharedPointer.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Skeleton" Collapsed="true">
+    <Position X="38.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAgACAACAAQAAAAAAABAAAgAChEAgA=</HashCode>
+      <FileName>Skeleton.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Skybox" Collapsed="true">
+    <Position X="26.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAABhAAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>Skybox.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SquareMatrix&lt;T, SIZE&gt;" Collapsed="true">
+    <Position X="28.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAEgAAAAQAACAEAAAIAAEAgAAAAJBA=</HashCode>
+      <FileName>Matrix.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StackAllocator" Collapsed="true">
+    <Position X="30" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAABAAAEBAAAAAABQSAAIAAAAAAIAAACAA=</HashCode>
+      <FileName>StackAllocator.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="String" Collapsed="true">
+    <Position X="33.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EkAAQEAAFBCAAAACxAAAAQAAACEEAgBQBAhhAABAhAA=</HashCode>
+      <FileName>String.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Texture" Collapsed="true">
+    <Position X="17.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAiAAAFACAgAAAAAgAAABAABAAAEAAQAIAAEAAAAA=</HashCode>
+      <FileName>Texture.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextureManager" Collapsed="true">
+    <Position X="12.25" Y="15.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABgBBgAAAAAQAABAEABAAABAAAAAAABAACAAAAAAA=</HashCode>
+      <FileName>TextureManager.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Timer" Collapsed="true">
+    <Position X="35.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAgAAAIAAAAAAAAAAAAAIAAAAAAEAEAAA=</HashCode>
+      <FileName>Timer.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Tracker&lt;T&gt;" Collapsed="true">
+    <Position X="37" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAEAAAAAAAAAAAAAQAAAAAICAQAIAAAAAAAA=</HashCode>
+      <FileName>Tracker.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Transform" Collapsed="true">
+    <Position X="38.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABQIAKCABACQgAIAAQQAEEAAQglAJABggwAAILA=</HashCode>
+      <FileName>Transform.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIButton" Collapsed="true">
+    <Position X="3.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAADEABIAACAAAAAAAAgAAQARASgCBEIBAAAAoCAAA=</HashCode>
+      <FileName>UIButton.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UICheckbox" Collapsed="true">
+    <Position X="5.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAkAHGAQIgICIAQAAAggCAAKgJACQDEEJBABAAECAAA=</HashCode>
+      <FileName>UICheckbox.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIColour" Collapsed="true">
+    <Position X="26.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAIAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAgAAAEAAg=</HashCode>
+      <FileName>UIColour.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIComboBox" Collapsed="true">
+    <Position X="3.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QiIASBKAACAAAEADIBigAAAgERAAAAEACjAEIoACAAM=</HashCode>
+      <FileName>UIComboBox.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIContainer" Collapsed="true">
+    <Position X="8" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQQCAAAAACAAAQAAAAAAARAABIAQgAAIBAAAQBCACE=</HashCode>
+      <FileName>UIContainer.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIElement" Collapsed="true">
+    <Position X="9" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAwAKACAABiEAJaAAAAAEBBQEBIIAAAAIXEQAQACICA=</HashCode>
+      <FileName>UIElement.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UILabel" Collapsed="true">
+    <Position X="10.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAACUBANQSAAziBgAAAABYAAAAAAAQ=</HashCode>
+      <FileName>UILabel.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIListBox" Collapsed="true">
+    <Position X="12.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAIACFAAIEACFAAIAQGAAAXYAZqQAgEEABgAAAACAAA=</HashCode>
+      <FileName>UIListBox.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIPanel" Collapsed="true">
+    <Position X="14.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAiEIAIAACAgAAAAAAAAAAARCAgAAECBAAAAAAAAA=</HashCode>
+      <FileName>UIPanel.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIRect" Collapsed="true">
+    <Position X="17" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAACAQQAAAAAAQAAAAEAATABgAAAABAAAAAAAAA=</HashCode>
+      <FileName>UIRect.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UISplitter" Collapsed="true">
+    <Position X="17" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABEACAAAQAIAAQABAAQAACEQAhQMIAAAMBLAQBAKIAA=</HashCode>
+      <FileName>UISplitter.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UITextbox" Collapsed="true">
+    <Position X="1.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AmQACFAAMACCkATrAVOiBCSYARoSDFEEIRQAAAAKAKA=</HashCode>
+      <FileName>UITextbox.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UITextButton" Collapsed="true">
+    <Position X="3.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAEAAAAVGBBACYAAgAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>UITextButton.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIToolbar" Collapsed="true">
+    <Position X="8" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAsgkQQAAQAQgAgAAACgEACAEAAAEAACAAAMIIkAEA=</HashCode>
+      <FileName>UIToolbar.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIToolbarItem" Collapsed="true">
+    <Position X="5.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAggAQAAAAAAAAgAAAAAAAAAAgAAA=</HashCode>
+      <FileName>UIToolbar.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VariableProperty&lt;V&gt;" Collapsed="true">
+    <Position X="4" Y="18.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABABAAAAAAAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>Property.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Vector&lt;T, SIZE&gt;" Collapsed="true">
+    <Position X="28.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAgAAAAQBBCAEIAAAAAECgAgAAAAA=</HashCode>
+      <FileName>Vector.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Vector4" Collapsed="true">
+    <Position X="30" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABEAAAAIAAAAAAQBAAAEAAAAAAEAgAgAAAAA=</HashCode>
+      <FileName>Vector4.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WaveSound" Collapsed="true">
+    <Position X="15" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAQAgAAAAAEAABACCAACAABBAAAAAAAYAAACAAA=</HashCode>
+      <FileName>Sound.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Window" Collapsed="true">
+    <Position X="31.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AKAAAAAEAAQAAAIAEAAIQAAAAQAEAEAAAAAACAIAIIA=</HashCode>
+      <FileName>Window.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="AbsoluteBounds" Collapsed="true">
+    <Position X="26.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAQAhgAAAAAAA=</HashCode>
+      <FileName>UIElement.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Bounds" Collapsed="true">
+    <Position X="28.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAQCAAQAAABAAAAEAAAAQAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Bounds.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Box" Collapsed="true">
+    <Position X="30" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAQAAAAACAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Box.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="BPMLists" Collapsed="true">
+    <Position X="31.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAKAAABAAAABAAAAAAAsAAIAAAA=</HashCode>
+      <FileName>lodepng.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="BPMNode" Collapsed="true">
+    <Position X="33.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAABAgA=</HashCode>
+      <FileName>lodepng.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ColorTree" Collapsed="true">
+    <Position X="35.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>lodepng.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Face" Collapsed="true">
+    <Position X="37" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABABAgAAAAAAICgAQAAAAAAAAA=</HashCode>
+      <FileName>Collider.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Float_IEEE754" Collapsed="true">
+    <Position X="38.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAAAAQAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>BufferIterator.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Glyph" Collapsed="true">
+    <Position X="26.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAQAAABAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Glyph.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Hash" Collapsed="true">
+    <Position X="28.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAgAAAAAAAAIAAAAAAIAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>lodepng.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="HuffmanTree" Collapsed="true">
+    <Position X="30" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAEAAAAAAAAAICAAAAAAAAACAA=</HashCode>
+      <FileName>lodepng.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Keyframe&lt;T&gt;" Collapsed="true">
+    <Position X="31.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAEAAAAAAAAAAAQBAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Keyframe.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="KeyName" Collapsed="true">
+    <Position X="33.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAEAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>InputManager.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="LineSegment" Collapsed="true">
+    <Position X="35.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAACAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LineSegment.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="OBJVertexDef" Collapsed="true">
+    <Position X="37" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAAAAAAABAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>ObjReader.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Pair&lt;T1, T2&gt;" Collapsed="true">
+    <Position X="38.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAAAgEAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Pair.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Ray" Collapsed="true">
+    <Position X="26.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Ray.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="RaycastResult" Collapsed="true">
+    <Position X="28.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>RaycastResult.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="RenderParam" Collapsed="true">
+    <Position X="30" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RenderParam.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ucvector" Collapsed="true">
+    <Position X="31.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAQAAAAAAQAAAAAAA=</HashCode>
+      <FileName>lodepng.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="UIBounds" Collapsed="true">
+    <Position X="33.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAQAhgAAAAAAA=</HashCode>
+      <FileName>UIElement.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="UICoord" Collapsed="true">
+    <Position X="35.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAABAAAAAAAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>UIElement.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="uivector" Collapsed="true">
+    <Position X="37" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAQAAAAAAQAAAAAAA=</HashCode>
+      <FileName>lodepng.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="UVRect" Collapsed="true">
+    <Position X="38.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAKAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UVRect.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Vertex17F" Collapsed="true">
+    <Position X="26.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>GAAAAAAAAAAAAAAAAgAAAIgAAAAAAAAAAAAAAgAAAgA=</HashCode>
+      <FileName>Vertex.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="VertexSkeletal" Collapsed="true">
+    <Position X="28.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>GQAAAAAAAACAAAAAAgAAAIgAEAAAAAAAAAAAAgAAAgA=</HashCode>
+      <FileName>Vertex.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="LevelMessages::ELevelMessage" Collapsed="true">
+    <Position X="33.5" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LevelIO.cpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="LevelVersions::__unnamed_enum_006c_1" Collapsed="true">
+    <Position X="26.5" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LevelIO.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="PropertyFlags::ELevelMessage" Collapsed="true">
+    <Position X="35.25" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAEAAAAAAAAAAAAAAACAIAAAIAAA=</HashCode>
+      <FileName>Property.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EAssetID" Collapsed="true">
+    <Position X="28.25" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAABAAEAAAAAAAAAAIAAAIAQAAAAAAAg=</HashCode>
+      <FileName>Asset.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EAxis" Collapsed="true">
+    <Position X="30" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAIAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAEADAA=</HashCode>
+      <FileName>InputManager.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ECollisionChannels" Collapsed="true">
+    <Position X="31.75" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAEAAAAAQABABAAAAAAAAQAAAAEAAAAAAAA=</HashCode>
+      <FileName>CollisionChannels.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ECursor" Collapsed="true">
+    <Position X="33.5" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAIAQAgAAIAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Engine.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EDirection" Collapsed="true">
+    <Position X="35.25" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAgAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Types.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EDirection2D" Collapsed="true">
+    <Position X="37" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAABAAAQAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>EDirection2D.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EEFileVersion" Collapsed="true">
+    <Position X="38.75" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mesh_Skeletal.cpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EEngineCreateFlags" Collapsed="true">
+    <Position X="26.5" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAACABAAAAAAAEAQAAAACIAACAgABAAAAAAAgAAA=</HashCode>
+      <FileName>Engine.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EEntityID" Collapsed="true">
+    <Position X="28.25" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAACAAIAAABAAQAABAAAAACAAAIABIAAEAAAAAA=</HashCode>
+      <FileName>EEntityID.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EInterpolationType" Collapsed="true">
+    <Position X="30" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Keyframe.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EKeycode" Collapsed="true">
+    <Position X="31.75" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>Y0AKDAz/AAACAgCAAQBAAAykggICAAgiAAAAvv//YQE=</HashCode>
+      <FileName>EKeycode.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EOverlapResult" Collapsed="true">
+    <Position X="37" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Collider.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EProjectionType" Collapsed="true">
+    <Position X="38.75" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAQAAAAA=</HashCode>
+      <FileName>EntCamera.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EPropertyType" Collapsed="true">
+    <Position X="26.5" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEEEAAAAAAACQAAQAABAAIAAAAAAgAAAAA4AMAAAA=</HashCode>
+      <FileName>Property.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ERenderChannels" Collapsed="true">
+    <Position X="28.25" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAACCAAAAAAAAAAQBABAAAAAAAAAAAAAAAEAAAAAA=</HashCode>
+      <FileName>ERenderChannels.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ESoundCategory" Collapsed="true">
+    <Position X="30" Y="13.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Sound.hpp</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

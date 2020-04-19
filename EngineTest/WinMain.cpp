@@ -268,7 +268,7 @@ int APIENTRY WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR cmdSt
 	{
 		camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
 		camera.SetZBounds(-100000.f, 100000.f);
-		camera.SetScale(128.f);
+		camera.SetOrthoPixelsPerUnit(128.f);
 		camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
 	}
 	else

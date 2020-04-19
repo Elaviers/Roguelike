@@ -7,11 +7,12 @@ class TextureManager : public AssetManager<Texture>
 private:
 	struct _TextureManagerColours
 	{
+		Texture *black = nullptr;
 		Texture *white = nullptr;
 		Texture *grey = nullptr;
 		Texture *normalDefault = nullptr;
 
-		SharedPointer<const Texture> tWhite, tGrey, tNormalDefault;
+		SharedPointer<const Texture> tBlack, tWhite, tGrey, tNormalDefault;
 	} _colours;
 
 	virtual Texture* _CreateResource(const String&, const Buffer<byte>&);
@@ -31,6 +32,7 @@ public:
 
 	void CMD_config(const Buffer<String>& args);
 
+	const SharedPointer<const Texture>& Black() const { return _colours.tBlack; }
 	const SharedPointer<const Texture>& White() const { return _colours.tWhite; }
 	const SharedPointer<const Texture>& Grey() const { return _colours.tGrey; }
 	const SharedPointer<const Texture>& NormalDefault() const { return _colours.tNormalDefault; }

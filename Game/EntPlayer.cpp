@@ -1,4 +1,4 @@
-#include "EntPlayer.h"
+#include "EntPlayer.hpp"
 #include <Engine/CollisionBox.hpp>
 #include <Engine/CollisionCapsule.hpp>
 #include <Engine/InputManager.hpp>
@@ -15,11 +15,13 @@ EntPlayer::EntPlayer()
 	_mesh.SetRelativeScale(Vector3(.5f, .5f, .5f));
 
 	_cameraPivot.SetParent(this);
-	_cameraPivot.SetRelativeRotation(Vector3(-20, 0, 0));
+	_cameraPivot.SetRelativeRotation(Vector3(-30, 45, 0));
 
 	_camera.SetParent(&_cameraPivot);
-	_camera.SetRelativePosition(Vector3(0, 0, -2));
-	
+	_camera.SetZBounds(-1000.f, 1000.f);
+	_camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
+	_camera.SetOrthoPixelsPerUnit(128.f);
+
 	GameInstance::Instance().SetActiveCamera(&_camera);
 
 	Engine::Instance().pInputManager->BindKey(EKeycode::SPACE, Callback(this, &EntPlayer::_Jump));
@@ -27,7 +29,7 @@ EntPlayer::EntPlayer()
 
 void EntPlayer::_Jump()
 {
-	_velocity[1] += 5.f;
+	_velocity.y += 5.f;
 }
 
 void EntPlayer::Update(float deltaTime)
@@ -38,14 +40,14 @@ void EntPlayer::Update(float deltaTime)
 
 	GameInstance& game = GameInstance::Instance();
 
-	_cameraPivot.AddRelativeRotation(Vector3(.1f * game.GetAxisLookUp(), .1f * game.GetAxisLookRight(), 0));
+	//_cameraPivot.AddRelativeRotation(Vector3(.1f * game.GetAxisLookUp(), .1f * game.GetAxisLookRight(), 0));
 
 	Transform worldTransform = GetWorldTransform();
 	Transform cameraT = _camera.GetWorldTransform();
 	
 	//Debug::PrintLine(String::From(_velocity).GetData());
 
-	_velocity[1] -= 9.8f * deltaTime;
+	_velocity.y -= 9.8f * deltaTime;
 
 	Vector3 dv;
 	float amountForward = game.GetAxisMoveForward() * 10;
@@ -56,8 +58,8 @@ void EntPlayer::Update(float deltaTime)
 	if (amountRight)
 		dv += cameraT.GetRightVector() * (deltaTime * amountRight);
 
-	_velocity[0] += dv[0];
-	_velocity[2] += dv[2];
+	_velocity.x += dv.x;
+	_velocity.z += dv.z;
 	
 
 	Vector3 movement = _velocity * deltaTime;
@@ -71,10 +73,10 @@ void EntPlayer::Update(float deltaTime)
 			!ents[i]->IsChildOf(this) && 
 			ents[i]->OverlapsCollider(_COLLIDER, desiredTransform, Vector3(), &penetration) == EOverlapResult::OVERLAPPING)
 		{
-			Pair<Vector3> contacts = ents[i]->GetShallowContactPointsWithCollider(.1f, _COLLIDER, desiredTransform, .1f);
-			Debug::PrintLine(CSTR(contacts.first, "\t", contacts.second));
+			//Pair<Vector3> contacts = ents[i]->GetShallowContactPointsWithCollider(.1f, _COLLIDER, desiredTransform, .1f);
+			//Debug::PrintLine(CSTR(contacts.first, "\t", contacts.second));
 
-			if (isnan(penetration[0]) || isnan(penetration[1]) || isnan(penetration[2])) continue;
+			if (isnan(penetration.x) || isnan(penetration.y) || isnan(penetration.z)) continue;
 
 			if (penetration.LengthSquared())
 			{
@@ -82,13 +84,13 @@ void EntPlayer::Update(float deltaTime)
 				{
 					Vector3 forbiddenDir = -penetration.Normalised();
 
-					_velocity -= 1.5f * forbiddenDir * Vector3::Dot(forbiddenDir, _velocity);
+					_velocity -= 1.5f * forbiddenDir * forbiddenDir.Dot(_velocity);
 				}
 
-				if (Maths::AlmostEqual(_velocity[1], 0.f, 0.1f))
+				if (Maths::AlmostEquals(_velocity.y, 0.f, 0.1f))
 				{
-					_velocity[0] *= .998f;
-					_velocity[2] *= .998f;
+					_velocity.x *= .998f;
+					_velocity.z *= .998f;
 				}
 
 				desiredTransform.Move(penetration);

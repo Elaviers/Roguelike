@@ -33,13 +33,13 @@ void FontTexture::_CMD_region(const Buffer<String>& args)
 		if (args[0] == "space")
 		{
 			Glyph& glyph = _charMap[' '];
-			glyph.uv[0] = (float)args[1].ToInt();
-			glyph.uv[1] = (float)args[2].ToInt();
-			glyph.uvSize[0] = (float)args[3].ToInt();
-			glyph.uvSize[1] = (float)args[4].ToInt();
+			glyph.uv.x = (float)args[1].ToInt();
+			glyph.uv.y = (float)args[2].ToInt();
+			glyph.uvSize.x = (float)args[3].ToInt();
+			glyph.uvSize.y = (float)args[4].ToInt();
 			glyph.advance = args[5].ToInt();
 
-			glyph.width = (int)(glyph.uvSize[0] * _texture->GetWidth());
+			glyph.width = (int)(glyph.uvSize.x * _texture->GetWidth());
 			if (glyph.width == 0)
 				glyph.width = glyph.advance;
 		}
@@ -78,10 +78,10 @@ void FontTexture::_ReadText(const String & string)
 						cY += _rowH;
 					}
 
-					glyph.uv[0] = cX / (float)_texture->GetWidth();
-					glyph.uv[1] = cY / (float)_texture->GetHeight();
-					glyph.uvSize[0] = glyph.width / (float)_texture->GetWidth();
-					glyph.uvSize[1] = _rowH / (float)_texture->GetHeight();
+					glyph.uv.x = cX / (float)_texture->GetWidth();
+					glyph.uv.y = cY / (float)_texture->GetHeight();
+					glyph.uvSize.x = glyph.width / (float)_texture->GetWidth();
+					glyph.uvSize.y = _rowH / (float)_texture->GetHeight();
 
 					cX += glyph.width;
 				}
@@ -140,10 +140,10 @@ size_t FontTexture::GetPositionOf(float pX, float pY, const char* string, const 
 	Vector3 advanceDirection = transform.GetRightVector();
 	Vector3 downDirection = -1.f * transform.GetUpVector();
 
-	float x = transform.GetPosition()[0];
-	float y = transform.GetPosition()[1];
+	float x = transform.GetPosition().x;
+	float y = transform.GetPosition().y;
 
-	float scale = (transform.GetScale()[0] / (float)_size);
+	float scale = (transform.GetScale().x / (float)_size);
 
 	float line = 0.f;
 	float currentLineW = 0.f;
@@ -162,10 +162,10 @@ size_t FontTexture::GetPositionOf(float pX, float pY, const char* string, const 
 			currentLineW = 0.f;
 			currentCharW = 0.f;
 
-			float x = transform.GetPosition()[0];
-			float y = transform.GetPosition()[1];
-			x += downDirection[0] * lineHeight * line;
-			y += downDirection[1] * lineHeight * line;
+			float x = transform.GetPosition().x;
+			float y = transform.GetPosition().y;
+			x += downDirection.x * lineHeight * line;
+			y += downDirection.y * lineHeight * line;
 		}
 		else if (*c == '\t')
 		{
@@ -183,16 +183,16 @@ size_t FontTexture::GetPositionOf(float pX, float pY, const char* string, const 
 			}
 		}
 
-		if (x + advanceDirection[0] * currentCharW >= pX)
+		if (x + advanceDirection.x * currentCharW >= pX)
 		{
-			if (x + advanceDirection[0] * currentCharW / 2.f <= pX)
+			if (x + advanceDirection.x * currentCharW / 2.f <= pX)
 				return i + 1;
 
 			return i;
 		}
 
-		x += advanceDirection[0] * currentCharW;
-		y += advanceDirection[1] * currentCharW;
+		x += advanceDirection.x * currentCharW;
+		y += advanceDirection.y * currentCharW;
 		currentLineW += currentCharW;
 
 		++i;
@@ -209,9 +209,9 @@ void FontTexture::RenderString(const char* string, const Transform & transform, 
 	Vector3 advanceDirection = charTransform.GetRightVector();
 	Vector3 downDirection = -1.f * charTransform.GetUpVector();
 
-	charTransform.Move(Vector3(0.f, Maths::Round(transform.GetScale()[1] / 2.f), 0.f));
+	charTransform.Move(Vector3(0.f, Maths::Round(transform.GetScale().y / 2.f), 0.f));
 
-	float scale = (transform.GetScale()[0] / (float)_size);
+	float scale = (transform.GetScale().x / (float)_size);
 
 	float line = 0.f;
 	float currentLineW = 0.f;
@@ -251,7 +251,7 @@ void FontTexture::RenderString(const char* string, const Transform & transform, 
 			{
 				float halfCharW = (glyph->width * scale / 2.f);
 				charTransform.Move(advanceDirection * halfCharW);
-				charTransform.SetScale(Vector3(glyph->width * scale, (float)transform.GetScale()[1], 1.f));
+				charTransform.SetScale(Vector3(glyph->width * scale, (float)transform.GetScale().y, 1.f));
 
 				GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVOffset, glyph->uv + halfTexel);
 				GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, glyph->uvSize - texel);

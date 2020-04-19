@@ -230,7 +230,6 @@
     <ClInclude Include="Bounds.hpp" />
     <ClInclude Include="Property.hpp" />
     <ClInclude Include="List.hpp" />
-    <ClInclude Include="EntBrush.hpp" />
     <ClInclude Include="EntBrush2D.hpp" />
     <ClInclude Include="EntBrush3D.hpp" />
     <ClInclude Include="Buffer.hpp" />
@@ -310,7 +309,8 @@
     <ClInclude Include="UIToolbar.hpp" />
     <ClInclude Include="Utilities.hpp" />
     <ClInclude Include="UVRect.hpp" />
-    <ClInclude Include="Vector.hpp" />
+    <ClInclude Include="Vector2.hpp" />
+    <ClInclude Include="Vector3.hpp" />
     <ClInclude Include="Vector4.hpp" />
     <ClInclude Include="Vertex.hpp" />
     <ClInclude Include="Window.hpp" />

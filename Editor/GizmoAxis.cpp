@@ -40,7 +40,7 @@ void GizmoAxis::Update(const Ray& mouseRay, float &minT)
 
 			//Snap to axis
 			Vector3 fv = transform.GetForwardVector();
-			_move.TryCall(_fv * Vector3::Dot(planeDelta, _fv));
+			_move.TryCall(_fv * planeDelta.Dot(_fv));
 		}
 	}
 	else

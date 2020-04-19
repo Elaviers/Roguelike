@@ -1,7 +1,6 @@
 #include "ToolEntity.hpp"
 #include "Editor.hpp"
 #include "UIPropertyManipulator.hpp"
-#include <Engine/EntBrush.hpp>
 #include <Engine/EntRenderable.hpp>
 #include <Engine/MacroUtilities.hpp>
 #include <Engine/RaycastResult.hpp>
@@ -69,7 +68,7 @@ void ToolEntity::MouseMove(const MouseData& mouseData)
 		if (results.GetSize() > 0)
 		{
 			Vector3 pos = r.origin + r.direction * results[0].entryTime;
-			pos[1] -= _placement->GetWorldBounds(true).min[1];
+			pos.y -= _placement->GetWorldBounds(true).min.y;
 			_placement->SetRelativePosition(pos);
 		
 			_owner.RefreshProperties();

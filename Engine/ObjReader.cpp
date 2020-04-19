@@ -122,23 +122,23 @@ Mesh_Static* IO::ReadOBJFile(const char *filename)
 
 							const Vector3 &newPos = positions.Last();
 
-							if (newPos[0] < mesh->bounds.min[0])
-								mesh->bounds.min[0] = newPos[0];
+							if (newPos.x < mesh->bounds.min.x)
+								mesh->bounds.min.x = newPos.x;
 
-							if (newPos[1] < mesh->bounds.min[1])
-								mesh->bounds.min[1] = newPos[1];
+							if (newPos.y < mesh->bounds.min.y)
+								mesh->bounds.min.y = newPos.y;
 
-							if (newPos[2] < mesh->bounds.min[2])
-								mesh->bounds.min[2] = newPos[2];
+							if (newPos.z < mesh->bounds.min.z)
+								mesh->bounds.min.z = newPos.z;
 
-							if (newPos[0] > mesh->bounds.max[0])
-								mesh->bounds.max[0] = newPos[0];
+							if (newPos.x > mesh->bounds.max.x)
+								mesh->bounds.max.x = newPos.x;
 
-							if (newPos[1] > mesh->bounds.max[1])
-								mesh->bounds.max[1] = newPos[1];
+							if (newPos.y > mesh->bounds.max.y)
+								mesh->bounds.max.y = newPos.y;
 
-							if (newPos[2] > mesh->bounds.max[2])
-								mesh->bounds.max[2] = newPos[2];
+							if (newPos.z > mesh->bounds.max.z)
+								mesh->bounds.max.z = newPos.z;
 						}
 					}
 

@@ -151,21 +151,21 @@ void Editor::_Init()
 
 	_viewports[1].gridPlane = EDirection::UP;
 	_viewports[1].camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
-	_viewports[1].camera.SetScale(32.f);
+	_viewports[1].camera.SetOrthoPixelsPerUnit(32.f);
 	_viewports[1].camera.SetZBounds(-10000.f, 10000.f);
 	_viewports[1].camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
 	_viewports[1].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f).SetFocusOnClick(false);
 
 	_viewports[2].gridPlane = EDirection::FORWARD;
 	_viewports[2].camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
-	_viewports[2].camera.SetScale(32.f);
+	_viewports[2].camera.SetOrthoPixelsPerUnit(32.f);
 	_viewports[2].camera.SetZBounds(-10000.f, 10000.f);
 	_viewports[2].camera.SetRelativeRotation(Vector3(0.f, 0.f, 0.f));
 	_viewports[2].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f).SetFocusOnClick(false);
 
 	_viewports[3].gridPlane = EDirection::RIGHT;
 	_viewports[3].camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
-	_viewports[3].camera.SetScale(32.f);
+	_viewports[3].camera.SetOrthoPixelsPerUnit(32.f);
 	_viewports[3].camera.SetZBounds(-10000.f, 10000.f);
 	_viewports[3].camera.SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
 	_viewports[3].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f).SetFocusOnClick(false);
@@ -596,8 +596,8 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 		_mouseData.rightElement = _mouseData.upElement = _mouseData.forwardElement = 0;
 	else
 	{
-		_mouseData.rightElement = right[0] ? 0 : right[1] ? 1 : 2;
-		_mouseData.upElement = up[0] ? 0 : up[1] ? 1 : 2;
+		_mouseData.rightElement = right.x ? 0 : right.y ? 1 : 2;
+		_mouseData.upElement = up.x ? 0 : up.y ? 1 : 2;
 		_mouseData.forwardElement = (_mouseData.rightElement != 0 && _mouseData.upElement != 0) ? 0 : (_mouseData.rightElement != 1 && _mouseData.upElement != 1) ? 1 : 2;
 	}
 
@@ -608,8 +608,8 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 	_mouseData.viewport = vpIndex;
 	_mouseData.x = x - (uint16)(bounds.x + (bounds.w / 2.f));
 	_mouseData.y = y - (uint16)(bounds.y + (bounds.h / 2.f));
-	_mouseData.unitX = camera.GetRelativePosition()[_mouseData.rightElement] + (float)_mouseData.x / camera.GetScale();
-	_mouseData.unitY = camera.GetRelativePosition()[_mouseData.upElement] + (float)_mouseData.y / camera.GetScale();
+	_mouseData.unitX = camera.GetRelativePosition()[_mouseData.rightElement] + (float)_mouseData.x / camera.GetOrthoPixelsPerUnit();
+	_mouseData.unitY = camera.GetRelativePosition()[_mouseData.upElement] + (float)_mouseData.y / camera.GetOrthoPixelsPerUnit();
 
 	if (_mouseData.isRightDown && _mouseData.viewport == prevViewport)
 	{
@@ -620,8 +620,8 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 			v[_mouseData.upElement] = _mouseData.prevUnitY - _mouseData.unitY;
 			camera.RelativeMove(v);
 
-			_mouseData.unitX = camera.GetRelativePosition()[_mouseData.rightElement] + (float)_mouseData.x / camera.GetScale();
-			_mouseData.unitY = camera.GetRelativePosition()[_mouseData.upElement] + (float)_mouseData.y / camera.GetScale();
+			_mouseData.unitX = camera.GetRelativePosition()[_mouseData.rightElement] + (float)_mouseData.x / camera.GetOrthoPixelsPerUnit();
+			_mouseData.unitY = camera.GetRelativePosition()[_mouseData.upElement] + (float)_mouseData.y / camera.GetOrthoPixelsPerUnit();
 		}
 		else
 		{
@@ -720,12 +720,12 @@ void Editor::Zoom(float amount)
 
 		if (camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC)
 		{
-			float mouseOffsetUnitsX = (float)_mouseData.x / camera.GetScale();
-			float mouseOffsetUnitsY = (float)_mouseData.y / camera.GetScale();
+			float mouseOffsetUnitsX = (float)_mouseData.x / camera.GetOrthoPixelsPerUnit();
+			float mouseOffsetUnitsY = (float)_mouseData.y / camera.GetOrthoPixelsPerUnit();
 			float moveX = mouseOffsetUnitsX - ((float)mouseOffsetUnitsX / (float)amount);
 			float moveY = mouseOffsetUnitsY - ((float)mouseOffsetUnitsY / (float)amount);
 
-			camera.SetScale(camera.GetScale() * amount);
+			camera.SetOrthoPixelsPerUnit(camera.GetOrthoPixelsPerUnit() * amount);
 			camera.RelativeMove(camera.GetRelativeTransform().GetRightVector() * moveX + camera.GetRelativeTransform().GetUpVector() * moveY);
 		}
 	}

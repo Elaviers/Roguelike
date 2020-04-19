@@ -1,0 +1,2 @@
+surface
+tex diffuse Debug/measuregeneric2

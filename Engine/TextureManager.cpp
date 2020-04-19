@@ -58,6 +58,7 @@ Texture* TextureManager::_CreateResource(const String& name, const String& text)
 
 void TextureManager::Initialise()
 {
+	_colours.black = new Texture(Buffer<byte>({ 0, 0, 0, 255 }), 1, 1);
 	_colours.white = new Texture(Buffer<byte>({ 255, 255, 255, 255 }), 1, 1);
 	_colours.grey = new Texture(Buffer<byte>({ 127, 127, 127, 255 }), 1, 1);
 	_colours.normalDefault = new Texture(Buffer<byte>({ 127, 127, 255, 255 }), 1, 1);
@@ -67,20 +68,24 @@ void TextureManager::Initialise()
 	colourInfo.mipLevels = 1;
 	colourInfo.minFilter = colourInfo.magFilter = GL_NEAREST;
 
+	_colours.black->info = colourInfo;
 	_colours.white->info = colourInfo;
 	_colours.grey->info = colourInfo;
 	_colours.normalDefault->info = colourInfo;
 
+	_colours.black->Create();
 	_colours.white->Create();
 	_colours.grey->Create();
 	_colours.normalDefault->Create();
 
-	SharedPointerData<Texture>& dWhite = _MapValue("white"), & dGrey = _MapValue("grey"), & dNormalDefault = _MapValue("normal_default");
+	SharedPointerData<Texture>& dBlack = _MapValue("black"), & dWhite = _MapValue("white"), & dGrey = _MapValue("grey"), & dNormalDefault = _MapValue("normal_default");
 
+	dBlack.SetPtr(_colours.black);
 	dWhite.SetPtr(_colours.white);
 	dGrey.SetPtr(_colours.grey);
 	dNormalDefault.SetPtr(_colours.normalDefault);
 
+	_colours.tBlack = SharedPointer<Texture>(dBlack);
 	_colours.tWhite = SharedPointer<Texture>(dWhite);
 	_colours.tGrey = SharedPointer<Texture>(dGrey);
 	_colours.tNormalDefault = SharedPointer<Texture>(dNormalDefault);

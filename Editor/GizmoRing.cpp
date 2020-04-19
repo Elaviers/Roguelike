@@ -13,8 +13,8 @@ bool GizmoRing::_GetAngle(const Ray& ray, float& angleOut) const
 		Vector3 rv = transform.GetRightVector();
 		Vector3 uv = transform.GetUpVector();
 
-		float x = Vector3::Dot(rv, dir);
-		float y = -Vector3::Dot(uv, dir);
+		float x = rv.Dot(dir);
+		float y = -uv.Dot(dir);
 
 		angleOut = Maths::ArcTangentDegrees2(y, x);
 		return true;

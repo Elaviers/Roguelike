@@ -4,7 +4,6 @@
 #include "SharedPointer.hpp"
 #include "Texture.hpp"
 #include "Transform.hpp"
-#include "Vector.hpp"
 
 class UIRect : public UIElement
 {

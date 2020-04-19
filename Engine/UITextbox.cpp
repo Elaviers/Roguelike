@@ -19,8 +19,8 @@ void UITextbox::_UpdateSelectionBox()
 {
 	Transform t = _label.GetRenderTransform();
 
-	float startX = t.GetPosition()[0] + (_selectionStart == 0 ? 0 : _label.GetFont()->CalculateStringWidth(_label.GetString().GetData(), _label.GetRenderTransform().GetScale()[0], _selectionStart));
-	float endX = t.GetPosition()[0] + (_selectionEnd == 0 ? 0 : _label.GetFont()->CalculateStringWidth(_label.GetString().GetData(), _label.GetRenderTransform().GetScale()[0], _selectionEnd));
+	float startX = t.GetPosition().x + (_selectionStart == 0 ? 0 : _label.GetFont()->CalculateStringWidth(_label.GetString().GetData(), _label.GetRenderTransform().GetScale().x, _selectionStart));
+	float endX = t.GetPosition().x + (_selectionEnd == 0 ? 0 : _label.GetFont()->CalculateStringWidth(_label.GetString().GetData(), _label.GetRenderTransform().GetScale().x, _selectionEnd));
 
 	if (startX > endX) Utilities::Swap(startX, endX);
 
@@ -47,9 +47,9 @@ void UITextbox::Render() const
 	if (_hasFocus && _caretStatus)
 	{
 		Transform t = _label.GetRenderTransform();
-		float caretX = _caretOffset * t.GetScale()[0] + (_caretPos == 0 ? 0.f : _label.GetFont()->CalculateStringWidth(_label.GetString().GetData(), t.GetScale()[0], _caretPos));
+		float caretX = _caretOffset * t.GetScale().x + (_caretPos == 0 ? 0.f : _label.GetFont()->CalculateStringWidth(_label.GetString().GetData(), t.GetScale().x, _caretPos));
 		t.Move(Vector3(caretX, _absoluteBounds.h / 2.f, 0.f));
-		t.SetScale(Vector3(_caretWidth, t.GetScale()[1], 0.f));
+		t.SetScale(Vector3(_caretWidth, t.GetScale().y, 0.f));
 
 		_caretColour.ApplyToShader();
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.GetTransformationMatrix());

@@ -9,20 +9,20 @@ void EntBrush2D::_OnTransformChanged()
 {
 	if (!_updatingTransform)
 	{
-		float hw = GetRelativeScale()[0] / 2.f;
-		float hh = GetRelativeScale()[1] / 2.f;
+		float hw = GetRelativeScale().x / 2.f;
+		float hh = GetRelativeScale().y / 2.f;
 
-		_point1 = Vector2(GetRelativePosition()[0] - hw, GetRelativePosition()[2] - hh);
-		_point2 = Vector2(GetRelativePosition()[0] + hh, GetRelativePosition()[2] + hh);
+		_point1 = Vector2(GetRelativePosition().x - hw, GetRelativePosition().z - hh);
+		_point2 = Vector2(GetRelativePosition().x + hh, GetRelativePosition().z + hh);
 	}
 }
 
 void EntBrush2D::_OnPointChanged()
 {
-	float x = (_point1[0] + _point2[0]) / 2.f;
-	float z = (_point1[1] + _point2[1]) / 2.f;
-	float w = Maths::Abs(_point1[0] - _point2[0]);
-	float h = Maths::Abs(_point1[1] - _point2[1]);
+	float x = (_point1.x + _point2.x) / 2.f;
+	float z = (_point1.y + _point2.y) / 2.f;
+	float w = Maths::Abs(_point1.x - _point2.x);
+	float h = Maths::Abs(_point1.y - _point2.y);
 
 	_updatingTransform = true;
 	SetRelativePosition(Vector3(x, level, z));
@@ -36,7 +36,7 @@ void EntBrush2D::Render(ERenderChannels channels) const
 	{
 		_material->Apply();
 		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale()[0], GetRelativeScale()[1]));
+		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale().x, GetRelativeScale().y));
 		Engine::Instance().pModelManager->Plane()->Render();
 		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
 	}
@@ -63,11 +63,11 @@ void EntBrush2D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> 
 	if (materialName)
 		SetMaterial(*materialName);
 
-	level = GetRelativePosition()[1];
-	_point1[0] = GetRelativePosition()[0] - GetRelativeScale()[0] / 2.f;
-	_point1[1] = GetRelativePosition()[2] - GetRelativeScale()[1] / 2.f;
-	_point2[0] = GetRelativePosition()[0] + GetRelativeScale()[0] / 2.f;
-	_point2[1] = GetRelativePosition()[2] + GetRelativeScale()[1] / 2.f;
+	level = GetRelativePosition().y;
+	_point1.x = GetRelativePosition().x - GetRelativeScale().x / 2.f;
+	_point1.y = GetRelativePosition().z - GetRelativeScale().y / 2.f;
+	_point2.x = GetRelativePosition().x + GetRelativeScale().x / 2.f;
+	_point2.y = GetRelativePosition().z + GetRelativeScale().y / 2.f;
 }
 
 const PropertyCollection& EntBrush2D::GetProperties()
