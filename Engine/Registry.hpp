@@ -1,9 +1,9 @@
 #pragma once
-#include "Debug.hpp"
-#include "Map.hpp"
 #include "Entity.hpp"
-#include "String.hpp"
-#include "Utilities.hpp"
+#include <ELCore/Map.hpp>
+#include <ELCore/String.hpp>
+#include <ELCore/Utilities.hpp>
+#include <ELSys/Debug.hpp>
 #include <typeinfo>
 
 class RegistryNodeBase

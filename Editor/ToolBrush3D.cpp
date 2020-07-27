@@ -2,7 +2,7 @@
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
 #include "UIPropertyManipulator.hpp"
-#include <Engine/MacroUtilities.hpp>
+#include <ELCore/MacroUtilities.hpp>
 
 const PropertyCollection& ToolBrush3D::_GetProperties()
 {
@@ -11,8 +11,8 @@ const PropertyCollection& ToolBrush3D::_GetProperties()
 	DO_ONCE(
 		properties.Add(
 		"Material",
-		MemberGetter<EntBrush3D, String>(&EntBrush3D::GetMaterialName),
-		MemberSetter<EntBrush3D, String>(&EntBrush3D::SetMaterial),
+		ContextualMemberGetter<EntBrush3D, String>(&EntBrush3D::GetMaterialName),
+		ContextualMemberSetter<EntBrush3D, String>(&EntBrush3D::SetMaterial),
 		offsetof(ToolBrush3D, _object),
 		PropertyFlags::MATERIAL)
 	);
@@ -23,7 +23,7 @@ const PropertyCollection& ToolBrush3D::_GetProperties()
 void ToolBrush3D::Initialise()
 {
 	_object.SetRelativeScale(Vector3());
-	_object.SetMaterial("alt");
+	_object.SetMaterial("alt", _owner.engine.context);
 }
 
 void ToolBrush3D::Activate(UIContainer& properties, UIContainer& toolProperties)
@@ -39,7 +39,7 @@ void ToolBrush3D::Cancel()
 
 void ToolBrush3D::MouseMove(const MouseData &mouseData)
 {
-	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC)
+	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 	{
 		if (mouseData.isLeftDown)
 		{
@@ -79,7 +79,7 @@ void ToolBrush3D::MouseMove(const MouseData &mouseData)
 
 void ToolBrush3D::MouseDown(const MouseData &mouseData)
 {
-	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
+	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
 }
 
 void ToolBrush3D::KeySubmit()
@@ -89,9 +89,8 @@ void ToolBrush3D::KeySubmit()
 	_object.Clone()->SetParent(&_owner.LevelRef());
 }
 
-void ToolBrush3D::Render(ERenderChannels channels) const
+void ToolBrush3D::Render(RenderQueue& q) const
 {
-	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(.8f, .8f, .8f, .5f));
-	_object.Render(channels);
+	_object.Render(q);
 }
 

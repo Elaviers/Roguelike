@@ -1,12 +1,12 @@
 #pragma once
-#include <Engine/UIContainer.hpp>
-#include <Engine/UIButton.hpp>
-#include <Engine/UICheckbox.hpp>
-#include <Engine/UIComboBox.hpp>
-#include <Engine/UILabel.hpp>
-#include <Engine/UIPanel.hpp>
-#include <Engine/UITextbox.hpp>
-#include <Engine/Property.hpp>
+#include <ELCore/Property.hpp>
+#include <ELUI/Container.hpp>
+#include <ELUI/Button.hpp>
+#include <ELUI/Checkbox.hpp>
+#include <ELUI/ComboBox.hpp>
+#include <ELUI/Label.hpp>
+#include <ELUI/Panel.hpp>
+#include <ELUI/Textbox.hpp>
 
 class Editor;
 

@@ -1,7 +1,8 @@
 #pragma once
 #include "FbxSdk.hpp"
-#include <Engine/Animation.hpp>
-#include <Engine/Mesh.hpp>
+#include <ELGraphics/Animation.hpp>
+
+class Mesh;
 
 namespace EditorIO
 {

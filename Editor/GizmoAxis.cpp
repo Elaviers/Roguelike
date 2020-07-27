@@ -1,10 +1,10 @@
 #include "GizmoAxis.hpp"
-#include <Engine/Colour.hpp>
-#include <Engine/DrawUtils.hpp>
-#include <Engine/Engine.hpp>
-#include <Engine/GLProgram.hpp>
-#include <Engine/RaycastResult.hpp>
-#include <Engine/TextureManager.hpp>
+#include <ELGraphics/Colour.hpp>
+#include <ELGraphics/TextureManager.hpp>
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderQueue.hpp>
+#include <ELPhys/Collision.hpp>
+#include <ELPhys/RaycastResult.hpp>
 
 void GizmoAxis::_OnTransformChanged()
 {
@@ -13,20 +13,17 @@ void GizmoAxis::_OnTransformChanged()
 	_collisionBox->SetTransform(Transform((2.f * transform.GetPosition() + _fv * _length) / 2.f, transform.GetRotation(), Vector3(0.1f, 0.1f, _length / 2.f)));
 }
 
-void GizmoAxis::Draw() const
+void GizmoAxis::Render(RenderQueue& q) const
 {
-	if (Engine::Instance().pModelManager && Engine::Instance().pTextureManager)
-	{
-		if (_canDrag)
-			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(1.f - _colour.r, 1.f - _colour.g, 1.f - _colour.b));
-		else
-			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
+	RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
 
-		DrawUtils::DrawLine(
-			*Engine::Instance().pModelManager, 
-			transform.GetPosition(), 
-			transform.GetPosition() + _fv * _length);
-	}
+	if (_canDrag)
+		e.AddSetColour(Colour(1.f - _colour.r, 1.f - _colour.g, 1.f - _colour.b));
+	else
+		e.AddSetColour(_colour);
+
+	e.AddSetLineWidth(2.f);
+	e.AddLine(transform.GetPosition(), transform.GetPosition() + _fv * _length);
 }
 
 void GizmoAxis::Update(const Ray& mouseRay, float &minT)
@@ -46,7 +43,7 @@ void GizmoAxis::Update(const Ray& mouseRay, float &minT)
 	else
 	{
 		RaycastResult rr;
-		if (_collider.IntersectsRay(Transform(), mouseRay, rr) && rr.entryTime < minT)
+		if (_collider.IntersectsRay(Transform(), mouseRay, ECollisionChannels::ALL, rr) && rr.entryTime < minT)
 		{
 			minT = rr.entryTime;
 

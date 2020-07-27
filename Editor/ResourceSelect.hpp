@@ -1,7 +1,8 @@
 #pragma once
-#include <Engine/String.hpp>
+#include <ELCore/String.hpp>
 #include <Windows.h>
 
+class EngineInstance;
 class GLContext;
 class GLProgram;
 class MaterialManager;
@@ -16,5 +17,5 @@ namespace ResourceSelect
 {
 	void Initialise();
 
-	String Dialog(MaterialManager&, ModelManager&, const char *searchDir, HWND parent, EResourceType type, const GLContext &context, GLProgram& programLit, const GLProgram& programUnlit);
+	String Dialog(EngineInstance&, const char *searchDir, HWND parent, EResourceType type, const GLContext &context, GLProgram& programLit, const GLProgram& programUnlit);
 };

@@ -1,6 +1,5 @@
 #pragma once
-#include "BufferIterator.hpp"
-#include "Types.hpp"
+#include <ELCore/Types.hpp>
 #include "Entity.hpp"
 
 namespace LevelVersions
@@ -15,7 +14,7 @@ namespace LevelVersions
 
 namespace LevelIO
 {
-	bool Read(Entity &out, const char *filename);
-	bool Write(const Entity &object, const char *filename);
+	bool Read(Entity &out, const char *filename, const Context& ctx);
+	bool Write(const Entity &object, const char *filename, const Context& ctx);
 
 }

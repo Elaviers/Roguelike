@@ -18,6 +18,6 @@ public:
 
 	virtual ~GizmoPlane() {}
 
-	virtual void Draw() const override;
+	virtual void Render(RenderQueue&) const override;
 	virtual void Update(const Ray& mouseRay, float& maxT) override;
 };

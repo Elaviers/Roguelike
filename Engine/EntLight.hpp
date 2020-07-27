@@ -1,17 +1,11 @@
 #pragma once
 #include "Entity.hpp"
-#include "Collider.hpp"
-#include "CollisionBox.hpp"
-#include "Vector3.hpp"
-
-class ModelManager;
+#include <ELPhys/CollisionBox.hpp>
 
 class EntLight : public Entity
 {
 	Vector3 _colour;
 	float _radius;
-
-	static int _frameLightCounter;
 
 	static Vector3 _editorBoxExtent;
 public:
@@ -22,18 +16,13 @@ public:
 
 	static bool drawLightSources;
 
-	static void FinaliseLightingForFrame();
-
 	const Vector3& GetColour() const { return _colour; }
 	float GetRadius() const { return _radius; }
 
 	void SetColour(const Vector3 &colour) { _colour = colour; }
 	void SetRadius(float radius) { _radius = radius; }
 
-	void ToShader(int glArrayIndex) const;
-
-	void Update(float deltaTime) override;
-	void Render(ERenderChannels) const override;
+	void Render(RenderQueue&) const override;
 
 	virtual const PropertyCollection& GetProperties() override;
 
@@ -50,6 +39,6 @@ public:
 	}
 
 	//File IO
-	virtual void WriteData(BufferWriter<byte>&, NumberedSet<String>& strings) const override;
-	virtual void ReadData(BufferReader<byte>&, const NumberedSet<String>& strings) override;
+	virtual void WriteData(ByteWriter&, NumberedSet<String>& strings, const Context& ctx) const override;
+	virtual void ReadData(ByteReader&, const NumberedSet<String>& strings, const Context& ctx) override;
 };

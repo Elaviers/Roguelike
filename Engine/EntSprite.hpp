@@ -1,10 +1,10 @@
 #pragma once
 #include "Entity.hpp"
-#include "Collider.hpp"
-#include "CollisionSphere.hpp"
-#include "Colour.hpp"
-#include "MaterialManager.hpp"
-#include "Material_Sprite.hpp"
+#include <ELCore/Context.hpp>
+#include <ELGraphics/Colour.hpp>
+#include <ELGraphics/MaterialManager.hpp>
+#include <ELGraphics/Material_Sprite.hpp>
+#include <ELPhys/CollisionSphere.hpp>
 
 class EntSprite : public Entity
 {
@@ -31,7 +31,7 @@ public:
 	void SetSize(float size) { _size = size; SetWorldScale(Vector3(size, size, size)); }
 	void SetColour(const Colour& colour) { _colour = colour; }
 
-	virtual void Render(ERenderChannels) const override;
+	virtual void Render(RenderQueue&) const override;
 
 	virtual Bounds GetBounds() const override { return Bounds(_size / 2.f); }
 	virtual const Collider* GetCollider() const override 
@@ -44,14 +44,14 @@ public:
 
 	SharedPointer<const MaterialSprite> GetMaterial() const { return _material; }
 
-	String GetMaterialName() const
+	String GetMaterialName(const Context& ctx) const
 	{
-		return Engine::Instance().pMaterialManager->FindNameOf(_material.Ptr());
+		return ctx.GetPtr<MaterialManager>()->FindNameOf(_material.Ptr());
 	}
 
-	void SetMaterialName(const String& name)
+	void SetMaterialName(const String& name, const Context& ctx)
 	{
-		_material = Engine::Instance().pMaterialManager->Get(name).Cast<const MaterialSprite>();
+		_material = ctx.GetPtr<MaterialManager>()->Get(name, ctx).Cast<const MaterialSprite>();
 	}
 
 	void SetMaterial(const SharedPointer<const MaterialSprite>& material)
@@ -60,7 +60,7 @@ public:
 	}
 
 	//File IO
-	virtual void WriteData(BufferWriter<byte>&, NumberedSet<String>& strings) const override;
-	virtual void ReadData(BufferReader<byte>&, const NumberedSet<String>& strings) override;
+	virtual void WriteData(ByteWriter&, NumberedSet<String>& strings, const Context& ctx) const override;
+	virtual void ReadData(ByteReader&, const NumberedSet<String>& strings, const Context& ctx) override;
 };
 

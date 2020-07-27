@@ -1,14 +1,12 @@
 #pragma once
 #include "EntRenderable.hpp"
-#include "CollisionBox.hpp"
+#include <ELPhys/CollisionBox.hpp>
 
 class EntBrush2D : public EntRenderable
 {
 protected:
 	Vector2 _point1;
 	Vector2 _point2;
-
-	SharedPointer<const Material> _material;
 
 	void _OnTransformChanged();
 	void _OnPointChanged();
@@ -20,15 +18,15 @@ public:
 
 	float level;
 
-	EntBrush2D() : EntRenderable(), _updatingTransform(false), level(0.f) 
+	EntBrush2D() : _updatingTransform(false), level(0.f) 
 	{ 
-		onTransformChanged += FunctionPointer<void>(this, &EntBrush2D::_OnTransformChanged);
+		onTransformChanged += Callback(this, &EntBrush2D::_OnTransformChanged);
 		SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
 	}
 
-	EntBrush2D(const EntBrush2D& other) : _updatingTransform(false), level(other.level)
+	EntBrush2D(const EntBrush2D& other) : EntRenderable(other), _point1(other._point1), _point2(other._point2), level(other.level), _updatingTransform(false)
 	{
-		onTransformChanged += FunctionPointer<void>(this, &EntBrush2D::_OnTransformChanged);
+		onTransformChanged += Callback(this, &EntBrush2D::_OnTransformChanged);
 	}
 
 	virtual ~EntBrush2D() {}
@@ -37,14 +35,14 @@ public:
 	void SetPoint2(const Vector2& position) { _point2 = position; _OnPointChanged(); }
 
 	void SetMaterial(const SharedPointer<const Material>& material) { _material = material; }
-	void SetMaterial(const String& name) { if (Engine::Instance().pMaterialManager) _material = Engine::Instance().pMaterialManager->Get(name); }
+	void SetMaterial(const String& name, const Context& ctx) { _material = ctx.GetPtr<MaterialManager>()->Get(name, ctx); }
 
 	const Vector2& GetPoint1() const { return _point1; }
 	const Vector2& GetPoint2() const { return _point2; }
 	const SharedPointer<const Material>& GetMaterial() const { return _material; }
-	String GetMaterialName() const
+	String GetMaterialName(const Context& ctx) const
 	{
-		if (Engine::Instance().pMaterialManager && _material) return Engine::Instance().pMaterialManager->FindNameOf(_material.Ptr());
+		if (_material) return ctx.GetPtr<MaterialManager>()->FindNameOf(_material.Ptr());
 		return "Unknown";
 	}
 
@@ -60,10 +58,10 @@ public:
 		return bounds;
 	}
 	
-	virtual void Render(ERenderChannels) const override;
+	virtual void Render(RenderQueue&) const override;
 
-	virtual void WriteData(BufferWriter<byte> &buffer, NumberedSet<String> &strings) const override;
-	virtual void ReadData(BufferReader<byte> &buffer, const NumberedSet<String> &strings) override;
+	virtual void WriteData(ByteWriter& buffer, NumberedSet<String>& strings, const Context& ctx) const override;
+	virtual void ReadData(ByteReader& buffer, const NumberedSet<String>& strings, const Context& ctx) override;
 
 	virtual const PropertyCollection& GetProperties() override;
 };

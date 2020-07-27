@@ -1,6 +1,6 @@
 #pragma once
-#include <Engine/ERenderChannels.hpp>
-#include <Engine/UIContainer.hpp>
+#include <ELGraphics/ERenderChannels.hpp>
+#include <ELUI/Container.hpp>
 
 class Editor;
 struct MouseData;
@@ -27,6 +27,6 @@ public:
 	virtual void KeySubmit()					{}
 	virtual void KeyDelete()					{}
 
-	virtual void Render(ERenderChannels) const	{}
+	virtual void Render(RenderQueue&) const		{}
 };
 

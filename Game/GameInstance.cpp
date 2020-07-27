@@ -1,11 +1,8 @@
-#include "GameInstance.h"
-#include <Engine/Engine.hpp>
-#include <Engine/InputManager.hpp>
+#include "GameInstance.hpp"
+#include <ELSys/InputManager.hpp>
 
-void GameInstance::SetupInputs()
+void GameInstance::SetupInputs(InputManager& inputManager)
 {
-	InputManager& inputManager = *Engine::Instance().pInputManager;
-
 	inputManager.BindAxis(EAxis::MOUSE_Y, &_axisLookUp);
 	inputManager.BindAxis(EAxis::MOUSE_X, &_axisLookRight);
 	inputManager.BindKeyAxis(EKeycode::W, &_axisMoveForward, 1.f);
@@ -20,5 +17,5 @@ void GameInstance::OnResize(uint16 w, uint16 h)
 	_h = h;
 
 	if (_activeCamera)
-		_activeCamera->SetViewport(w, h);
+		_activeCamera->GetProjection().SetDimensions(Vector2T(w, h));
 }

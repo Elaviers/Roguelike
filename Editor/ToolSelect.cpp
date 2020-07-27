@@ -2,10 +2,13 @@
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
 #include "UIPropertyManipulator.hpp"
-#include <Engine/DrawUtils.hpp>
-#include <Engine/InputManager.hpp>
-#include <Engine/MacroUtilities.hpp>
-#include <Engine/RaycastResult.hpp>
+#include <ELCore/MacroUtilities.hpp>
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderEntry.hpp>
+#include <ELGraphics/RenderQueue.hpp>
+#include <ElSys/InputManager.hpp>
+#include <ELSys/System.hpp>
+#include <ELPhys/RaycastResult.hpp>
 
 const PropertyCollection& ToolSelect::_GetProperties()
 {
@@ -101,7 +104,7 @@ void ToolSelect::_UpdateGizmoPos()
 
 void ToolSelect::_SetHoverObject(Entity* ho)
 {
-	_hoverObject = Engine::Instance().pObjectTracker->Track(ho);
+	_hoverObject = _owner.engine.pObjectTracker->Track(ho);
 
 	_hoverObjectIsSelected = false;
 
@@ -136,7 +139,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 {
 	_hoverObjectIsSelected = false;
 
-	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC)
+	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 	{
 		if (mouseData.isLeftDown)
 		{
@@ -215,7 +218,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 
 				if (mouseData.unitX >= bounds.min[mouseData.rightElement] && mouseData.unitX <= bounds.max[mouseData.rightElement] && mouseData.unitY >= bounds.min[mouseData.upElement] && mouseData.unitY <= bounds.max[mouseData.upElement])
 				{
-					::SetCursor(::LoadCursor(NULL, IDC_HAND));
+					System::SetCursor(ECursor::HAND);
 					_hoverObject = _selectedObjects[i];
 					_hoverObjectIsSelected = true;
 					found = true;
@@ -232,10 +235,9 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 	{
 		EntCamera& camera = _owner.GetVP(mouseData.viewport).camera;
 
-		if (camera.GetProjectionType() == EProjectionType::PERSPECTIVE)
+		if (camera.GetProjection().GetType() == EProjectionType::PERSPECTIVE)
 		{
-			Ray r(camera.ScreenCoordsToRay(Vector2((float)mouseData.x / camera.GetViewport()[0], (float)mouseData.y / camera.GetViewport()[1])));
-			r.channels = ECollisionChannels::ALL;
+			Ray r(camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2((float)mouseData.x / camera.GetProjection().GetDimensions().x, (float)mouseData.y / camera.GetProjection().GetDimensions().y)));
 
 			//Gizmo
 			{
@@ -243,7 +245,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 				_gizmo.Update(mouseData, r, t);
 
 				if (t < INFINITY)
-					::SetCursor(::LoadCursor(NULL, IDC_HAND));
+					System::SetCursor(ECursor::HAND);
 			}
 
 			_owner.RefreshProperties();
@@ -256,7 +258,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 				_SetHoverObject(results[0].object);
 
 				if (_hoverObjectIsSelected == false)
-					::SetCursor(::LoadCursor(NULL, IDC_HAND));
+					System::SetCursor(ECursor::HAND);
 			}
 			else
 				_hoverObject.Clear();
@@ -268,7 +270,7 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 {
 	if (_gizmo.MouseDown())
 	{
-		if (Engine::Instance().pInputManager->IsKeyDown(EKeycode::ALT))
+		if (_owner.engine.pInputManager->IsKeyDown(EKeycode::ALT))
 			_shouldCopy = true;
 
 		return;
@@ -276,7 +278,7 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 
 	if (mouseData.viewport >= 0)
 	{
-		if (_owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::PERSPECTIVE)
+		if (_owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::PERSPECTIVE)
 		{
 			_placing = false;
 
@@ -284,13 +286,13 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 			{
 				if (_hoverObject)
 					Select(_hoverObject.Ptr());
-				else if (!Engine::Instance().pInputManager->IsKeyDown(EKeycode::CTRL))
+				else if (!_owner.engine.pInputManager->IsKeyDown(EKeycode::LCTRL))
 					ClearSelection();
 			}
 		}
 		else if (_hoverObject)
 		{
-			if (Engine::Instance().pInputManager->IsKeyDown(EKeycode::ALT))
+			if (_owner.engine.pInputManager->IsKeyDown(EKeycode::ALT))
 				_shouldCopy = true;
 
 			Vector3 objPos = _hoverObject->GetWorldPosition();
@@ -318,7 +320,7 @@ void ToolSelect::KeySubmit()
 
 	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
 	{
-		_selectedObjects[i] = Engine::Instance().pObjectTracker->Track(result[i]);
+		_selectedObjects[i] = _owner.engine.pObjectTracker->Track(result[i]);
 		_selectedObjects[i]->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoPos);
 	}
 
@@ -331,37 +333,42 @@ void ToolSelect::KeySubmit()
 void ToolSelect::KeyDelete()
 {
 	for (uint32 i = 0; i < _selectedObjects.GetSize(); ++i)
-		_selectedObjects[i]->Delete();
+		_selectedObjects[i]->Delete(_owner.engine.context);
 
 	ClearSelection();
 }
 
-void ToolSelect::Render(ERenderChannels channels) const
+void ToolSelect::Render(RenderQueue& q) const
 {
-	glLineWidth(3);
-	
 	if (_placing)
 	{
-		glDepthFunc(GL_ALWAYS);
-		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour::Cyan);
-		DrawUtils::DrawBox(*Engine::Instance().pModelManager, _sbPoint1, _sbPoint2);
-		glDepthFunc(GL_LESS);
+		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
+		e.AddSetColour(Colour::Cyan);
+		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
+		e.AddBox(_sbPoint1, _sbPoint2);
 	}
 	
-	if (_selectedObjects.GetSize() > 0 && EntCamera::Current()->GetProjectionType() == EProjectionType::PERSPECTIVE)
+	if (_selectedObjects.GetSize() > 0 && EntCamera::Current()->GetProjection().GetType() == EProjectionType::PERSPECTIVE)
 	{
-		glDepthFunc(GL_ALWAYS);
-		_gizmo.Draw();
-		glDepthFunc(GL_LESS);
+		RenderEntry& pre = q.NewDynamicEntry(ERenderChannels::EDITOR);
+		pre.AddCommand(RCMDSetDepthFunc::ALWAYS);
+		_gizmo.Render(q);
+		RenderEntry& post = q.NewDynamicEntry(ERenderChannels::EDITOR);
+		post.AddCommand(RCMDSetDepthFunc::LEQUAL);
 	}
 	
-
-	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour::Yellow);
-	for (uint32 i = 0; i < _selectedObjects.GetSize(); ++i)
+	if (_selectedObjects.GetSize())
 	{
-		Bounds bounds = _selectedObjects[i]->GetWorldBounds();
+		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
+		e.AddSetColour(Colour::Cyan);
+		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 
-		DrawUtils::DrawBox(*Engine::Instance().pModelManager, bounds.min, bounds.max);
+		for (uint32 i = 0; i < _selectedObjects.GetSize(); ++i)
+		{
+			Bounds bounds = _selectedObjects[i]->GetWorldBounds();
+
+			e.AddBox(bounds.min, bounds.max);
+		}
 	}
 }
 
@@ -373,10 +380,10 @@ void ToolSelect::Select(Entity* object)
 		return;
 	}
 
-	if (!Engine::Instance().pInputManager->IsKeyDown(EKeycode::CTRL))
+	if (!_owner.engine.pInputManager->IsKeyDown(EKeycode::LCTRL))
 		ClearSelection();
 
-	_selectedObjects.Add(Engine::Instance().pObjectTracker->Track(object));
+	_selectedObjects.Add(_owner.engine.pObjectTracker->Track(object));
 
 	_owner.ChangePropertyEntity(_selectedObjects.Last().Ptr());
 	_selectedObjects.Last()->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoPos);
@@ -402,9 +409,9 @@ void ToolSelect::_CloneSelection()
 		_selectedObjects[i]->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoPos);
 
 		Entity* newObject = _selectedObjects[i]->Clone();
-		newObject->GetProperties().Transfer(_selectedObjects[i].Ptr(), newObject);
+		newObject->GetProperties().Transfer(_selectedObjects[i].Ptr(), newObject, _owner.engine.context);
 
-		_selectedObjects[i] = Engine::Instance().pObjectTracker->Track(newObject);
+		_selectedObjects[i] = _owner.engine.pObjectTracker->Track(newObject);
 		
 		if (isHoverObject) _hoverObject = _selectedObjects[i];
 		_selectedObjects[i]->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoPos);

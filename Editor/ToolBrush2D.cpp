@@ -2,7 +2,7 @@
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
 #include "UIPropertyManipulator.hpp"
-#include <Engine/MacroUtilities.hpp>
+#include <ELCore/MacroUtilities.hpp>
 
 const PropertyCollection& ToolBrush2D::_GetProperties()
 {
@@ -11,8 +11,8 @@ const PropertyCollection& ToolBrush2D::_GetProperties()
 	DO_ONCE_BEGIN;
 	properties.Add(
 		"Material",
-		MemberGetter<EntBrush2D, String>(&EntBrush2D::GetMaterialName),
-		MemberSetter<EntBrush2D, String>(&EntBrush2D::SetMaterial),
+		ContextualMemberGetter<EntBrush2D, String>(&EntBrush2D::GetMaterialName),
+		ContextualMemberSetter<EntBrush2D, String>(&EntBrush2D::SetMaterial),
 		offsetof(ToolBrush2D, _object),
 		PropertyFlags::MATERIAL);
 
@@ -27,7 +27,7 @@ const PropertyCollection& ToolBrush2D::_GetProperties()
 void ToolBrush2D::Initialise()
 {
 	_object.SetRelativeScale(Vector3());
-	_object.SetMaterial("bricks");
+	_object.SetMaterial("bricks", _owner.engine.context);
 }
 
 void ToolBrush2D::Activate(UIContainer& properties, UIContainer& toolProperties)
@@ -79,8 +79,7 @@ void ToolBrush2D::MouseUp(const MouseData &mouseData)
 	}
 }
 
-void ToolBrush2D::Render(ERenderChannels channels) const
+void ToolBrush2D::Render(RenderQueue& q) const
 {
-	GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(.8f, .8f, .8f, .5f));
-	_object.Render(channels);
+	_object.Render(q);
 }

@@ -1,14 +1,13 @@
 #pragma once
-#include "Bounds.hpp"
-#include "BufferIterator.hpp"
-#include "Collider.hpp"
-#include "Event.hpp"
-#include "Map.hpp"
-#include "NumberedSet.hpp"
 #include "EEntityID.hpp"
-#include "ERenderChannels.hpp"
-#include "PropertyCollection.hpp"
-#include "Transform.hpp"
+#include <ELCore/ByteReader.hpp>
+#include <ELCore/ByteWriter.hpp>
+#include <ELCore/NumberedSet.hpp>
+#include <ELCore/Event.hpp>
+#include <ELCore/PropertyCollection.hpp>
+#include <ELMaths/Bounds.hpp>
+#include <ELMaths/Transform.hpp>
+#include <ELPhys/Collider.hpp>
 #include <cstdlib>
 
 #define Entity_FUNCS(CLASSNAME, ID)																							\
@@ -23,7 +22,8 @@ public:																														\
 	static const byte TypeID = (byte)(ID);
 
 class Collider;
-class EntCamera; //!!! todo - make this forward declaration unnecessary
+class RenderQueue;
+struct Frustum;
 struct Ray;
 struct RaycastResult;
 
@@ -109,7 +109,7 @@ public:
 
 	virtual ~Entity() {}
 
-	void Delete();
+	void Delete(const Context&);
 	
 	#pragma region Transform
 
@@ -151,7 +151,7 @@ public:
 	void SetWorldPosition(const Vector3 &v) 
 	{ 
 		if (_parent)
-			SetRelativePosition(v * _parent->GetInverseTransformationMatrix());
+			SetRelativePosition((Vector4(v, 1.f) * _parent->GetInverseTransformationMatrix()).GetXYZ());
 		else
 			SetRelativePosition(v);
 	}
@@ -171,8 +171,8 @@ public:
 			SetRelativeScale(v);
 	}
 
-	Mat4 GetTransformationMatrix() const;
-	Mat4 GetInverseTransformationMatrix() const;
+	Matrix4 GetTransformationMatrix() const;
+	Matrix4 GetInverseTransformationMatrix() const;
 
 	#pragma endregion
 
@@ -217,10 +217,10 @@ public:
 			src._children[i]->Clone()->SetParent(this);
 	}
 
-	void DeleteChildren()
+	void DeleteChildren(const Context& ctx)
 	{
 		while (_children.GetSize())
-			_children[0]->Delete();
+			_children[0]->Delete(ctx);
 	}
 
 	bool IsChildOf(const Entity* parent) const
@@ -246,19 +246,19 @@ public:
 	void SetFlags(EFlags flags) { _flags = flags; }
 
 	virtual void Update(float deltaTime) {}
-	virtual void Render(ERenderChannels) const {}
+	virtual void Render(RenderQueue&) const {}
 
 	void UpdateAll(float deltaTime);
-	void RenderAll(const EntCamera &camera, ERenderChannels) const;
+	void RenderAll(RenderQueue&, const Frustum& cameraFrustum) const;
 
 	virtual const PropertyCollection& GetProperties();
 
 	//IO
-	void WriteAllToFile(BufferWriter<byte>&, NumberedSet<String> &strings) const;
-	static Entity* CreateFromData(BufferReader<byte>&, const NumberedSet<String>& strings);
+	void WriteAllToFile(ByteWriter&, NumberedSet<String>& strings, const Context& ctx) const;
+	static Entity* CreateFromData(ByteReader&, const NumberedSet<String>& strings, const Context& ctx);
 
-	virtual void WriteData(BufferWriter<byte>&, NumberedSet<String>& strings) const;
-	virtual void ReadData(BufferReader<byte>&, const NumberedSet<String>& strings);
+	virtual void WriteData(ByteWriter&, NumberedSet<String>& strings, const Context& ctx) const;
+	virtual void ReadData(ByteReader&, const NumberedSet<String>& strings, const Context& ctx);
 
 	//Collision
 	virtual const Collider* GetCollider() const { return nullptr; }
@@ -316,8 +316,8 @@ public:
 	bool IsType() const { return dynamic_cast<const T*>(this) != nullptr; }
 
 	//Commands
-	void CMD_List(const Buffer<String>& args);
-	void CMD_Ent(const Buffer<String>& args);
+	void CMD_List(const Buffer<String>& args, const Context& ctx);
+	void CMD_Ent(const Buffer<String>& args, const Context& ctx);
 
 protected:
 	template<typename T>
@@ -331,5 +331,5 @@ protected:
 	}
 };
 
-#include "MacroUtilities.hpp"
+#include <ELCore/MacroUtilities.hpp>
 DEFINE_BITMASK_FUNCS(Entity::EFlags, byte)

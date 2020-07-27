@@ -1,9 +1,9 @@
 #pragma once
 #include "Tool.hpp"
 #include "Gizmo.hpp"
-#include <Engine/Buffer.hpp>
 #include <Engine/Entity.hpp>
-#include <Engine/SharedPointer.hpp>
+#include <ELCore/Buffer.hpp>
+#include <ELCore/SharedPointer.hpp>
 
 class ToolSelect : public Tool
 {
@@ -66,7 +66,7 @@ public:
 	virtual void KeySubmit() override;
 	virtual void KeyDelete() override;
 
-	virtual void Render(ERenderChannels) const override;
+	virtual void Render(RenderQueue&) const override;
 
 	void Select(Entity* object);
 	void ClearSelection();

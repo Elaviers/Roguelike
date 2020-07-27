@@ -1,4 +1,4 @@
-model gizmo.mesh
+mesh gizmo
 material gizmo
 
 collision box

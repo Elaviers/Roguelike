@@ -1,13 +1,6 @@
 #include "EntLight.hpp"
-#include "Engine.hpp"
-#include "GL.hpp"
-#include "GLProgram.hpp"
-#include "MacroUtilities.hpp"
-#include "ModelManager.hpp"
-#include "String.hpp"
-#include "TextureManager.hpp"
-
-int EntLight::_frameLightCounter;
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderQueue.hpp>
 
 Vector3 EntLight::_editorBoxExtent(.1f, .1f, .1f);
 
@@ -32,57 +25,34 @@ const PropertyCollection& EntLight::GetProperties()
 	return cvars;
 }
 
-void EntLight::ToShader(int glArrayIndex) const
+void EntLight::Render(RenderQueue& q) const
 {
-	Mat4 worldTransform = GetWorldTransform().GetTransformationMatrix();
+	RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SURFACE, -1);
+	e.AddLight(GetWorldTransform().GetPosition(), _colour, _radius);
 
-	String arrayElemName = String("Lights[") + String::From(glArrayIndex) + ']';
-	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Position")),	1, worldTransform[3]);
-	glUniform3fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Colour")),	1, _colour.GetData());
-	glUniform1fv(GLProgram::Current().GetUniformLocation(CSTR(arrayElemName, ".Radius")),	1, &_radius);
-}
-
-void EntLight::Update(float deltaTime)
-{
-	EntLight::_frameLightCounter = 0;
-}
-
-void EntLight::Render(ERenderChannels channels) const
-{
-	if (channels & ERenderChannels::PRE_RENDER && EntLight::_frameLightCounter < GLProgram::Current().GetMaxLightCount())
-		ToShader(EntLight::_frameLightCounter++);
-
-	if (EntLight::drawLightSources && Engine::Instance().pTextureManager && channels & ERenderChannels::EDITOR)
+	if (EntLight::drawLightSources)
 	{
 		const float colour[4] = { _colour.x, _colour.y, _colour.z, 1.f };
-		Engine::Instance().pTextureManager->White()->Bind(0);
-		glUniform4fv(GLProgram::Current().GetUniformLocation("Colour"), 1, colour);
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, Matrix::Scale(_editorBoxExtent * 2.f) * GetTransformationMatrix());
-		Engine::Instance().pModelManager->Cube()->Render();
+		RenderEntry& de = q.NewDynamicEntry(ERenderChannels::UNLIT);
+		de.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
+		de.AddSetColour(Colour(Vector4(_colour, 1.f)));
+		de.AddSetTransform(Matrix4::Scale(_editorBoxExtent * 2.f) * GetTransformationMatrix());
+		de.AddCommand(RCMDRenderMesh::CUBE);
 	}
 }
 
-void EntLight::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
+void EntLight::WriteData(ByteWriter& writer, NumberedSet<String>& strings, const Context& ctx) const
 {
-	Entity::WriteData(writer, strings);
+	Entity::WriteData(writer, strings, ctx);
 
 	writer.Write_float(_radius);
-	writer.Write_vector3(_colour);
+	_colour.Write(writer);
 }
 
-void EntLight::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+void EntLight::ReadData(ByteReader& reader, const NumberedSet<String>& strings, const Context& ctx)
 {
-	Entity::ReadData(reader, strings);
+	Entity::ReadData(reader, strings, ctx);
 
 	_radius = reader.Read_float();
-	_colour = reader.Read_vector3();
-}
-
-//static
-void EntLight::FinaliseLightingForFrame()
-{
-	for (int i = _frameLightCounter; i < GLProgram::Current().GetMaxLightCount(); ++i)
-	{
-		GLProgram::Current().SetFloat(CSTR("Lights[", i, "].Radius"), 0.f);
-	}
+	_colour.Read(reader);
 }

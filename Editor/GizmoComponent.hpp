@@ -1,7 +1,9 @@
 #pragma once
-#include <Engine/Colour.hpp>
-#include <Engine/Ray.hpp>
-#include <Engine/Transform.hpp>
+#include <ELGraphics/Colour.hpp>
+#include <ELMaths/Ray.hpp>
+#include <ELMaths/Transform.hpp>
+
+class RenderQueue;
 
 class GizmoComponent
 {
@@ -25,7 +27,7 @@ public:
 
 	virtual ~GizmoComponent() {}
 
-	virtual void Draw() const {}
+	virtual void Render(RenderQueue&) const {}
 
 	/*
 		Will not consider collisions past maxT

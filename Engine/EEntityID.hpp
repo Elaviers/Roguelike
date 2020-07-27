@@ -1,5 +1,5 @@
 #pragma once
-#include "Types.hpp"
+#include <ELCore/Types.hpp>
 
 enum class EEntityID : byte
 {

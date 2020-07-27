@@ -1,7 +1,7 @@
 #include "GizmoRing.hpp"
-#include <Engine/DrawUtils.hpp>
-#include <Engine/Engine.hpp>
-#include <Engine/GLProgram.hpp>
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderQueue.hpp>
+#include <ELPhys/Collision.hpp>
 
 bool GizmoRing::_GetAngle(const Ray& ray, float& angleOut) const
 {
@@ -23,17 +23,17 @@ bool GizmoRing::_GetAngle(const Ray& ray, float& angleOut) const
 	return false;
 }
 
-void GizmoRing::Draw() const
+void GizmoRing::Render(RenderQueue& q) const
 {
-	if (Engine::Instance().pModelManager && Engine::Instance().pTextureManager)
-	{
-		if (_canDrag)
-			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(1.f - _colour.r, 1.f - _colour.g, 1.f - _colour.b));
-		else
-			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
+	RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
+
+	if (_canDrag)
+		e.AddSetColour(Colour(1.f - _colour.r, 1.f - _colour.g, 1.f - _colour.b));
+	else
+		e.AddSetColour(_colour);
 	
-		DrawUtils::DrawRing(*Engine::Instance().pModelManager, transform.GetPosition(), transform.GetForwardVector(), 1.f, 32);
-	}
+	e.AddSetLineWidth(2.f);
+	e.AddRing(transform.GetPosition(), transform.GetForwardVector(), 1.f, 32);
 }
 
 void GizmoRing::Update(const Ray& ray, float& minT)

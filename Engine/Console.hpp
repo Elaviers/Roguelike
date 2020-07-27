@@ -1,8 +1,10 @@
 #pragma once
-#include "Buffer.hpp"
-#include "RigidPropertyCollection.hpp"
-#include "Font.hpp"
+#include <ELCore/Buffer.hpp>
+#include <ELCore/RigidPropertyCollection.hpp>
+#include <ELGraphics/Font.hpp>
 #include <Windows.h>
+
+class RenderQueue;
 
 class Console
 {
@@ -28,11 +30,12 @@ class Console
 
 	void _ExpandBuffer();
 
-	void _CMD_echo(const Buffer<String>& tokens);
-	void _CMD_help(const Buffer<String>& tokens);
+	void _CMD_echo(const Buffer<String>& tokens, const Context&);
+	void _CMD_help(const Buffer<String>& tokens, const Context&);
+
 
 public:
-	Console() : _nextBufferIndex(0), _prePrompt('>') 
+	Console() : _nextBufferIndex(0), _prePrompt('>')
 	{
 		_cvars.CreateVar("Echo", CommandPtr(this, &Console::_CMD_echo));
 		_cvars.CreateVar("Help", CommandPtr(this, &Console::_CMD_help));
@@ -43,8 +46,11 @@ public:
 	RigidPropertyCollection& Cvars() { return _cvars; }
 
 	void Print(const char* string);
-	void InputChar(char key);
+	void InputChar(char key, const Context& ctx);
 	void Backspace();
-	void SubmitPrompt();
-	void Render(const Font &font, float deltaTime);
+	void SubmitPrompt(const Context& ctx);
+
+	void Render(RenderQueue& q, const Font& font, float deltaTime);
+	
+	void CMD_texmgr(const Buffer<String>& tokens, const Context&);
 };

@@ -1,4 +1,4 @@
-model debug.mesh
+mesh debug
 
 material bricks
 

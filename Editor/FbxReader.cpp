@@ -1,6 +1,6 @@
 #include "EditorIO.hpp"
-#include <Engine/Mesh_Skeletal.hpp>
-#include <Engine/Mesh_Static.hpp>
+#include <ELGraphics/Mesh_Skeletal.hpp>
+#include <ELGraphics/Mesh_Static.hpp>
 
 inline Vector3 FbxVector4ToVector3(const FbxVector4& v)
 {
@@ -12,9 +12,9 @@ inline Vector2 FbxVector2ToVector2(const FbxVector2& v)
 	return Vector2((float)v[0], (float)v[1]);
 }
 
-inline Mat4 FbxAMatrixToMat4(const FbxAMatrix& m)
+inline Matrix4 FbxAMatrixToMatrix4(const FbxAMatrix& m)
 {
-	Mat4 result;
+	Matrix4 result;
 	for (int r = 0; r < 4; ++r)
 		for (int c = 0; c < 4; ++c)
 			result[r][c] = (float)m.Get(r, c);
@@ -22,7 +22,7 @@ inline Mat4 FbxAMatrixToMat4(const FbxAMatrix& m)
 	return result;
 }
 
-inline FbxAMatrix Mat4ToFbxAMatrix(const Mat4& m)
+inline FbxAMatrix Matrix4ToFbxAMatrix(const Matrix4& m)
 {
 	FbxAMatrix result;
 	for (int r = 0; r < 4; ++r)
@@ -94,7 +94,7 @@ class FbxMeshDataImporter
 		fbxTransform.mData[2][2] *= -1.f;
 		fbxTransform.mData[3][2] *= -1.f;
 
-		Mat4 transform = FbxAMatrixToMat4(fbxTransform);
+		Matrix4 transform = FbxAMatrixToMatrix4(fbxTransform);
 
 		Vertex result;
 		
@@ -103,7 +103,7 @@ class FbxMeshDataImporter
 			Debug::Error("Could not find the control point index of a vertex!");
 
 		result.cpIndex = (uint32)cpIndex;
-		result.pos = FbxVector4ToVector3(mesh->mControlPoints[result.cpIndex]) * transform;
+		result.pos = (Vector4(FbxVector4ToVector3(mesh->mControlPoints[result.cpIndex]), 1.f) * transform).GetXYZ();
 
 		FbxVector4 fbxNormal;
 		if (mesh->GetPolygonVertexNormal(polyIndex, vertIndex, fbxNormal))
@@ -202,7 +202,7 @@ class FbxMeshDataImporter
 							{
 								FbxAMatrix binding = cluster->GetLink()->EvaluateGlobalTransform().Inverse();
 								FbxSpaceToEngineSpace(binding);
-								joint->bindingMatrix = FbxAMatrixToMat4(binding);
+								joint->bindingMatrix = FbxAMatrixToMatrix4(binding);
 
 								FbxAMatrix lt = cluster->GetLink()->EvaluateLocalTransform();
 								FbxSpaceToEngineSpace(lt);
@@ -360,9 +360,9 @@ public:
 								VertexMapping& vertexMapping = (*vertGroups)[vgIndex];
 
 								List<uint32>& affectedVerts = _vertsForCP[vertexMapping.cpIndex];
-								for (auto iVertexIndex = affectedVerts.First(); iVertexIndex.IsValid(); ++iVertexIndex)
+								for (uint32 iVertexIndex : affectedVerts)
 								{
-									VertexSkeletal& vertex = mesh->vertices[*iVertexIndex];
+									VertexSkeletal& vertex = mesh->vertices[iVertexIndex];
 
 									for (int slot = 0; slot < VertexSkeletal::BONE_COUNT; ++slot)
 										if (vertex.boneWeights[slot] == 0.f)
@@ -470,7 +470,7 @@ public:
 
 								if (joint)
 								{
-									FbxAMatrix binding = Mat4ToFbxAMatrix(joint->bindingMatrix);
+									FbxAMatrix binding = Matrix4ToFbxAMatrix(joint->bindingMatrix);
 									EngineSpaceToFbxSpace(binding);
 
 									FbxAMatrix transform = cluster->GetLink()->EvaluateGlobalTransform(fbxTime) * binding;

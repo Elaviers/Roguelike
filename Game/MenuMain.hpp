@@ -1,7 +1,9 @@
 #pragma once
-#include <Engine/UITextButton.hpp>
-#include <Engine/UIContainer.hpp>
-#include <Engine/UIRect.hpp>
+#include <ELUI/TextButton.hpp>
+#include <ELUI/Container.hpp>
+#include <ELUI/Rect.hpp>
+
+class EngineInstance;
 
 class MenuMain : public UIContainer
 {
@@ -18,7 +20,7 @@ public:
 	MenuMain() {}
 	virtual ~MenuMain() {}
 
-	void Initialise(const FunctionPointer<void, const String&> &onLevelChosen, const Callback &onQuit);
+	void Initialise(const FunctionPointer<void, const String&> &onLevelChosen, const Callback &onQuit, EngineInstance& engineInstance);
 
 	void ButtonStart(UIButton&);
 	void ButtonQuit(UIButton&);

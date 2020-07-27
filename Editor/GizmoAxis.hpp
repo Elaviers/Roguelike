@@ -1,8 +1,8 @@
 #pragma once
 #include "GizmoComponent.hpp"
-#include <Engine/Collider.hpp>
-#include <Engine/CollisionBox.hpp>
-#include <Engine/FunctionPointer.hpp>
+#include <ELCore/FunctionPointer.hpp>
+#include <ELPhys/Collider.hpp>
+#include <ELPhys/CollisionBox.hpp>
 
 /*
 	GizmoAxis
@@ -37,6 +37,6 @@ public:
 
 	virtual ~GizmoAxis() {}
 
-	virtual void Draw() const override;
+	virtual void Render(RenderQueue&) const override;
 	virtual void Update(const Ray &mouseRay, float &maxT) override;
 };

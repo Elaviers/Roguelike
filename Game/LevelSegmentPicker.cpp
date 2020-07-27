@@ -1,7 +1,7 @@
 #include "LevelSegmentPicker.hpp"
 #include <Engine/LevelIO.hpp>
 
-LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const String& rootLevelDir)
+LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const String& rootLevelDir, const Context& ctx)
 {
 	LevelSegmentPicker result;
 
@@ -29,14 +29,14 @@ LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const St
 			else if (tokens.GetSize() >= 2 && tokens[0] == "segment" && bag)
 			{
 				Entity* segment = Entity::Create();
-				if (LevelIO::Read(*segment, CSTR(rootLevelDir, tokens[1])))
+				if (LevelIO::Read(*segment, CSTR(rootLevelDir, tokens[1]), ctx))
 				{
 					bag->bag.Add(segment, tokens.GetSize() > 2 ? tokens[2].ToFloat() : 1);
 					if (bagTotalOverride)
 						bag->bag.SetRemainingWeight(bagTotalOverride);
 				}
 				else
-					segment->Delete();
+					segment->Delete(ctx);
 			}
 		}
 	}
@@ -50,7 +50,7 @@ const Entity* LevelSegmentPicker::TakeNextSegment(Random& random, unsigned int d
 
 	List<List<SegmentBag>::Iterator> options;
 
-	for (auto it = _essentialBags.First(); it.IsValid(); ++it)
+	for (auto it = _essentialBags.begin(); it.IsValid(); ++it)
 	{
 		if (depth >= it->minimumDepth && depth <= it->maximumDepth)
 		{
@@ -60,11 +60,11 @@ const Entity* LevelSegmentPicker::TakeNextSegment(Random& random, unsigned int d
 
 	bool essential = true;
 
-	if (!options.First().IsValid())
+	if (!options.begin().IsValid())
 	{
 		essential = false;
 
-		for (auto it = _otherBags.First(); it.IsValid(); ++it)
+		for (auto it = _otherBags.begin(); it.IsValid(); ++it)
 		{
 			if (depth >= it->minimumDepth && depth <= it->maximumDepth)
 			{
@@ -93,15 +93,15 @@ void LevelSegmentPicker::GetAvailableOptions(const Random& random, unsigned int 
 	out_Bag.Clear();
 
 	Random r = random;
-	for (auto it = _essentialBags.First(); it.IsValid(); ++it)
+	for (SegmentBag& bag : _essentialBags)
 	{
-		if (depth >= it->minimumDepth && depth <= it->maximumDepth)
+		if (depth >= bag.minimumDepth && depth <= bag.maximumDepth)
 		{
-			for (size_t i = 0; i < it->bag.GetEntries().GetSize(); ++i)
+			for (size_t i = 0; i < bag.bag.GetEntries().GetSize(); ++i)
 			{
-				const auto& entry = it->bag.GetEntries()[i];
+				const auto& entry = bag.bag.GetEntries()[i];
 				if (entry.weight >= 0.f)
-					out_Bag.Emplace(entry.weight, true, this, &*it, entry.item);
+					out_Bag.Emplace(entry.weight, true, this, &bag, entry.item);
 			}
 		}
 	}
@@ -112,13 +112,13 @@ void LevelSegmentPicker::GetAvailableOptions(const Random& random, unsigned int 
 	{
 		essential = false;
 
-		for (auto it = _otherBags.First(); it.IsValid(); ++it)
+		for (SegmentBag& bag : _otherBags)
 		{
-			for (size_t i = 0; i < it->bag.GetEntries().GetSize(); ++i)
+			for (size_t i = 0; i < bag.bag.GetEntries().GetSize(); ++i)
 			{
-				const auto& entry = it->bag.GetEntries()[i];
+				const auto& entry = bag.bag.GetEntries()[i];
 				if (entry.weight >= 0.f)
-					out_Bag.Emplace(entry.weight, false, this, &*it, entry.item);
+					out_Bag.Emplace(entry.weight, false, this, &bag, entry.item);
 			}
 		}
 	}
@@ -130,7 +130,7 @@ void LevelSegmentPicker::BagItem::TakeFromRelevantBag(float weight) const
 
 	if (_isEssential)
 	{
-		for (auto it = _owner->_essentialBags.First(); it.IsValid();)
+		for (auto it = _owner->_essentialBags.begin(); it.IsValid();)
 		{
 			if (it->bag.GetRemainingWeight() <= 0.f)
 				it = _owner->_essentialBags.Remove(it);
@@ -140,7 +140,7 @@ void LevelSegmentPicker::BagItem::TakeFromRelevantBag(float weight) const
 	}
 	else
 	{
-		for (auto it = _owner->_otherBags.First(); it.IsValid();)
+		for (auto it = _owner->_otherBags.begin(); it.IsValid();)
 		{
 			if (it->bag.GetRemainingWeight() <= 0.f)
 				it = _owner->_otherBags.Remove(it);

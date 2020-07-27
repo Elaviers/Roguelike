@@ -9,787 +9,112 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Header Files\GL">
-      <UniqueIdentifier>{ef0f8a6f-b811-46ea-a015-521c6ea57002}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\GL">
-      <UniqueIdentifier>{1d01c458-8af9-46ec-8f6c-be82e6f19149}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Managers">
-      <UniqueIdentifier>{7bb587e0-f989-40e0-b70c-3d55c2dcf9d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Managers">
-      <UniqueIdentifier>{a35d9df3-0b46-4c11-8d6b-dc2927e11df1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Templates">
-      <UniqueIdentifier>{ca266841-d26a-42f8-a0cb-51702cc07ef9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\ThirdParty">
-      <UniqueIdentifier>{0b4d1dd8-c6b9-49b5-b571-446040ddeb50}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\ThirdParty">
-      <UniqueIdentifier>{cb6291c1-0edc-4203-9b29-2ef21c610e3c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Utility">
-      <UniqueIdentifier>{cdf13266-f0d9-42ca-812f-1feab5e99765}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Utility">
-      <UniqueIdentifier>{496e4161-455b-437f-89ca-818e161cab35}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Classes">
-      <UniqueIdentifier>{212a0fdb-451e-4315-98ab-46c2682cf10b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Classes">
-      <UniqueIdentifier>{245d7ead-a5ca-4307-84f4-5a81415d8dab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Collision">
-      <UniqueIdentifier>{a2597635-c896-4f28-88fe-76c3e9f0b17d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Collision">
-      <UniqueIdentifier>{9a3d25fd-5bd1-4e73-bf0d-de5b38e7a45c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\UI">
-      <UniqueIdentifier>{cf258569-873d-4276-b76f-f68b92961822}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\UI">
-      <UniqueIdentifier>{2e5a11a7-f061-4856-ab59-d165d937bf09}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Structs">
-      <UniqueIdentifier>{2954450f-6256-4bca-a1d2-0966e09cdf07}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Debug">
-      <UniqueIdentifier>{99e21c64-5280-4453-aae9-a1804dfadb46}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Debug">
-      <UniqueIdentifier>{e654034a-1403-4e45-9e1d-e63d7b3809c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Console">
-      <UniqueIdentifier>{813e2e6c-249f-4635-acf3-d0893e610a65}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Console">
-      <UniqueIdentifier>{f7f59164-3f44-432d-99dd-f5dd8189d0ec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Audio">
-      <UniqueIdentifier>{83e72d7d-c44d-479a-a2d1-85544d6c6310}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Audio">
-      <UniqueIdentifier>{eb0cf789-b3ea-41a9-9d00-8aeb6adc2b22}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Animation">
-      <UniqueIdentifier>{e0bc8e20-5243-4804-8f4f-254f6421900f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Animation">
-      <UniqueIdentifier>{d27ddd08-bf3d-4d3d-b0d4-590204ae0efb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Maths">
-      <UniqueIdentifier>{aa3d1d65-80b8-4009-9bdf-4eae889d5e13}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Maths">
-      <UniqueIdentifier>{02cab95f-986f-4bdb-b168-7164162ff200}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asset">
-      <UniqueIdentifier>{2fb5e6d2-e544-49b5-9997-20f9dee96ffa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asset">
-      <UniqueIdentifier>{9c4a75bf-886d-4c88-8dca-80f82330cc9d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Entities">
-      <UniqueIdentifier>{c60b00f4-374f-4db6-9c75-a51fa3273a7f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Entitites">
-      <UniqueIdentifier>{b493a4d8-6b89-4099-915d-f6b1e24dba32}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Windows">
-      <UniqueIdentifier>{33c27f08-82e3-4cd3-b1a3-7ac3f88004b7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Enums">
-      <UniqueIdentifier>{3f29fdca-f13f-4e41-9194-3bcaa180ee91}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Types.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GL.hpp">
-      <Filter>Header Files\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="GLProgram.hpp">
-      <Filter>Header Files\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelManager.hpp">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Buffer.hpp">
-      <Filter>Header Files\Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.hpp">
-      <Filter>Header Files\Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="GLTexture.hpp">
-      <Filter>Header Files\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="TextureManager.hpp">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="GLDepthMap.hpp">
-      <Filter>Header Files\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="GLCubemap.hpp">
-      <Filter>Header Files\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="InputManager.hpp">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawUtils.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="GLContext.hpp">
-      <Filter>Header Files\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="MaterialManager.hpp">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Utilities.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="IO.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Registry.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="Skybox.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="String.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="BufferIterator.hpp">
-      <Filter>Header Files\Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="Collider.hpp">
-      <Filter>Header Files\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Collision.hpp">
-      <Filter>Header Files\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Bounds.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="UIElement.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UIButton.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UIContainer.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UIRect.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="FontManager.hpp">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="UILabel.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="RaycastResult.hpp">
-      <Filter>Header Files\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="Glyph.hpp">
-      <Filter>Header Files\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="Pair.hpp">
-      <Filter>Header Files\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="UVRect.hpp">
-      <Filter>Header Files\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderParam.hpp">
-      <Filter>Header Files\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="UIPanel.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugManager.hpp">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugObject.hpp">
-      <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugFrustum.hpp">
-      <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugString.hpp">
-      <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="LevelIO.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="NumberedSet.hpp">
-      <Filter>Header Files\Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.hpp">
-      <Filter>Header Files\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="FunctionPointer.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="Debug.hpp">
-      <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="List.hpp">
-      <Filter>Header Files\Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="Sampler.hpp">
-      <Filter>Header Files\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="AudioManager.hpp">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Sound.hpp">
-      <Filter>Header Files\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Console.hpp">
-      <Filter>Header Files\Console</Filter>
-    </ClInclude>
-    <ClInclude Include="AudioUtilities.hpp">
-      <Filter>Header Files\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="lodepng.h">
-      <Filter>Header Files\ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="Skeleton.hpp">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="Joint.hpp">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation.hpp">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector4.hpp">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Quaternion.hpp">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Ray.hpp">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Rotation.hpp">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrix.hpp">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Maths.hpp">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimationTrack.hpp">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="Keyframe.hpp">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="GLMeshRenderer.hpp">
-      <Filter>Header Files\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimationManager.hpp">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Asset.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Font_Texture.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Font.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Font_TTF.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Material_Grid.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Material_Surface.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh_Skeletal.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh_Static.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="Hashing.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="AssetManager.hpp">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Hashmap.hpp">
-      <Filter>Header Files\Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="Box.hpp">
-      <Filter>Header Files\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="Material_Sprite.hpp">
-      <Filter>Header Files\Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="SharedPointer.hpp">
-      <Filter>Header Files\Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="Tracker.hpp">
-      <Filter>Header Files\Templates</Filter>
-    </ClInclude>
-    <ClInclude Include="Event.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="Random.hpp">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Time.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Property.hpp">
-      <Filter>Header Files\Console</Filter>
-    </ClInclude>
-    <ClInclude Include="PropertyCollection.hpp">
-      <Filter>Header Files\Console</Filter>
-    </ClInclude>
-    <ClInclude Include="RigidPropertyCollection.hpp">
-      <Filter>Header Files\Console</Filter>
-    </ClInclude>
-    <ClInclude Include="RigidProperty.hpp">
-      <Filter>Header Files\Console</Filter>
-    </ClInclude>
-    <ClInclude Include="MacroUtilities.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Colour.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="EntSprite.hpp">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.hpp">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntBrush2D.hpp">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntBrush3D.hpp">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntCamera.hpp">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntConnector.hpp">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntLight.hpp">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntRenderable.hpp">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntSkeletal.hpp">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionShape.hpp">
-      <Filter>Header Files\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionBox.hpp">
-      <Filter>Header Files\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionSphere.hpp">
-      <Filter>Header Files\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionChannels.hpp">
-      <Filter>Header Files\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionCapsule.hpp">
-      <Filter>Header Files\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="LineSegment.h">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugLine.hpp">
-      <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="Pool.h">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="StackAllocator.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityIterator.hpp">
-      <Filter>Header Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="UITextbox.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="EEntityID.hpp">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="ERenderChannels.hpp">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="UICheckbox.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UIListBox.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UIComboBox.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UITextButton.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UIColour.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UIToolbar.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="UISplitter.hpp">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="EKeycode.hpp">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3.hpp">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector2.hpp">
-      <Filter>Header Files\Maths</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="GLProgram.cpp">
-      <Filter>Source Files\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="GL.cpp">
-      <Filter>Source Files\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelManager.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="GLTexture.cpp">
-      <Filter>Source Files\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="GLDepthMap.cpp">
-      <Filter>Source Files\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="GLCubemap.cpp">
-      <Filter>Source Files\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="lodepng.cpp">
-      <Filter>Source Files\ThirdParty</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawUtils.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="GLContext.cpp">
-      <Filter>Source Files\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="MaterialManager.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="IO.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjReader.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Skybox.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="Registry.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="String.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="Vertex.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="Collision.cpp">
-      <Filter>Source Files\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Collider.cpp">
-      <Filter>Source Files\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="UIButton.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="UIContainer.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="UIRect.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="UIElement.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="FontManager.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="UILabel.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="UIPanel.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Bounds.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugManager.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugObject.cpp">
-      <Filter>Source Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugFrustum.cpp">
-      <Filter>Source Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugString.cpp">
-      <Filter>Source Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="LevelIO.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug.cpp">
-      <Filter>Source Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="AudioManager.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="Sampler.cpp">
-      <Filter>Source Files\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="WavReader.cpp">
-      <Filter>Source Files\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Sound.cpp">
-      <Filter>Source Files\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Console.cpp">
-      <Filter>Source Files\Console</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine.cpp">
+    <ClCompile Include="EntBrush2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AudioUtilities.cpp">
-      <Filter>Source Files\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>Source Files\Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="Quaternion.cpp">
-      <Filter>Source Files\Maths</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector.cpp">
-      <Filter>Source Files\Maths</Filter>
-    </ClCompile>
-    <ClCompile Include="Maths.cpp">
-      <Filter>Source Files\Maths</Filter>
-    </ClCompile>
-    <ClCompile Include="Matrix.cpp">
-      <Filter>Source Files\Maths</Filter>
-    </ClCompile>
-    <ClCompile Include="GLMeshRenderer.cpp">
-      <Filter>Source Files\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="AnimationManager.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="Material_Grid.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="Material_Surface.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh_Skeletal.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh_Static.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="Font_TTF.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="Font_Texture.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="Font.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="MH2.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="SHA256.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Utilities.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Material_Sprite.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="SharedPointer.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="Random.cpp">
-      <Filter>Source Files\Maths</Filter>
-    </ClCompile>
-    <ClCompile Include="Time.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Property.cpp">
-      <Filter>Source Files\Console</Filter>
-    </ClCompile>
-    <ClCompile Include="PropertyCollection.cpp">
-      <Filter>Source Files\Console</Filter>
-    </ClCompile>
-    <ClCompile Include="RigidPropertyCollection.cpp">
-      <Filter>Source Files\Console</Filter>
-    </ClCompile>
-    <ClCompile Include="Colour.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Source Files\Entitites</Filter>
-    </ClCompile>
-    <ClCompile Include="EntBrush2D.cpp">
-      <Filter>Source Files\Entitites</Filter>
-    </ClCompile>
     <ClCompile Include="EntBrush3D.cpp">
-      <Filter>Source Files\Entitites</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EntCamera.cpp">
-      <Filter>Source Files\Entitites</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EntConnector.cpp">
-      <Filter>Source Files\Entitites</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EntLight.cpp">
-      <Filter>Source Files\Entitites</Filter>
-    </ClCompile>
-    <ClCompile Include="EntRenderable.cpp">
-      <Filter>Source Files\Entitites</Filter>
-    </ClCompile>
-    <ClCompile Include="EntSkeletal.cpp">
-      <Filter>Source Files\Entitites</Filter>
-    </ClCompile>
-    <ClCompile Include="EntSprite.cpp">
-      <Filter>Source Files\Entitites</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files\Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="AnimationTrack.cpp">
-      <Filter>Source Files\Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="CollisionBox.cpp">
-      <Filter>Source Files\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="CollisionSphere.cpp">
-      <Filter>Source Files\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="CollisionCapsule.cpp">
-      <Filter>Source Files\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugLine.cpp">
-      <Filter>Source Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="StackAllocator.cpp">
-      <Filter>Source Files\Classes</Filter>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EntityIterator.cpp">
-      <Filter>Source Files\Classes</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UITextbox.cpp">
-      <Filter>Source Files\UI</Filter>
+    <ClCompile Include="EntLight.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine_Win.cpp">
-      <Filter>Source Files\Windows</Filter>
+    <ClCompile Include="EntRenderable.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UICheckbox.cpp">
-      <Filter>Source Files\UI</Filter>
+    <ClCompile Include="EntSkeletal.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UIListBox.cpp">
-      <Filter>Source Files\UI</Filter>
+    <ClCompile Include="EntSprite.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UIComboBox.cpp">
-      <Filter>Source Files\UI</Filter>
+    <ClCompile Include="LevelIO.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UIColour.cpp">
-      <Filter>Source Files\UI</Filter>
+    <ClCompile Include="Registry.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UIToolbar.cpp">
-      <Filter>Source Files\UI</Filter>
+    <ClCompile Include="Console.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UISplitter.cpp">
-      <Filter>Source Files\UI</Filter>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineInstance.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram.cd" />
+    <ClInclude Include="EntBrush2D.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntBrush3D.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntCamera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntConnector.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityIterator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntLight.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntRenderable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntSkeletal.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntSprite.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelIO.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EEntityID.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Registry.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineInstance.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

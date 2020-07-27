@@ -1,8 +1,8 @@
 #pragma once
-#include <Engine/UIContainer.hpp>
-#include <Engine/Buffer.hpp>
-#include <Engine/UITextButton.hpp>
-#include <Engine/UIPanel.hpp>
+#include <ELUI/Container.hpp>
+#include <ELCore/Buffer.hpp>
+#include <ELUI/TextButton.hpp>
+#include <ELUI/Panel.hpp>
 
 class Font;
 class Material;

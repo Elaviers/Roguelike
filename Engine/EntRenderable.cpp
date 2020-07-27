@@ -1,7 +1,8 @@
 #include "EntRenderable.hpp"
-#include "Collider.hpp"
-#include "GLProgram.hpp"
-#include "MacroUtilities.hpp"
+#include <ELCore/Context.hpp>
+#include <ELGraphics/MeshManager.hpp>
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderQueue.hpp>
 
 const PropertyCollection& EntRenderable::GetProperties()
 {
@@ -11,15 +12,15 @@ const PropertyCollection& EntRenderable::GetProperties()
 	_AddBaseProperties(cvars);
 	cvars.Add(
 		"Model", 
-		MemberGetter<EntRenderable, String>(&EntRenderable::GetModelName), 
-		MemberSetter<EntRenderable, String>(&EntRenderable::SetModel), 
+		ContextualMemberGetter<EntRenderable, String>(&EntRenderable::GetModelName), 
+		ContextualMemberSetter<EntRenderable, String>(&EntRenderable::SetModel), 
 		0,
 		PropertyFlags::MODEL);
 
 	cvars.Add(
 		"Material", 
-		MemberGetter<EntRenderable, String>(&EntRenderable::GetMaterialName), 
-		MemberSetter<EntRenderable, String>(&EntRenderable::SetMaterial), 
+		ContextualMemberGetter<EntRenderable, String>(&EntRenderable::GetMaterialName), 
+		ContextualMemberSetter<EntRenderable, String>(&EntRenderable::SetMaterial), 
 		0,
 		PropertyFlags::MATERIAL);
 	DO_ONCE_END;
@@ -27,21 +28,23 @@ const PropertyCollection& EntRenderable::GetProperties()
 	return cvars;
 }
 
-void EntRenderable::Render(ERenderChannels channels) const
+void EntRenderable::Render(RenderQueue& q) const
 {
 	if (_model)
 	{
+		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SURFACE);
+
 		if (_material)
 		{
-			if (! (channels & _material->GetRenderChannelss()))
-				return;
-
-			_material->Apply();
+			_material->Apply(e);
 		}
 
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
-		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
-		_model->Render();
+		e.AddCommand(RCMDSetUVOffset::Default());
+		e.AddCommand(RCMDSetUVScale::Default());
+
+		e.AddSetColour(_colour);
+		e.AddSetTransform(GetTransformationMatrix());
+		e.AddRenderMesh(*_model->GetMesh());
 	}
 }
 
@@ -53,50 +56,52 @@ const Collider* EntRenderable::GetCollider() const
 	return nullptr;
 }
 
-String EntRenderable::GetModelName() const
+String EntRenderable::GetModelName(const Context& ctx) const
 {
-	if (Engine::Instance().pModelManager && _model) return Engine::Instance().pModelManager->FindNameOf(_model.Ptr());
+	if (_model) return ctx.GetPtr<ModelManager>()->FindNameOf(_model.Ptr());
 	return "Unknown";
 }
 
-String EntRenderable::GetMaterialName() const
-{																						//todo: remove Smelly const cast
-	if (Engine::Instance().pMaterialManager && _material) return Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material.Ptr()));
+String EntRenderable::GetMaterialName(const Context& ctx) const
+{																	//todo: remove Smelly const cast
+	if (_material) return ctx.GetPtr<MaterialManager>()->FindNameOf(const_cast<Material*>(_material.Ptr()));
 	return "Unknown";
 }
 
-void EntRenderable::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
+void EntRenderable::WriteData(ByteWriter &writer, NumberedSet<String> &strings, const Context& ctx) const
 {
-	Entity::WriteData(writer, strings);
+	Entity::WriteData(writer, strings, ctx);
 
-	if (Engine::Instance().pModelManager && _model)
+	ModelManager* modelManager = ctx.GetPtr<ModelManager>();
+	if (_model)
 	{
-		uint16 id = strings.Add(Engine::Instance().pModelManager->FindNameOf(_model.Ptr()));
+		uint16 id = strings.Add(modelManager->FindNameOf(_model.Ptr()));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);
 
-	if (!_materialIsDefault && Engine::Instance().pMaterialManager && _material)
+	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
+	if (!_materialIsDefault && _material)
 	{																	//todo: const cast removal
-		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material.Ptr())));
+		uint16 id = strings.Add(materialManager->FindNameOf(const_cast<Material*>(_material.Ptr())));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);
 
-	writer.Write_vector4(_colour);
+	((const Vector4&)_colour).Write(writer);
 }
 
-void EntRenderable::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
+void EntRenderable::ReadData(ByteReader &reader, const NumberedSet<String> &strings, const Context& ctx)
 {
-	Entity::ReadData(reader, strings);
+	Entity::ReadData(reader, strings, ctx);
 
 	const String *string;
 
 	if (string = strings.Get(reader.Read_uint16()))
-		SetModel(*string);
+		SetModel(*string, ctx);
 
 	if (string = strings.Get(reader.Read_uint16()))
-		SetMaterial(*string);
+		SetMaterial(*string, ctx);
 
-	_colour = reader.Read_vector4();
+	((Vector4&)_colour).Read(reader);
 }

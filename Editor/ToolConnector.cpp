@@ -2,7 +2,7 @@
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
 #include "UIPropertyManipulator.hpp"
-#include <Engine/MacroUtilities.hpp>
+#include <ELCore/MacroUtilities.hpp>
 
 const PropertyCollection& ToolConnector::_GetProperties()
 {
@@ -28,7 +28,7 @@ void ToolConnector::Cancel()
 
 void ToolConnector::MouseMove(const MouseData &mouseData)
 {
-	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC)
+	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 	{
 		if (mouseData.isLeftDown)
 		{
@@ -39,13 +39,13 @@ void ToolConnector::MouseMove(const MouseData &mouseData)
 
 			v[mouseData.rightElement] = p1[0];
 			v[mouseData.upElement] = p1[1];
-			//v[mouseData.forwardElement] = _connector.GetPoint1()[mouseData.forwardElement];
-			//_connector.SetPoint1(v);
+			v[mouseData.forwardElement] = _connector.GetPoint1()[mouseData.forwardElement];
+			_connector.SetPoint1(v);
 
 			v[mouseData.rightElement] = p2[0];
 			v[mouseData.upElement] = p2[1];
-			//v[mouseData.forwardElement] = _connector.GetPoint2()[mouseData.forwardElement];
-			//_connector.SetPoint2(v);
+			v[mouseData.forwardElement] = _connector.GetPoint2()[mouseData.forwardElement];
+			_connector.SetPoint2(v);
 		}
 		else if (!_placing)
 		{
@@ -54,19 +54,19 @@ void ToolConnector::MouseMove(const MouseData &mouseData)
 			v[mouseData.rightElement] = (float)mouseData.unitX_rounded;
 			v[mouseData.upElement] = (float)mouseData.unitY_rounded;
 			v[mouseData.forwardElement] = -100.f;
-			//_connector.SetPoint1(v);
+			_connector.SetPoint1(v);
 
 			v[mouseData.rightElement] = (float)mouseData.unitX_rounded + 1.f;
    			v[mouseData.upElement] = (float)mouseData.unitY_rounded + 1.f;
 			v[mouseData.forwardElement] = 100.f;
-			//_connector.SetPoint2(v);
+			_connector.SetPoint2(v);
 		}
 	}
 }
 
 void ToolConnector::MouseDown(const MouseData &mouseData)
 {
-	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
+	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
 }
 
 void ToolConnector::KeySubmit()
@@ -76,13 +76,9 @@ void ToolConnector::KeySubmit()
 	EntConnector *clone = _connector.TypedClone();
 	//clone->SetRenderColour(Colour(0.f, 1.f, 0.f));
 	clone->SetParent(&_owner.LevelRef());
-
-	//_connector.SetMin(Vector3());
-	//_connector.SetMax(Vector3());
 }
 
-void ToolConnector::Render(ERenderChannels channels) const
+void ToolConnector::Render(RenderQueue& q) const
 {
-	glLineWidth(3);
-	_connector.Render(channels);
+	_connector.Render(q);
 }

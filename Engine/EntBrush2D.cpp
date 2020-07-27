@@ -1,9 +1,7 @@
 #include "EntBrush2D.hpp"
-#include "GLProgram.hpp"
-#include "MacroUtilities.hpp"
-#include "MaterialManager.hpp"
-#include "ModelManager.hpp"
-#include "Utilities.hpp"
+#include <ELCore/Context.hpp>
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderQueue.hpp>
 
 void EntBrush2D::_OnTransformChanged()
 {
@@ -30,38 +28,41 @@ void EntBrush2D::_OnPointChanged()
 	_updatingTransform = false;
 }
 
-void EntBrush2D::Render(ERenderChannels channels) const
+void EntBrush2D::Render(RenderQueue& q) const
 {
-	if (Engine::Instance().pModelManager && _material && channels & _material->GetRenderChannelss())
+	if (_material)
 	{
-		_material->Apply();
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale().x, GetRelativeScale().y));
-		Engine::Instance().pModelManager->Plane()->Render();
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
+		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SURFACE, 0);
+		_material->Apply(e);
+		e.AddSetUVScale(Vector2(GetRelativeScale().x, GetRelativeScale().y));
+		e.AddCommand(RCMDSetUVOffset::Default());
+		e.AddSetTransform(GetTransformationMatrix());
+		e.AddSetColour(Colour::White);
+		e.AddCommand(RCMDRenderMesh::PLANE);
 	}
 }
 
 
-void EntBrush2D::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
+void EntBrush2D::WriteData(ByteWriter& writer, NumberedSet<String>& strings, const Context& ctx) const
 {
-	Entity::WriteData(writer, strings);
+	Entity::WriteData(writer, strings, ctx);
 
-	if (Engine::Instance().pMaterialManager && _material)
+	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
+	if (_material)
 	{
-		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(_material.Ptr()));
+		uint16 id = strings.Add(materialManager->FindNameOf(_material.Ptr()));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);
 }
 
-void EntBrush2D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
+void EntBrush2D::ReadData(ByteReader &reader, const NumberedSet<String> &strings, const Context& ctx)
 {
-	Entity::ReadData(reader, strings);
+	Entity::ReadData(reader, strings, ctx);
 
 	const String *materialName = strings.Get(reader.Read_uint16());
 	if (materialName)
-		SetMaterial(*materialName);
+		SetMaterial(*materialName, ctx);
 
 	level = GetRelativePosition().y;
 	_point1.x = GetRelativePosition().x - GetRelativeScale().x / 2.f;
@@ -79,8 +80,8 @@ const PropertyCollection& EntBrush2D::GetProperties()
 
 	cvars.Add(
 		"Material",
-		MemberGetter<EntBrush2D, String>(&EntBrush2D::GetMaterialName),
-		MemberSetter<EntBrush2D, String>(&EntBrush2D::SetMaterial),
+		ContextualMemberGetter<EntBrush2D, String>(&EntBrush2D::GetMaterialName),
+		ContextualMemberSetter<EntBrush2D, String>(&EntBrush2D::SetMaterial),
 		0,
 		PropertyFlags::MATERIAL);
 

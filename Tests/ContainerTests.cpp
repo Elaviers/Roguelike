@@ -1,13 +1,13 @@
 #include "CppUnitTest.h"
 
-#include <Engine/Buffer.hpp>
-#include <Engine/List.hpp>
-#include <Engine/Map.hpp>
-#include <Engine/Maths.hpp>
-#include <Engine/Hashmap.hpp>
-#include <Engine/NumberedSet.hpp>
-#include <Engine/Random.hpp>
-#include <Engine/String.hpp>
+#include <ELCore/Buffer.hpp>
+#include <ELCore/List.hpp>
+#include <ELCore/Map.hpp>
+#include <ELCore/Hashmap.hpp>
+#include <ELCore/NumberedSet.hpp>
+#include <ELCore/String.hpp>
+#include <ELMaths/Maths.hpp>
+#include <ELMaths/Random.hpp>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -69,19 +69,19 @@ namespace EngineTests
 			{
 				float floats[3] = { 1.f, 2.f, 3.f };
 
-				Buffer<float> b1(floats, 3), b2({1.f, 2.f, 3.f});
-				Buffer<float> b3(b1), b4 = b1;
+				Buffer<float> m10(floats, 3), m11({1.f, 2.f, 3.f});
+				Buffer<float> m12(m10), m13 = m10;
 
-				Assert::IsTrue(b1 == b2 && b2 == b3 && b3 == b4, L"Buffer construction/assignment error");
+				Assert::IsTrue(m10 == m11 && m11 == m12 && m12 == m13, L"Buffer construction/assignment error");
 
-				Buffer<float> b5 = b1 + b2 + b3 + b4 + b5;
+				Buffer<float> b5 = m10 + m11 + m12 + m13 + b5;
 				Assert::IsTrue(b5 == Buffer<float>({ 1,2,3,1,2,3,1,2,3,1,2,3 }), L"Buffer addition error");
 			}
 		}
 
 		TEST_METHOD(TestList)
 		{
-			Random random;
+			Random random(2);
 			List<String> list;
 			constexpr int size = 1000;
 			constexpr int count = 1;
@@ -98,7 +98,7 @@ namespace EngineTests
 				Assert::IsTrue(list.GetSize() == size, L"List size is incorrect");
 
 				int itCount = 0;
-				for (auto it = list.First(); it.IsValid(); ++it)
+				for (auto it = list.begin(); it.IsValid(); ++it)
 					++itCount;
 
 				Assert::IsTrue(itCount == size, L"List iterator error");

@@ -1,12 +1,15 @@
 #pragma once
-#include <Engine/Font.hpp>
-#include <Engine/GLContext.hpp>
-#include <Engine/GLProgram.hpp>
+#include <Engine/EngineInstance.hpp>
 #include <Engine/LevelIO.hpp>
-#include <Engine/Timer.hpp>
-#include <Engine/Window.hpp>
-#include <Engine/UIToolbar.hpp>
-#include <Engine/UISplitter.hpp>
+#include <ELGraphics/Font.hpp>
+#include <ELGraphics/RenderQueue.hpp>
+#include <ELSys/GLContext.hpp>
+#include <ELSys/GLProgram.hpp>
+#include <ELSys/Timer.hpp>
+#include <ELSys/Window.hpp>
+#include <ELSys/Window_Win32.hpp>
+#include <ELUI/Toolbar.hpp>
+#include <ELUI/Splitter.hpp>
 #include "FbxSdk.hpp"
 #include "HierachyWindow.hpp"
 #include "MouseData.hpp"
@@ -48,8 +51,8 @@ private:
 	bool _consoleIsActive = false;
 
 	//Window stuff
-	Window _window;
-	Window _vpArea;
+	Window_Win32 _window;
+	Window_Win32 _vpArea;
 	HierachyWindow _hierachyWindow;
 
 	UIContainer _ui;
@@ -62,10 +65,13 @@ private:
 
 	Viewport _viewports[VIEWPORTCOUNT];
 
-	//OpenGL
+	//Rendering
 	GLContext _glContext;
 	GLProgram _shaderLit;
 	GLProgram _shaderUnlit;
+
+	RenderQueue _uiQueue;
+	RenderQueue _consoleQueue;
 
 	//Editor
 	bool _drawEditorFeatures = true;
@@ -88,7 +94,6 @@ private:
 	float _axisLookX = 0.f;
 	float _axisLookY = 0.f;
 
-	static LRESULT CALLBACK _ConsoleProc(HWND, UINT, WPARAM, LPARAM);
 	static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
 	static LRESULT CALLBACK _vpAreaProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -101,6 +106,8 @@ private:
 	void _OnToolbarItemSelection(UIToolbarItem& item) { SetTool((ETool)item.GetUserData(), false); }
 
 public:
+	EngineInstance engine;
+
 	struct _EditorTools
 	{
 		ToolSelect select;
@@ -118,8 +125,6 @@ public:
 	void Run();
 	void Frame();
 	void Render();
-	void RenderUI();
-	void RenderConsole();
 	void RenderViewport(Viewport& vp);
 
 	void Zoom(float);

@@ -1,7 +1,6 @@
 #include "HierachyWindow.hpp"
 #include "Editor.hpp"
 #include "resource.h"
-#include <Engine/Engine.hpp>
 #include <Engine/Entity.hpp>
 #include <CommCtrl.h>
 #include <windowsx.h>
@@ -118,7 +117,7 @@ void HierachyWindow::Initialise(HBRUSH brush)
 
 HTREEITEM HierachyWindow::_AddObject(Entity& obj, HTREEITEM parent, HTREEITEM after)
 {
-	auto regNode = Engine::Instance().registry.GetNode(obj.GetTypeID());
+	auto regNode = _owner->engine.registry.GetNode(obj.GetTypeID());
 	String name = regNode ? regNode->name : "???";
 
 	if (obj.GetName().GetLength())
@@ -148,7 +147,7 @@ HTREEITEM HierachyWindow::_AddObject(Entity& obj, HTREEITEM parent, HTREEITEM af
 
 void HierachyWindow::Refresh(Entity& root)
 {
-	_currentRoot = Engine::Instance().pObjectTracker->Track(&root);
+	_currentRoot = _owner->engine.pObjectTracker->Track(&root);
 
 	TreeView_DeleteAllItems(_treeView);
 
@@ -175,7 +174,7 @@ void HierachyWindow::BeginDrag(LPNMTREEVIEW nmtv)
 	// parent window. 
 	ShowCursor(FALSE);
 	SetCapture(GetParent(_treeView));
-	_dragObj = Engine::Instance().pObjectTracker->Track(_currentRoot->FindChildWithUID((uint32)nmtv->itemNew.lParam));
+	_dragObj = _owner->engine.pObjectTracker->Track(_currentRoot->FindChildWithUID((uint32)nmtv->itemNew.lParam));
 }
 
 void HierachyWindow::MouseMove(int x, int y)

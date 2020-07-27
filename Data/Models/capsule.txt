@@ -1,4 +1,4 @@
-model capsule.mesh
+mesh capsule
 
 material bricks
 

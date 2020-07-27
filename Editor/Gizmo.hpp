@@ -2,7 +2,7 @@
 #include "GizmoAxis.hpp"
 #include "GizmoPlane.hpp"
 #include "GizmoRing.hpp"
-#include <Engine/Ray.hpp>
+#include <ELMaths/Ray.hpp>
 
 /*
 	Gizmo
@@ -92,9 +92,9 @@ public:
 			_all[i]->MouseUp();
 	}
 
-	void Draw() const
+	void Render(RenderQueue& q) const
 	{
 		for (int i = 0; i < _componentCount; ++i)
-			_all[i]->Draw();
+			_all[i]->Render(q);
 	}
 };

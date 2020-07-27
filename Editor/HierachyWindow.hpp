@@ -1,12 +1,12 @@
 #pragma once
-#include <Engine/Window.hpp>
-#include <Engine/SharedPointer.hpp>
+#include <ELCore/SharedPointer.hpp>
+#include <ELSys/Window_Win32.hpp>
 #include <CommCtrl.h>
 
 class Entity;
 class Editor;
 
-class HierachyWindow : public Window
+class HierachyWindow : public Window_Win32
 {
 	static const TCHAR* _className;
 	static LRESULT _WindowProc(HWND, UINT, WPARAM, LPARAM);
@@ -34,10 +34,10 @@ public:
 
 	static void Initialise(HBRUSH);
 
-	void Create(const Window* parent)
+	void Create(const Window_Win32* parent)
 	{
-		Window::Create(_className, TEXT("Hierachy"), this, parent ? WS_CHILD : 0, parent ? parent->GetHwnd() : NULL);
-		Window::SetSize(256, 512);
+		Window_Win32::Create(_className, TEXT("Hierachy"), this, parent ? WS_CHILD : 0, parent ? parent->GetHWND() : NULL);
+		Window_Win32::SetSize(256, 512);
 	}
 
 	void Refresh(Entity& root);

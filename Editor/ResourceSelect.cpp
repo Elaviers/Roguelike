@@ -1,21 +1,24 @@
 #include "ResourceSelect.hpp"
 #include <CommCtrl.h>
-#include <Engine/Colour.hpp>
-#include <Engine/Debug.hpp>
-#include <Engine/DrawUtils.hpp>
+#include <Engine/EngineInstance.hpp>
 #include <Engine/EntCamera.hpp>
 #include <Engine/EntLight.hpp>
 #include <Engine/EntRenderable.hpp>
 #include <Engine/EntSprite.hpp>
-#include <Engine/GL.hpp>
-#include <Engine/GLContext.hpp>
-#include <Engine/GLProgram.hpp>
-#include <Engine/IO.hpp>
-#include <Engine/MaterialManager.hpp>
 #include <Engine/ModelManager.hpp>
-#include <Engine/TextureManager.hpp>
-#include <Engine/Utilities.hpp>
-#include <Engine/Window.hpp>
+#include <ELGraphics/Colour.hpp>
+#include <ELGraphics/IO.hpp>
+#include <ELGraphics/MaterialManager.hpp>
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderQueue.hpp>
+#include <ELGraphics/TextureManager.hpp>
+#include <ELSys/Debug.hpp>
+#include <ELSys/GL.hpp>
+#include <ELSys/GLContext.hpp>
+#include <ELSys/GLProgram.hpp>
+#include <ELSys/System.hpp>
+#include <ELSys/Utilities.hpp>
+#include <ELSys/Window.hpp>
 #include "resource.h"
 
 constexpr LPCTSTR viewportClassName = TEXT("RESSELECTCLASS");
@@ -23,11 +26,13 @@ constexpr LPCTSTR viewportClassName = TEXT("RESSELECTCLASS");
 class RSDialog
 {
 private:
+	EngineInstance& engine;
+
 	const GLContext* glContext;
 	GLProgram* programLit;
 	const GLProgram* programUnlit;
-	MaterialManager* const materialManager;
-	ModelManager* const modelManager;
+
+	RenderQueue renderQueue;
 
 	Entity _cameraRoot;
 	EntCamera _camera;
@@ -41,12 +46,7 @@ private:
 public:
 	String currentName = "";
 
-	union
-	{
-		SharedPointer<const Model> selectionAsModel;
-		SharedPointer<const Material> selectionAsMaterial;
-		SharedPointer<const Asset> selection;
-	};
+	SharedPointer<const Asset> selection;
 
 	bool isModelSelect = false;
 
@@ -54,34 +54,33 @@ public:
 
 	HIMAGELIST imageList = NULL;
 
-	RSDialog(const GLContext& context, GLProgram& programLit, const GLProgram& programUnlit, MaterialManager& materialManager, ModelManager& modelManager) :
+	RSDialog(EngineInstance& engine, const GLContext& context, GLProgram& programLit, const GLProgram& programUnlit) :
+		engine(engine),
 		_moving(false),
 		_sizing(false),
 		glContext(&context),
 		programLit(&programLit),
 		programUnlit(&programUnlit),
-		materialManager(&materialManager),
-		modelManager(&modelManager),
 		selection(),
 		viewportDC(NULL)
 	{}
 
 	~RSDialog() {}
 
-	inline const String &GetRootPath() { return isModelSelect ? modelManager->GetRootPath() : materialManager->GetRootPath(); }
+	inline const String &GetRootPath() { return isModelSelect ? engine.pModelManager->GetRootPath() : engine.pMaterialManager->GetRootPath(); }
 
 	void InitScene(int vpW, int vpH)
 	{
 		//opengl
 		WindowFunctions::SetDefaultPixelFormat(viewportDC);
-		glContext->Use(viewportDC);
+		glContext->Use_Win32(viewportDC);
 
-		_camera.SetViewport(vpW, vpH);
+		_camera.GetProjection().SetDimensions(Vector2T(vpW, vpH));
 
 		_camera.SetParent(&_cameraRoot);
 
-		_camera.SetProjectionType(EProjectionType::PERSPECTIVE);
-		_camera.SetPerspFOV(90.f);
+		_camera.GetProjection().SetType(EProjectionType::PERSPECTIVE);
+		_camera.GetProjection().SetPerspectiveFOV(90.f);
 		_camera.SetRelativePosition(Vector3(0.f, 0.f, 1.f));
 		_camera.SetRelativeRotation(Vector3(0.f, 180.f, 0.f));
 
@@ -89,7 +88,7 @@ public:
 		_light.SetRelativePosition(Vector3(0.5f, 0.5f, 0.f));
 
 		if (!isModelSelect)
-			_object.SetModel(modelManager->Cube());
+			_object.SetModel(engine.pModelManager->Cube(), engine.context);
 
 		_moving = false;
 		_sizing = false;
@@ -97,25 +96,69 @@ public:
 
 	void Update()
 	{
-		if (isModelSelect)
-			_object.SetModel(selectionAsModel);
-		else
+		const Model* pModel = dynamic_cast<const Model*>(selection.Ptr());
+
+		if (pModel)
 		{
-			if (dynamic_cast<const MaterialSprite*>(selectionAsMaterial.Ptr()))
+			SharedPointer<const Model> model = engine.pModelManager->Find(pModel);
+
+			if (model)
 			{
-				_sprite.SetMaterial(selectionAsMaterial.Cast<const MaterialSprite>());
-				_object.SetMaterial(SharedPointer<const Material>());
+				_object.SetModel(model, engine.context);
+				
+				if (!_object.GetMaterial())
+					_object.SetMaterial(engine.pMaterialManager->Get("white", engine.context));
 			}
 			else
+				Debug::Error("Modelmanager cannot track a model ptr that doesn't belong to it!");
+		}
+		else
+		{
+			const Material* pMaterial = dynamic_cast<const Material*>(selection.Ptr());
+
+			if (pMaterial)
 			{
-				_sprite.SetMaterial(SharedPointer<const MaterialSprite>());
-				_object.SetMaterial(selectionAsMaterial);
+				SharedPointer<const Material> material = engine.pMaterialManager->Find(pMaterial);
+				const MaterialSprite* pSprite = dynamic_cast<const MaterialSprite*>(pMaterial);
+
+				if (!material)
+				{
+					Debug::Error("Materialmgr cannot track a material ptr that doesn't belong to it!");
+					return;
+				}
+
+				if (pSprite)
+				{
+					_object.SetMaterial(SharedPointer<const Material>());
+					_sprite.SetMaterial(material.Cast<const MaterialSprite>());
+				}
+				else
+				{
+					_sprite.SetMaterial(SharedPointer<const MaterialSprite>());
+					_object.SetMaterial(material);
+				}
 			}
 		}
 	}
 
 	void Draw()
 	{
+		renderQueue.ClearDynamicQueue();
+		_light.Render(renderQueue);
+		_object.Render(renderQueue);
+		_sprite.Render(renderQueue);
+
+		RenderEntry& e = renderQueue.NewDynamicEntry(ERenderChannels::UNLIT);
+		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
+		e.AddSetColour(Colour::Red);
+		e.AddLine(Vector3(-1.f, 0.f, 0.f), Vector3(1.f, 0.f, 0.f));
+
+		e.AddSetColour(Colour::Green);
+		e.AddLine(Vector3(0.f, -1.f, 0.f), Vector3(0.f, 1.f, 0.f));
+
+		e.AddSetColour(Colour::Blue);
+		e.AddLine(Vector3(0.f, 0.f, -1.f), Vector3(0.f, 0.f, 1.f));
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glDepthFunc(GL_LESS);
@@ -135,27 +178,12 @@ public:
 			programLit->SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
 			programLit->SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1, 1));
 
-			_light.ToShader(0);
-
-			_object.Render(ERenderChannels::SURFACE);
+			renderQueue.Render(ERenderChannels::SURFACE, *engine.pMeshManager, *engine.pTextureManager);
 		}
 
 		programUnlit->Use();
 		_camera.Use();
-
-		Engine::Instance().pTextureManager->White()->Bind(0);
-
-		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Colour::Red);
-		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(-1.f, 0.f, 0.f), Vector3(1.f, 0.f, 0.f));
-
-		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Colour::Green);
-		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(0.f, -1.f, 0.f), Vector3(0.f, 1.f, 0.f));
-
-		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Colour::Blue);
-		DrawUtils::DrawLine(*Engine::Instance().pModelManager, Vector3(0.f, 0.f, -1.f), Vector3(0.f, 0.f, 1.f));
-
-		programUnlit->SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
-		_sprite.Render(ERenderChannels::SPRITE);
+		renderQueue.Render(ERenderChannels::UNLIT | ERenderChannels::SPRITE, *engine.pMeshManager, *engine.pTextureManager);
 
 		::SwapBuffers(viewportDC);
 	};
@@ -206,9 +234,9 @@ INT_PTR RSDialog::DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		Buffer<String> keynames;
 
 		if (rs->isModelSelect)
-			keynames = Engine::Instance().pModelManager->GetAllPossibleKeys();
+			keynames = rs->engine.pModelManager->GetAllPossibleKeys();
 		else
-			keynames = Engine::Instance().pMaterialManager->GetAllPossibleKeys();
+			keynames = rs->engine.pMaterialManager->GetAllPossibleKeys();
 
 		for (uint32 i = 0; i < keynames.GetSize(); ++i)
 		{
@@ -266,9 +294,9 @@ INT_PTR RSDialog::DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			rs->currentName = textBuffer;
 
 			if (rs->isModelSelect)
-				rs->selection = Engine::Instance().pModelManager->Get(rs->currentName).Cast<const Asset>();
+				rs->selection = rs->engine.pModelManager->Get(rs->currentName, rs->engine.context).Cast<const Asset>();
 			else
-				rs->selection = Engine::Instance().pMaterialManager->Get(rs->currentName).Cast<const Asset>();
+				rs->selection = rs->engine.pMaterialManager->Get(rs->currentName, rs->engine.context).Cast<const Asset>();
 
 			rs->Update();
 			rs->Draw();
@@ -312,7 +340,7 @@ LRESULT RSDialog::ViewportProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 	case WM_MOUSEMOVE:
 		if (rs->_moving || rs->_sizing)
 		{
-			::SetCursor(NULL);
+			System::SetCursor(ECursor::NONE);
 
 			RECT rect;
 			::GetWindowRect(hwnd, &rect);
@@ -362,9 +390,9 @@ void ResourceSelect::Initialise()
 	::RegisterClassEx(&windowClass);
 }
 
-String ResourceSelect::Dialog(MaterialManager &materialManager, ModelManager &modelManager, const char *search, HWND parent, EResourceType type, const GLContext &context, GLProgram &programLit, const GLProgram &programUnlit)
+String ResourceSelect::Dialog(EngineInstance& engine, const char *search, HWND parent, EResourceType type, const GLContext &context, GLProgram &programLit, const GLProgram &programUnlit)
 {
-	RSDialog rs(context, programLit, programUnlit, materialManager, modelManager);
+	RSDialog rs(engine, context, programLit, programUnlit);
 	rs.isModelSelect = type == EResourceType::MODEL;
 
 	if (::DialogBoxParam(NULL, MAKEINTRESOURCE(IDD_RES_SELECT), parent, (DLGPROC)RSDialog::DialogProc, (LPARAM)&rs) == 1)

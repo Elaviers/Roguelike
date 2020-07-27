@@ -1,17 +1,17 @@
 #pragma once
 #include "EntRenderable.hpp"
-#include "Animation.hpp"
+#include <ELGraphics/Animation.hpp>
 
 class EntSkeletal : public EntRenderable
 {
-	Buffer<Mat4> _skinningMatrices;
+	Buffer<Matrix4> _skinningMatrices;
 
 	SharedPointer<const Animation> _animation;
 	float _currentTime;
 
-	void _CMD_PlayAnimation(const Buffer<String>& args);
+	void _CMD_PlayAnimation(const Buffer<String>& args, const Context&);
 
-	virtual void _OnModelChanged() override;
+	virtual void _OnMeshChanged() override;
 
 public:
 	Entity_FUNCS(EntSkeletal, EEntityID::SKELETAL);
@@ -20,7 +20,7 @@ public:
 	virtual ~EntSkeletal() {}
 
 	virtual void Update(float deltaTime) override;
-	virtual void Render(ERenderChannels) const override;
+	virtual void Render(RenderQueue&) const override;
 
 	virtual PropertyCollection& GetProperties() override;
 

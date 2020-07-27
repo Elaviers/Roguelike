@@ -1,8 +1,8 @@
 #pragma once
 #include "Tool.hpp"
 #include <Engine/EEntityID.hpp>
-#include <Engine/PropertyCollection.hpp>
-#include <Engine/SharedPointer.hpp>
+#include <ELCore/PropertyCollection.hpp>
+#include <ELCore/SharedPointer.hpp>
 
 class ToolEntity : public Tool
 {
@@ -26,5 +26,5 @@ public:
 	virtual void MouseMove(const MouseData&) override;
 	virtual void MouseDown(const MouseData&) override;
 
-	virtual void Render(ERenderChannels) const override;
+	virtual void Render(RenderQueue&) const override;
 };

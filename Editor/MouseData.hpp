@@ -1,11 +1,13 @@
 #pragma once
-#include <Engine/Types.hpp>
+#include <ELCore/Types.hpp>
 
 struct MouseData
 {
 	int viewport = 0;
 	int x = 0;
 	int y = 0;
+	int prevX = 0;
+	int prevY = 0;
 
 	float unitX = 0.f;
 	float unitY = 0.f;

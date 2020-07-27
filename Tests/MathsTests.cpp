@@ -1,10 +1,10 @@
 #include "CppUnitTest.h"
-
-#include <Engine/Random.hpp>
-#include <Engine/Rotation.hpp>
-#include <Engine/Vector2.hpp>
-#include <Engine/Vector3.hpp>
-#include <Engine/Vector4.hpp>
+#include <ELMaths/Matrix4.hpp>
+#include <ELMaths/Random.hpp>
+#include <ELMaths/Rotation.hpp>
+#include <ELMaths/Vector2.hpp>
+#include <ELMaths/Vector3.hpp>
+#include <ELMaths/Vector4.hpp>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -15,7 +15,7 @@ namespace EngineTests
 	public:
 		TEST_METHOD(TestRandom)
 		{
-			Random r;
+			Random r(32);
 
 			for (int i = 0; i < 100000; ++i)
 			{
@@ -40,16 +40,16 @@ namespace EngineTests
 
 		TEST_METHOD(TestRotations)
 		{
-			Assert::IsTrue(Quaternion(VectorMaths::V3X, 45.f).ToEuler().AlmostEquals(Vector3(45.f, 0.f, 0.f), .1f));
-			Assert::IsTrue(Quaternion(VectorMaths::V3Y, 45.f).ToEuler().AlmostEquals(Vector3(0.f, -45.f, 0.f), .1f));
-			Assert::IsTrue(Quaternion(VectorMaths::V3Z, 45.f).ToEuler().AlmostEquals(Vector3(0.f, 0.f, 45.f), .1f));
+			Assert::IsTrue(Quaternion(VectorMaths::V3X, 45.f).ToEulerYXZ().AlmostEquals(Vector3(45.f, 0.f, 0.f), .1f));
+			Assert::IsTrue(Quaternion(VectorMaths::V3Y, 45.f).ToEulerYXZ().AlmostEquals(Vector3(0.f, -45.f, 0.f), .1f));
+			Assert::IsTrue(Quaternion(VectorMaths::V3Z, 45.f).ToEulerYXZ().AlmostEquals(Vector3(0.f, 0.f, 45.f), .1f));
 		}
 
 		TEST_METHOD(TestMatrices)
 		{
-			Mat4 m = Matrix::Transformation(Vector3(0.f, 1.f, 0.f), Quaternion(Vector3(0, 1, 0), 90.f), Vector3(2, 2, 2));
+			Matrix4 m = Matrix4::Transformation(Vector3(0.f, 1.f, 0.f), Quaternion(Vector3(0, 1, 0), 90.f), Vector3(2, 2, 2));
 
-			Assert::IsTrue((Vector3(1, 0, 0) * m).AlmostEquals(Vector3(0, 1, 2), .1f));
+			Assert::IsTrue((Vector4(1, 0, 0, 1) * m).GetXYZ().AlmostEquals(Vector3(0, 1, 2), .1f));
 		}
 	};
 }

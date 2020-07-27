@@ -1,5 +1,6 @@
 #include "CppUnitTest.h"
-#include <Engine/PropertyCollection.hpp>
+#include <ELCore/Context.hpp>
+#include <ELCore/PropertyCollection.hpp>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -44,15 +45,17 @@ namespace EngineTests
 
 			int a; float b; String p;
 
-			bool gotA = map.Get<int>(&instance, "TEST-A", a);
-			bool gotB = map.Get<float>(&instance, "TEST-B", b);
-			bool gotP = map.Get<String>(&instance, "TEST-PV", p);
+			Context ctx;
+
+			bool gotA = map.Get<int>(&instance, "TEST-A", a, ctx);
+			bool gotB = map.Get<float>(&instance, "TEST-B", b, ctx);
+			bool gotP = map.Get<String>(&instance, "TEST-PV", p, ctx);
 
 			Assert::IsTrue(gotA && gotB && gotP && a == instance.a && b == instance.b && p == instance.GetPrivate(), L"PropertyCollection.Get returned unexpected value");
 
-			map.Set<int>(&instance, "TEST-A", 69);
-			map.Set<float>(&instance, "TEST-B", 64.f);
-			map.Set<String>(&instance, "TEST-PV", "lmao");
+			map.Set<int>(&instance, "TEST-A", 69, ctx);
+			map.Set<float>(&instance, "TEST-B", 64.f, ctx);
+			map.Set<String>(&instance, "TEST-PV", "lmao", ctx);
 
 			Assert::IsTrue(instance.a == 69 && instance.b == 64.f && instance.GetPrivate() == "lmao", L"PropertyCollection.Set error");
 		}

@@ -1,134 +1,24 @@
 #include "Game.hpp"
-#include <Engine/AudioManager.hpp>
+#include <ELAudio/AudioManager.hpp>
+#include <ELGraphics/FontManager.hpp>
+#include <ELMaths/Frustum.hpp>
+#include <ELSys/GL.hpp>
+#include <ELSys/IO.hpp>
+#include <ELSys/Utilities.hpp>
 #include <Engine/Console.hpp>
-#include <Engine/Engine.hpp>
 #include <Engine/EntLight.hpp>
-#include <Engine/FontManager.hpp>
-#include <Engine/GL.hpp>
 #include <Engine/LevelIO.hpp>
-#include <Engine/IO.hpp>
 #include <windowsx.h>
 #include "EntPlayer.hpp"
-#include "GameInstance.h"
+#include "GameInstance.hpp"
 #include "LevelGeneration.hpp"
 #include "MenuMain.hpp"
-
-LRESULT CALLBACK Game::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-{
-	Game *game = (Game*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
-
-	switch (msg)
-	{
-	case WM_CREATE:
-	{
-		LPCREATESTRUCT create = (LPCREATESTRUCT)lparam;
-		::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)create->lpCreateParams);
-	}
-		break;
-
-	case WM_CLOSE:
-		::DestroyWindow(hwnd);
-		break;
-
-	case WM_DESTROY:
-		game->_running = false;
-		break;
-
-	case WM_SIZE:
-		game->Resize(LOWORD(lparam), HIWORD(lparam));
-		game->Render();
-		break;
-
-	case WM_MOUSEMOVE:
-		game->MouseMove(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-		break;
-
-	case WM_LBUTTONDOWN:
-		game->MouseDown();
-		break;
-
-	case WM_LBUTTONUP:
-		game->MouseUp();
-		break;
-
-	case WM_KEYDOWN:
-		if (lparam& (1 << 30))
-			break; //Key repeats ignored
-
-		game->KeyDown((EKeycode)wparam);
-		break;
-
-	case WM_KEYUP:
-		game->KeyUp((EKeycode)wparam);
-
-		break;
-
-	case WM_CHAR:
-		game->InputChar((char)wparam);
-		break;
-
-	case WM_INPUT:
-	{
-		static Buffer<byte> buffer;
-
-		UINT size;
-		GetRawInputData((HRAWINPUT)lparam, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
-
-		if (buffer.GetSize() < size)
-			buffer.SetSize(size);
-
-		GetRawInputData((HRAWINPUT)lparam, RID_INPUT, &buffer[0], &size, sizeof(RAWINPUTHEADER));
-
-		RAWINPUT* input = (RAWINPUT*)buffer.Data();
-		if (input->header.dwType == RIM_TYPEMOUSE)
-		{
-			game->MouseInput((short)input->data.mouse.lLastX, (short)input->data.mouse.lLastY);
-		}
-	}
-		break;
-
-	default: return ::DefWindowProc(hwnd, msg, wparam, lparam);
-	}
-
-	return 0;
-}
-
-void Game::_InitWindow()
-{
-	{
-		LPCTSTR dummyClassName = TEXT("DUMMY");
-		LPCTSTR className = TEXT("GAMEWINDOW");
-
-		WNDCLASSEX windowClass = {};
-		windowClass.cbSize = sizeof(WNDCLASSEX);
-		windowClass.lpfnWndProc = ::DefWindowProc;
-		windowClass.hInstance = ::GetModuleHandle(NULL);
-		windowClass.lpszClassName = dummyClassName;
-		::RegisterClassEx(&windowClass);
-
-		windowClass.lpfnWndProc = _WindowProc;
-		windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-		windowClass.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
-		windowClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-		windowClass.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-		windowClass.lpszClassName = className;
-		::RegisterClassEx(&windowClass);
-
-		GLContext dummy;
-		dummy.CreateDummyAndUse(dummyClassName);
-		GL::LoadDummyExtensions();
-		
-		_window.Create(className, "Window", this);
-			
-		dummy.Delete();
-	}
-}
 
 void Game::_InitGL()
 {
 	_glContext.Create(_window);
 	_glContext.Use(_window);
-	GL::LoadExtensions(_window.GetHDC());
+	GL::LoadExtensions(_window);
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -147,56 +37,100 @@ void Game::_InitGL()
 
 void Game::_Init()
 {
-	RAWINPUTDEVICE rawMouseInput;
-	rawMouseInput.usUsagePage = 0x01;
-	rawMouseInput.usUsage = 0x02;
-	rawMouseInput.dwFlags = 0;
-	rawMouseInput.hwndTarget = 0;
+	_engine.Init(EEngineCreateFlags::ALL, nullptr);
+	_engine.pFontManager->AddPath(Utilities::GetSystemFontDir());
 
-	if (RegisterRawInputDevices(&rawMouseInput, 1, sizeof(rawMouseInput)) == FALSE)
-	{
-		Debug::Error("Raw mouse input registration error!");
-	}
+	_engine.pWorld = &_world;
+	GameInstance::Instance().world = &_world;
 
-	Engine::Instance().Init(EEngineCreateFlags::ALL, nullptr);
-	Engine::Instance().pFontManager->AddPath(Utilities::GetSystemFontDir());
-
-	Engine::Instance().pWorld = &_world;
-
-	GameInstance::Instance().SetupInputs();
+	GameInstance::Instance().SetupInputs(*_engine.pInputManager);
 
 	_consoleIsActive = false;
 	_uiIsActive = true;
 
-	_uiCamera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
-	_uiCamera.SetOrthoPixelsPerUnit(1.f);
-	_uiCamera.SetZBounds(-10.f, 10.f);
+	_uiCamera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
+	_uiCamera.GetProjection().SetNearFar(-10.f, 10.f);
 }
 
 void Game::Run()
 {
-	_InitWindow();
+	GLContext dummy;
+	dummy.CreateDummyAndUse();
+	GL::LoadDummyExtensions();
+
+	_window.Create("Window");
+
+	dummy.Delete();
+
 	_InitGL();
 	_Init();
 
 	MenuMain *menu = new MenuMain();
 	menu->SetBounds(UICoord(0.5f, -256.f), UICoord(0.5f, -256.f), UICoord(0.f, 512.f), UICoord(0.f, 512.f));
-	menu->Initialise(FunctionPointer<void, const String&>(this, &Game::StartLevel), Callback(this, &Game::ButtonQuit));
+	menu->Initialise(FunctionPointer<void, const String&>(this, &Game::StartLevel), Callback(this, &Game::ButtonQuit), _engine);
 	menu->SetParent(&_ui);
 
 	_window.Show();
 
-	MSG msg;
+	WindowEvent e;
 	_running = true;
 	while (_running)
 	{
-		while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		_timer.Start();
+		_engine.pInputManager->ClearMouseInput();
+
+		while (_window.PollEvent(e))
 		{
-			::TranslateMessage(&msg);
-			::DispatchMessage(&msg);
+			switch (e.type)
+			{
+			case WindowEvent::CLOSED:
+				_running = false;
+				break;
+
+			case WindowEvent::RESIZE:
+				Resize(e.data.resize.w, e.data.resize.h);
+				Render();
+				break;
+
+			case WindowEvent::MOUSEMOVE:
+				MouseMove(e.data.mouseMove.x, e.data.mouseMove.y);
+				break;
+
+			case WindowEvent::LEFTMOUSEDOWN:
+				MouseDown();
+				break;
+
+			case WindowEvent::LEFTMOUSEUP:
+				MouseUp();
+				break;
+
+			case WindowEvent::KEYDOWN:
+				if (e.data.keyDown.isRepeat)
+					break;
+
+				KeyDown(e.data.keyDown.key);
+				break;
+
+			case WindowEvent::KEYUP:
+				KeyUp(e.data.keyUp.key);
+
+				break;
+
+			case WindowEvent::CHAR:
+				InputChar(e.data.character);
+				break;
+
+			case WindowEvent::RAWINPUT:
+				if (e.data.rawInput.type == WindowEvent::RawInputType::MOUSE)
+				{
+					_engine.pInputManager->AddMouseInput(e.data.rawInput.mouse.lastX, e.data.rawInput.mouse.lastY);
+				}
+				break;
+			}
 		}
 
 		Frame();
+		_deltaTime = _timer.SecondsSinceStart();
 	}
 }
 
@@ -206,19 +140,20 @@ void Game::StartLevel(const String& filename)
 
 	if (ext == ".txt")
 	{
-		_world.DeleteChildren();
+		_world.DeleteChildren(_engine.context);
 
 		String fileString = IO::ReadFileString(filename.GetData());
-		LevelGeneration::GenerateLevel(_world, fileString);
+		LevelGeneration::GenerateLevel(_world, fileString, _engine.context);
 	}
 	else
 	{
-		_world.DeleteChildren();
-		LevelIO::Read(_world, filename.GetData());
+		_world.DeleteChildren(_engine.context);
+		LevelIO::Read(_world, filename.GetData(), _engine.context);
 	}
 
 	EntPlayer* player = EntPlayer::Create();
 	player->SetParent(&_world);
+	player->Init(_engine.context);
 
 	EntLight* light = EntLight::Create();
 	light->SetParent(player);
@@ -231,57 +166,49 @@ void Game::StartLevel(const String& filename)
 
 void Game::Frame()
 {
-	_timer.Start();
-
-	_window.SetTitle(CSTR(_mouseXForFrame, " ", _mouseYForFrame));
-
-	Engine::Instance().pInputManager->SetMouseAxes(_mouseXForFrame, _mouseYForFrame);
-	_mouseXForFrame = _mouseYForFrame = 0;
-
-	Engine::Instance().pAudioManager->FillBuffer();
+	_engine.pAudioManager->FillBuffer();
 
 	_world.UpdateAll(_deltaTime);
 	_ui.Update(_deltaTime);
 
 	Render();
-	_deltaTime = _timer.SecondsSinceStart();
 }
 
 void Game::Render()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glDepthFunc(GL_LEQUAL);
-
+	_renderQueue.ClearDynamicQueue();
+	_uiQueue.ClearDynamicQueue();
 
 	const EntCamera* activeCamera = GameInstance::Instance().GetActiveCamera();
 	if (activeCamera)
 	{
+		Frustum cameraFrustum;
+		activeCamera->GetProjection().ToFrustum(activeCamera->GetWorldTransform(), cameraFrustum);
+		_world.RenderAll(_renderQueue, cameraFrustum);
+	}
+
+	if (_uiIsActive)
+		_ui.Render(_uiQueue);
+
+	if (_consoleIsActive)
+		_engine.pConsole->Render(_uiQueue, *_engine.pFontManager->Get("consolas", _engine.context), _deltaTime);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDepthFunc(GL_LEQUAL);
+
+	_shaderUnlit.Use();
+	_uiCamera.Use();
+	_uiQueue.Render(ERenderChannels::UNLIT, *_engine.pMeshManager, *_engine.pTextureManager);
+
+	if (activeCamera)
+	{
 		_shaderLit.Use();
-		_shaderLit.SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
-		_shaderLit.SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1, 1));
-		_shaderLit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureNormal, 1);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureReflection, 3);
-
 		activeCamera->Use();
-		_world.RenderAll(*activeCamera, ERenderChannels::PRE_RENDER);
-		EntLight::FinaliseLightingForFrame();
-		_world.RenderAll(*activeCamera, ERenderChannels::SURFACE);
-	}
-
-	_shaderUnlit.Use();
-	_uiCamera.Use();
-
-	if (_uiIsActive)
-		_ui.Render();
-
-	if (_consoleIsActive)
-	{
-		_shaderUnlit.SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
-		Engine::Instance().pConsole->Render(*Engine::Instance().pFontManager->Get("consolas"), _deltaTime);
+		_renderQueue.Render(ERenderChannels::SURFACE, *_engine.pMeshManager, *_engine.pTextureManager);
 	}
 
 	_window.SwapBuffers();
@@ -292,21 +219,15 @@ void Game::Resize(uint16 w, uint16 h)
 	GameInstance::Instance().OnResize(w, h);
 
 	_ui.SetBounds(0, 0, UICoord(0.f, w), UICoord(0.f, h));
-	_uiCamera.SetViewport(w, h);
+	_uiCamera.GetProjection().SetDimensions(Vector2T(w, h));
 	_uiCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
-}
-
-void Game::MouseInput(short x, short y)
-{
-	_mouseXForFrame += x;
-	_mouseYForFrame += y;
 }
 
 void Game::MouseMove(uint16 x, uint16 y)
 {
 	if (_uiIsActive)
 	{
-		_ui.OnMouseMove((float)x, (float)(_uiCamera.GetViewport().y - y));
+		_ui.OnMouseMove((float)x, (float)(_uiCamera.GetProjection().GetDimensions().y - y));
 	}
 }
 
@@ -331,7 +252,7 @@ void Game::KeyDown(EKeycode key)
 	if (_uiIsActive)
 		_ui.OnKeyDown(key);
 
-	Engine::Instance().pInputManager->KeyDown(key);
+	_engine.pInputManager->KeyDown(key);
 
 	if (key == EKeycode::TILDE)
 	{
@@ -345,7 +266,7 @@ void Game::KeyUp(EKeycode key)
 	if (_uiIsActive)
 		_ui.OnKeyUp(key);
 	
-	Engine::Instance().pInputManager->KeyUp(key);
+	_engine.pInputManager->KeyUp(key);
 }
 
 void Game::InputChar(char character)
@@ -358,7 +279,7 @@ void Game::InputChar(char character)
 		if (character == '`')
 			return;
 
-		Engine::Instance().pConsole->InputChar(character);
+		_engine.pConsole->InputChar(character, _engine.context);
 	}
 }
 

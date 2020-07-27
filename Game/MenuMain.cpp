@@ -1,10 +1,10 @@
 #include "MenuMain.hpp"
-#include <Engine/Engine.hpp>
-#include <Engine/FontManager.hpp>
-#include <Engine/MaterialManager.hpp>
+#include <Engine/EngineInstance.hpp>
+#include <ELGraphics/FontManager.hpp>
+#include <ELGraphics/MaterialManager.hpp>
 #include "MenuStartLevel.hpp"
 
-void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelChosen, const Callback &onQuit)
+void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelChosen, const Callback &onQuit, EngineInstance& engineInstance)
 {
 	const UIColour btnColour(Colour::Blue, Colour::Yellow);
 	const UIColour btnColourHover(Colour::Blue, Colour(.9f, .9f, .1f));
@@ -13,9 +13,9 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	_onLevelChosen = onLevelChosen;
 	_onQuit = onQuit;
 
-	SharedPointer<const Material> material = Engine::Instance().pMaterialManager->Get("uibutton1");
-	SharedPointer<const Material> panelMat = Engine::Instance().pMaterialManager->Get("panel");
-	SharedPointer<const Font> arial = Engine::Instance().pFontManager->Get("arial");
+	SharedPointer<const Material> material = engineInstance.pMaterialManager->Get("uibutton1", engineInstance.context);
+	SharedPointer<const Material> panelMat = engineInstance.pMaterialManager->Get("panel", engineInstance.context);
+	SharedPointer<const Font> arial = engineInstance.pFontManager->Get("arial", engineInstance.context);
 
 	_buttonStart.SetFont(arial);
 	_buttonQuit.SetFont(arial);
@@ -82,7 +82,7 @@ void MenuMain::ButtonQuit(UIButton&)
 	_onQuit();
 }
 
-#include <Engine/IO.hpp>
+#include <ELSys/IO.hpp>
 const Buffer<Pair<const wchar_t*>> LEVELFILTER({Pair<const wchar_t*>(L"Level File", L"*.lvl")});
 
 void MenuMain::ButtonSingleLevel(UIButton&)

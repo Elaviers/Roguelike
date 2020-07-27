@@ -1,9 +1,9 @@
 #pragma once
 #include "Entity.hpp"
-#include "Colour.hpp"
-#include "Engine.hpp"
-#include "MaterialManager.hpp"
 #include "ModelManager.hpp"
+#include <ELCore/Context.hpp>
+#include <ELGraphics/Colour.hpp>
+#include <ELGraphics/MaterialManager.hpp>
 
 class EntRenderable : public Entity
 {
@@ -15,7 +15,7 @@ protected:
 
 	bool _materialIsDefault;
 
-	virtual void _OnModelChanged() {}
+	virtual void _OnMeshChanged() {}
 
 public:
 	Entity_FUNCS(EntRenderable, EEntityID::RENDERABLE)
@@ -36,35 +36,37 @@ public:
 
 	void SetColour(const Colour& colour) { _colour = colour; }
 	
-	void SetMaterial(const String &name) { if (Engine::Instance().pMaterialManager) SetMaterial(Engine::Instance().pMaterialManager->Get(name)); }
+	void SetMaterial(const String &name, const Context& ctx) { SetMaterial(ctx.GetPtr<MaterialManager>()->Get(name, ctx)); }
 	void SetMaterial(const SharedPointer<const Material>& material) { _material = material; _materialIsDefault = false; }
 
-	void SetModel(const String& name) { if (Engine::Instance().pModelManager) SetModel(Engine::Instance().pModelManager->Get(name)); }
-	void SetModel(const SharedPointer<const Model>& model)
+	void SetModel(const String& name, const Context& ctx) { SetModel(ctx.GetPtr<ModelManager>()->Get(name, ctx), ctx); }
+	void SetModel(const SharedPointer<const Model>& model, const Context& ctx)
 	{
 		_model = model;
-		if (_model && model->GetDefaultMaterialName().GetLength() != 0)
+		
+		if (_model && _model->GetDefaultMaterialName().GetLength() != 0)
 		{
-			SetMaterial(model->GetDefaultMaterialName());
+			SetMaterial(model->GetDefaultMaterialName(), ctx);
 			_materialIsDefault = true;
 		}
+		else SetMaterial(SharedPointer<const Material>());
 
-		_OnModelChanged();
+		_OnMeshChanged();
 	}
 
 	bool MaterialIsDefault() const { return _materialIsDefault; }
 
-	virtual void Render(ERenderChannels) const override;
+	virtual void Render(RenderQueue&) const override;
 
 	virtual const PropertyCollection& GetProperties() override;
 
 	//These are for properties really
-	String GetModelName() const;
-	String GetMaterialName() const;
+	String GetModelName(const Context& ctx) const;
+	String GetMaterialName(const Context& ctx) const;
 
 	//File IO
-	virtual void WriteData(BufferWriter<byte>&, NumberedSet<String> &strings) const override;
-	virtual void ReadData(BufferReader<byte>&, const NumberedSet<String> &strings) override;
+	virtual void WriteData(ByteWriter&, NumberedSet<String> &strings, const Context& ctx) const override;
+	virtual void ReadData(ByteReader&, const NumberedSet<String> &strings, const Context& ctx) override;
 
 	//Collision
 	virtual const Collider* GetCollider() const override;
@@ -72,7 +74,7 @@ public:
 	//Other
 	virtual Bounds GetBounds() const override 
 	{
-		if (_model) return _model->GetBounds();
+		if (_model) return _model->GetMesh()->bounds;
 		return Bounds();
 	}
 };

@@ -1,26 +1,54 @@
 #include "EntConnector.hpp"
-#include "CollisionBox.hpp"
-#include "Colour.hpp"
-#include "DrawUtils.hpp"
-#include "Engine.hpp"
-#include "GLProgram.hpp"
-#include "ModelManager.hpp"
-#include "TextureManager.hpp"
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderQueue.hpp>
+#include <ELPhys/CollisionBox.hpp>
 
-Collider EntConnector::COLLIDER = Collider(ECollisionChannels::EDITOR, CollisionBox(Transform(Vector3(), Rotation(), Vector3(.5f, .5f, 0.f))));
-
-void EntConnector::Render(ERenderChannels channels) const {
-	static const Mat4 planeT = Matrix::RotationY(180.f);
-
-	if (Engine::Instance().pModelManager && (channels & ERenderChannels::UNLIT))
+void EntConnector::_OnTransformChanged()
+{
+	if (!_updatingTransform)
 	{
-		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour::Green);
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, planeT * GetTransformationMatrix());
-		Engine::Instance().pTextureManager->White()->Bind(0);
-		Engine::Instance().pModelManager->Plane()->Render();
+		float hw = GetRelativeScale().x / 2.f;
+		float hh = GetRelativeScale().y / 2.f;
+		float hd = GetRelativeScale().z / 2.f;
 
-		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour::Red);
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
-		Engine::Instance().pModelManager->Plane()->Render();
+		_point1 = Vector3(GetRelativePosition().x - hw, GetRelativePosition().y - hh, GetRelativePosition().z - hd);
+		_point2 = Vector3(GetRelativePosition().x + hw, GetRelativePosition().y + hh, GetRelativePosition().z + hd);
 	}
+}
+
+void EntConnector::_OnPointChanged()
+{
+	float x = (_point1.x + _point2.x) / 2.f;
+	float y = (_point1.y + _point2.y) / 2.f;
+	float z = (_point1.z + _point2.z) / 2.f;
+	float w = Maths::Abs(_point1.x - _point2.x);
+	float h = Maths::Abs(_point1.y - _point2.y);
+	float d = Maths::Abs(_point1.z - _point2.z);
+
+	_updatingTransform = true;
+	SetRelativePosition(Vector3(x, y, z));
+	SetRelativeScale(Vector3(w, h, d));
+	_updatingTransform = false;
+}
+
+void EntConnector::Render(RenderQueue& q) const {
+	/*
+	static const Matrix4 planeT = Matrix4::RotationY(180.f);
+
+	RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
+	e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
+	e.AddSetColour(Colour::Green);
+	e.AddSetTransform(planeT * GetTransformationMatrix());
+	e.AddCommand(RCMDRenderMesh::PLANE);
+
+	e.AddSetColour(Colour::Red);
+	e.AddSetTransform(GetTransformationMatrix());
+	e.AddCommand(RCMDRenderMesh::PLANE);
+	*/
+
+	RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
+	e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
+	e.AddSetColour(Colour::Green);
+	e.AddSetLineWidth(2.f);
+	e.AddBox(_point1, _point2);
 }

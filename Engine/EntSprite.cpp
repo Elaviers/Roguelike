@@ -1,14 +1,17 @@
 #include "EntSprite.hpp"
-#include "GLProgram.hpp"
-#include "MacroUtilities.hpp"
-#include "ModelManager.hpp"
 #include "EntCamera.hpp"
+#include <ELCore/Context.hpp>
+#include <ELGraphics/MaterialManager.hpp>
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderQueue.hpp>
 
-void EntSprite::Render(ERenderChannels channels) const
+void EntSprite::Render(RenderQueue& q) const
 {
-	if (Engine::Instance().pModelManager && EntCamera::Current() && _material && channels & _material->GetRenderChannelss())
+	if (_material)
 	{
-		Mat4 t;
+		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SPRITE);
+
+		Matrix4 t;
 
 		if (_fixedYaw)
 		{
@@ -18,17 +21,17 @@ void EntSprite::Render(ERenderChannels channels) const
 
 			float y = Maths::ArcTangentDegrees2(delta.x, delta.z);
 			Vector3 e = Vector3(0, y, 0);
-			t = Matrix::Transformation(pos, e, Vector3(_size, _size, _size));
+			t = Matrix4::Transformation(pos, e, Vector3(_size, _size, _size));
 		}
 		else
-			t = Matrix::Transformation(GetWorldPosition(), EntCamera::Current()->GetWorldRotation().GetQuat(), Vector3(_size, _size, _size));
+			t = Matrix4::Transformation(GetWorldPosition(), EntCamera::Current()->GetWorldRotation().GetQuat(), Vector3(_size, _size, _size));
 		
-		_material->Apply();
-
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t);
-		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
-
-		Engine::Instance().pModelManager->Plane()->Render();
+		_material->Apply(e);
+		e.AddCommand(RCMDSetUVOffset::Default());
+		e.AddCommand(RCMDSetUVScale::Default());
+		e.AddSetTransform(t);
+		e.AddSetColour(_colour);
+		e.AddCommand(RCMDRenderMesh::PLANE);
 	}
 }
 
@@ -41,8 +44,8 @@ const PropertyCollection& EntSprite::GetProperties()
 
 	cvars.Add(
 		"Material",
-		MemberGetter<EntSprite, String>(&EntSprite::GetMaterialName),
-		MemberSetter<EntSprite, String>(&EntSprite::SetMaterialName),
+		ContextualMemberGetter<EntSprite, String>(&EntSprite::GetMaterialName),
+		ContextualMemberSetter<EntSprite, String>(&EntSprite::SetMaterialName),
 		0,
 		PropertyFlags::MATERIAL);
 
@@ -58,30 +61,32 @@ const PropertyCollection& EntSprite::GetProperties()
 	return cvars;
 }
 
-void EntSprite::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
+void EntSprite::WriteData(ByteWriter& writer, NumberedSet<String>& strings, const Context& ctx) const
 {
-	Entity::WriteData(writer, strings);
+	Entity::WriteData(writer, strings, ctx);
 
 	writer.Write_float(_size);
-	writer.Write_vector4(_colour);
+	((const Vector4&)_colour).Write(writer);
 
-	if (Engine::Instance().pMaterialManager && _material)
+	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
+	if (_material)
 	{
-		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(_material.Ptr()));
+		uint16 id = strings.Add(materialManager->FindNameOf(_material.Ptr()));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);
 }
 
-void EntSprite::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+void EntSprite::ReadData(ByteReader& reader, const NumberedSet<String>& strings, const Context& ctx)
 {
-	Entity::ReadData(reader, strings);
+	Entity::ReadData(reader, strings, ctx);
 
 	_size = reader.Read_float();
-	_colour = reader.Read_vector4();
-
+	((Vector4&)_colour).Read(reader);
+	
 	const String* materialName = strings.Get(reader.Read_uint16());
 
-	if (Engine::Instance().pMaterialManager && materialName)
-		_material = Engine::Instance().pMaterialManager->Get(*materialName).Cast<const MaterialSprite>();
+	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
+	if (materialName)
+		_material = materialManager->Get(*materialName, ctx).Cast<const MaterialSprite>();
 }

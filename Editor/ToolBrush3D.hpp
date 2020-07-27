@@ -23,6 +23,6 @@ public:
 	virtual void MouseDown(const MouseData&) override;
 	virtual void KeySubmit() override;
 
-	virtual void Render(ERenderChannels) const override;
+	virtual void Render(RenderQueue&) const override;
 };
 

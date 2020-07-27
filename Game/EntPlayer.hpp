@@ -21,8 +21,10 @@ class EntPlayer : public Entity
 public:
 	Entity_FUNCS(EntPlayer, 100);
 
-	EntPlayer();
+	EntPlayer() {}
 	virtual ~EntPlayer() {}
+
+	void Init(const Context&);
 
 	void Update(float deltaTime);
 };

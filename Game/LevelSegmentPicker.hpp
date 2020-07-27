@@ -18,7 +18,7 @@ public:
 	LevelSegmentPicker() {}
 	~LevelSegmentPicker() {}
 
-	static LevelSegmentPicker FromString(const String& string, const String& rootLevelDir);
+	static LevelSegmentPicker FromString(const String& string, const String& rootLevelDir, const Context&);
 
 	const Entity* TakeNextSegment(Random& random, unsigned int depth);
 	

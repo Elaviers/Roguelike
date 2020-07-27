@@ -99,9 +99,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;opengl32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
@@ -120,9 +122,11 @@ EXIT 0</Command>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;opengl32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
@@ -144,11 +148,13 @@ EXIT 0</Command>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;opengl32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
@@ -170,11 +176,13 @@ EXIT 0</Command>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;opengl32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Data\* $(TargetDir)Data\* /q /s /e /r /y
@@ -203,7 +211,7 @@ EXIT 0</Command>
     <ClCompile Include="ToolEntity.cpp" />
     <ClCompile Include="ToolSelect.cpp" />
     <ClCompile Include="UIPropertyManipulator.cpp" />
-    <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Editor.hpp" />

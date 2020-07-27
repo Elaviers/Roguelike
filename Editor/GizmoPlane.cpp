@@ -1,29 +1,26 @@
 #include "GizmoPlane.hpp"
-#include <Engine/Collision.hpp>
-#include <Engine/Engine.hpp>
-#include <Engine/GLProgram.hpp>
 #include <Engine/ModelManager.hpp>
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderEntry.hpp>
+#include <ELGraphics/RenderQueue.hpp>
+#include <ELPhys/Collision.hpp>
 
 void GizmoPlane::_OnTransformChanged()
 {
 
 }
 
-void GizmoPlane::Draw() const
+void GizmoPlane::Render(RenderQueue& q) const
 {
-	if (Engine::Instance().pModelManager && Engine::Instance().pTextureManager)
-	{
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, transform.GetTransformationMatrix());
-		
-		if (_canDrag)
-			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(1.f - _colour.r, 1.f - _colour.g, 1.f - _colour.b));
-		else
-			GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
+	RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
 
-		glDisable(GL_CULL_FACE);
-		Engine::Instance().pModelManager->Plane()->Render();
-		glEnable(GL_CULL_FACE);
-	}
+	if (_canDrag)
+		e.AddSetColour(Colour(1.f - _colour.r, 1.f - _colour.g, 1.f - _colour.b));
+	else
+		e.AddSetColour(_colour);
+
+	e.AddSetTransform(transform.GetTransformationMatrix());
+	e.AddCommand(RCMDRenderMesh::PLANE);
 }
 
 void GizmoPlane::Update(const Ray& ray, float& minT)

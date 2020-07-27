@@ -1,6 +1,7 @@
 #pragma once
 #include <Engine/EntCamera.hpp>
-#include <Engine/UIRect.hpp>
+#include <ELGraphics/RenderQueue.hpp>
+#include <ELUI/Rect.hpp>
 
 struct Viewport
 {
@@ -9,4 +10,6 @@ struct Viewport
 	EntCamera camera;
 
 	UIRect ui;
+
+	RenderQueue renderQueue;
 };

@@ -1,10 +1,11 @@
 #include "LevelGeneration.hpp"
 #include "LevelSegmentPicker.hpp"
+#include <ELCore/String.hpp>
 #include <Engine/Entity.hpp>
 #include <Engine/EntityIterator.hpp>
 #include <Engine/LevelIO.hpp>
-#include <Engine/Random.hpp>
-#include <Engine/String.hpp>
+#include <ELMaths/Random.hpp>
+#include <ELSys/Time.hpp>
 
 inline RandomBag<const EntConnector*> GetAllAvailableConnectors(const Entity& root, Random &random)
 {
@@ -110,11 +111,11 @@ void GenerateConnectedSegments(Entity &world, const Entity &src, LevelSegmentPic
 	}
 }
 
-bool LevelGeneration::GenerateLevel(Entity& root, const String &string)
+bool LevelGeneration::GenerateLevel(Entity& root, const String &string, const Context& ctx)
 {
-	Random random;
+	Random random(Time::GetRandSeed());
 
-	LevelSegmentPicker picker = LevelSegmentPicker::FromString(string, ROOT_DIR);
+	LevelSegmentPicker picker = LevelSegmentPicker::FromString(string, ROOT_DIR, ctx);
 
 	int depth = 10;
 

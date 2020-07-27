@@ -1,43 +1,31 @@
 #pragma once
-#include "Asset.hpp"
-#include "Bounds.hpp"
-#include "Collider.hpp"
-#include "GLMeshRenderer.hpp"
-#include "Mesh.hpp"
-#include "String.hpp"
+#include <ELCore/SharedPointer.hpp>
+#include <ELGraphics/Mesh.hpp>
+#include <ELPhys/Collider.hpp>
 
 class Model : public Asset
 {
 protected:
-	Mesh* _mesh;
-	GLMeshRenderer _meshRenderer;
+	SharedPointer<const Mesh> _mesh;
 
 	String _defaultMaterialName;
 	Collider _collider;
 
-	void _CMD_model(const Buffer<String> &args);
-	void _CMD_collision(const Buffer<String> &args);
+	void _CMD_mesh(const Buffer<String>& args, const Context&);
+	void _CMD_collision(const Buffer<String>& args, const Context&);
 
 public:
-	//This is stupid. The model is responsible for deletion of the mesh, so don't delete them it using this!
-	Model(Mesh *mesh = nullptr, const Collider& collider = Collider(ECollisionChannels::ALL)) : _mesh(mesh), _collider(collider) {}
-
-	void Delete()
-	{
-		_meshRenderer.Delete();
-		delete _mesh;
-	}
+	Model() {}
+	virtual ~Model() {}
 
 	virtual const PropertyCollection& GetProperties();
 
-	GLMeshRenderer& MeshRenderer() { return _meshRenderer; }
-
-	const Mesh* GetMesh() const { return _mesh; }
-	const Bounds& GetBounds() const { return _mesh->bounds; }
+	const SharedPointer<const Mesh>& GetMesh() const { return _mesh; }
 	const Collider& GetCollider() const { return _collider; }
 	const String& GetDefaultMaterialName() const { return _defaultMaterialName; }
 
-	bool operator==(const Model &other) const { return _meshRenderer == other._meshRenderer; }
-
-	void Render() const { _meshRenderer.Render(); }
+	void SetMesh(const SharedPointer<const Mesh>& mesh) { _mesh = mesh; }
+	void SetCollider(const Collider& collider) { _collider = collider; }
+	void SetDefaultMaterialName(const String& defaultMaterial) { _defaultMaterialName = defaultMaterial; }
 };
+

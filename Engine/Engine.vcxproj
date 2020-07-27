@@ -18,6 +18,43 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Console.cpp" />
+    <ClCompile Include="EngineInstance.cpp" />
+    <ClCompile Include="EntBrush2D.cpp" />
+    <ClCompile Include="EntBrush3D.cpp" />
+    <ClCompile Include="EntCamera.cpp" />
+    <ClCompile Include="EntConnector.cpp" />
+    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityIterator.cpp" />
+    <ClCompile Include="EntLight.cpp" />
+    <ClCompile Include="EntRenderable.cpp" />
+    <ClCompile Include="EntSkeletal.cpp" />
+    <ClCompile Include="EntSprite.cpp" />
+    <ClCompile Include="LevelIO.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ModelManager.cpp" />
+    <ClCompile Include="Registry.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Console.hpp" />
+    <ClInclude Include="EEntityID.hpp" />
+    <ClInclude Include="EngineInstance.hpp" />
+    <ClInclude Include="EntBrush2D.hpp" />
+    <ClInclude Include="EntBrush3D.hpp" />
+    <ClInclude Include="EntCamera.hpp" />
+    <ClInclude Include="EntConnector.hpp" />
+    <ClInclude Include="Entity.hpp" />
+    <ClInclude Include="EntityIterator.hpp" />
+    <ClInclude Include="EntLight.hpp" />
+    <ClInclude Include="EntRenderable.hpp" />
+    <ClInclude Include="EntSkeletal.hpp" />
+    <ClInclude Include="EntSprite.hpp" />
+    <ClInclude Include="LevelIO.hpp" />
+    <ClInclude Include="Model.hpp" />
+    <ClInclude Include="ModelManager.hpp" />
+    <ClInclude Include="Registry.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{910514DF-E498-4CB8-BEC5-304060E649B8}</ProjectGuid>
@@ -72,32 +109,32 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)Build\StaticLibs\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)Build\StaticLibs\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)Build\StaticLibs\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)Build\StaticLibs\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
@@ -109,9 +146,10 @@
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnablePREfast>true</EnablePREfast>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>freetype.lib;Shell32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>ELAudio.lib;ELCore.lib;ELGraphics.lib;ELMaths.lib;ELPhys.lib;ELSys.lib;ELUI.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
@@ -127,9 +165,10 @@
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnablePREfast>true</EnablePREfast>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>freetype.lib;Shell32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>ELAudio.lib;ELCore.lib;ELGraphics.lib;ELMaths.lib;ELPhys.lib;ELSys.lib;ELUI.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
@@ -147,13 +186,14 @@
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnablePREfast>true</EnablePREfast>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>freetype.lib;Shell32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>ELAudio.lib;ELCore.lib;ELGraphics.lib;ELMaths.lib;ELPhys.lib;ELSys.lib;ELUI.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
@@ -171,13 +211,14 @@
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnablePREfast>true</EnablePREfast>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>freetype.lib;Shell32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>ELAudio.lib;ELCore.lib;ELGraphics.lib;ELMaths.lib;ELPhys.lib;ELSys.lib;ELUI.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
       <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
@@ -185,240 +226,6 @@
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="Animation.hpp" />
-    <ClInclude Include="AnimationManager.hpp" />
-    <ClInclude Include="AnimationTrack.hpp" />
-    <ClInclude Include="Asset.hpp" />
-    <ClInclude Include="AudioUtilities.hpp" />
-    <ClInclude Include="Box.hpp" />
-    <ClInclude Include="CollisionCapsule.hpp" />
-    <ClInclude Include="CollisionChannels.hpp" />
-    <ClInclude Include="CollisionShape.hpp" />
-    <ClInclude Include="Colour.hpp" />
-    <ClInclude Include="Console.hpp" />
-    <ClInclude Include="DebugLine.hpp" />
-    <ClInclude Include="EKeycode.hpp" />
-    <ClInclude Include="EntityIterator.hpp" />
-    <ClInclude Include="Event.hpp" />
-    <ClInclude Include="UIColour.hpp" />
-    <ClInclude Include="Hashing.hpp" />
-    <ClInclude Include="Hashmap.hpp" />
-    <ClInclude Include="LineSegment.h" />
-    <ClInclude Include="MacroUtilities.hpp" />
-    <ClInclude Include="Material_Sprite.hpp" />
-    <ClInclude Include="Mesh.hpp" />
-    <ClInclude Include="Font_TTF.hpp" />
-    <ClInclude Include="Font_Texture.hpp" />
-    <ClInclude Include="EEntityID.hpp" />
-    <ClInclude Include="EntSkeletal.hpp" />
-    <ClInclude Include="EntSprite.hpp" />
-    <ClInclude Include="Pool.h" />
-    <ClInclude Include="Random.hpp" />
-    <ClInclude Include="PropertyCollection.hpp" />
-    <ClInclude Include="RigidProperty.hpp" />
-    <ClInclude Include="SharedPointer.hpp" />
-    <ClInclude Include="Joint.hpp" />
-    <ClInclude Include="Keyframe.hpp" />
-    <ClInclude Include="Mesh_Skeletal.hpp" />
-    <ClInclude Include="Mesh_Static.hpp" />
-    <ClInclude Include="Quaternion.hpp" />
-    <ClInclude Include="Rotation.hpp" />
-    <ClInclude Include="Skeleton.hpp" />
-    <ClInclude Include="Sound.hpp" />
-    <ClInclude Include="AudioManager.hpp" />
-    <ClInclude Include="Bounds.hpp" />
-    <ClInclude Include="Property.hpp" />
-    <ClInclude Include="List.hpp" />
-    <ClInclude Include="EntBrush2D.hpp" />
-    <ClInclude Include="EntBrush3D.hpp" />
-    <ClInclude Include="Buffer.hpp" />
-    <ClInclude Include="BufferIterator.hpp" />
-    <ClInclude Include="FunctionPointer.hpp" />
-    <ClInclude Include="EntCamera.hpp" />
-    <ClInclude Include="Collider.hpp" />
-    <ClInclude Include="Collision.hpp" />
-    <ClInclude Include="EntConnector.hpp" />
-    <ClInclude Include="CollisionBox.hpp" />
-    <ClInclude Include="DebugFrustum.hpp" />
-    <ClInclude Include="DebugManager.hpp" />
-    <ClInclude Include="DebugObject.hpp" />
-    <ClInclude Include="DebugString.hpp" />
-    <ClInclude Include="DrawUtils.hpp" />
-    <ClInclude Include="Engine.hpp" />
-    <ClInclude Include="Debug.hpp" />
-    <ClInclude Include="Font.hpp" />
-    <ClInclude Include="FontManager.hpp" />
-    <ClInclude Include="Entity.hpp" />
-    <ClInclude Include="GL.hpp" />
-    <ClInclude Include="GLContext.hpp" />
-    <ClInclude Include="GLCubemap.hpp" />
-    <ClInclude Include="GLDepthMap.hpp" />
-    <ClInclude Include="Glyph.hpp" />
-    <ClInclude Include="InputManager.hpp" />
-    <ClInclude Include="LevelIO.hpp" />
-    <ClInclude Include="lodepng.h" />
-    <ClInclude Include="GLMeshRenderer.hpp" />
-    <ClInclude Include="GLProgram.hpp" />
-    <ClInclude Include="GLTexture.hpp" />
-    <ClInclude Include="IO.hpp" />
-    <ClInclude Include="EntLight.hpp" />
-    <ClInclude Include="Map.hpp" />
-    <ClInclude Include="Material.hpp" />
-    <ClInclude Include="Material_Grid.hpp" />
-    <ClInclude Include="Material_Surface.hpp" />
-    <ClInclude Include="MaterialManager.hpp" />
-    <ClInclude Include="Maths.hpp" />
-    <ClInclude Include="Matrix.hpp" />
-    <ClInclude Include="Model.hpp" />
-    <ClInclude Include="ModelManager.hpp" />
-    <ClInclude Include="RigidPropertyCollection.hpp" />
-    <ClInclude Include="Pair.hpp" />
-    <ClInclude Include="Ray.hpp" />
-    <ClInclude Include="RaycastResult.hpp" />
-    <ClInclude Include="Registry.hpp" />
-    <ClInclude Include="EntRenderable.hpp" />
-    <ClInclude Include="RenderParam.hpp" />
-    <ClInclude Include="AssetManager.hpp" />
-    <ClInclude Include="NumberedSet.hpp" />
-    <ClInclude Include="Sampler.hpp" />
-    <ClInclude Include="ERenderChannels.hpp" />
-    <ClInclude Include="Skybox.hpp" />
-    <ClInclude Include="CollisionSphere.hpp" />
-    <ClInclude Include="StackAllocator.hpp" />
-    <ClInclude Include="String.hpp" />
-    <ClInclude Include="Texture.hpp" />
-    <ClInclude Include="TextureManager.hpp" />
-    <ClInclude Include="Time.hpp" />
-    <ClInclude Include="Timer.hpp" />
-    <ClInclude Include="Tracker.hpp" />
-    <ClInclude Include="Transform.hpp" />
-    <ClInclude Include="Types.hpp" />
-    <ClInclude Include="UIButton.hpp" />
-    <ClInclude Include="UICheckbox.hpp" />
-    <ClInclude Include="UIComboBox.hpp" />
-    <ClInclude Include="UIListBox.hpp" />
-    <ClInclude Include="UIContainer.hpp" />
-    <ClInclude Include="UIElement.hpp" />
-    <ClInclude Include="UILabel.hpp" />
-    <ClInclude Include="UIPanel.hpp" />
-    <ClInclude Include="UIRect.hpp" />
-    <ClInclude Include="UISplitter.hpp" />
-    <ClInclude Include="UITextbox.hpp" />
-    <ClInclude Include="UITextButton.hpp" />
-    <ClInclude Include="UIToolbar.hpp" />
-    <ClInclude Include="Utilities.hpp" />
-    <ClInclude Include="UVRect.hpp" />
-    <ClInclude Include="Vector2.hpp" />
-    <ClInclude Include="Vector3.hpp" />
-    <ClInclude Include="Vector4.hpp" />
-    <ClInclude Include="Vertex.hpp" />
-    <ClInclude Include="Window.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="AnimationManager.cpp" />
-    <ClCompile Include="AnimationTrack.cpp" />
-    <ClCompile Include="AudioUtilities.cpp" />
-    <ClCompile Include="CollisionCapsule.cpp" />
-    <ClCompile Include="Colour.cpp" />
-    <ClCompile Include="Console.cpp" />
-    <ClCompile Include="DebugLine.cpp" />
-    <ClCompile Include="Engine_Win.cpp" />
-    <ClCompile Include="EntityIterator.cpp" />
-    <ClCompile Include="UIColour.cpp" />
-    <ClCompile Include="PropertyCollection.cpp" />
-    <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="Font.cpp" />
-    <ClCompile Include="Font_TTF.cpp" />
-    <ClCompile Include="Font_Texture.cpp" />
-    <ClCompile Include="Material_Sprite.cpp" />
-    <ClCompile Include="EntSkeletal.cpp" />
-    <ClCompile Include="EntSprite.cpp" />
-    <ClCompile Include="Random.cpp" />
-    <ClCompile Include="RigidPropertyCollection.cpp" />
-    <ClCompile Include="SharedPointer.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Mesh_Skeletal.cpp" />
-    <ClCompile Include="Mesh_Static.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="MH2.cpp" />
-    <ClCompile Include="Quaternion.cpp" />
-    <ClCompile Include="SHA256.cpp" />
-    <ClCompile Include="Sound.cpp" />
-    <ClCompile Include="AudioManager.cpp" />
-    <ClCompile Include="Bounds.cpp" />
-    <ClCompile Include="Property.cpp" />
-    <ClCompile Include="EntBrush2D.cpp" />
-    <ClCompile Include="EntBrush3D.cpp" />
-    <ClCompile Include="EntCamera.cpp" />
-    <ClCompile Include="Collider.cpp" />
-    <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="EntConnector.cpp" />
-    <ClCompile Include="CollisionBox.cpp" />
-    <ClCompile Include="DebugFrustum.cpp" />
-    <ClCompile Include="DebugManager.cpp" />
-    <ClCompile Include="DebugObject.cpp" />
-    <ClCompile Include="DebugString.cpp" />
-    <ClCompile Include="DrawUtils.cpp" />
-    <ClCompile Include="FontManager.cpp" />
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="GL.cpp" />
-    <ClCompile Include="GLContext.cpp" />
-    <ClCompile Include="GLCubemap.cpp" />
-    <ClCompile Include="GLDepthMap.cpp" />
-    <ClCompile Include="InputManager.cpp" />
-    <ClCompile Include="LevelIO.cpp" />
-    <ClCompile Include="lodepng.cpp" />
-    <ClCompile Include="GLMeshRenderer.cpp" />
-    <ClCompile Include="GLProgram.cpp" />
-    <ClCompile Include="GLTexture.cpp" />
-    <ClCompile Include="IO.cpp" />
-    <ClCompile Include="EntLight.cpp" />
-    <ClCompile Include="Material_Grid.cpp" />
-    <ClCompile Include="MaterialManager.cpp" />
-    <ClCompile Include="Material_Surface.cpp" />
-    <ClCompile Include="Maths.cpp" />
-    <ClCompile Include="Matrix.cpp" />
-    <ClCompile Include="ModelManager.cpp" />
-    <ClCompile Include="ObjReader.cpp" />
-    <ClCompile Include="Registry.cpp" />
-    <ClCompile Include="EntRenderable.cpp" />
-    <ClCompile Include="Sampler.cpp" />
-    <ClCompile Include="Skybox.cpp" />
-    <ClCompile Include="CollisionSphere.cpp" />
-    <ClCompile Include="StackAllocator.cpp" />
-    <ClCompile Include="String.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
-    <ClCompile Include="Time.cpp" />
-    <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="UIButton.cpp" />
-    <ClCompile Include="UICheckbox.cpp" />
-    <ClCompile Include="UIComboBox.cpp" />
-    <ClCompile Include="UIListBox.cpp" />
-    <ClCompile Include="UIContainer.cpp" />
-    <ClCompile Include="UIElement.cpp" />
-    <ClCompile Include="UILabel.cpp" />
-    <ClCompile Include="UIPanel.cpp" />
-    <ClCompile Include="UIRect.cpp" />
-    <ClCompile Include="UISplitter.cpp" />
-    <ClCompile Include="UITextbox.cpp" />
-    <ClCompile Include="UIToolbar.cpp" />
-    <ClCompile Include="Utilities.cpp" />
-    <ClCompile Include="Vector.cpp" />
-    <ClCompile Include="Vertex.cpp" />
-    <ClCompile Include="WavReader.cpp" />
-    <ClCompile Include="Window.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Debug.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -1,0 +1,5 @@
+SURFACE
+tex diffuse white
+tex normal unitnormal
+tex specular white
+tex reflection white

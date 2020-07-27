@@ -1,7 +1,9 @@
 #include "EntBrush3D.hpp"
-#include "GLProgram.hpp"
-#include "MacroUtilities.hpp"
-#include "Utilities.hpp"
+#include <ELCore/Context.hpp>
+#include <ELCore/MacroUtilities.hpp>
+#include <ELCore/Utilities.hpp>
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderQueue.hpp>
 
 void EntBrush3D::_OnTransformChanged()
 {
@@ -31,86 +33,81 @@ void EntBrush3D::_OnPointChanged()
 	_updatingTransform = false;
 }
 
-#include "DrawUtils.hpp"
-
-void EntBrush3D::Render(ERenderChannels channels) const
+void EntBrush3D::Render(RenderQueue& q) const
 {
-	ModelManager* modelManager = Engine::Instance().pModelManager;
-
-	if (modelManager && _material && channels & _material->GetRenderChannelss())
+	if (_material)
 	{
-		_material->Apply();
-
-		Mat4 pt = _parent ? _parent->GetTransformationMatrix() : Mat4();
-
+		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SURFACE, 0);
+		_material->Apply(e);
+		e.AddCommand(RCMDSetUVOffset::Default());
+		e.AddSetColour(Colour::White);
+		
+		Matrix4 pt = _parent ? _parent->GetTransformationMatrix() : Matrix4();
 		Transform t;
-
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale().x, GetRelativeScale().y));
+		
 		//Front
 		t.SetScale(Vector3(GetRelativeScale().x, GetRelativeScale().y, 1.f));
 		t.SetPosition(GetRelativePosition() + Vector3(0.f, 0.f, -GetRelativeScale().z / 2.f));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane()->Render();
+		e.AddSetUVScale(Vector2(GetRelativeScale().x, GetRelativeScale().y));
+		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddCommand(RCMDRenderMesh::PLANE);
 
 		//Back
 		t.SetRotation(Vector3(0.f, 180.f, 0.f));
 		t.Move(Vector3(0.f, 0.f, GetRelativeScale().z));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane()->Render();
+		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddCommand(RCMDRenderMesh::PLANE);
 
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale().z, GetRelativeScale().y));
 		//Left
 		t.SetScale(Vector3(GetRelativeScale().z, GetRelativeScale().y, 1.f));
 		t.SetRotation(Vector3(0.f, 90.f, 0.f));
 		t.SetPosition(Vector3(GetRelativePosition() - Vector3(GetRelativeScale().x / 2.f, 0.f, 0.f)));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane()->Render();
+		e.AddSetUVScale(Vector2(GetRelativeScale().z, GetRelativeScale().y));
+		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddCommand(RCMDRenderMesh::PLANE);
 
 		//Right
 		t.SetRotation(Vector3(0.f, -90.f, 0.f));
 		t.Move(Vector3(GetRelativeScale().x, 0.f, 0.f));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane()->Render();
+		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddCommand(RCMDRenderMesh::PLANE);
 
-
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(GetRelativeScale().x, GetRelativeScale().z));
 		//Bottom
 		t.SetScale(Vector3(GetRelativeScale().x, GetRelativeScale().z, 1.f));
 		t.SetRotation(Vector3(90.f, 0.f, 0.f));
 		t.SetPosition(GetRelativePosition() - Vector3(0.f, GetRelativeScale().y / 2.f, 0.f));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane()->Render();
+		e.AddSetUVScale(Vector2(GetRelativeScale().x, GetRelativeScale().z));
+		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddCommand(RCMDRenderMesh::PLANE);
 
 		//Top
 		t.SetRotation(Vector3(-90.f, 0.f, 0.f));
 		t.Move(Vector3(0.f, GetRelativeScale().y, 0.f));
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, t.MakeTransformationMatrix() * pt);
-		modelManager->Plane()->Render();
-
-		//Done
-		GLProgram::Current().SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1.f, 1.f));
+		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddCommand(RCMDRenderMesh::PLANE);
 	}
 }
 
-void EntBrush3D::WriteData(BufferWriter<byte> &writer, NumberedSet<String> &strings) const
+void EntBrush3D::WriteData(ByteWriter &writer, NumberedSet<String> &strings, const Context& ctx) const
 {
-	Entity::WriteData(writer, strings);
+	Entity::WriteData(writer, strings, ctx);
 
-	if (Engine::Instance().pMaterialManager && _material)
+	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
+	if (materialManager && _material)
 	{																	//todo: const cast removal
-		uint16 id = strings.Add(Engine::Instance().pMaterialManager->FindNameOf(const_cast<Material*>(_material.Ptr())));
+		uint16 id = strings.Add(materialManager->FindNameOf(const_cast<Material*>(_material.Ptr())));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);
 }
 
-void EntBrush3D::ReadData(BufferReader<byte> &reader, const NumberedSet<String> &strings)
+void EntBrush3D::ReadData(ByteReader &reader, const NumberedSet<String> &strings, const Context& ctx)
 {
-	Entity::ReadData(reader, strings);
+	Entity::ReadData(reader, strings, ctx);
 
 	const String *materialName = strings.Get(reader.Read_uint16());
 	if (materialName)
-		SetMaterial(*materialName);
+		SetMaterial(*materialName, ctx);
 
 	_point1.x = GetRelativePosition().x - GetRelativeScale().x / 2.f;
 	_point1.y = GetRelativePosition().y - GetRelativeScale().y / 2.f;
@@ -129,8 +126,8 @@ const PropertyCollection& EntBrush3D::GetProperties()
 
 	cvars.Add(
 		"Material", 
-		MemberGetter<EntBrush3D, String>(&EntBrush3D::GetMaterialName), 
-		MemberSetter<EntBrush3D, String>(&EntBrush3D::SetMaterial), 
+		ContextualMemberGetter<EntBrush3D, String>(&EntBrush3D::GetMaterialName), 
+		ContextualMemberSetter<EntBrush3D, String>(&EntBrush3D::SetMaterial), 
 		0,
 		PropertyFlags::MATERIAL);
 		

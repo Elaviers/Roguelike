@@ -1,6 +1,6 @@
 #pragma once
-#include <Engine/Buffer.hpp>
-#include <Engine/String.hpp>
+#include <ELCore/Buffer.hpp>
+#include <ELCore/String.hpp>
 #include <Windows.h>
 
 namespace StringSelect

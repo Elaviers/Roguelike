@@ -1,8 +1,9 @@
 #include "EntSkeletal.hpp"
-#include "AnimationManager.hpp"
-#include "GLProgram.hpp"
-#include "MacroUtilities.hpp"
-#include "Mesh_Skeletal.hpp"
+#include <ELCore/Context.hpp>
+#include <ELGraphics/AnimationManager.hpp>
+#include <ELGraphics/Mesh_Skeletal.hpp>
+#include <ELGraphics/RenderCommand.hpp>
+#include <ELGraphics/RenderQueue.hpp>
 
 PropertyCollection& EntSkeletal::GetProperties()
 {
@@ -17,20 +18,21 @@ PropertyCollection& EntSkeletal::GetProperties()
 	return properties;
 }
 
-void EntSkeletal::_CMD_PlayAnimation(const Buffer<String>& args)
+void EntSkeletal::_CMD_PlayAnimation(const Buffer<String>& args, const Context& ctx)
 {
 	if (args.GetSize())
 	{
-		SharedPointer<Animation> anim = Engine::Instance().pAnimationManager->Get(args[0]);
+		AnimationManager* animManager = ctx.GetPtr<AnimationManager>();
+		SharedPointer<Animation> anim = animManager->Get(args[0], ctx);
 
 		if (anim)
 			PlayAnimation(anim);
 	}
 }
 
-void EntSkeletal::_OnModelChanged()
+void EntSkeletal::_OnMeshChanged()
 {
-	const Mesh_Skeletal* skeletal = dynamic_cast<const Mesh_Skeletal*>(_model->GetMesh());
+	const Mesh_Skeletal* skeletal = dynamic_cast<const Mesh_Skeletal*>(_model->GetMesh().Ptr());
 	if (skeletal) _skinningMatrices.SetSize(skeletal->skeleton.GetJointCount());
 }
 
@@ -46,31 +48,29 @@ void EntSkeletal::Update(float deltaTime)
 
 	if (_animation)
 	{
-		const Mesh_Skeletal* skeletal = dynamic_cast<const Mesh_Skeletal*>(_model->GetMesh());
+		const Mesh_Skeletal* skeletal = dynamic_cast<const Mesh_Skeletal*>(_model->GetMesh().Ptr());
 		if (skeletal)
 			_animation->Evaluate(_skinningMatrices, skeletal->skeleton, _currentTime);
 	}
 }
 
-void EntSkeletal::Render(ERenderChannels channels) const
+void EntSkeletal::Render(RenderQueue& q) const
 {
 	if (_model)
 	{
+		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SURFACE);
+		
 		if (_material)
 		{
-			if (!(channels & _material->GetRenderChannelss()))
-				return;
-
-			_material->Apply();
+			_material->Apply(e);
 		}
 
-		GLProgram::Current().SetMat4(DefaultUniformVars::mat4Model, GetTransformationMatrix());
-		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, _colour);
-		
-		if (_skinningMatrices.GetSize())
-			glUniformMatrix4fv(GLProgram::Current().GetUniformLocation(DefaultUniformVars::mat4aBones),
-			(GLsizei)_skinningMatrices.GetSize(), GL_FALSE, (float*)_skinningMatrices.Data());
+		e.AddCommand(RCMDSetUVOffset::Default());
+		e.AddCommand(RCMDSetUVScale::Default());
 
-		_model->Render();
+		e.AddSetTransform(GetTransformationMatrix());
+		e.AddSetColour(_colour);
+		e.AddSetSkinningMatrices(&_skinningMatrices);
+		e.AddRenderMesh(*_model->GetMesh());
 	}
 }

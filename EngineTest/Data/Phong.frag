@@ -41,7 +41,7 @@ void main()
 	mat4 CameraTransform = inverse(M_View);
 	vec3 CameraPosition = vec3(CameraTransform[3][0], CameraTransform[3][1], CameraTransform[3][2]);
 	
-	float SurfaceSpecular  = texture(T_Specular, UV).r;
+	float SurfaceSpecular = texture(T_Specular, UV).r;
 	float SurfaceReflectivity = texture(T_Reflection, UV).r;
 	vec3 SurfaceToCamera = normalize(CameraPosition - WorldPosition);
 	vec3 SurfaceColour = (1.0 - SurfaceReflectivity) * texture(T_Diffuse, UV).rgb;

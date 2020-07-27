@@ -1,2 +1,2 @@
-model gizmo.mesh
+mesh gizmo
 material gizmo

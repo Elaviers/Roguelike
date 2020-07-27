@@ -1,6 +1,6 @@
 #pragma once
-#include <Engine/Buffer.hpp>
-#include <Engine/Random.hpp>
+#include <ELCore/Buffer.hpp>
+#include <ELMaths/Random.hpp>
 
 template <typename T, typename W = float>
 class RandomBag

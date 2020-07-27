@@ -2,9 +2,9 @@
 #include "Editor.hpp"
 #include "UIPropertyManipulator.hpp"
 #include <Engine/EntRenderable.hpp>
-#include <Engine/MacroUtilities.hpp>
-#include <Engine/RaycastResult.hpp>
 #include <Engine/Registry.hpp>
+#include <ELCore/MacroUtilities.hpp>
+#include <ELPhys/RaycastResult.hpp>
 
 const PropertyCollection& ToolEntity::_GetProperties()
 {
@@ -27,9 +27,9 @@ void ToolEntity::_SetClassID(const byte &id)
 	_classID = id;
 
 	if (_placement)
-		_placement->Delete();
-
-	_placement = Engine::Instance().pObjectTracker->Track(Engine::Instance().registry.GetNode(_classID)->New());
+		_placement->Delete(_owner.engine.context);
+	
+	_placement = _owner.engine.pObjectTracker->Track(_owner.engine.registry.GetNode(_classID)->New());
 
 	_owner.ChangePropertyEntity(_placement.Ptr());
 }
@@ -52,17 +52,17 @@ void ToolEntity::Activate(UIContainer& properties, UIContainer& toolProperties)
 void ToolEntity::Deactivate()
 {
 	if (_placement)
-		_placement->Delete();
+		_placement->Delete(_owner.engine.context);
 	
 	_placement.Clear();
 }
 
 void ToolEntity::MouseMove(const MouseData& mouseData)
 {
-	if (mouseData.viewport >= 0 && _placement && _owner.GetVP(mouseData.viewport).camera.GetProjectionType() == EProjectionType::PERSPECTIVE)
+	if (mouseData.viewport >= 0 && _placement && _owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::PERSPECTIVE)
 	{
 		EntCamera& camera = _owner.GetVP(mouseData.viewport).camera;
-		Ray r = camera.ScreenCoordsToRay(Vector2((float)mouseData.x / camera.GetViewport()[0], (float)mouseData.y / camera.GetViewport()[1]));
+		Ray r = camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2((float)mouseData.x / camera.GetProjection().GetDimensions()[0], (float)mouseData.y / camera.GetProjection().GetDimensions()[1]));
 		Buffer<RaycastResult> results = _owner.LevelRef().Raycast(r);
 
 		if (results.GetSize() > 0)
@@ -85,23 +85,22 @@ void ToolEntity::MouseDown(const MouseData &mouseData)
 {
 	if (_placement && _readyToPlace)
 	{
-		Entity* newObj = Engine::Instance().registry.GetNode(_classID)->New();
+		Entity* newObj = _owner.engine.registry.GetNode(_classID)->New();
 		newObj->SetParent(&_owner.LevelRef());
 
 		Entity* from = (Entity*)(_owner.GetPropertyObject());
 		if (from)
 		{
 			const PropertyCollection& cvars = newObj->GetProperties();
-			cvars.Transfer(from, newObj);
+			cvars.Transfer(from, newObj, _owner.engine.context);
 		}
 	}
 }
 
-void ToolEntity::Render(ERenderChannels channels) const
+void ToolEntity::Render(RenderQueue& q) const
 {
 	if (_placement && _readyToPlace)
 	{
-		GLProgram::Current().SetVec4(DefaultUniformVars::vec4Colour, Colour(1.f, 1.f, 1.f, 0.5f));
-		_placement->Render(channels);
+		_placement->Render(q);
 	}
 }

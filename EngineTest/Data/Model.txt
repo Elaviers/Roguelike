@@ -1,1 +1,2 @@
-model Model.obj
+mesh Mesh
+material reflect

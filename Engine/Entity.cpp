@@ -1,20 +1,17 @@
 #include "Entity.hpp"
 #include "EntityIterator.hpp"
-#include "Collider.hpp"
-#include "Engine.hpp"
-#include "EntCamera.hpp"
-#include "GL.hpp"
-#include "GLProgram.hpp"
-#include "LineSegment.h"
-#include "MacroUtilities.hpp"
-#include "RaycastResult.hpp"
+#include "Registry.hpp"
+#include <ELCore/Context.hpp>
+#include <ELMaths/Frustum.hpp>
+#include <ELMaths/LineSegment.hpp>
+#include <ELCore/Tracker.hpp>
 
 void Entity::_AddBaseProperties(PropertyCollection &cvars)
 {
 	cvars.Add(
 		"Name",			
 		MemberGetter<Entity, const String&>	(&Entity::GetName), 
-		MemberSetter<Entity, String>			(&Entity::SetName));
+		MemberSetter<Entity, String>		(&Entity::SetName));
 
 	cvars.Add<uint32>(
 		"UID",	
@@ -24,20 +21,20 @@ void Entity::_AddBaseProperties(PropertyCollection &cvars)
 	cvars.Add(
 		"Position",		
 		MemberGetter<Transform, const Vector3&>	(&Transform::GetPosition), 
-		MemberSetter<Transform, Vector3>			(&Transform::SetPosition),
+		MemberSetter<Transform, Vector3>		(&Transform::SetPosition),
 		offsetof(Entity, _transform));
 
 
 	cvars.Add(
 		"Rotation",		
 		MemberGetter<Transform, const Vector3&>	(&Transform::GetRotationEuler),
-		MemberSetter<Transform, Vector3>			(&Transform::SetRotationEuler),
+		MemberSetter<Transform, Vector3>		(&Transform::SetRotationEuler),
 		offsetof(Entity, _transform));
 
 	cvars.Add(
 		"Scale",
 		MemberGetter<Transform, const Vector3&>	(&Transform::GetScale), 
-		MemberSetter<Transform, Vector3>			(&Transform::SetScale),
+		MemberSetter<Transform, Vector3>		(&Transform::SetScale),
 		offsetof(Entity, _transform));
 }
 
@@ -48,15 +45,15 @@ const PropertyCollection& Entity::GetProperties()
 	return cvars;
 }
 
-Mat4 Entity::GetTransformationMatrix() const
+Matrix4 Entity::GetTransformationMatrix() const
 {
 	if (_parent)
-		return Mat4(_transform.GetTransformationMatrix()) * _parent->GetTransformationMatrix();
+		return Matrix4(_transform.GetTransformationMatrix()) * _parent->GetTransformationMatrix();
 
-	return Mat4(_transform.GetTransformationMatrix());
+	return Matrix4(_transform.GetTransformationMatrix());
 }
 
-Mat4 Entity::GetInverseTransformationMatrix() const
+Matrix4 Entity::GetInverseTransformationMatrix() const
 {
 	if (_parent)
 		return _parent->GetInverseTransformationMatrix() * _transform.GetInverseTransformationMatrix();
@@ -72,24 +69,24 @@ void Entity::UpdateAll(float deltaTime)
 		_children[i]->UpdateAll(deltaTime);
 }
 
-void Entity::RenderAll(const EntCamera &camera, ERenderChannels channels) const
+void Entity::RenderAll(RenderQueue& q, const Frustum& cameraFrustum) const
 {
-	if (camera.FrustumOverlaps(GetWorldBounds()) || _flags & EFlags::DBG_ALWAYS_DRAW)
-		Render(channels);
+	Bounds b = GetWorldBounds();
+
+	if (cameraFrustum.OverlapsAABB(b.min, b.max) || _flags & EFlags::DBG_ALWAYS_DRAW)
+		Render(q);
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
-		_children[i]->RenderAll(camera, channels);
+		_children[i]->RenderAll(q, cameraFrustum);
 }
 
-void Entity::Delete()
+void Entity::Delete(const Context& ctx)
 {
-	if (Engine::Instance().pObjectTracker)
-	{
-		Engine::Instance().pObjectTracker->Null(this);
-	}
+	Tracker<Entity>* entTracker = ctx.GetPtr<Tracker<Entity>>(false);
+	if (entTracker)
+		entTracker->Null(this);
 
-
-	DeleteChildren();
+	DeleteChildren(ctx);
 	SetParent(nullptr);
 
 	if (_dynamic)
@@ -151,7 +148,7 @@ Entity* Entity::FindChildWithUID(uint32 uid)
 
 //File IO
 
-void Entity::WriteAllToFile(BufferWriter<byte>& buffer, NumberedSet<String>& strings) const
+void Entity::WriteAllToFile(ByteWriter& buffer, NumberedSet<String>& strings, const Context& ctx) const
 {
 	if (_flags & EFlags::SAVEABLE)
 	{
@@ -159,37 +156,38 @@ void Entity::WriteAllToFile(BufferWriter<byte>& buffer, NumberedSet<String>& str
 		if (id != 0)
 		{
 			buffer.Write_byte(id);
-			WriteData(buffer, strings);
+			WriteData(buffer, strings, ctx);
 		}
 	}
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
-		_children[i]->WriteAllToFile(buffer, strings);
+		_children[i]->WriteAllToFile(buffer, strings, ctx);
 }
 
 //static
-Entity* Entity::CreateFromData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+Entity* Entity::CreateFromData(ByteReader& reader, const NumberedSet<String>& strings, const Context& ctx)
 {
 	byte id = reader.Read_byte();
-	Entity* obj = Engine::Instance().registry.GetNode(id)->New();
+	Registry* registry = ctx.GetPtr<Registry>();
+	Entity* obj = registry->GetNode(id)->New();
 	if (obj)
-		obj->ReadData(reader, strings);
+		obj->ReadData(reader, strings, ctx);
 	else
 		Debug::Error(CSTR("Cannot create Entity with ID ", (int)id));
 
 	return obj;
 }
 
-void Entity::WriteData(BufferWriter<byte>& writer, NumberedSet<String>& strings) const
+void Entity::WriteData(ByteWriter& writer, NumberedSet<String>& strings, const Context& ctx) const
 {
-	_transform.WriteToBuffer(writer);
-	writer.Write_string(_name.GetData());
+	_transform.Write(writer);
+	_name.Write(writer);
 }
 
-void Entity::ReadData(BufferReader<byte>& reader, const NumberedSet<String>& strings)
+void Entity::ReadData(ByteReader& reader, const NumberedSet<String>& strings, const Context& ctx)
 {
-	_transform.ReadFromBuffer(reader);
-	_name = reader.Read_string();
+	_transform.Read(reader);
+	_name.Read(reader);
 }
 
 //Collision
@@ -198,7 +196,9 @@ bool Entity::OverlapsRay(const Ray& ray, RaycastResult& result) const
 {
 	const Collider* collider = GetCollider();
 	if (collider)
-		return collider->IntersectsRay(GetWorldTransform(), ray, result);
+		return collider->IntersectsRay(GetWorldTransform(), ray, ECollisionChannels::ALL, result);
+
+	//TODO- RAY NEEDS CHANNELS
 
 	return false;
 }
@@ -307,19 +307,19 @@ Entity& Entity::operator=(Entity&& other) noexcept
 Bounds Entity::GetWorldBounds(bool noTranslation) const
 {
 	Bounds b = GetBounds();
-	Mat4 wt = GetWorldTransform().GetTransformationMatrix();
+	Matrix4 wt = GetWorldTransform().GetTransformationMatrix();
 	if (noTranslation) wt[3][0] = wt[3][1] = wt[3][2] = 0.f;
 
 	//Yeah, this is not optimised at all...
 	Vector3 testPoints[8] = {
-		b.min * wt,
-		b.max * wt,
-		Vector3(b.min.x, b.min.y, b.max.z) * wt,
-		Vector3(b.min.x, b.max.y, b.min.z) * wt,
-		Vector3(b.min.x, b.max.y, b.max.z) * wt,
-		Vector3(b.max.x, b.min.y, b.min.z) * wt,
-		Vector3(b.max.x, b.min.y, b.max.z) * wt,
-		Vector3(b.max.x, b.max.y, b.min.z) * wt
+		(Vector4(b.min, 1.f) * wt).GetXYZ(),
+		(Vector4(b.max, 1.f) * wt).GetXYZ(),
+		(Vector4(b.min.x, b.min.y, b.max.z, 1.f) * wt).GetXYZ(),
+		(Vector4(b.min.x, b.max.y, b.min.z, 1.f) * wt).GetXYZ(),
+		(Vector4(b.min.x, b.max.y, b.max.z, 1.f) * wt).GetXYZ(),
+		(Vector4(b.max.x, b.min.y, b.min.z, 1.f) * wt).GetXYZ(),
+		(Vector4(b.max.x, b.min.y, b.max.z, 1.f) * wt).GetXYZ(),
+		(Vector4(b.max.x, b.max.y, b.min.z, 1.f) * wt).GetXYZ()
 	};
 
 	Vector3 min = testPoints[0];
@@ -337,15 +337,16 @@ Bounds Entity::GetWorldBounds(bool noTranslation) const
 //
 #include "Console.hpp"
 
-void Entity::CMD_List(const Buffer<String>& tokens)
+void Entity::CMD_List(const Buffer<String>& tokens, const Context& ctx)
 {
-	Engine::Instance().pConsole->Print(CSTR(GetClassString(), "\t\t\"", _name, "\"\t\t0x", String::From((int64)_uid, 0, 16), '\n'));
+	Console* console = ctx.GetPtr<Console>();
+	console->Print(CSTR(GetClassString(), "\t\t\"", _name, "\"\t\t0x", String::FromInt(_uid, 0, 16), '\n'));
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
-		_children[i]->CMD_List(tokens);
+		_children[i]->CMD_List(tokens, ctx);
 }
 
-void Entity::CMD_Ent(const Buffer<String>& tokens)
+void Entity::CMD_Ent(const Buffer<String>& tokens, const Context& ctx)
 {
 	if (tokens.GetSize() >= 1)
 	{
@@ -353,17 +354,19 @@ void Entity::CMD_Ent(const Buffer<String>& tokens)
 
 		if (obj)
 		{
+			Console* console = ctx.GetPtr<Console>();
+
 			if (tokens.GetSize() >= 2)
 			{
 				Buffer<String> objTokens(&tokens[1], tokens.GetSize() - 1);
-				Engine::Instance().pConsole->Print(obj->GetProperties().HandleCommand(obj, objTokens).GetData());
+				console->Print(obj->GetProperties().HandleCommand(obj, objTokens, ctx).GetData());
 			}
 			else
 			{
 				const Buffer<Property*> properties = obj->GetProperties().GetAll();
 
 				for (size_t i = 0; i < properties.GetSize(); ++i)
-					Engine::Instance().pConsole->Print(CSTR(properties[i]->GetName(), "\t\t", properties[i]->GetTypeString(), "\t\t<", properties[i]->GetAsString(obj), ">\n"));
+					console->Print(CSTR(properties[i]->GetName(), "\t\t", properties[i]->GetTypeName(), "\t\t<", properties[i]->GetAsString(obj, ctx), ">\n"));
 			}
 		}
 	}

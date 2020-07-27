@@ -1,30 +1,31 @@
 #include "EntPlayer.hpp"
-#include <Engine/CollisionBox.hpp>
-#include <Engine/CollisionCapsule.hpp>
-#include <Engine/InputManager.hpp>
+#include "GameInstance.hpp"
+#include <ELCore/Context.hpp>
+#include <ELPhys/CollisionBox.hpp>
+#include <ELPhys/CollisionCapsule.hpp>
+#include <ELSys/InputManager.hpp>
 #include <Engine/ModelManager.hpp>
-#include "GameInstance.h"
 
 Collider EntPlayer::_COLLIDER = Collider(ECollisionChannels::PLAYER, CollisionCapsule(1.f, .5f));
 
-EntPlayer::EntPlayer()
+void EntPlayer::Init(const Context& ctx)
 {
 	_mesh.SetParent(this);
-	_mesh.SetModel("capsule");
-	_mesh.SetMaterial("white");
+	_mesh.SetModel("capsule", ctx);
+	_mesh.SetMaterial("white", ctx);
 	_mesh.SetRelativeScale(Vector3(.5f, .5f, .5f));
 
 	_cameraPivot.SetParent(this);
 	_cameraPivot.SetRelativeRotation(Vector3(-30, 45, 0));
 
 	_camera.SetParent(&_cameraPivot);
-	_camera.SetZBounds(-1000.f, 1000.f);
-	_camera.SetProjectionType(EProjectionType::ORTHOGRAPHIC);
-	_camera.SetOrthoPixelsPerUnit(128.f);
+	_camera.GetProjection().SetNearFar(-1000.f, 1000.f);
+	_camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
+	_camera.GetProjection().SetOrthographicScale(128.f);
 
 	GameInstance::Instance().SetActiveCamera(&_camera);
 
-	Engine::Instance().pInputManager->BindKey(EKeycode::SPACE, Callback(this, &EntPlayer::_Jump));
+	ctx.GetPtr<InputManager>()->BindKey(EKeycode::SPACE, Callback(this, &EntPlayer::_Jump));
 }
 
 void EntPlayer::_Jump()
@@ -34,13 +35,13 @@ void EntPlayer::_Jump()
 
 void EntPlayer::Update(float deltaTime)
 {
-	Entity* spinner = Engine::Instance().pWorld->FindChildWithName("spin");
+	Entity* spinner = GameInstance::Instance().world->FindChildWithName("spin");
 	if (spinner)
 		spinner->AddRelativeRotation(Vector3(0.f, deltaTime * 30.f, 0.f));
 
 	GameInstance& game = GameInstance::Instance();
 
-	//_cameraPivot.AddRelativeRotation(Vector3(.1f * game.GetAxisLookUp(), .1f * game.GetAxisLookRight(), 0));
+	_cameraPivot.AddRelativeRotation(Vector3(.1f * game.GetAxisLookUp(), .1f * game.GetAxisLookRight(), 0));
 
 	Transform worldTransform = GetWorldTransform();
 	Transform cameraT = _camera.GetWorldTransform();
@@ -67,7 +68,7 @@ void EntPlayer::Update(float deltaTime)
 	Transform desiredTransform = Transform(worldTransform.GetPosition() + movement, worldTransform.GetRotation(), worldTransform.GetScale());
 
 	Vector3 penetration;
-	Buffer<Entity*> ents = Engine::Instance().pWorld->FindChildrenOfType<Entity>();
+	Buffer<Entity*> ents = GameInstance::Instance().world->FindChildrenOfType<Entity>();
 	for (size_t i = 0; i < ents.GetSize(); ++i)
 		if (ents[i]->GetUID() != GetUID() && 
 			!ents[i]->IsChildOf(this) && 
