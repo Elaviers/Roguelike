@@ -77,28 +77,28 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)Include;$(SolutionDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(SolutionDir)ELLib\Headers;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)Include;$(SolutionDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(SolutionDir)ELLib\Headers;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Include;$(SolutionDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(SolutionDir)ELLib\Headers;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Include;$(SolutionDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(SolutionDir)ELLib\Headers;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\;$(LibraryPath)</LibraryPath>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_$(ProjectName)\</OutDir>

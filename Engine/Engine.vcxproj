@@ -109,32 +109,32 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)Build\StaticLibs\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)ELLib\Headers;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)ELLib\Build\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)Build\StaticLibs\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)ELLib\Headers;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)ELLib\Build\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)Build\StaticLibs\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)ELLib\Headers;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)ELLib\Build\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)Build\$(Configuration)_$(Platform)_Engine\</OutDir>
     <IntDir>$(ProjectDir)Intermediate\$(Configuration)_$(Platform)\</IntDir>
-    <IncludePath>$(SolutionDir);$(SolutionDir)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)Build\StaticLibs\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)ELLib\Headers;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Libraries\$(Configuration)\$(Platform);$(SolutionDir)ELLib\Build\$(Configuration)\$(Platform);$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
@@ -152,9 +152,8 @@
       <AdditionalDependencies>ELAudio.lib;ELCore.lib;ELGraphics.lib;ELMaths.lib;ELPhys.lib;ELSys.lib;ELUI.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
-
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -171,9 +170,8 @@
       <AdditionalDependencies>ELAudio.lib;ELCore.lib;ELGraphics.lib;ELMaths.lib;ELPhys.lib;ELSys.lib;ELUI.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
-
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -196,9 +194,8 @@
       <AdditionalDependencies>ELAudio.lib;ELCore.lib;ELGraphics.lib;ELMaths.lib;ELPhys.lib;ELSys.lib;ELUI.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
-
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -221,9 +218,8 @@
       <AdditionalDependencies>ELAudio.lib;ELCore.lib;ELGraphics.lib;ELMaths.lib;ELPhys.lib;ELSys.lib;ELUI.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Libraries\$(Configuration)\$(Platform)\freetype.pdb $(TargetDir) /q /r /y
-
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

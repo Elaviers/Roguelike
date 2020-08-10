@@ -1,0 +1,3 @@
+[submodule "ELLib"]
+	path = ELLib
+	url = https://github.com/Elaviers/ELLib
