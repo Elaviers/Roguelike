@@ -227,7 +227,7 @@ void Game::MouseMove(uint16 x, uint16 y)
 {
 	if (_uiIsActive)
 	{
-		_ui.OnMouseMove((float)x, (float)(_uiCamera.GetProjection().GetDimensions().y - y));
+		_ui.OnMouseMove((float)x, (float)(_uiCamera.GetProjection().GetDimensions().y - y), false);
 	}
 }
 

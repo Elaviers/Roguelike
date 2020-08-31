@@ -108,11 +108,11 @@ void Editor::_Init()
 	inputManager->BindKeyAxis(EKeycode::RIGHT, &_axisLookX, 1.f);
 	inputManager->BindKeyAxis(EKeycode::LEFT, &_axisLookX, -1.f);
 
-	inputManager->BindKey(EKeycode::ENTER, Callback(this, &Editor::KeySubmit));
-	inputManager->BindKey(EKeycode::ESCAPE, Callback(this, &Editor::KeyCancel));
-	inputManager->BindKey(EKeycode::DEL, Callback(this, &Editor::KeyDelete));
+	inputManager->BindKeyDown(EKeycode::ENTER, Callback(this, &Editor::KeySubmit));
+	inputManager->BindKeyDown(EKeycode::ESCAPE, Callback(this, &Editor::KeyCancel));
+	inputManager->BindKeyDown(EKeycode::DEL, Callback(this, &Editor::KeyDelete));
 
-	inputManager->BindKey(EKeycode::TILDE, Callback(this, &Editor::ToggleConsole));
+	inputManager->BindKeyDown(EKeycode::TILDE, Callback(this, &Editor::ToggleConsole));
 
 	_level.onNameChanged +=		Callback(this, &Editor::RefreshLevel);
 	_level.onChildChanged +=	Callback(this, &Editor::RefreshLevel);
@@ -305,7 +305,7 @@ void Editor::Frame()
 		{
 			uint16 x = cursorPos.x - client.left;
 			uint16 y = _uiCamera.GetProjection().GetDimensions().y - (cursorPos.y - client.top);
-			_ui.OnMouseMove(x, y);
+			_ui.OnMouseMove(x, y, false);
 			
 			System::SetCursor(_ui.GetCursor());
 
@@ -406,10 +406,10 @@ void Editor::RenderViewport(Viewport& vp)
 		e.AddSetLineWidth(lineW);
 
 		e.AddSetColour(Colour(.75f, .75f, .75f));
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridPlane, 1.f, gridLimit, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridPlane, 1.f, gridLimit, 0.f, 0.f);
 
 		e.AddSetColour(Colour(.5f, .5f, 1.f));
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridPlane, 10.f, gridLimit, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridPlane, 10.f, gridLimit, 0.f, 0.f);
 
 		engine.pDebugManager->RenderWorld(vp.renderQueue);
 	}

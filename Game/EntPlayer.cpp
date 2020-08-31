@@ -25,7 +25,7 @@ void EntPlayer::Init(const Context& ctx)
 
 	GameInstance::Instance().SetActiveCamera(&_camera);
 
-	ctx.GetPtr<InputManager>()->BindKey(EKeycode::SPACE, Callback(this, &EntPlayer::_Jump));
+	ctx.GetPtr<InputManager>()->BindKeyDown(EKeycode::SPACE, Callback(this, &EntPlayer::_Jump));
 }
 
 void EntPlayer::_Jump()
