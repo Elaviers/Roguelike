@@ -39,9 +39,9 @@ void EntPlayer::_Jump()
 
 void EntPlayer::Update(float deltaTime)
 {
-	//Entity* spinner = GameInstance::Instance().world->FindChildWithName("spin");
-	//if (spinner)
-	//	spinner->AddRelativeRotation(Vector3(0.f, deltaTime * 30.f, 0.f));
+	Entity* spinner = GameInstance::Instance().world->FindChildWithName("spin");
+	if (spinner)
+		spinner->AddRelativeRotation(Vector3(0.f, deltaTime * 30.f, 0.f));
 
 	GameInstance& game = GameInstance::Instance();
 	_cameraPivot.AddRelativeRotation(Vector3(-.1f * game.GetAxisLookUp(), .1f * game.GetAxisLookRight(), 0));
@@ -70,13 +70,11 @@ void EntPlayer::Update(float deltaTime)
 		SetWorldTransform(wt);
 	}
 
-	//Physics movement (broken)
+	//Physics movement
 	if (true)
 	{
 		Transform worldTransform = GetWorldTransform();
 		Transform cameraT = _camera.GetWorldTransform();
-
-		//Debug::PrintLine(String::From(_velocity).GetData());
 
 		_velocity.y -= 9.8f * deltaTime;
 

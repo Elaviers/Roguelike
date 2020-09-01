@@ -77,6 +77,9 @@ void Game::Run()
 	while (_running)
 	{
 		_timer.Start();
+		if (_deltaTime > 1 / 30.f)
+			_deltaTime = 1 / 30.f;
+
 		_engine.pInputManager->ClearMouseInput();
 
 		while (_window.PollEvent(e))
