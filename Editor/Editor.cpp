@@ -365,7 +365,7 @@ void Editor::Render()
 
 	_shaderUnlit.Use();
 	_uiCamera.Use();
-	_uiQueue.Render(ERenderChannels::UNLIT, *engine.pMeshManager, *engine.pTextureManager);	
+	_uiQueue.Render(ERenderChannels::UNLIT, *engine.pMeshManager, *engine.pTextureManager, 0);	
 	_vpArea.SwapBuffers();
 	
 
@@ -379,7 +379,7 @@ void Editor::Render()
 
 	_shaderUnlit.Use();
 	_consoleCamera.Use();
-	_consoleQueue.Render(ERenderChannels::UNLIT, *engine.pMeshManager, *engine.pTextureManager);
+	_consoleQueue.Render(ERenderChannels::UNLIT, *engine.pMeshManager, *engine.pTextureManager, 0);
 	_consoleWindow.SwapBuffers();
 }
 
@@ -421,11 +421,11 @@ void Editor::RenderViewport(Viewport& vp)
 	_shaderLit.SetInt(DefaultUniformVars::intTextureNormal, 1);
 	_shaderLit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
 	_shaderLit.SetInt(DefaultUniformVars::intTextureReflection, 3);
-	vp.renderQueue.Render(_litRenderChannels, *engine.pMeshManager, *engine.pTextureManager);
+	vp.renderQueue.Render(_litRenderChannels, *engine.pMeshManager, *engine.pTextureManager, _shaderLit.GetInt(DefaultUniformVars::intLightCount));
 
 	_shaderUnlit.Use();
 	camera.Use((int)bounds.x, (int)bounds.y);
-	vp.renderQueue.Render(_unlitRenderChannels | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), *engine.pMeshManager, *engine.pTextureManager);
+	vp.renderQueue.Render(_unlitRenderChannels | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), *engine.pMeshManager, *engine.pTextureManager, 0);
 }
 
 void Editor::ResizeViews(uint16 w, uint16 h)

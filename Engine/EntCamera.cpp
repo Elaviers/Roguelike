@@ -19,6 +19,17 @@ void EntCamera::Use(int vpX, int vpY) const
 	GLProgram::Current().SetMatrix4(DefaultUniformVars::mat4View, GetInverseTransformationMatrix());
 }
 
+const PropertyCollection& EntCamera::GetProperties()
+{
+	static PropertyCollection properties;
+	DO_ONCE_BEGIN;
+	_AddBaseProperties(properties);
+	
+	DO_ONCE_END;
+
+	return properties;
+}
+
 void EntCamera::WriteData(ByteWriter& writer, NumberedSet<String>& strings, const Context& ctx) const
 {
 	Entity::WriteData(writer, strings, ctx);

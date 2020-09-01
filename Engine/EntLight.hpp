@@ -28,7 +28,7 @@ public:
 
 	virtual Bounds GetBounds() const 
 	{
-		static Bounds bounds(_editorBoxExtent);
+		static Bounds bounds(_radius);
 		return bounds;
 	}
 

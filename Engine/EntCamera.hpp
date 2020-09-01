@@ -21,8 +21,7 @@ public:
 	Projection& GetProjection() { return _projection; }
 	const Projection& GetProjection() const { return _projection; }
 	
-	//todo : implement this xd
-	//virtual const PropertyCollection& GetProperties() override;
+	virtual const PropertyCollection& GetProperties() override;
 
 	//File IO
 	virtual void WriteData(ByteWriter&, NumberedSet<String>& strings, const Context& ctx) const override;

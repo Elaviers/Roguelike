@@ -27,4 +27,6 @@ public:
 	void Init(const Context&);
 
 	void Update(float deltaTime);
+
+	virtual const Collider* GetCollider() const override { return &_COLLIDER; };
 };

@@ -43,7 +43,7 @@ void Game::_Init()
 	_engine.pWorld = &_world;
 	GameInstance::Instance().world = &_world;
 
-	GameInstance::Instance().SetupInputs(*_engine.pInputManager);
+	GameInstance::Instance().Initialise(*this);
 
 	_consoleIsActive = false;
 	_uiIsActive = true;
@@ -198,7 +198,7 @@ void Game::Render()
 
 	_shaderUnlit.Use();
 	_uiCamera.Use();
-	_uiQueue.Render(ERenderChannels::UNLIT, *_engine.pMeshManager, *_engine.pTextureManager);
+	_uiQueue.Render(ERenderChannels::UNLIT, *_engine.pMeshManager, *_engine.pTextureManager, 0);
 
 	if (activeCamera)
 	{
@@ -208,7 +208,8 @@ void Game::Render()
 		_shaderLit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureReflection, 3);
 		activeCamera->Use();
-		_renderQueue.Render(ERenderChannels::SURFACE, *_engine.pMeshManager, *_engine.pTextureManager);
+
+		_renderQueue.Render(ERenderChannels::SURFACE, *_engine.pMeshManager, *_engine.pTextureManager, _shaderLit.GetInt(DefaultUniformVars::intLightCount));
 	}
 
 	_window.SwapBuffers();

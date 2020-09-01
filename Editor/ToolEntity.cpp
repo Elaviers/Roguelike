@@ -94,6 +94,8 @@ void ToolEntity::MouseDown(const MouseData &mouseData)
 			const PropertyCollection& cvars = newObj->GetProperties();
 			cvars.Transfer(from, newObj, _owner.engine.context);
 		}
+
+		newObj = newObj;
 	}
 }
 

@@ -19,7 +19,7 @@ void ModelManager::Initialise(MeshManager& meshManager)
 	_invCube.SetMesh(meshManager.InverseCube());
 
 	_plane.SetCollider(Collider(ECollisionChannels::ALL, CollisionBox(Transform(Vector3(), Vector3(), Vector3(1, 1, .001f)))));
-	_cube.SetCollider(Collider(ECollisionChannels::ALL, CollisionBox()));
+	_cube.SetCollider(Collider(ECollisionChannels::ALL, CollisionBox(Box(Vector3(), Vector3(.5f, .5f, .5f)))));
 
 	SharedPointerData<Model>& dLine = _MapValue("line"), &dPlane = _MapValue("plane"), &dCube = _MapValue("cube"), &dInvCube = _MapValue("invcube");
 	dLine.SetPtr(&_line);

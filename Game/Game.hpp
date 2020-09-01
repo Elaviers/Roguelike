@@ -41,6 +41,8 @@ public:
 	Game() : _consoleIsActive(false), _uiIsActive(true), _running(false), _deltaTime(0.f) {}
 	~Game() {}
 
+	const Context& GetContext() const { return _engine.context; }
+
 	void Run();
 	void Frame();
 	void Render();

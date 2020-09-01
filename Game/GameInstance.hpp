@@ -1,10 +1,12 @@
 #pragma once
 #include <Engine/EntCamera.hpp>
 
+class Game;
 class InputManager;
 
 class GameInstance
 {
+	Game* _game;
 	EntCamera* _activeCamera;
 
 	float _axisMoveForward;
@@ -25,7 +27,9 @@ public:
 
 	GameInstance() : _activeCamera(nullptr), _axisMoveForward(0.f), _axisMoveRight(0.f), _axisLookUp(0.f), _axisLookRight(0.f), _w(0), _h(0) {}
 
-	void SetupInputs(InputManager&);
+	Game* GetGame() { return _game; }
+
+	void Initialise(Game&);
 
 	void OnResize(uint16 w, uint16 h);
 

@@ -1,7 +1,9 @@
 #version 410
-#define LIGHT_COUNT 8
+#define MAX_LIGHT_COUNT 8
 #define BLINN false
 #define FLAT false
+
+uniform int LightCount = 8;
 
 struct Light
 {
@@ -10,7 +12,7 @@ struct Light
 	float Radius;
 };
 
-uniform Light Lights[LIGHT_COUNT];
+uniform Light Lights[MAX_LIGHT_COUNT];
 uniform mat4 M_Model;
 uniform mat4 M_View;
 uniform samplerCube Cubemap;
@@ -30,6 +32,8 @@ float shine = 32;
 
 void main()
 {
+	int effectiveLightCount = min(LightCount, MAX_LIGHT_COUNT);
+
 	vec2 UV = vec2(UV_IN.x, 1 - UV_IN.y);
 
 	vec3 UVNormal = texture(T_Normal, UV).rgb * 2 - 1;
@@ -49,7 +53,7 @@ void main()
 	float Distance;
 	vec3 Diffuse;
 	vec3 Specular;
-	for (int i = 0; i < LIGHT_COUNT; ++i)
+	for (int i = 0; i < effectiveLightCount; ++i)
 	{
 		if (Lights[i].Radius != 0.0)
 		{
