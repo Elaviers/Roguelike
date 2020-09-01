@@ -123,7 +123,7 @@ void Game::Run()
 			case WindowEvent::RAWINPUT:
 				if (e.data.rawInput.type == WindowEvent::RawInputType::MOUSE)
 				{
-					_engine.pInputManager->AddMouseInput(e.data.rawInput.mouse.lastX, e.data.rawInput.mouse.lastY);
+					_engine.pInputManager->AddMouseInput((float)e.data.rawInput.mouse.lastX, (float)e.data.rawInput.mouse.lastY);
 				}
 				break;
 			}

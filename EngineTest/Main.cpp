@@ -14,23 +14,28 @@
 #include <ELSys/Timer.hpp>
 #include <ELSys/Utilities.hpp>
 
+//Orthographic camera mode
 #define ORTHO 0
 
-const char* fontName = "consolas.txt";
-const char *meshName = "Model";
-const char *texDiffuse = "Diffuse.png";
-const char *texNormal = "Normal.png";
-const char *texSpecular = "Specular.png";
-const char *texReflection = "Reflectivity.png";
+//Names of a bunch of assets
+constexpr const char *fontName = "consolas.txt";
+constexpr const char *meshName = "Model";
+constexpr const char *texDiffuse = "Diffuse.png";
+constexpr const char *texNormal = "Normal.png";
+constexpr const char *texSpecular = "Specular.png";
+constexpr const char *texReflection = "Reflectivity.png";
 const char *skyFaces[6] = { "SkyLeft.png", "SkyRight.png", "SkyUp.png", "SkyDown.png", "SkyFront.png", "SkyBack.png" };
 
+//Used by main loop
 bool running = false;
 
-//
+//An instance of the roguelike engine.
+//Contains asset managers mostly
 EngineInstance engine;
 RenderQueue renderQueue;
 RenderQueue uiQueue;
 
+//LIGHTS
 Entity lightParent1;
 Vector3 rotationOffset1(0.f, 45, 0.f);
 Entity lightParent2;
@@ -44,6 +49,7 @@ EntLight light2;
 EntLight light3;
 EntLight light4;
 
+//Other entities
 EntRenderable renderable;
 EntCamera camera;
 EntRenderable cube;
@@ -51,25 +57,31 @@ Entity cubeParent;
 Vector3 cubeParentRotationOffset(2.f, 11.7f, 0.f);
 Vector3 cubeRotationOffset(9.f, 23.f, 0.f);
 
+//4x4 projection matrix used for UI (orthographic duh)
 Matrix4 uiProjectionMatrix;
 
-//
-
+//The skybox class is just a cubemap wrapper right now...
 Skybox sky;
 
+//This is the context OpenGL will use to render stuff
 GLContext glContext;
 
+//Shaders
 GLProgram program_Lit;
 GLProgram program_Unlit;
 GLProgram program_Sky;
+
+//This is my cool theoretically cross-platform window class
 Window window;
 
 bool cursorLocked = false;
+
+//Set when cursor is locked to window
 POINT lockPos;
 
-float axisX = 0.f, axisY = 0.f, axisZ = 0.f;
-float lookX = 0.f, lookY = 0.f, lookZ = 0.f;
-float mouseLookX = 0.f, mouseLookY = 0.f;
+volatile float axisX = 0.f, axisY = 0.f, axisZ = 0.f;
+volatile float lookX = 0.f, lookY = 0.f, lookZ = 0.f;
+volatile float mouseLookX = 0.f, mouseLookY = 0.f;
 
 Timer timer;
 float dt = 0.f;
@@ -94,8 +106,10 @@ inline void UnlockCursor()
 	::ShowCursor(TRUE);
 }
 
+//Here's the entry point
 int Main()
 {
+	//I have to create a stupid context to load some extensions (but not all)
 	GLContext dummy;
 	dummy.CreateDummyAndUse();
 	GL::LoadDummyExtensions();
@@ -113,14 +127,24 @@ int Main()
 	window.SetTitle("GL Init");
 	//
 	GL::LoadExtensions(window);
+
+	//No vsync
 	wglSwapIntervalEXT(0);
 
+	//Backface culling
 	glEnable(GL_CULL_FACE);
+
+	//Depth testing
 	glEnable(GL_DEPTH_TEST);
+
+
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	
+	//Traslucency
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	//Winding order of front face
 	glFrontFace(GL_CCW);
 
 	glLineWidth(2);
@@ -140,7 +164,10 @@ int Main()
 	window.SetTitle("Manager Init");
 
 	//
+	//This will allocate and initialise all of the asset managers
 	engine.Init(EEngineCreateFlags::ALL, nullptr);
+
+	//Add Windows/Fonts directory so I can load some TTF fonts from it
 	engine.pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	ModelManager& modelManager = *engine.pModelManager;
@@ -153,22 +180,22 @@ int Main()
 	textureManager.SetRootPath("Data/");
 	engine.pFontManager->SetRootPath("Data/");
 
-	inputManager.BindKeyAxis(EKeycode::A, &axisX, -1);
-	inputManager.BindKeyAxis(EKeycode::D, &axisX, 1);
-	inputManager.BindKeyAxis(EKeycode::F, &axisY, -1);
-	inputManager.BindKeyAxis(EKeycode::SPACE, &axisY, 1);
-	inputManager.BindKeyAxis(EKeycode::S, &axisZ, -1);
-	inputManager.BindKeyAxis(EKeycode::W, &axisZ, 1);
+	inputManager.BindKeyAxis(EKeycode::A, (float*)&axisX, -1);
+	inputManager.BindKeyAxis(EKeycode::D, (float*)&axisX, 1);
+	inputManager.BindKeyAxis(EKeycode::F, (float*)&axisY, -1);
+	inputManager.BindKeyAxis(EKeycode::SPACE, (float*)&axisY, 1);
+	inputManager.BindKeyAxis(EKeycode::S, (float*)&axisZ, -1);
+	inputManager.BindKeyAxis(EKeycode::W, (float*)&axisZ, 1);
 
-	inputManager.BindKeyAxis(EKeycode::DOWN, &lookX, -1);
-	inputManager.BindKeyAxis(EKeycode::UP, &lookX, 1);
-	inputManager.BindKeyAxis(EKeycode::LEFT, &lookY, -1);
-	inputManager.BindKeyAxis(EKeycode::RIGHT, &lookY, 1);
-	inputManager.BindKeyAxis(EKeycode::Q, &lookZ, -1);
-	inputManager.BindKeyAxis(EKeycode::E, &lookZ, 1);
+	inputManager.BindKeyAxis(EKeycode::DOWN, (float*)&lookX, -1);
+	inputManager.BindKeyAxis(EKeycode::UP, (float*)&lookX, 1);
+	inputManager.BindKeyAxis(EKeycode::LEFT, (float*)&lookY, -1);
+	inputManager.BindKeyAxis(EKeycode::RIGHT, (float*)&lookY, 1);
+	inputManager.BindKeyAxis(EKeycode::Q, (float*)&lookZ, -1);
+	inputManager.BindKeyAxis(EKeycode::E, (float*)&lookZ, 1);
 
-	inputManager.BindAxis(EAxis::MOUSE_X, &mouseLookY);
-	inputManager.BindAxis(EAxis::MOUSE_Y, &mouseLookX);
+	inputManager.BindAxis(EAxis::MOUSE_X, (float*)&mouseLookY);
+	inputManager.BindAxis(EAxis::MOUSE_Y, (float*)&mouseLookX);
 
 
 	//
@@ -197,7 +224,7 @@ int Main()
 	{
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetNearFar(-100000.f, 100000.f);
-		camera.GetProjection().SetOrthographicScale(128.f);
+		camera.GetProjection().SetOrthographicScale(128.f); //pixels per unit
 		camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
 	}
 	else
@@ -244,6 +271,9 @@ int Main()
 	WindowEvent e;
 	while (running)
 	{
+		timer.Start();
+		t += dt;
+
 		while (window.PollEvent(e))
 		{
 			switch (e.type)
@@ -288,6 +318,7 @@ int Main()
 		}
 
 		Frame();
+		dt = timer.SecondsSinceStart();
 	}
 
 	return 0;
@@ -296,22 +327,20 @@ int Main()
 
 void Frame()
 {
-	timer.Start();
-
+	engine.pInputManager->ClearMouseInput();
 	if (cursorLocked) {
 		POINT cursorPos;
 		::GetCursorPos(&cursorPos);
-		engine.pInputManager->ClearMouseInput();
-		engine.pInputManager->AddMouseInput((short)(cursorPos.x - lockPos.x), -(short)(cursorPos.y - lockPos.y));
+		engine.pInputManager->AddMouseInput((float)(cursorPos.x - lockPos.x), -(float)(cursorPos.y - lockPos.y));
 		::SetCursorPos(lockPos.x, lockPos.y);
 	}
 
 	float moveAmount = MOVERATE * dt;
 	float turnAmount = TURNRATE * dt;
 
-	camera.RelativeMove(camera.GetRelativeTransform().GetForwardVector() * axisZ * moveAmount +
-		camera.GetRelativeTransform().GetRightVector() * axisX * moveAmount +
-		camera.GetRelativeTransform().GetUpVector() * axisY * moveAmount);
+	camera.RelativeMove(camera.GetRelativeTransform().GetForwardVector() * (float)axisZ * moveAmount +
+		camera.GetRelativeTransform().GetRightVector() * (float)axisX * moveAmount +
+		camera.GetRelativeTransform().GetUpVector() * (float)axisY * moveAmount);
 
 	camera.AddRelativeRotation(Vector3(lookX * turnAmount + mouseLookX * MOUSESENS, lookY * turnAmount + mouseLookY * MOUSESENS, lookZ * turnAmount));
 
@@ -396,19 +425,30 @@ void Frame()
 		
 		//Draw unlit
 		{
+			//Bind the unlit shader to the current GL context
 			program_Unlit.Use();
+			
+			//Always do this after using a program. It applies the inverse transformation of the camera as well as the projection to the shader's uniform variables
 			camera.Use();
+
+			//This renders all the stuff in the queue
+			//This will only render entries in the queue that contain the channels UNLIT or EDITOR
 			renderQueue.Render(ERenderChannels::UNLIT | ERenderChannels::EDITOR, *engine.pMeshManager, *engine.pTextureManager, 0);
 		}
 
 		{
 			program_Lit.Use();
 			camera.Use();
+
+			//The engine is a pooey in the aspect that the texture units 0, 1, 2, and 3 are always bound to the diffuse, normal, specular, and reflectivity textures respectively.
+			//No PBR yet!
 			program_Lit.SetInt(DefaultUniformVars::intCubemap, 100);
 			program_Lit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
 			program_Lit.SetInt(DefaultUniformVars::intTextureNormal, 1);
 			program_Lit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
 			program_Lit.SetInt(DefaultUniformVars::intTextureReflection, 3);
+
+
 			renderQueue.Render(ERenderChannels::SURFACE, *engine.pMeshManager, *engine.pTextureManager, program_Lit.GetInt(DefaultUniformVars::intLightCount));
 		}
 
@@ -416,7 +456,11 @@ void Frame()
 		if (camera.GetProjection().GetType() == EProjectionType::PERSPECTIVE)
 		{
 			program_Sky.Use();
+
+			//bind the view matrix to this instead of the default thing......
 			Matrix4 skyView = camera.GetInverseTransformationMatrix();
+
+			//....because I strip out the translation from the matrix
 			skyView[3][0] = skyView[3][1] = skyView[3][2] = 0;
 
 			program_Sky.SetMatrix4(DefaultUniformVars::mat4Projection, camera.GetProjection().GetMatrix());
@@ -438,7 +482,4 @@ void Frame()
 		//
 		window.SwapBuffers();
 	}
-
-	dt = timer.SecondsSinceStart();
-	t += dt;
 }

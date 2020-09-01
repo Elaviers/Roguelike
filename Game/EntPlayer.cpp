@@ -44,84 +44,90 @@ void EntPlayer::Update(float deltaTime)
 	//	spinner->AddRelativeRotation(Vector3(0.f, deltaTime * 30.f, 0.f));
 
 	GameInstance& game = GameInstance::Instance();
-	InputManager* inputManager = game.GetGame()->GetContext().GetPtr<InputManager>();
-
 	_cameraPivot.AddRelativeRotation(Vector3(-.1f * game.GetAxisLookUp(), .1f * game.GetAxisLookRight(), 0));
 
-	float z = (inputManager->IsKeyDown(EKeycode::SPACE) ? 1.f : 0.f) - (inputManager->IsKeyDown(EKeycode::LCTRL) ? 1.f : 0.f);
-	const float moveFactor = 2.f * deltaTime;
-
-	Transform wt = GetWorldTransform();
-	wt.Move(Vector3(game.GetAxisMoveRight() * moveFactor, z * moveFactor, game.GetAxisMoveForward() * moveFactor));
-	SetWorldTransform(wt);
-
-	Buffer<Entity*> ents = GameInstance::Instance().world->FindChildrenOfType<Entity>();
-	for (size_t i = 0; i < ents.GetSize(); ++i)
-	{
-		if (ents[i]->GetUID() != GetUID() && !ents[i]->IsChildOf(this) && ents[i]->Overlaps(*this) == EOverlapResult::OVERLAPPING)
+	//Overlap printout
+	if (false) {
+		Buffer<Entity*> ents = GameInstance::Instance().world->FindChildrenOfType<Entity>();
+		for (size_t i = 0; i < ents.GetSize(); ++i)
 		{
-			static int l = 0;
-			Debug::PrintLine(CSTR("OVERLAPPING ", l++));
-			break;
+			if (ents[i]->GetUID() != GetUID() && !ents[i]->IsChildOf(this) && ents[i]->Overlaps(*this) == EOverlapResult::OVERLAPPING)
+			{
+				static int l = 0;
+				Debug::PrintLine(CSTR("OVERLAPPING ", l++));
+				break;
+			}
 		}
 	}
 
-	/*
-	Transform worldTransform = GetWorldTransform();
-	Transform cameraT = _camera.GetWorldTransform();
-	
-	//Debug::PrintLine(String::From(_velocity).GetData());
+	//Debug movement (noclip)
+	if (false) {
+		Transform wt = GetWorldTransform();
+		InputManager* inputManager = game.GetGame()->GetContext().GetPtr<InputManager>();
+		float z = (inputManager->IsKeyDown(EKeycode::SPACE) ? 1.f : 0.f) - (inputManager->IsKeyDown(EKeycode::LCTRL) ? 1.f : 0.f);
+		const float moveFactor = 2.f * deltaTime;
+		wt.Move(Vector3(game.GetAxisMoveRight() * moveFactor, z * moveFactor, game.GetAxisMoveForward() * moveFactor));
+		SetWorldTransform(wt);
+	}
 
-	_velocity.y -= 9.8f * deltaTime;
+	//Physics movement (broken)
+	if (true)
+	{
+		Transform worldTransform = GetWorldTransform();
+		Transform cameraT = _camera.GetWorldTransform();
 
-	Vector3 dv;
-	float amountForward = game.GetAxisMoveForward() * 10;
-	if (amountForward)
-		dv += cameraT.GetForwardVector() * (deltaTime * amountForward);
+		//Debug::PrintLine(String::From(_velocity).GetData());
 
-	float amountRight = game.GetAxisMoveRight() * 10;
-	if (amountRight)
-		dv += cameraT.GetRightVector() * (deltaTime * amountRight);
+		_velocity.y -= 9.8f * deltaTime;
 
-	_velocity.x += dv.x;
-	_velocity.z += dv.z;
-	
+		Vector3 dv;
+		float amountForward = game.GetAxisMoveForward() * 10;
+		if (amountForward)
+			dv += cameraT.GetForwardVector() * (deltaTime * amountForward);
 
-	Vector3 movement = _velocity * deltaTime;
+		float amountRight = game.GetAxisMoveRight() * 10;
+		if (amountRight)
+			dv += cameraT.GetRightVector() * (deltaTime * amountRight);
 
-	Transform desiredTransform = Transform(worldTransform.GetPosition() + movement, worldTransform.GetRotation(), worldTransform.GetScale());
+		_velocity.x += dv.x;
+		_velocity.z += dv.z;
 
-	Vector3 penetration;
-	Buffer<Entity*> ents = GameInstance::Instance().world->FindChildrenOfType<Entity>();
-	for (size_t i = 0; i < ents.GetSize(); ++i)
-		if (ents[i]->GetUID() != GetUID() && 
-			!ents[i]->IsChildOf(this) && 
-			ents[i]->OverlapsCollider(_COLLIDER, desiredTransform, Vector3(), &penetration) == EOverlapResult::OVERLAPPING)
-		{
-			//Pair<Vector3> contacts = ents[i]->GetShallowContactPointsWithCollider(.1f, _COLLIDER, desiredTransform, .1f);
-			//Debug::PrintLine(CSTR(contacts.first, "\t", contacts.second));
 
-			if (isnan(penetration.x) || isnan(penetration.y) || isnan(penetration.z)) continue;
+		Vector3 movement = _velocity * deltaTime;
 
-			if (penetration.LengthSquared())
+		Transform desiredTransform = Transform(worldTransform.GetPosition() + movement, worldTransform.GetRotation(), worldTransform.GetScale());
+
+		Vector3 penetration;
+		Buffer<Entity*> ents = GameInstance::Instance().world->FindChildrenOfType<Entity>();
+		for (size_t i = 0; i < ents.GetSize(); ++i)
+			if (ents[i]->GetUID() != GetUID() &&
+				!ents[i]->IsChildOf(this) &&
+				ents[i]->OverlapsCollider(_COLLIDER, desiredTransform, Vector3(), &penetration) == EOverlapResult::OVERLAPPING)
 			{
-				if (_velocity.LengthSquared())
+				//Pair<Vector3> contacts = ents[i]->GetShallowContactPointsWithCollider(.1f, _COLLIDER, desiredTransform, .1f);
+				//Debug::PrintLine(CSTR(contacts.first, "\t", contacts.second));
+
+				if (isnan(penetration.x) || isnan(penetration.y) || isnan(penetration.z)) continue;
+
+				if (penetration.LengthSquared())
 				{
-					Vector3 forbiddenDir = -penetration.Normalised();
+					if (_velocity.LengthSquared())
+					{
+						Vector3 forbiddenDir = -penetration.Normalised();
 
-					_velocity -= 1.5f * forbiddenDir * forbiddenDir.Dot(_velocity);
+						_velocity -= 1.5f * forbiddenDir * forbiddenDir.Dot(_velocity);
+					}
+
+					if (Maths::AlmostEquals(_velocity.y, 0.f, 0.1f))
+					{
+						_velocity.x *= .998f;
+						_velocity.z *= .998f;
+					}
+
+					desiredTransform.Move(penetration);
 				}
-
-				if (Maths::AlmostEquals(_velocity.y, 0.f, 0.1f))
-				{
-					_velocity.x *= .998f;
-					_velocity.z *= .998f;
-				}
-
-				desiredTransform.Move(penetration);
 			}
-		}
 
-	SetWorldTransform(desiredTransform);
-	*/
+		SetWorldTransform(desiredTransform);
+	}
 }
