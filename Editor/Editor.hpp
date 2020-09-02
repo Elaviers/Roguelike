@@ -73,6 +73,8 @@ private:
 	RenderQueue _uiQueue;
 	RenderQueue _consoleQueue;
 
+	GLCubemap _reflect;
+
 	//Editor
 	bool _drawEditorFeatures = true;
 

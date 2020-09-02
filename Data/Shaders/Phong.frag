@@ -23,7 +23,7 @@ uniform sampler2D T_Reflection;
 uniform vec4 Colour;
 
 layout(location = 0) in vec3 WorldPosition;
-layout(location = 1) in vec2 UV;
+layout(location = 1) in vec2 UV_IN;
 layout(location = 3) in mat3 TBN;
 
 out vec4 OutColour;
@@ -35,6 +35,8 @@ void main()
 {
 	int effectiveLightCount = min(LightCount, MAX_LIGHT_COUNT);
 
+	vec2 UV = vec2(UV_IN.x, 1 - UV_IN.y);
+
 	vec3 UVNormal = texture(T_Normal, UV).rgb * 2 - 1;
 
 	vec3 WorldNormal;
@@ -44,7 +46,7 @@ void main()
 	mat4 CameraTransform = inverse(M_View);
 	vec3 CameraPosition = vec3(CameraTransform[3][0], CameraTransform[3][1], CameraTransform[3][2]);
 	
-	float SurfaceSpecular  = texture(T_Specular, UV).r;
+	float SurfaceSpecular = texture(T_Specular, UV).r;
 	float SurfaceReflectivity = texture(T_Reflection, UV).r;
 	vec3 SurfaceToCamera = normalize(CameraPosition - WorldPosition);
 	vec3 SurfaceColour = (1.0 - SurfaceReflectivity) * texture(T_Diffuse, UV).rgb;

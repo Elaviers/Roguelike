@@ -229,11 +229,25 @@ void Editor::_InitGL()
 
 	glEnable(GL_MULTISAMPLE);
 
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 	glLineWidth(lineW);
 
-	_shaderLit.SetMaxLightCount(8);
 	_shaderLit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Phong.frag");
 	_shaderUnlit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
+
+	TextureData faces[6];
+	for (int i = 0; i < 6; ++i)
+	{
+		faces[i].data = new byte[4]();
+		faces[i].width = 1;
+		faces[i].height = 1;
+	}
+
+	_reflect.Create(faces);
+
+	for (int i = 0; i < 6; ++i)
+		delete faces[i].data;
 }
 
 #pragma endregion
@@ -417,6 +431,8 @@ void Editor::RenderViewport(Viewport& vp)
 	if (_currentTool) _currentTool->Render(vp.renderQueue);
 
 	/////////
+	_reflect.Bind(100);
+	_shaderLit.SetInt(DefaultUniformVars::intCubemap, 100);
 	_shaderLit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
 	_shaderLit.SetInt(DefaultUniformVars::intTextureNormal, 1);
 	_shaderLit.SetInt(DefaultUniformVars::intTextureSpecular, 2);

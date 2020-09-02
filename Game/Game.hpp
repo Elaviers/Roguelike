@@ -3,6 +3,7 @@
 #include <Engine/EntCamera.hpp>
 #include <ELGraphics/RenderQueue.hpp>
 #include <ELSys/GLContext.hpp>
+#include <ELSys/GLCubemap.hpp>
 #include <ELSys/GLProgram.hpp>
 #include <ELSys/InputManager.hpp> //For keycode
 #include <ELSys/Timer.hpp>
@@ -34,6 +35,8 @@ private:
 	EntCamera _uiCamera;
 
 	Entity _world;
+
+	GLCubemap _reflect;
 
 	void _InitGL();
 	void _Init();
