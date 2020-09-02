@@ -212,6 +212,7 @@ EXIT 0</Command>
     <ClCompile Include="ToolSelect.cpp" />
     <ClCompile Include="UIPropertyManipulator.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Editor.hpp" />

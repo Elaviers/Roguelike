@@ -143,6 +143,10 @@ void Game::Run()
 					_engine.pInputManager->AddMouseInput((float)e.data.rawInput.mouse.lastX, (float)e.data.rawInput.mouse.lastY);
 				}
 				break;
+
+			case WindowEvent::FOCUS_LOST:
+				_engine.pInputManager->Reset();
+				break;
 			}
 		}
 

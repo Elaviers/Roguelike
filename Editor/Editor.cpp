@@ -133,33 +133,18 @@ void Editor::_Init()
 
 	UIColour vpColour(Colour::Black, Colour(.1f, .1f, .1f));
 
-	_viewports[0].gridPlane = EDirection::UP;
-	_viewports[0].camera.GetProjection().SetType(EProjectionType::PERSPECTIVE);
-	_viewports[0].camera.SetRelativePosition(Vector3(-5.f, 5.f, -5.f));
-	_viewports[0].camera.SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
-	_viewports[0].camera.GetProjection().SetNearFar(0.001f, 100.f);
-	_viewports[0].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f).SetFocusOnClick(false);
-
-	_viewports[1].gridPlane = EDirection::UP;
-	_viewports[1].camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-	_viewports[1].camera.GetProjection().SetOrthographicScale(32.f);
-	_viewports[1].camera.GetProjection().SetNearFar(-10000.f, 10000.f);
-	_viewports[1].camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
-	_viewports[1].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f).SetFocusOnClick(false);
-
-	_viewports[2].gridPlane = EDirection::FORWARD;
-	_viewports[2].camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-	_viewports[2].camera.GetProjection().SetOrthographicScale(32.f);
-	_viewports[2].camera.GetProjection().SetNearFar(-10000.f, 10000.f);
-	_viewports[2].camera.SetRelativeRotation(Vector3(0.f, 0.f, 0.f));
-	_viewports[2].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f).SetFocusOnClick(false);
-
-	_viewports[3].gridPlane = EDirection::RIGHT;
-	_viewports[3].camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-	_viewports[3].camera.GetProjection().SetOrthographicScale(32.f);
-	_viewports[3].camera.GetProjection().SetNearFar(-10000.f, 10000.f);
-	_viewports[3].camera.SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
-	_viewports[3].ui.SetTexture(radialGradient).SetColour(vpColour).SetParent(&_vpAreaUI).SetZ(100.f).SetFocusOnClick(false);
+	SharedPointer<const Font> vpFont = engine.pFontManager->Get("consolas", engine.context);
+	for (int i = 0; i < VIEWPORTCOUNT; ++i)
+	{
+		_viewports[i].ui.SetParent(&_vpAreaUI);
+		_viewports[i].bg.SetTexture(radialGradient).SetColour(vpColour).SetZ(100.f).SetFocusOnClick(false);
+		_viewports[i].SetFont(vpFont);
+	}
+	
+	_viewports[0].SetCameraType(Viewport::ECameraType::PERSPECTIVE);
+	_viewports[1].SetCameraType(Viewport::ECameraType::ORTHO_Y);
+	_viewports[2].SetCameraType(Viewport::ECameraType::ORTHO_Z);
+	_viewports[3].SetCameraType(Viewport::ECameraType::ORTHO_X);
 
 	//Note: toolbar is added after the viewport background ui because containers pass events to last elements first
 	_toolbar.SetButtonMaterial(engine.pMaterialManager->Get("uibutton1", engine.context)).SetButtonBorderSize(2.f)
@@ -257,7 +242,7 @@ void Editor::Run()
 	_Init();
 	_window.Show();
 
-	_consoleFont = engine.pFontManager->Get("consolas", engine.context);
+	_consoleFont = engine.pFontManager->Get("arial", engine.context);
 
 	_window.SetTitle("Editor");
 
