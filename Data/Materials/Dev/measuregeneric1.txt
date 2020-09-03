@@ -1,2 +1,2 @@
 surface
-tex diffuse measuregeneric1
+tex diffuse Dev/measuregeneric1

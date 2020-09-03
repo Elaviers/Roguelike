@@ -7,10 +7,6 @@
 
 class Viewport
 {
-	UIComboBox _comboBox;
-
-	void _OnComboBoxItemSelected(UIComboBox&);
-
 public:
 	enum class ECameraType
 	{
@@ -21,7 +17,15 @@ public:
 		ORTHO_Z
 	};
 
-	EDirection gridPlane = EDirection::UP;
+protected:
+	UIComboBox _comboBox;
+
+	ECameraType _cameraType;
+
+	void _OnComboBoxItemSelected(UIComboBox&);
+
+public:
+	Axes::EAxis gridAxis = Axes::EAxis::Y;
 
 	EntCamera camera;
 
@@ -32,6 +36,7 @@ public:
 
 	Viewport();
 
+	ECameraType GetCameraType() const { return _cameraType; }
 	void SetCameraType(ECameraType);
 
 	void SetFont(const SharedPointer<const Font>&);

@@ -4,6 +4,8 @@
 #include <ELCore/PropertyCollection.hpp>
 #include <ELCore/SharedPointer.hpp>
 
+class Viewport;
+
 class ToolEntity : public Tool
 {
 	byte _classID;
@@ -15,6 +17,8 @@ class ToolEntity : public Tool
 
 	void _SetClassID(const byte &id);
 	byte _GetClassID() const { return _classID; }
+
+	bool _ViewportCanPlace(const Viewport&) const;
 
 public:
 	ToolEntity(Editor &level) : Tool(level), _classID((byte)EEntityID::NONE), _placement(), _readyToPlace(false) {}

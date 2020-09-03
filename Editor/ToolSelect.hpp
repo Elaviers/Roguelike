@@ -5,6 +5,8 @@
 #include <ELCore/Buffer.hpp>
 #include <ELCore/SharedPointer.hpp>
 
+class Viewport;
+
 class ToolSelect : public Tool
 {
 	bool _placing;
@@ -36,6 +38,8 @@ class ToolSelect : public Tool
 	void _SetHoverObject(Entity*);
 
 	void _CloneSelection();
+
+	bool _ViewportCanRaySelect(const Viewport&) const;
 
 public:
 	ToolSelect(Editor& level) : Tool(level),

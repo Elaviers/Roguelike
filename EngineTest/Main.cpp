@@ -194,8 +194,8 @@ int Main()
 	inputManager.BindKeyAxis(EKeycode::Q, (float*)&lookZ, -1);
 	inputManager.BindKeyAxis(EKeycode::E, (float*)&lookZ, 1);
 
-	inputManager.BindAxis(EAxis::MOUSE_X, (float*)&mouseLookY);
-	inputManager.BindAxis(EAxis::MOUSE_Y, (float*)&mouseLookX);
+	inputManager.BindAxis(EInputAxis::MOUSE_X, (float*)&mouseLookY);
+	inputManager.BindAxis(EInputAxis::MOUSE_Y, (float*)&mouseLookX);
 
 
 	//
@@ -407,11 +407,11 @@ void Frame()
 		RenderEntry& e = renderQueue.NewDynamicEntry(ERenderChannels::UNLIT);
 		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 		e.AddSetColour(Colour::Red);
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), EDirection::RIGHT, 1.f, limit, 0.f, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), Axes::X, 1.f, limit, 0.f, 0.f);
 		e.AddSetColour(Colour::Green);
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), EDirection::UP, 1.f, limit, 0.f, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), Axes::Y, 1.f, limit, 0.f, 0.f);
 		e.AddSetColour(Colour::Blue);
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), EDirection::FORWARD, 1.f, limit, 0.f, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), Axes::Z, 1.f, limit, 0.f, 0.f);
 
 		//UI
 		//fps string

@@ -1,2 +1,2 @@
 surface
-tex diffuse measurewall2
+tex diffuse Dev/measurewall2

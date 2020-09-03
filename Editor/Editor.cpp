@@ -12,6 +12,7 @@
 #include <ELGraphics/RenderCommand.hpp>
 #include <ELMaths/Frustum.hpp>
 #include <ELMaths/Ray.hpp>
+#include <ELPhys/Collision.hpp>
 #include <ELSys/InputManager.hpp>
 #include <ELSys/System.hpp>
 #include <ELSys/Utilities.hpp>
@@ -312,16 +313,21 @@ void Editor::Frame()
 		}
 	}
 
-	EntCamera &perspCam = _viewports[_activeVP].camera;
-	perspCam.RelativeMove(
-		perspCam.GetRelativeTransform().GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed
-		+ perspCam.GetRelativeTransform().GetRightVector() * _deltaTime * _axisMoveX * moveSpeed
-		+ perspCam.GetRelativeTransform().GetUpVector() * _deltaTime * _axisMoveZ * moveSpeed);
+	if (_activeVP)
+	{
+		EntCamera& perspCam = _activeVP->camera;
+		perspCam.RelativeMove(
+			perspCam.GetRelativeTransform().GetForwardVector() * _deltaTime * _axisMoveY * moveSpeed
+			+ perspCam.GetRelativeTransform().GetRightVector() * _deltaTime * _axisMoveX * moveSpeed
+			+ perspCam.GetRelativeTransform().GetUpVector() * _deltaTime * _axisMoveZ * moveSpeed);
 
-	perspCam.AddRelativeRotation(Vector3(_deltaTime * _axisLookY * rotSpeed, _deltaTime * _axisLookX * rotSpeed, 0.f));
+		perspCam.AddRelativeRotation(Vector3(_deltaTime * _axisLookY * rotSpeed, _deltaTime * _axisLookX * rotSpeed, 0.f));
+	}
 
 	engine.pDebugManager->Update(_deltaTime);
-	engine.pDebugManager->AddToWorld(DebugFrustum::FromCamera(_viewports[0].camera.GetWorldTransform(), _viewports[0].camera.GetProjection()));
+
+	if (_viewports[0].GetCameraType() == Viewport::ECameraType::PERSPECTIVE)
+		engine.pDebugManager->AddToWorld(DebugFrustum::FromCamera(_viewports[0].camera.GetWorldTransform(), _viewports[0].camera.GetProjection()));
 
 
 	Entity* dbgObjA = engine.pWorld->FindChildWithUID(dbgIDA);
@@ -405,10 +411,10 @@ void Editor::RenderViewport(Viewport& vp)
 		e.AddSetLineWidth(lineW);
 
 		e.AddSetColour(Colour(.75f, .75f, .75f));
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridPlane, 1.f, gridLimit, 0.f, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridAxis, 1.f, gridLimit, 0.f, 0.f);
 
 		e.AddSetColour(Colour(.5f, .5f, 1.f));
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridPlane, 10.f, gridLimit, 0.f, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridAxis, 10.f, gridLimit, 0.f, 0.f);
 
 		engine.pDebugManager->RenderWorld(vp.renderQueue);
 	}
@@ -547,7 +553,7 @@ void Editor::SetTool(ETool tool, bool changeToolbar)
 
 void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 {
-	int vpIndex = -1;
+	Viewport* vp = nullptr;
 
 	for (int i = 0; i < VIEWPORTCOUNT; ++i)
 	{
@@ -557,20 +563,18 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 			x <= (bounds.x + bounds.w) &&
 			y <= (bounds.y + bounds.h))
 		{
-			vpIndex = i;
+			vp = &_viewports[i];
 			break;
 		}
 	}
 
-	if (vpIndex < 0)
+	if (vp == nullptr)
 	{
-		_mouseData.viewport = -1;
+		_mouseData.viewport = nullptr;
 		return;
 	}
 
-	const AbsoluteBounds& bounds = _viewports[vpIndex].ui.GetAbsoluteBounds();
-
-	if (_mouseData.viewport != vpIndex)
+	if (_mouseData.viewport != vp)
 	{
 		if (_mouseData.isLeftDown)
 			LeftMouseUp();
@@ -579,48 +583,64 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 			RightMouseUp();
 	}
 
-	EntCamera& camera = _viewports[vpIndex].camera;
-	Vector3 right = camera.GetRelativeTransform().GetRightVector();
-	Vector3 up = camera.GetRelativeTransform().GetUpVector();
-
-	if (camera.GetProjection().GetType() == EProjectionType::PERSPECTIVE)
-		_mouseData.rightElement = _mouseData.upElement = _mouseData.forwardElement = 0;
-	else
-	{
-		_mouseData.rightElement = right.x ? 0 : right.y ? 1 : 2;
-		_mouseData.upElement = up.x ? 0 : up.y ? 1 : 2;
-		_mouseData.forwardElement = (_mouseData.rightElement != 0 && _mouseData.upElement != 0) ? 0 : (_mouseData.rightElement != 1 && _mouseData.upElement != 1) ? 1 : 2;
-	}
+	const AbsoluteBounds& bounds = vp->ui.GetAbsoluteBounds();
+	Viewport* prevViewport = _mouseData.viewport;
 
 	_mouseData.prevX = _mouseData.x;
 	_mouseData.prevY = _mouseData.y;
 	_mouseData.prevUnitX = _mouseData.unitX;
 	_mouseData.prevUnitY = _mouseData.unitY;
-	int prevViewport = _mouseData.viewport;
-
-	_mouseData.viewport = vpIndex;
+	_mouseData.viewport = vp;
 	_mouseData.x = x - (uint16)(bounds.x + (bounds.w / 2.f));
 	_mouseData.y = y - (uint16)(bounds.y + (bounds.h / 2.f));
 
-	if (camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
+	EntCamera& camera = vp->camera;
+	Vector3 right = camera.GetRelativeTransform().GetRightVector();
+	Vector3 up = camera.GetRelativeTransform().GetUpVector();
+
+	switch (_mouseData.viewport->GetCameraType())
 	{
-		_mouseData.unitX = camera.GetRelativePosition()[_mouseData.rightElement] + (float)_mouseData.x / camera.GetProjection().GetOrthographicScale();
-		_mouseData.unitY = camera.GetRelativePosition()[_mouseData.upElement] + (float)_mouseData.y / camera.GetProjection().GetOrthographicScale();
+	case Viewport::ECameraType::ORTHO_X:
+	case Viewport::ECameraType::ORTHO_Y:
+	case Viewport::ECameraType::ORTHO_Z:
+	{
+		int rightElement = right.x ? 0 : right.y ? 1 : 2;
+		int upElement = up.x ? 0 : up.y ? 1 : 2;
+		_mouseData.unitX = camera.GetRelativePosition()[rightElement] + (float)_mouseData.x / camera.GetProjection().GetOrthographicScale();
+		_mouseData.unitY = camera.GetRelativePosition()[upElement] + (float)_mouseData.y / camera.GetProjection().GetOrthographicScale();
 	}
-	else
+		break;
+
+	case Viewport::ECameraType::ISOMETRIC:
+	{
+		Ray r = camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2((float)_mouseData.x / camera.GetProjection().GetDimensions().x, (float)_mouseData.y / camera.GetProjection().GetDimensions().y));
+		float t =  Collision::IntersectRayPlane(r, Vector3(), Vector3(0.f, 1.f, 0.f));
+		if (t > 0.f)
+		{
+			Vector3 pp = r.origin + r.direction * t;
+			_mouseData.unitX = pp.x;
+			_mouseData.unitY = pp.z;
+		}
+		else 
+			_mouseData.unitX = _mouseData.unitY = 0.f;
+	}
+		break;
+
+	default:
 		_mouseData.unitX = _mouseData.unitY = 0.f;
+		break;
+	}	
 
 	if (_mouseData.isRightDown && _mouseData.viewport == prevViewport)
 	{
 		if (camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 		{
-			Vector3 v;
-			v[_mouseData.rightElement] = _mouseData.prevUnitX - _mouseData.unitX;
-			v[_mouseData.upElement] = _mouseData.prevUnitY - _mouseData.unitY;
-			camera.RelativeMove(v);
+			camera.RelativeMove(right * (_mouseData.prevUnitX - _mouseData.unitX) + up * (_mouseData.prevUnitY - _mouseData.unitY));
 
-			_mouseData.unitX = camera.GetRelativePosition()[_mouseData.rightElement] + (float)_mouseData.x / camera.GetProjection().GetOrthographicScale();
-			_mouseData.unitY = camera.GetRelativePosition()[_mouseData.upElement] + (float)_mouseData.y / camera.GetProjection().GetOrthographicScale();
+			_mouseData.unitX = _mouseData.prevUnitX;
+			_mouseData.unitY = _mouseData.prevUnitY;
+			//_mouseData.unitX = camera.GetRelativePosition()[rightElement] + (float)_mouseData.x / camera.GetProjection().GetOrthographicScale();
+			//_mouseData.unitY = camera.GetRelativePosition()[upElement] + (float)_mouseData.y / camera.GetProjection().GetOrthographicScale();
 		}
 		else
 		{
@@ -631,10 +651,10 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 	_mouseData.unitX_rounded = _mouseData.unitX < 0.f ? (int)(_mouseData.unitX - 1.f) : (int)_mouseData.unitX;
 	_mouseData.unitY_rounded = _mouseData.unitY < 0.f ? (int)(_mouseData.unitY - 1.f) : (int)_mouseData.unitY;
 
-	if (camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
-		_window.SetTitle(CSTR(_mouseData.viewport, " Mouse X:", _mouseData.x, " (", _mouseData.unitX, " ) Mouse Y:", _mouseData.y, " (", _mouseData.unitY, ')'));
+	if (camera.GetProjection().GetType() != EProjectionType::PERSPECTIVE)
+		_window.SetTitle(CSTR("Mouse X:", _mouseData.x, " (", _mouseData.unitX, ") Mouse Y:", _mouseData.y, " (", _mouseData.unitY, ')'));
 	else
-		_window.SetTitle(CSTR(_mouseData.viewport, " Mouse X:", _mouseData.x, " (", _mouseData.unitX, " ) Mouse Y:", _mouseData.y));
+		_window.SetTitle(CSTR("Mouse X:", _mouseData.x, " Mouse Y:", _mouseData.y));
 
 	if (_currentTool)
 		_currentTool->MouseMove(_mouseData);
@@ -668,7 +688,7 @@ void Editor::RightMouseDown()
 {
 	_mouseData.isRightDown = true;
 
-	if (_mouseData.viewport >= 0 && _viewports[_mouseData.viewport].camera.GetProjection().GetType() == EProjectionType::PERSPECTIVE)
+	if (_mouseData.viewport && _mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::PERSPECTIVE)
 		_activeVP = _mouseData.viewport;
 }
 
@@ -712,9 +732,9 @@ void Editor::RefreshLevel()
 
 void Editor::Zoom(float amount)
 {
-	if (_mouseData.viewport >= 0)
+	if (_mouseData.viewport)
 	{
-		EntCamera& camera = _viewports[_mouseData.viewport].camera;
+		EntCamera& camera = _mouseData.viewport->camera;
 
 		if (camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 		{

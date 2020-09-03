@@ -34,6 +34,11 @@ void ToolEntity::_SetClassID(const byte &id)
 	_owner.ChangePropertyEntity(_placement.Ptr());
 }
 
+bool ToolEntity::_ViewportCanPlace(const Viewport& vp) const
+{
+	return vp.GetCameraType() == Viewport::ECameraType::PERSPECTIVE || vp.GetCameraType() == Viewport::ECameraType::ISOMETRIC;
+}
+
 void ToolEntity::Initialise()
 {
 	_classID = (byte)EEntityID::RENDERABLE;
@@ -59,9 +64,9 @@ void ToolEntity::Deactivate()
 
 void ToolEntity::MouseMove(const MouseData& mouseData)
 {
-	if (mouseData.viewport >= 0 && _placement && _owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::PERSPECTIVE)
+	if (mouseData.viewport && _placement && _ViewportCanPlace(*mouseData.viewport))
 	{
-		EntCamera& camera = _owner.GetVP(mouseData.viewport).camera;
+		EntCamera& camera = mouseData.viewport->camera;
 		Ray r = camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2((float)mouseData.x / camera.GetProjection().GetDimensions()[0], (float)mouseData.y / camera.GetProjection().GetDimensions()[1]));
 		Buffer<RaycastResult> results = _owner.LevelRef().Raycast(r);
 

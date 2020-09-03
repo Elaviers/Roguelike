@@ -85,8 +85,7 @@ private:
 
 	Tool *_currentTool = nullptr;
 
-	int _activeVP = 0;
-
+	Viewport* _activeVP = nullptr;
 
 	MouseData _mouseData;
 

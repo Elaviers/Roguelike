@@ -43,7 +43,7 @@ void ToolBrush2D::Cancel()
 
 void ToolBrush2D::MouseMove(const MouseData &mouseData)
 {
-	if (mouseData.forwardElement == 1)
+	if (mouseData.viewport->gridAxis == Axes::Y)
 	{
 		if (mouseData.isLeftDown)
 		{
@@ -65,13 +65,13 @@ void ToolBrush2D::MouseMove(const MouseData &mouseData)
 
 void ToolBrush2D::MouseDown(const MouseData &mouseData)
 {
-	if (mouseData.viewport == 1)
+	if (mouseData.viewport->gridAxis == Axes::Y)
 		_placing = true;
 }
 
 void ToolBrush2D::MouseUp(const MouseData &mouseData)
 {
-	if (mouseData.viewport == 1)
+	if (mouseData.viewport->gridAxis == Axes::Y)
 	{
 		_placing = false;
 

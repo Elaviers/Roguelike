@@ -8,8 +8,8 @@ void GameInstance::Initialise(Game& game)
 
 	InputManager& inputManager = *game.GetContext().GetPtr<InputManager>();
 
-	inputManager.BindAxis(EAxis::MOUSE_Y, &_axisLookUp);
-	inputManager.BindAxis(EAxis::MOUSE_X, &_axisLookRight);
+	inputManager.BindAxis(EInputAxis::MOUSE_Y, &_axisLookUp);
+	inputManager.BindAxis(EInputAxis::MOUSE_X, &_axisLookRight);
 	inputManager.BindKeyAxis(EKeycode::W, &_axisMoveForward, 1.f);
 	inputManager.BindKeyAxis(EKeycode::S, &_axisMoveForward, -1.f);
 	inputManager.BindKeyAxis(EKeycode::D, &_axisMoveRight, 1.f);

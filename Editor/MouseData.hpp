@@ -1,14 +1,17 @@
 #pragma once
 #include <ELCore/Types.hpp>
 
+class Viewport;
+
 struct MouseData
 {
-	int viewport = 0;
+	Viewport* viewport;
 	int x = 0;
 	int y = 0;
 	int prevX = 0;
 	int prevY = 0;
 
+	//Unit of the cursor on the viewport's grid
 	float unitX = 0.f;
 	float unitY = 0.f;
 	float heldUnitX = 0.f;
@@ -23,9 +26,4 @@ struct MouseData
 	int unitY_rounded = 0;
 	int heldUnitX_rounded = 0;
 	int heldUnitY_rounded = 0;
-
-	//ORTHO ONLY
-	byte forwardElement = 0;
-	byte rightElement = 0;
-	byte upElement = 0;
 };

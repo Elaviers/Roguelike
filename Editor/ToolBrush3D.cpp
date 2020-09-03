@@ -39,8 +39,13 @@ void ToolBrush3D::Cancel()
 
 void ToolBrush3D::MouseMove(const MouseData &mouseData)
 {
-	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
+	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 	{
+		Axes::EAxis fwdAxis = mouseData.viewport->gridAxis;
+		int fwdElement = fwdAxis;
+		int rightElement = Axes::GetHorizontalAxis(fwdAxis);
+		int upElement = Axes::GetVerticalAxis(fwdAxis);
+
 		if (mouseData.isLeftDown)
 		{
 			Vector2 p1, p2;
@@ -49,10 +54,10 @@ void ToolBrush3D::MouseMove(const MouseData &mouseData)
 			Vector3 p13d = _object.GetPoint1();
 			Vector3 p23d = _object.GetPoint2();
 
-			p13d[mouseData.rightElement] = (float)p1[0];
-			p13d[mouseData.upElement] = (float)p1[1];
-			p23d[mouseData.rightElement] = (float)p2[0];
-			p23d[mouseData.upElement] = (float)p2[1];
+			p13d[rightElement] = (float)p1[0];
+			p13d[upElement] = (float)p1[1];
+			p23d[rightElement] = (float)p2[0];
+			p23d[upElement] = (float)p2[1];
 
 			_object.SetPoint1(p13d);
 			_object.SetPoint2(p23d);
@@ -61,14 +66,14 @@ void ToolBrush3D::MouseMove(const MouseData &mouseData)
 		else if (!_placing)
 		{
 			Vector3 p1;
-			p1[mouseData.rightElement] = (float)mouseData.unitX_rounded;
-			p1[mouseData.upElement] = (float)mouseData.unitY_rounded;
-			p1[mouseData.forwardElement] = -100;
+			p1[rightElement] = (float)mouseData.unitX_rounded;
+			p1[upElement] = (float)mouseData.unitY_rounded;
+			p1[fwdElement] = -100;
 
 			Vector3 p2;
-			p2[mouseData.rightElement] = (float)(mouseData.unitX_rounded + 1);
-			p2[mouseData.upElement] = (float)(mouseData.unitY_rounded + 1);
-			p2[mouseData.forwardElement] = 100;
+			p2[rightElement] = (float)(mouseData.unitX_rounded + 1);
+			p2[upElement] = (float)(mouseData.unitY_rounded + 1);
+			p2[fwdElement] = 100;
 
 			_object.SetPoint1(p1);
 			_object.SetPoint2(p2);
@@ -79,7 +84,7 @@ void ToolBrush3D::MouseMove(const MouseData &mouseData)
 
 void ToolBrush3D::MouseDown(const MouseData &mouseData)
 {
-	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
+	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
 }
 
 void ToolBrush3D::KeySubmit()

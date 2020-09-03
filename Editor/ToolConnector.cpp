@@ -28,8 +28,13 @@ void ToolConnector::Cancel()
 
 void ToolConnector::MouseMove(const MouseData &mouseData)
 {
-	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
+	if (mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 	{
+		Axes::EAxis fwdAxis = mouseData.viewport->gridAxis;
+		int fwdElement = fwdAxis;
+		int rightElement = Axes::GetHorizontalAxis(fwdAxis);
+		int upElement = Axes::GetVerticalAxis(fwdAxis);
+
 		if (mouseData.isLeftDown)
 		{
 			Vector2 p1, p2;
@@ -37,28 +42,28 @@ void ToolConnector::MouseMove(const MouseData &mouseData)
 
 			Vector3 v;
 
-			v[mouseData.rightElement] = p1[0];
-			v[mouseData.upElement] = p1[1];
-			v[mouseData.forwardElement] = _connector.GetPoint1()[mouseData.forwardElement];
+			v[rightElement] = p1[0];
+			v[upElement] = p1[1];
+			v[fwdElement] = _connector.GetPoint1()[fwdElement];
 			_connector.SetPoint1(v);
 
-			v[mouseData.rightElement] = p2[0];
-			v[mouseData.upElement] = p2[1];
-			v[mouseData.forwardElement] = _connector.GetPoint2()[mouseData.forwardElement];
+			v[rightElement] = p2[0];
+			v[upElement] = p2[1];
+			v[fwdElement] = _connector.GetPoint2()[fwdElement];
 			_connector.SetPoint2(v);
 		}
 		else if (!_placing)
 		{
 			Vector3 v;
 
-			v[mouseData.rightElement] = (float)mouseData.unitX_rounded;
-			v[mouseData.upElement] = (float)mouseData.unitY_rounded;
-			v[mouseData.forwardElement] = -100.f;
+			v[rightElement] = (float)mouseData.unitX_rounded;
+			v[upElement] = (float)mouseData.unitY_rounded;
+			v[fwdElement] = -100.f;
 			_connector.SetPoint1(v);
 
-			v[mouseData.rightElement] = (float)mouseData.unitX_rounded + 1.f;
-   			v[mouseData.upElement] = (float)mouseData.unitY_rounded + 1.f;
-			v[mouseData.forwardElement] = 100.f;
+			v[rightElement] = (float)mouseData.unitX_rounded + 1.f;
+   			v[upElement] = (float)mouseData.unitY_rounded + 1.f;
+			v[fwdElement] = 100.f;
 			_connector.SetPoint2(v);
 		}
 	}
@@ -66,7 +71,7 @@ void ToolConnector::MouseMove(const MouseData &mouseData)
 
 void ToolConnector::MouseDown(const MouseData &mouseData)
 {
-	if (mouseData.viewport >= 0 && _owner.GetVP(mouseData.viewport).camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
+	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
 }
 
 void ToolConnector::KeySubmit()
