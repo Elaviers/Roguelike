@@ -6,8 +6,8 @@ Viewport::Viewport()
 	bg.SetParent(&ui);
 
 	_comboBox.SetBounds(UICoord(1.f, -128.f), UICoord(1.f, -16.f), UICoord(0.f, 110.f), UICoord(0.f, 16.f));
-	_comboBox.SetTextAlignment(ETextAlignment::RIGHT).SetColour(Colour::Invisible).SetColourHover(Colour(0.f, 0.f, 1.f, 0.25f)).SetColourHold(Colour(0.f, 0.f, 1.f, 0.5f)).SetBorderSize(0.f);
-	_comboBox.SetListColour(Colour::Invisible).SetListTextAlignment(ETextAlignment::RIGHT).SetListItemHeight(16.f);
+	_comboBox.SetTextAlignment(ETextAlignment::RIGHT).SetTextMargin(0.f).SetColour(Colour::Invisible).SetColourHover(Colour(0.f, 0.f, 1.f, 0.25f)).SetColourHold(Colour(0.f, 0.f, 1.f, 0.5f)).SetBorderSize(0.f);
+	_comboBox.SetListColour(Colour::Invisible).SetListTextAlignment(ETextAlignment::RIGHT).SetListTextMargin(0.f).SetListItemHeight(16.f);
 	_comboBox.Add("Perspective");
 	_comboBox.Add("Isometric");
 	_comboBox.Add("X");
@@ -61,8 +61,9 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		gridAxis = Axes::X;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(32.f);
-		camera.GetProjection().SetNearFar(-10000.f, 10000.f);
+		camera.GetProjection().SetNearFar(0.f, 20000.f);
 		camera.SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
+		camera.SetRelativePosition(Vector3(10000.f, 0.f, 0.f));
 		break;
 
 	case Viewport::ECameraType::ORTHO_Y:
@@ -70,8 +71,9 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		gridAxis = Axes::Y;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(32.f);
-		camera.GetProjection().SetNearFar(-10000.f, 10000.f);
+		camera.GetProjection().SetNearFar(0.f, 20000.f);
 		camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
+		camera.SetRelativePosition(Vector3(0.f, 10000.f, 0.f));
 		break;
 
 	case Viewport::ECameraType::ORTHO_Z:
@@ -79,8 +81,9 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		gridAxis = Axes::Z;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(32.f);
-		camera.GetProjection().SetNearFar(-10000.f, 10000.f);
+		camera.GetProjection().SetNearFar(0.f, 20000.f);
 		camera.SetRelativeRotation(Vector3(0.f, 0.f, 0.f));
+		camera.SetRelativePosition(Vector3(0.f, 0.f, -10000.f));
 		break;
 			
 	}

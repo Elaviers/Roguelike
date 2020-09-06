@@ -87,6 +87,9 @@
     <ClCompile Include="Viewport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GizmoBrushSizer2D.cpp">
+      <Filter>Source Files\Tools\Gizmo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EditorIO.hpp">
@@ -153,6 +156,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Viewport.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GizmoBrushSizer2D.hpp">
+      <Filter>Header Files\Tools\Gizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="E2DBrushEdge.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

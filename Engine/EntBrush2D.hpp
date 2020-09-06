@@ -2,9 +2,14 @@
 #include "EntRenderable.hpp"
 #include <ELPhys/CollisionBox.hpp>
 
+/*
+	Todo: Allow on any axis
+*/
 class EntBrush2D : public EntRenderable
 {
 protected:
+	Axes::EAxis _axis;
+
 	Vector2 _point1;
 	Vector2 _point2;
 
@@ -21,7 +26,6 @@ public:
 	EntBrush2D() : _updatingTransform(false), level(0.f) 
 	{ 
 		onTransformChanged += Callback(this, &EntBrush2D::_OnTransformChanged);
-		SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
 	}
 
 	EntBrush2D(const EntBrush2D& other) : EntRenderable(other), _point1(other._point1), _point2(other._point2), level(other.level), _updatingTransform(false)

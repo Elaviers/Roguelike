@@ -24,7 +24,7 @@ void EntBrush2D::_OnPointChanged()
 
 	_updatingTransform = true;
 	SetRelativePosition(Vector3(x, level, z));
-	SetRelativeScale(Vector3(w, h, 0.f));
+	SetRelativeScale(Vector3(w, 0.f, h));
 	_updatingTransform = false;
 }
 
@@ -34,9 +34,9 @@ void EntBrush2D::Render(RenderQueue& q) const
 	{
 		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SURFACE, 0);
 		_material->Apply(e);
-		e.AddSetUVScale(Vector2(GetRelativeScale().x, GetRelativeScale().y));
+		e.AddSetUVScale(Vector2(GetRelativeScale().x, GetRelativeScale().z));
 		e.AddCommand(RCMDSetUVOffset::Default());
-		e.AddSetTransform(GetTransformationMatrix());
+		e.AddSetTransform(Matrix4::RotationX(-90.f) * GetTransformationMatrix());
 		e.AddSetColour(Colour::White);
 		e.AddCommand(RCMDRenderMesh::PLANE);
 	}

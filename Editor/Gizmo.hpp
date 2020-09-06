@@ -1,7 +1,8 @@
 #pragma once
-#include "GizmoAxis.hpp"
-#include "GizmoPlane.hpp"
-#include "GizmoRing.hpp"
+#include "E2DBrushEdge.hpp"
+#include "GizmoComponent.hpp"
+#include <ELCore/Concepts.hpp>
+#include <ELCore/List.hpp>
 #include <ELMaths/Ray.hpp>
 
 /*
@@ -12,75 +13,73 @@
 
 class Gizmo
 {
-	GizmoAxis _axisX;
-	GizmoAxis _axisY;
-	GizmoAxis _axisZ;
-	GizmoPlane _planeXY;
-	GizmoPlane _planeXZ;
-	GizmoPlane _planeYZ;
-	GizmoRing _ringX;
-	GizmoRing _ringY;
-	GizmoRing _ringZ;
+	List<GizmoComponent*> _components;
 
-	constexpr static int _componentCount = 9;
-	GizmoComponent* const _all[_componentCount] = {
-		&_axisX, &_axisY, &_axisZ, 
-		&_planeXY, &_planeXZ, &_planeYZ,
-		&_ringX, &_ringY, &_ringZ 
-	};
+	Transform _transform;
 
+	//Returns amount moved
+	FunctionPointer<Vector3, const Vector3&> _fpMove;
+
+	//The function takes an axis and an angle(degrees) and returns the angle consumed
+	FunctionPointer<float, const Vector3&, float> _fpRotate;
+
+	FunctionPointer<void, E2DBrushEdge, const Vector3&> _fpSetSide;
+
+	Setter<const Vector3&> _fpScale; //unused
 public:
-	Gizmo(const Setter<const Vector3&> &move, const FunctionPointer<float, const Vector3&, float> &rotate) :
-		_axisX(Vector4(1, 0, 0), move),
-		_axisY(Vector4(0, 1, 0), move),
-		_axisZ(Vector4(0, 0, 1), move),
-		_planeXY(Vector4(1, 1, 0), move),
-		_planeXZ(Vector4(1, 0, 1), move),
-		_planeYZ(Vector4(0, 1, 1), move),
-		_ringX(Vector4(.5f, 0, 0), rotate),
-		_ringY(Vector4(0, .5f, 0), rotate),
-		_ringZ(Vector4(0, 0, .5f), rotate)
-	{}
-
-	~Gizmo() {}
-
-	const Vector3& GetPosition() const { return _ringX.transform.GetPosition(); }
-
-	void SetTransform(const Transform& t)
+	Gizmo() {}
+	~Gizmo() 
 	{
-		for (int i = 0; i < _componentCount; ++i)
-			_all[i]->transform = t;
+		for (GizmoComponent* c : _components)
+			delete c;
+	}
 
-		_axisY.transform.Rotate(Quaternion(Vector3(1, 0, 0), 90.f));
-		_axisX.transform.Rotate(Quaternion(Vector3(0, 1, 0), -90.f));
+	const Transform& GetTransform() const { return _transform; }
+	void SetTransform(const Transform& t) 
+	{ 
+		_transform = t; 
 
-		_planeXZ.transform.Rotate(Quaternion(Vector3(1, 0, 0), 90.f));
-		_planeYZ.transform.Rotate(Quaternion(Vector3(0, 1, 0), -90.f));
+		for (GizmoComponent* c : _components)
+			c->SetGizmoTransform(_transform);
+	}
 
-		_ringY.transform.Rotate(Quaternion(Vector3(1, 0, 0), 90.f));
-		_ringX.transform.Rotate(Quaternion(Vector3(0, 1, 0), -90.f));
+	void SetObjectTransform(const Transform& objt)
+	{
+		for (GizmoComponent* c : _components)
+			c->SetObjectTransform(objt);
+	}
 
-		_planeXY.transform.Move(Vector3(.5f, .5f, 0.f));
-		_planeXZ.transform.Move(Vector3(.5f, 0.f, .5f));
-		_planeYZ.transform.Move(Vector3(0.f, .5f, .5f));
+	const FunctionPointer<Vector3, const Vector3&>& GetMoveFunction() const { return _fpMove; }
+	const FunctionPointer<float, const Vector3&, float>& GetRotateFunction() const { return _fpRotate; }
+	const Setter<const Vector3&>& GetScaleFunction() const { return _fpScale; }
+	const FunctionPointer<void, E2DBrushEdge, const Vector3&>& GetSideFunction() const { return _fpSetSide; }
 
-		_planeXY.transform.SetScale(Vector3(.5f, .5f, .5f));
-		_planeXZ.transform.SetScale(Vector3(.5f, .5f, .5f));
-		_planeYZ.transform.SetScale(Vector3(.5f, .5f, .5f));
+	void SetMoveFunction(const FunctionPointer<Vector3, const Vector3&>& move) { _fpMove = move; }
+	void SetRotateFunction(const FunctionPointer<float, const Vector3&, float>& rotate) { _fpRotate = rotate; }
+	void SetScaleFunction(const Setter<const Vector3&>& scale) { _fpScale = scale; }
+	void SetSideFunction(const FunctionPointer<void, E2DBrushEdge, const Vector3&>& setSide) { _fpSetSide = setSide; }
+
+	template <typename T>
+	requires Concepts::DerivedFrom<T, GizmoComponent>
+	void AddComponent(const T& component) { (*_components.Add(new T(component)))->_owner = this;  }
+	void ClearComponents() 
+	{ 
+		for (GizmoComponent* c : _components)
+			delete c;
+
+		_components.Clear();
 	}
 
 	void Update(const MouseData &data, const Ray& mouseRay, float &maxT)
 	{
-		for (int i = 0; i < _componentCount; ++i)
-		{
-			_all[i]->Update(mouseRay, maxT);
-		}
+		for (GizmoComponent* c : _components)
+			c->Update(data, mouseRay, maxT);
 	}
 
 	bool MouseDown()
 	{
-		for (int i = 0; i < _componentCount; ++i)
-			if (_all[i]->MouseDown())
+		for (GizmoComponent* c : _components)
+			if (c->MouseDown())
 				return true;
 
 		return false;
@@ -88,13 +87,13 @@ public:
 
 	void MouseUp()
 	{
-		for (int i = 0; i < _componentCount; ++i)
-			_all[i]->MouseUp();
+		for (GizmoComponent* c : _components)
+			c->MouseUp();
 	}
 
 	void Render(RenderQueue& q) const
 	{
-		for (int i = 0; i < _componentCount; ++i)
-			_all[i]->Render(q);
+		for (const GizmoComponent* c : _components)
+			c->Render(q);
 	}
 };

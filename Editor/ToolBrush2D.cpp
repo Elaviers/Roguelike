@@ -45,19 +45,21 @@ void ToolBrush2D::MouseMove(const MouseData &mouseData)
 {
 	if (mouseData.viewport->gridAxis == Axes::Y)
 	{
+		Vector2 offset = mouseData.viewport->GetCameraType() == Viewport::ECameraType::ISOMETRIC ? Vector2(-_object.level, -_object.level) : Vector2();
+
 		if (mouseData.isLeftDown)
 		{
 			Vector2 p1, p2;
 			EditorUtil::CalculatePointsFromMouseData(mouseData, p1, p2);
 
-			_object.SetPoint1(p1);
-			_object.SetPoint2(p2);
+			_object.SetPoint1(p1 + offset);
+			_object.SetPoint2(p2 + offset);
 			_owner.RefreshProperties();
 		}
 		else
 		{
-			_object.SetPoint1(Vector2((float)mouseData.unitX_rounded, (float)mouseData.unitY_rounded));
-			_object.SetPoint2(Vector2((float)(mouseData.unitX_rounded + 1), (float)(mouseData.unitY_rounded + 1)));
+			_object.SetPoint1(Vector2((float)mouseData.unitX_rounded, (float)mouseData.unitY_rounded) + offset);
+			_object.SetPoint2(Vector2((float)(mouseData.unitX_rounded + 1), (float)(mouseData.unitY_rounded + 1)) + offset);
 			_owner.RefreshProperties();
 		}
 	}

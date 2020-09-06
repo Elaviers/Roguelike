@@ -3,29 +3,33 @@
 #include <ELMaths/Ray.hpp>
 #include <ELMaths/Transform.hpp>
 
+class Gizmo;
+struct MouseData;
 class RenderQueue;
 
 class GizmoComponent
 {
 protected:
+	friend Gizmo;
+
+	Gizmo* _owner;
+
 	Colour _colour;
 
 	bool _canDrag;
 	bool _isDragging;
-	
-	virtual void _OnTransformChanged() {}
 
 	GizmoComponent(const Colour& colour) : 
 		_colour(colour), 
 		_canDrag(false),
-		_isDragging(false),
-		transform(Callback(this, &GizmoComponent::_OnTransformChanged)) 
+		_isDragging(false)
 	{}
 
 public:
-	Transform transform;
-
 	virtual ~GizmoComponent() {}
+
+	virtual void SetGizmoTransform(const Transform& transform) {};
+	virtual void SetObjectTransform(const Transform& transform) {};
 
 	virtual void Render(RenderQueue&) const {}
 
@@ -33,7 +37,7 @@ public:
 		Will not consider collisions past maxT
 		if successful, maxT is set to the entry time
 	*/
-	virtual void Update(const Ray& mouseRay, float& maxT) {}
+	virtual void Update(const MouseData& mouseData, const Ray& mouseRay, float& maxT) {}
 
 	bool MouseDown() { 
 		if (_canDrag)

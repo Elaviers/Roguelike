@@ -5,19 +5,22 @@ class GizmoPlane : public GizmoComponent
 {
 	Vector3 _grabOffset;
 
-	Setter<const Vector3&> _move;
+	Transform _relativeTransform;
+	Transform _transform;
 
-protected:
-	virtual void _OnTransformChanged() override;
-
+	Vector3 _moveDelta;
+		
 public:
-	GizmoPlane(const Colour& colour, Setter<const Vector3&> move) :
+	GizmoPlane(const Colour& colour, const Transform& relativeTransform) :
 		GizmoComponent(colour),
-		_move(move)
+		_relativeTransform(relativeTransform),
+		_transform(relativeTransform)
 	{}
 
 	virtual ~GizmoPlane() {}
 
+	virtual void SetGizmoTransform(const Transform& transform) override;
+
 	virtual void Render(RenderQueue&) const override;
-	virtual void Update(const Ray& mouseRay, float& maxT) override;
+	virtual void Update(const MouseData& mouseData, const Ray& mouseRay, float& maxT) override;
 };

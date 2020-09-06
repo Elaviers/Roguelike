@@ -1,6 +1,10 @@
 #include "ToolSelect.hpp"
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
+#include "GizmoAxis.hpp"
+#include "GizmoBrushSizer2D.hpp"
+#include "GizmoPlane.hpp"
+#include "GizmoRing.hpp"
 #include "UIPropertyManipulator.hpp"
 #include <ELCore/MacroUtilities.hpp>
 #include <ELGraphics/RenderCommand.hpp>
@@ -23,19 +27,22 @@ const PropertyCollection& ToolSelect::_GetProperties()
 		"SnapToWorld",
 		offsetof(ToolSelect, _snapToWorld));
 
-	properties.Add<bool>(
+	properties.Add(
 		"GizmoIsLocal",
-		offsetof(ToolSelect, _gizmoIsLocal));
+		MemberGetter<ToolSelect, bool>(&ToolSelect::_GetGizmoIsLocal),
+		MemberSetter<ToolSelect, bool>(&ToolSelect::_SetGizmoIsLocal));
 	DO_ONCE_END;
 
 	return properties;
 }
 
-void ToolSelect::_GizmoMove(const Vector3& delta)
+Vector3 ToolSelect::_GizmoMove(const Vector3& delta)
 {
+	//todo: gizmo snapping for local mode
+
 	Vector3 d(delta);
 
-	if (!_snapToWorld && _gridSnap)
+	if (!_gizmoIsLocal && !_snapToWorld && _gridSnap)
 	{
 		d.x = Maths::Trunc(d.x, _gridSnap);
 		d.y = Maths::Trunc(d.y, _gridSnap);
@@ -47,7 +54,7 @@ void ToolSelect::_GizmoMove(const Vector3& delta)
 		Vector3 startPos = _selectedObjects[i]->GetWorldPosition();
 		Vector3 endPos = startPos + d;
 
-		if (_snapToWorld && _gridSnap)
+		if (!_gizmoIsLocal && _snapToWorld && _gridSnap)
 		{
 			endPos.x = Maths::Trunc(endPos.x, _gridSnap);
 			endPos.y = Maths::Trunc(endPos.y, _gridSnap);
@@ -62,6 +69,8 @@ void ToolSelect::_GizmoMove(const Vector3& delta)
 
 		_selectedObjects[i]->SetWorldPosition(endPos);
 	}
+
+	return d;
 }
 
 float ToolSelect::_GizmoRotate(const Vector3 &axis, float angle)
@@ -77,7 +86,7 @@ float ToolSelect::_GizmoRotate(const Vector3 &axis, float angle)
 	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
 	{
 		_selectedObjects[i]->SetWorldPosition(
-			VectorMaths::RotateAbout(_selectedObjects[i]->GetWorldPosition(), _gizmo.GetPosition(), rotation));
+			VectorMaths::RotateAbout(_selectedObjects[i]->GetWorldPosition(), _gizmo.GetTransform().GetPosition(), rotation));
 
 		_selectedObjects[i]->SetWorldRotation(_selectedObjects[i]->GetWorldRotation() * rotation);
 	}
@@ -85,7 +94,66 @@ float ToolSelect::_GizmoRotate(const Vector3 &axis, float angle)
 	return _gizmoIsLocal ? 0.f : angle;
 }
 
-void ToolSelect::_UpdateGizmoPos()
+void ToolSelect::_GizmoSetSidePos(E2DBrushEdge edge, const Vector3& delta)
+{
+	//note: will not work for any plane that is not axis-aligned!
+
+	Entity* ent = _selectedObjects[0].Ptr();
+	Transform wt = ent->GetWorldTransform();
+	Vector3 scale = wt.GetScale();
+
+	Vector3 normal;
+	int elem = -1;
+	switch (edge)
+	{
+	case E2DBrushEdge::NEG_X:
+		normal = -wt.GetRightVector();
+		elem = 0;
+		break;
+	case E2DBrushEdge::POS_X:
+		normal = wt.GetRightVector();
+		elem = 0;
+		break;
+	case E2DBrushEdge::NEG_Y:
+		normal = -wt.GetForwardVector();
+		elem = 2;
+		break;
+	case E2DBrushEdge::POS_Y:
+		normal = wt.GetForwardVector();
+		elem = 2;
+		break;
+
+	default:
+		Debug::Break(); //This should never execute!
+		return;
+	}
+
+	Vector3 anchor = wt.GetPosition() - normal * (scale[elem] / 2.f);
+	Vector3 edgePos = anchor + normal * scale[elem];
+	Vector3 finalEdgePos;
+	if (_gridSnap)
+	{
+		if (_snapToWorld)
+		{
+			finalEdgePos = edgePos + delta;
+			finalEdgePos[elem] = Maths::Trunc(finalEdgePos[elem], _gridSnap);
+		}
+		else
+		{
+			Vector3 d = delta;
+			d[elem] = Maths::Trunc(d[elem], _gridSnap);
+			finalEdgePos = edgePos + d;
+		}
+	}
+	else finalEdgePos = edgePos + delta;
+
+	wt.SetPosition((anchor + finalEdgePos) / 2.f);
+	scale[elem] = (anchor - finalEdgePos).Length();
+	wt.SetScale(scale);
+	ent->SetWorldTransform(wt);
+}
+
+void ToolSelect::_UpdateGizmoTransform()
 {
 	if (_gizmoIsLocal && _selectedObjects.GetSize() == 1)
 		_gizmo.SetTransform(Transform(_selectedObjects[0]->GetWorldPosition(), _selectedObjects[0]->GetWorldRotation()));
@@ -99,6 +167,7 @@ void ToolSelect::_UpdateGizmoPos()
 		avgPosition /= (float)_selectedObjects.GetSize();
 
 		_gizmo.SetTransform(Transform(avgPosition));
+		_brushGizmo.SetObjectTransform(_selectedObjects[0]->GetWorldTransform());
 	}
 }
 
@@ -126,6 +195,26 @@ void ToolSelect::Initialise()
 	_gridSnap = .25f;
 	_snapToWorld = false;
 	_gizmoIsLocal = false;
+
+	_gizmo.AddComponent(GizmoAxis(Colour::Red, Vector3(1, 0, 0)));
+	_gizmo.AddComponent(GizmoAxis(Colour::Green, Vector3(0, 1, 0)));
+	_gizmo.AddComponent(GizmoAxis(Colour::Blue, Vector3(0, 0, 1)));
+	_gizmo.AddComponent(GizmoRing(Colour::Red, Vector3(0, 90, 0)));
+	_gizmo.AddComponent(GizmoRing(Colour::Green, Vector3(90, 0, 0)));
+	_gizmo.AddComponent(GizmoRing(Colour::Blue, Rotation()));
+	_gizmo.AddComponent(GizmoPlane(Colour(1.f, 1.f, 0.f), Transform(Vector3(0.5f, 0.5f, 0.f), Rotation(), Vector3(0.25f, 0.25f, 0.25f))));
+	_gizmo.AddComponent(GizmoPlane(Colour(1.f, 0.f, 1.f), Transform(Vector3(0.5f, 0.f, 0.5f), Vector3(-90.f, 0.f, 0.f), Vector3(0.25f, 0.25f, 0.25f))));
+	_gizmo.AddComponent(GizmoPlane(Colour(0.f, 1.f, 1.f), Transform(Vector3(0.0f, 0.5f, 0.5f), Vector3(0.f, -90.f, 0.f), Vector3(0.25f, 0.25f, 0.25f))));
+
+	_brushGizmo.AddComponent(GizmoBrushSizer2D(Colour::Yellow, E2DBrushEdge::NEG_X));
+	_brushGizmo.AddComponent(GizmoBrushSizer2D(Colour::Yellow, E2DBrushEdge::POS_X));
+	_brushGizmo.AddComponent(GizmoBrushSizer2D(Colour::Yellow, E2DBrushEdge::NEG_Y));
+	_brushGizmo.AddComponent(GizmoBrushSizer2D(Colour::Yellow, E2DBrushEdge::POS_Y));
+
+	_gizmo.SetMoveFunction(FunctionPointer<Vector3, const Vector3&>(this, &ToolSelect::_GizmoMove));
+	_gizmo.SetRotateFunction(FunctionPointer<float, const Vector3&, float>(this, &ToolSelect::_GizmoRotate));
+
+	_brushGizmo.SetSideFunction(FunctionPointer<void, E2DBrushEdge, const Vector3&>(this, &ToolSelect::_GizmoSetSidePos));
 }
 
 void ToolSelect::Activate(UIContainer& properties, UIContainer& toolProperties)
@@ -247,40 +336,36 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 	{
 		EntCamera& camera = mouseData.viewport->camera;
 
-		if (canRaySelect)
-		{
-			Ray r(camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2((float)mouseData.x / camera.GetProjection().GetDimensions().x, (float)mouseData.y / camera.GetProjection().GetDimensions().y)));
+		Ray r(camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2((float)mouseData.x / camera.GetProjection().GetDimensions().x, (float)mouseData.y / camera.GetProjection().GetDimensions().y)));
 
-			//Gizmo
-			{
-				float t = INFINITY;
-				_gizmo.Update(mouseData, r, t);
+		if (_activeGizmo) {
+			float t = INFINITY;
+			_activeGizmo->Update(mouseData, r, t);
 
-				if (t < INFINITY)
-					System::SetCursor(ECursor::HAND);
-			}
-
-			_owner.RefreshProperties();
-
-			//Update hoverobject
-			Buffer<RaycastResult> results = _owner.LevelRef().Raycast(r);
-
-			if (results.GetSize())
-			{
-				_SetHoverObject(results[0].object);
-
-				if (_hoverObjectIsSelected == false)
-					System::SetCursor(ECursor::HAND);
-			}
-			else
-				_hoverObject.Clear();
+			if (t < INFINITY)
+				System::SetCursor(ECursor::HAND);
 		}
+
+		_owner.RefreshProperties();
+
+		//Update hoverobject
+		Buffer<RaycastResult> results = _owner.LevelRef().Raycast(r);
+
+		if (results.GetSize())
+		{
+			_SetHoverObject(results[0].object);
+
+			if (_hoverObjectIsSelected == false)
+				System::SetCursor(ECursor::HAND);
+		}
+		else
+			_hoverObject.Clear();
 	}
 }
 
 void ToolSelect::MouseDown(const MouseData &mouseData)
 {
-	if (_gizmo.MouseDown())
+	if (_activeGizmo && _activeGizmo->MouseDown())
 	{
 		if (_owner.engine.pInputManager->IsKeyDown(EKeycode::ALT))
 			_shouldCopy = true;
@@ -318,7 +403,7 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 
 void ToolSelect::MouseUp(const MouseData& mouseData)
 {
-	_gizmo.MouseUp();
+	if (_activeGizmo) _activeGizmo->MouseUp();
 }
 
 void ToolSelect::KeySubmit()
@@ -333,13 +418,13 @@ void ToolSelect::KeySubmit()
 	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
 	{
 		_selectedObjects[i] = _owner.engine.pObjectTracker->Track(result[i]);
-		_selectedObjects[i]->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoPos);
+		_selectedObjects[i]->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
 	}
 
 	if (_selectedObjects.GetSize() > 0)
 		_owner.ChangePropertyEntity(_selectedObjects.Last().Ptr());
 
-	_UpdateGizmoPos();
+	_UpdateGizmoTransform();
 }
 
 void ToolSelect::KeyDelete()
@@ -360,16 +445,16 @@ void ToolSelect::Render(RenderQueue& q) const
 		e.AddBox(_sbPoint1, _sbPoint2);
 	}
 	
-	if (_selectedObjects.GetSize() > 0 && EntCamera::Current()->GetProjection().GetType() == EProjectionType::PERSPECTIVE)
+	if (_activeGizmo)
 	{
 		RenderEntry& pre = q.NewDynamicEntry(ERenderChannels::EDITOR);
 		pre.AddCommand(RCMDSetDepthFunc::ALWAYS);
-		_gizmo.Render(q);
+		_activeGizmo->Render(q);
 		RenderEntry& post = q.NewDynamicEntry(ERenderChannels::EDITOR);
 		post.AddCommand(RCMDSetDepthFunc::LEQUAL);
 	}
 	
-	if (_selectedObjects.GetSize())
+	if (_activeGizmo != &_brushGizmo && _selectedObjects.GetSize())
 	{
 		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
 		e.AddSetColour(Colour::Cyan);
@@ -398,19 +483,23 @@ void ToolSelect::Select(Entity* object)
 	_selectedObjects.Add(_owner.engine.pObjectTracker->Track(object));
 
 	_owner.ChangePropertyEntity(_selectedObjects.Last().Ptr());
-	_selectedObjects.Last()->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoPos);
-	_UpdateGizmoPos();
+	_selectedObjects.Last()->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
+	_UpdateGizmoTransform();
+
+	_activeGizmo = dynamic_cast<EntBrush2D*>(_selectedObjects[0].Ptr()) ? &_brushGizmo : &_gizmo;
 }
 
 void ToolSelect::ClearSelection()
 {
 	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
 		if (_selectedObjects[i])
-			_selectedObjects[i]->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoPos);
+			_selectedObjects[i]->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoTransform);
 
 	_owner.ClearProperties();
 	_selectedObjects.SetSize(0);
 	_hoverObject.Clear();
+
+	_activeGizmo = nullptr;
 }
 
 void ToolSelect::_CloneSelection()
@@ -418,7 +507,7 @@ void ToolSelect::_CloneSelection()
 	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
 	{
 		bool isHoverObject = _hoverObject == _selectedObjects[i];
-		_selectedObjects[i]->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoPos);
+		_selectedObjects[i]->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoTransform);
 
 		Entity* newObject = _selectedObjects[i]->Clone();
 		newObject->GetProperties().Transfer(_selectedObjects[i].Ptr(), newObject, _owner.engine.context);
@@ -426,11 +515,11 @@ void ToolSelect::_CloneSelection()
 		_selectedObjects[i] = _owner.engine.pObjectTracker->Track(newObject);
 		
 		if (isHoverObject) _hoverObject = _selectedObjects[i];
-		_selectedObjects[i]->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoPos);
+		_selectedObjects[i]->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
 	}
 	
 	_hoverObjectIsSelected = true;
 	_owner.ChangePropertyEntity(_selectedObjects.Last().Ptr());
 
-	_UpdateGizmoPos();
+	_UpdateGizmoTransform();
 }

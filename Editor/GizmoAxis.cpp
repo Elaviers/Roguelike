@@ -1,4 +1,5 @@
 #include "GizmoAxis.hpp"
+#include "Gizmo.hpp"
 #include <ELGraphics/Colour.hpp>
 #include <ELGraphics/TextureManager.hpp>
 #include <ELGraphics/RenderCommand.hpp>
@@ -6,11 +7,11 @@
 #include <ELPhys/Collision.hpp>
 #include <ELPhys/RaycastResult.hpp>
 
-void GizmoAxis::_OnTransformChanged()
+void GizmoAxis::SetGizmoTransform(const Transform& gizmoTransform)
 {
-	_fv = transform.GetForwardVector();
-
-	_collisionBox->SetTransform(Transform((2.f * transform.GetPosition() + _fv * _length) / 2.f, transform.GetRotation(), Vector3(0.1f, 0.1f, _length / 2.f)));
+	_position = gizmoTransform.GetPosition();
+	_fv = gizmoTransform.GetRotation().GetQuat().Transform(_axis);
+	_lineEnd = _position + _fv * _length;
 }
 
 void GizmoAxis::Render(RenderQueue& q) const
@@ -23,35 +24,41 @@ void GizmoAxis::Render(RenderQueue& q) const
 		e.AddSetColour(_colour);
 
 	e.AddSetLineWidth(2.f);
-	e.AddLine(transform.GetPosition(), transform.GetPosition() + _fv * _length);
+	e.AddLine(_position, _lineEnd);
 }
 
-void GizmoAxis::Update(const Ray& mouseRay, float &minT)
+void GizmoAxis::Update(const MouseData& mouseData, const Ray& mouseRay, float & maxT)
 {
+	Vector3 line2camera = (mouseRay.origin - _position).Normalise();
+	float t = Collision::IntersectRayPlane(mouseRay, _position, Vector3::TripleCross(_fv, line2camera, _fv));
+	Vector3 pp = mouseRay.origin + mouseRay.direction * t;
+
 	if (_isDragging)
 	{
-		float t = Collision::IntersectRayPlane(mouseRay, transform.GetPosition(), transform.GetRightVector());
 		if (t != 0.f)
 		{
-			Vector3 planeDelta = mouseRay.origin + mouseRay.direction * t - (transform.GetPosition() + _grabOffset);
-
-			//Snap to axis
-			Vector3 fv = transform.GetForwardVector();
-			_move.TryCall(_fv * planeDelta.Dot(_fv));
+			Vector3 planeDelta = pp - (_position + _grabOffset);
+			_owner->GetMoveFunction()(_fv * _fv.Dot(planeDelta));
 		}
 	}
 	else
 	{
-		RaycastResult rr;
-		if (_collider.IntersectsRay(Transform(), mouseRay, ECollisionChannels::ALL, rr) && rr.entryTime < minT)
+		if (t < maxT)
 		{
-			minT = rr.entryTime;
+			Vector3 cp = Collision::ClosestPointOnLineSegment(_position, _lineEnd, pp);
+			float dist2 = (cp - pp).LengthSquared();
 
-			_grabOffset = mouseRay.origin + mouseRay.direction * rr.entryTime - transform.GetPosition();
-			
-			_canDrag = true;
+			if (dist2 <= 0.05f * 0.05f)
+			{
+				maxT = t;
+
+				_grabOffset = pp - _position;
+
+				_canDrag = true;
+				return;
+			}
 		}
-		else
-			_canDrag = false;
+
+		_canDrag = false;
 	}
 }

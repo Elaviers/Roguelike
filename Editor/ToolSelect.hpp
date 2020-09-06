@@ -24,16 +24,24 @@ class ToolSelect : public Tool
 	bool _snapToWorld;
 	bool _gizmoIsLocal;
 
+	//property callbacks
+	bool _GetGizmoIsLocal() const { return _gizmoIsLocal; }
+	void _SetGizmoIsLocal(const bool &gizmoIsLocal) { _gizmoIsLocal = gizmoIsLocal; _UpdateGizmoTransform(); }
+
 	Gizmo _gizmo;
+	Gizmo _brushGizmo;
+
+	Gizmo* _activeGizmo;
 
 	Vector3 _sbPoint1;
 	Vector3 _sbPoint2;
 
 	const PropertyCollection& _GetProperties();
 
-	void _GizmoMove(const Vector3& delta);
+	Vector3 _GizmoMove(const Vector3& delta);
 	float _GizmoRotate(const Vector3 &axis, float angle);
-	void _UpdateGizmoPos();
+	void _GizmoSetSidePos(E2DBrushEdge edge, const Vector3& delta);
+	void _UpdateGizmoTransform();
 
 	void _SetHoverObject(Entity*);
 
@@ -52,9 +60,7 @@ public:
 		_gridSnap(1.f),
 		_snapToWorld(0),
 		_gizmoIsLocal(0),
-		_gizmo(
-			Setter<const Vector3&>(this, &ToolSelect::_GizmoMove), 
-			FunctionPointer<float, const Vector3 &, float>(this, &ToolSelect::_GizmoRotate)) 
+		_activeGizmo(nullptr)
 	{}
 	virtual ~ToolSelect() {}
 

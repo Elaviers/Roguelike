@@ -200,6 +200,7 @@ EXIT 0</Command>
     <ClCompile Include="EditorUtil.cpp" />
     <ClCompile Include="FbxReader.cpp" />
     <ClCompile Include="GizmoAxis.cpp" />
+    <ClCompile Include="GizmoBrushSizer2D.cpp" />
     <ClCompile Include="GizmoPlane.cpp" />
     <ClCompile Include="GizmoRing.cpp" />
     <ClCompile Include="HierachyWindow.cpp" />
@@ -215,12 +216,14 @@ EXIT 0</Command>
     <ClCompile Include="Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="E2DBrushEdge.hpp" />
     <ClInclude Include="Editor.hpp" />
     <ClInclude Include="EditorIO.hpp" />
     <ClInclude Include="EditorUtil.hpp" />
     <ClInclude Include="FbxSdk.hpp" />
     <ClInclude Include="Gizmo.hpp" />
     <ClInclude Include="GizmoAxis.hpp" />
+    <ClInclude Include="GizmoBrushSizer2D.hpp" />
     <ClInclude Include="GizmoComponent.hpp" />
     <ClInclude Include="GizmoPlane.hpp" />
     <ClInclude Include="GizmoRing.hpp" />

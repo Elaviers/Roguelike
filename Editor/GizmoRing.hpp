@@ -4,20 +4,26 @@
 class GizmoRing : public GizmoComponent
 {
 	float _firstAngle;
+	Rotation _axis;
 
-	FunctionPointer<float, const Vector3&, float> _rotate;
+	Vector3 _position;
+	Vector3 _fv; //oriented along axis
+	Vector3 _rv;
+	Vector3 _uv;
 
 	bool _GetAngle(const Ray& mouseRay, float &angleOut) const;
 
 public:
-	//The function takes an axis and an angle(degrees) and returns the angle consumed
-	GizmoRing(const Colour& colour, const FunctionPointer<float, const Vector3&, float>& rotate) :
+	GizmoRing(const Colour& colour, const Rotation& axis) :
 		GizmoComponent(colour),
 		_firstAngle(0.f),
-		_rotate(rotate) {}
+		_axis(axis)
+	{}
 
 	virtual ~GizmoRing() {}
 
+	virtual void SetGizmoTransform(const Transform& transform) override;
+
 	virtual void Render(RenderQueue&) const override;
-	virtual void Update(const Ray& mouseRay, float& minT) override;
+	virtual void Update(const MouseData& mouseData, const Ray& mouseRay, float& minT) override;
 };
