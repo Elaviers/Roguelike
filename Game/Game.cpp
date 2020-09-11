@@ -7,7 +7,6 @@
 #include <ELSys/Utilities.hpp>
 #include <Engine/Console.hpp>
 #include <Engine/EntLight.hpp>
-#include <Engine/LevelIO.hpp>
 #include <windowsx.h>
 #include "EntPlayer.hpp"
 #include "GameInstance.hpp"
@@ -51,10 +50,9 @@ void Game::_InitGL()
 
 void Game::_Init()
 {
-	_engine.Init(EEngineCreateFlags::ALL, nullptr);
+	_engine.Init(EEngineCreateFlags::ALL);
 	_engine.pFontManager->AddPath(Utilities::GetSystemFontDir());
 
-	_engine.pWorld = &_world;
 	GameInstance::Instance().world = &_world;
 
 	GameInstance::Instance().Initialise(*this);
@@ -161,19 +159,19 @@ void Game::StartLevel(const String& filename)
 
 	if (ext == ".txt")
 	{
-		_world.DeleteChildren(_engine.context);
+		_world.Clear(_engine.context);
 
 		String fileString = IO::ReadFileString(filename.GetData());
 		LevelGeneration::GenerateLevel(_world, fileString, _engine.context);
 	}
 	else
 	{
-		_world.DeleteChildren(_engine.context);
-		LevelIO::Read(_world, filename.GetData(), _engine.context);
+		_world.Clear(_engine.context);
+		_world.Read(filename.GetData(), _engine.context);
 	}
 
 	EntPlayer* player = EntPlayer::Create();
-	player->SetParent(&_world);
+	player->SetParent(&_world.RootEntity());
 	player->Init(_engine.context);
 
 	EntLight* light = EntLight::Create();
@@ -189,7 +187,7 @@ void Game::Frame()
 {
 	_engine.pAudioManager->FillBuffer();
 
-	_world.UpdateAll(_deltaTime);
+	_world.Update(_deltaTime);
 	_ui.Update(_deltaTime);
 
 	Render();
@@ -205,7 +203,7 @@ void Game::Render()
 	{
 		Frustum cameraFrustum;
 		activeCamera->GetProjection().ToFrustum(activeCamera->GetWorldTransform(), cameraFrustum);
-		_world.RenderAll(_renderQueue, cameraFrustum);
+		_world.Render(_renderQueue, cameraFrustum);
 	}
 
 	if (_uiIsActive)
@@ -224,12 +222,12 @@ void Game::Render()
 	if (activeCamera)
 	{
 		_shaderLit.Use();
-		_reflect.Bind(100);
 		_shaderLit.SetInt(DefaultUniformVars::intCubemap, 100);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureNormal, 1);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureReflection, 3);
+		_reflect.Bind(100);
 		activeCamera->Use();
 
 		_renderQueue.Render(ERenderChannels::SURFACE, *_engine.pMeshManager, *_engine.pTextureManager, _shaderLit.GetInt(DefaultUniformVars::intLightCount));

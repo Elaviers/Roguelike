@@ -24,7 +24,7 @@ const PropertyCollection& EntCamera::GetProperties()
 	static PropertyCollection properties;
 	DO_ONCE_BEGIN;
 	_AddBaseProperties(properties);
-	
+
 	DO_ONCE_END;
 
 	return properties;

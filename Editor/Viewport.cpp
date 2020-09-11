@@ -50,9 +50,9 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		_comboBox.SetString("Isometric");
 		gridAxis = Axes::Y;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-		camera.GetProjection().SetOrthographicScale(32.f);
+		camera.GetProjection().SetOrthographicScale(8.f);
 		camera.GetProjection().SetNearFar(0.f, 20000.f);
-		camera.SetRelativeRotation(Vector3(-35.264f, 45.f, 0.f));
+		camera.SetRelativeRotation(Vector3(-Maths::ArcTangentDegrees(1.f / Maths::SQRT2_F), 45.f, 0.f));
 		camera.SetRelativePosition(camera.GetRelativeTransform().GetForwardVector() * -10000.f);
 		break;
 
@@ -60,7 +60,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		_comboBox.SetString("X");
 		gridAxis = Axes::X;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-		camera.GetProjection().SetOrthographicScale(32.f);
+		camera.GetProjection().SetOrthographicScale(8.f);
 		camera.GetProjection().SetNearFar(0.f, 20000.f);
 		camera.SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
 		camera.SetRelativePosition(Vector3(10000.f, 0.f, 0.f));
@@ -70,7 +70,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		_comboBox.SetString("Y");
 		gridAxis = Axes::Y;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-		camera.GetProjection().SetOrthographicScale(32.f);
+		camera.GetProjection().SetOrthographicScale(8.f);
 		camera.GetProjection().SetNearFar(0.f, 20000.f);
 		camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
 		camera.SetRelativePosition(Vector3(0.f, 10000.f, 0.f));
@@ -80,7 +80,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		_comboBox.SetString("Z");
 		gridAxis = Axes::Z;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-		camera.GetProjection().SetOrthographicScale(32.f);
+		camera.GetProjection().SetOrthographicScale(8.f);
 		camera.GetProjection().SetNearFar(0.f, 20000.f);
 		camera.SetRelativeRotation(Vector3(0.f, 0.f, 0.f));
 		camera.SetRelativePosition(Vector3(0.f, 0.f, -10000.f));

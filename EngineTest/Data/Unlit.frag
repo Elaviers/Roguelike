@@ -12,7 +12,7 @@ void main()
 {
 	if (IsFont)
 	{
-		float alpha = texture(T_Diffuse, vec2(UV.x, 1 - UV.y)).r;
+		float alpha = texture(T_Diffuse, UV).r;
 
 		if (alpha > 0)
 		{

@@ -183,8 +183,8 @@ public:
 
 	void SetParent(Entity* parent);
 
-	Entity* FindChildWithName(const String& name);
-	Entity* FindChildWithUID(uint32 uid);
+	Entity* FindChild(const String& name);
+	Entity* FindChild(uint32 uid);
 
 	template<typename T>
 	void FindChildrenOfType(Buffer<T*>& out)

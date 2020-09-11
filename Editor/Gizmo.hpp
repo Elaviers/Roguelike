@@ -1,5 +1,5 @@
 #pragma once
-#include "E2DBrushEdge.hpp"
+#include "EBrushEdge.hpp"
 #include "GizmoComponent.hpp"
 #include <ELCore/Concepts.hpp>
 #include <ELCore/List.hpp>

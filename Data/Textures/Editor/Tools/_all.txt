@@ -1,0 +1,4 @@
+min nearest
+mag nearest
+mips 0
+aniso 0

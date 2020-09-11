@@ -16,6 +16,7 @@ out vec4 OutColour;
 void main()
 {
 	vec4 tex = texture(T_Diffuse, UV);
+	if (tex.a < 0.01) discard; //don't write invisible fragments
 
 	if (Blend) 
 		OutColour = mix(BlendFrom, BlendTo, tex.r) * vec4(1, 1, 1, tex.a);

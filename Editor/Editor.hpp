@@ -1,6 +1,6 @@
 #pragma once
 #include <Engine/EngineInstance.hpp>
-#include <Engine/LevelIO.hpp>
+#include <Engine/World.hpp>
 #include <ELGraphics/Font.hpp>
 #include <ELGraphics/RenderQueue.hpp>
 #include <ELSys/GLContext.hpp>
@@ -13,6 +13,7 @@
 #include "FbxSdk.hpp"
 #include "HierachyWindow.hpp"
 #include "MouseData.hpp"
+#include "ToolIso.hpp"
 #include "ToolBrush2D.hpp"
 #include "ToolBrush3D.hpp"
 #include "ToolConnector.hpp"
@@ -26,10 +27,11 @@
 enum class ETool
 {
 	SELECT = 0,
-	BRUSH2D = 1,
-	BRUSH3D = 2,
-	ENTITY = 3,
-	CONNECTOR = 4
+	ISO = 1,
+	BRUSH2D = 2,
+	BRUSH3D = 3,
+	ENTITY = 4,
+	CONNECTOR = 5
 };
 
 class Editor
@@ -81,7 +83,7 @@ private:
 	ERenderChannels _litRenderChannels = ERenderChannels::NONE;
 	ERenderChannels _unlitRenderChannels = ERenderChannels(ERenderChannels::SURFACE | ERenderChannels::UNLIT);
 
-	Entity _level;
+	World _level;
 
 	Tool *_currentTool = nullptr;
 
@@ -112,15 +114,16 @@ public:
 	struct _EditorTools
 	{
 		ToolSelect select;
+		ToolIso iso;
 		ToolBrush2D brush2D;
 		ToolBrush3D brush3D;
 		ToolEntity entity;
 		ToolConnector connector;
 
-		_EditorTools(Editor& editor) : select(editor), brush2D(editor), brush3D(editor), entity(editor), connector(editor) {}
+		_EditorTools(Editor& editor) : select(editor), iso(editor), brush2D(editor), brush3D(editor), entity(editor), connector(editor) {}
 	} tools;
 
-	Editor() : _fbxManager(nullptr), _hierachyWindow(this), tools(*this), _level(Entity::EFlags::NONE, "Level") {}
+	Editor() : _fbxManager(nullptr), _hierachyWindow(this), tools(*this) {}
 	~Editor();
 
 	void Run();
@@ -162,7 +165,7 @@ public:
 	void SetTool(ETool tool, bool changeToolbarSelection = true);
 
 	//For Tools
-	Entity& LevelRef() { return _level; }
+	World& WorldRef() { return _level; }
 
 	Viewport& GetVP(int index) { return _viewports[index]; }
 

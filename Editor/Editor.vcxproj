@@ -210,13 +210,14 @@ EXIT 0</Command>
     <ClCompile Include="ToolBrush3D.cpp" />
     <ClCompile Include="ToolConnector.cpp" />
     <ClCompile Include="ToolEntity.cpp" />
+    <ClCompile Include="ToolIso.cpp" />
     <ClCompile Include="ToolSelect.cpp" />
     <ClCompile Include="UIPropertyManipulator.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="E2DBrushEdge.hpp" />
+    <ClInclude Include="EBrushEdge.hpp" />
     <ClInclude Include="Editor.hpp" />
     <ClInclude Include="EditorIO.hpp" />
     <ClInclude Include="EditorUtil.hpp" />
@@ -229,6 +230,7 @@ EXIT 0</Command>
     <ClInclude Include="GizmoRing.hpp" />
     <ClInclude Include="HierachyWindow.hpp" />
     <ClInclude Include="MouseData.hpp" />
+    <ClInclude Include="ToolIso.hpp" />
     <ClInclude Include="Viewport.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceSelect.hpp" />

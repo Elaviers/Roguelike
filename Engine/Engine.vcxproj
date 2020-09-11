@@ -31,10 +31,13 @@
     <ClCompile Include="EntRenderable.cpp" />
     <ClCompile Include="EntSkeletal.cpp" />
     <ClCompile Include="EntSprite.cpp" />
-    <ClCompile Include="LevelIO.cpp" />
+    <ClCompile Include="GeoIsoTile.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="Registry.cpp" />
+    <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="TileManager.cpp" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Console.hpp" />
@@ -50,10 +53,14 @@
     <ClInclude Include="EntRenderable.hpp" />
     <ClInclude Include="EntSkeletal.hpp" />
     <ClInclude Include="EntSprite.hpp" />
-    <ClInclude Include="LevelIO.hpp" />
+    <ClInclude Include="Geometry.hpp" />
+    <ClInclude Include="GeoIsoTile.hpp" />
     <ClInclude Include="Model.hpp" />
     <ClInclude Include="ModelManager.hpp" />
     <ClInclude Include="Registry.hpp" />
+    <ClInclude Include="Tile.hpp" />
+    <ClInclude Include="TileManager.hpp" />
+    <ClInclude Include="World.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ELLib\ELAudio\ELAudio.vcxproj">

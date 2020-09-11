@@ -115,7 +115,10 @@ class FbxMeshDataImporter
 		FbxVector2 uv;
 		bool unmapped;
 		if (mesh->GetPolygonVertexUV(polyIndex, vertIndex, uvSet, uv, unmapped))
+		{
 			result.uv = FbxVector2ToVector2(uv);
+			result.uv.y = 1.f - result.uv.y;
+		}
 
 		return result;
 	}

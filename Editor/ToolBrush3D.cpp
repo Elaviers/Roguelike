@@ -91,7 +91,7 @@ void ToolBrush3D::KeySubmit()
 {
 	_placing = false;
 
-	_object.Clone()->SetParent(&_owner.LevelRef());
+	_object.Clone()->SetParent(&_owner.WorldRef().RootEntity());
 }
 
 void ToolBrush3D::Render(RenderQueue& q) const

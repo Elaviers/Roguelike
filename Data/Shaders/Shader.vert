@@ -57,7 +57,7 @@ void main()
 	gl_Position = M_Projection * M_View * vec4(WorldPosition, 1);
 
 	VertexColour = VertexColour_IN;
-	UV = vec2(UV_IN.x, 1 - UV_IN.y) * UVScale + UVOffset;
+	UV = UV_IN * UVScale + UVOffset;
 	TBN = 
 		mat3(
 			normalize((M_Model * vec4(tangent, 0)).xyz), 

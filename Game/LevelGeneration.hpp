@@ -4,11 +4,12 @@
 #include <Engine/EntConnector.hpp>
 
 class LevelBag;
+class World;
 
 namespace LevelGeneration
 {
 	constexpr const char* ROOT_DIR = "Data/Levels/";
 
-	bool GenerateLevel(Entity& root, const String&, const Context&);
+	bool GenerateLevel(World& root, const String&, const Context&);
 
 }

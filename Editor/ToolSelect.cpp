@@ -167,7 +167,9 @@ void ToolSelect::_UpdateGizmoTransform()
 		avgPosition /= (float)_selectedObjects.GetSize();
 
 		_gizmo.SetTransform(Transform(avgPosition));
-		_brushGizmo.SetObjectTransform(_selectedObjects[0]->GetWorldTransform());
+
+		if (_selectedObjects.GetSize())
+			_brushGizmo.SetObjectTransform(_selectedObjects[0]->GetWorldTransform());
 	}
 }
 
@@ -349,7 +351,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 		_owner.RefreshProperties();
 
 		//Update hoverobject
-		Buffer<RaycastResult> results = _owner.LevelRef().Raycast(r);
+		Buffer<RaycastResult> results = _owner.WorldRef().RootEntity().Raycast(r);
 
 		if (results.GetSize())
 		{
@@ -396,6 +398,8 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 
 			_origObjectX = objPos[Axes::GetHorizontalAxis(mouseData.viewport->gridAxis)];
 			_origObjectY = objPos[Axes::GetVerticalAxis(mouseData.viewport->gridAxis)];
+
+			_placing = false;
 		}
 		else _placing = true;
 	}
@@ -411,7 +415,7 @@ void ToolSelect::KeySubmit()
 	_placing = false;
 	ClearSelection();
 
-	Buffer<Entity*> result = _owner.LevelRef().FindOverlappingChildren(Collider(ECollisionChannels::ALL, CollisionBox(Box::FromPoints(_sbPoint1, _sbPoint2))));
+	Buffer<Entity*> result = _owner.WorldRef().RootEntity().FindOverlappingChildren(Collider(ECollisionChannels::ALL, CollisionBox(Box::FromPoints(_sbPoint1, _sbPoint2))));
 
 	_selectedObjects.SetSize(result.GetSize());
 

@@ -27,7 +27,7 @@ namespace EngineTests
 	{
 		TEST_CLASS_INITIALIZE(ClassInit)
 		{
-			engine.Init(EEngineCreateFlags(0), nullptr); //Registry only
+			engine.Init(EEngineCreateFlags(0)); //Registry only
 			MaterialManager* materialManager = engine.pMaterialManager = new MaterialManager();
 			ModelManager* modelManager = engine.pModelManager = new ModelManager();
 

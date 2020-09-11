@@ -3,6 +3,7 @@
 
 class Game;
 class InputManager;
+class World;
 
 class GameInstance
 {
@@ -17,7 +18,7 @@ class GameInstance
 	uint16 _w, _h;
 
 public:
-	Entity* world;
+	World* world;
 
 	static GameInstance& Instance()
 	{

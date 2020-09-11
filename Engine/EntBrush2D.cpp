@@ -36,8 +36,10 @@ void EntBrush2D::Render(RenderQueue& q) const
 		_material->Apply(e);
 		e.AddSetUVScale(Vector2(GetRelativeScale().x, GetRelativeScale().z));
 		e.AddCommand(RCMDSetUVOffset::Default());
-		e.AddSetTransform(Matrix4::RotationX(-90.f) * GetTransformationMatrix());
 		e.AddSetColour(Colour::White);
+		e.AddSetTransform(Matrix4::RotationX(-90.f) * GetTransformationMatrix());
+		e.AddCommand(RCMDRenderMesh::PLANE);
+		e.AddSetTransform(Matrix4::RotationX(90.f) * GetTransformationMatrix());
 		e.AddCommand(RCMDRenderMesh::PLANE);
 	}
 }

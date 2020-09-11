@@ -3,7 +3,7 @@
 #include <ELCore/String.hpp>
 #include <Engine/Entity.hpp>
 #include <Engine/EntityIterator.hpp>
-#include <Engine/LevelIO.hpp>
+#include <Engine/World.hpp>
 #include <ELMaths/Random.hpp>
 #include <ELSys/Time.hpp>
 
@@ -21,7 +21,7 @@ inline RandomBag<const EntConnector*> GetAllAvailableConnectors(const Entity& ro
 	return result;
 }
 
-Entity* CreateConnectedSegment(Entity& world, const EntConnector &parentConnector, LevelSegmentPicker& picker, Random &random, unsigned int depth)
+Entity* CreateConnectedSegment(World& world, const EntConnector &parentConnector, LevelSegmentPicker& picker, Random &random, unsigned int depth)
 {
 	Transform pcWt = parentConnector.GetWorldTransform();
 
@@ -62,7 +62,7 @@ Entity* CreateConnectedSegment(Entity& world, const EntConnector &parentConnecto
 
 					t = t * segWt;
 
-					if (it->GetCollider() && world.AnyPartOverlapsCollider(*it->GetCollider(), t) == EOverlapResult::OVERLAPPING)
+					if (it->GetCollider() && world.RootEntity().AnyPartOverlapsCollider(*it->GetCollider(), t) == EOverlapResult::OVERLAPPING)
 					{
 						cannotFit = true;
 						break;
@@ -75,7 +75,7 @@ Entity* CreateConnectedSegment(Entity& world, const EntConnector &parentConnecto
 				item.TakeFromRelevantBag(1.f);
 
 				Entity* newSegment = Entity::Create();
-				newSegment->SetParent(&world);
+				newSegment->SetParent(&world.RootEntity());
 				newSegment->SetWorldTransform(segWt);
 				newSegment->CloneChildrenFrom(*segment);
 
@@ -94,7 +94,7 @@ Entity* CreateConnectedSegment(Entity& world, const EntConnector &parentConnecto
 	return nullptr;
 }
 
-void GenerateConnectedSegments(Entity &world, const Entity &src, LevelSegmentPicker &picker, Random &random, unsigned int depth)
+void GenerateConnectedSegments(World &world, const Entity &src, LevelSegmentPicker &picker, Random &random, unsigned int depth)
 {
 	if (depth <= 0) return;
 
@@ -111,7 +111,7 @@ void GenerateConnectedSegments(Entity &world, const Entity &src, LevelSegmentPic
 	}
 }
 
-bool LevelGeneration::GenerateLevel(Entity& root, const String &string, const Context& ctx)
+bool LevelGeneration::GenerateLevel(World& world, const String &string, const Context& ctx)
 {
 	Random random(Time::GetRandSeed());
 
@@ -133,10 +133,10 @@ bool LevelGeneration::GenerateLevel(Entity& root, const String &string, const Co
 
 	const Entity* initialSegment = picker.TakeNextSegment(random, depth);
 	Entity *segmentClone = Entity::Create();
-	segmentClone->SetParent(&root);
+	segmentClone->SetParent(&world.RootEntity());
 	segmentClone->CloneChildrenFrom(*initialSegment);
 	
-	GenerateConnectedSegments(root, *segmentClone, picker, random, depth - 1);
+	GenerateConnectedSegments(world, *segmentClone, picker, random, depth - 1);
 
 	return true;
 }

@@ -1,6 +1,7 @@
 #include "EngineInstance.hpp"
 #include "Console.hpp"
 #include "ModelManager.hpp"
+#include "TileManager.hpp"
 #include <ELGraphics/AnimationManager.hpp>
 #include <ELAudio/AudioManager.hpp>
 #include <ELGraphics/DebugManager.hpp>
@@ -39,10 +40,8 @@ inline T* CREATE(bool condition, Context& ctx)
 	return nullptr;
 }
 
-void EngineInstance::Init(EEngineCreateFlags flags, Entity *world)
+void EngineInstance::Init(EEngineCreateFlags flags)
 {
-	pWorld = world;
-
 	FT_Error error = FT_Init_FreeType(&_ftLib);
 	if (error) { Debug::Error("Freetype init error"); }
 
@@ -61,6 +60,7 @@ void EngineInstance::Init(EEngineCreateFlags flags, Entity *world)
 	pMeshManager =		CREATE<MeshManager>(flags & EEngineCreateFlags::MESHMGR, context);
 	pModelManager =		CREATE<ModelManager>(flags & EEngineCreateFlags::MODELMGR, context);
 	pTextureManager =	CREATE<TextureManager>(flags & EEngineCreateFlags::TEXTUREMGR, context);
+	pTileManager =		CREATE<TileManager>(flags & EEngineCreateFlags::TILEMGR, context);
 	pObjectTracker =	CREATE<Tracker<Entity>>(flags & EEngineCreateFlags::OBJTRACKER, context);
 
 	if (pConsole)
@@ -69,11 +69,13 @@ void EngineInstance::Init(EEngineCreateFlags flags, Entity *world)
 		pConsole->Cvars().CreateVar("TexMgr", CommandPtr(pConsole, &Console::CMD_texmgr));
 		pConsole->Cvars().CreateVar("Play", CommandPtr(pAudioManager, &AudioManager::CMD_play));
 
+		/* todo: move this somewhere else
 		if (pWorld)
 		{
 			pConsole->Cvars().CreateVar("Ents", CommandPtr(pWorld, &Entity::CMD_List));
 			pConsole->Cvars().CreateVar("Ent", CommandPtr(pWorld, &Entity::CMD_Ent));
 		}
+		*/
 	}
 
 	if (pAnimationManager)
@@ -110,6 +112,12 @@ void EngineInstance::Init(EEngineCreateFlags flags, Entity *world)
 			pMaterialManager->Initialise(*pTextureManager);
 			pMaterialManager->SetRootPath("Data/Materials/");
 		}
+	}
+
+	if (pTileManager)
+	{
+		pTileManager->Initialise();
+		pTileManager->SetRootPath("Data/Tiles/");
 	}
 
 	if (pFontManager) 

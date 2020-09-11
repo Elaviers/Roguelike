@@ -1,11 +1,51 @@
-#include "LevelIO.hpp"
+#include "World.hpp"
 #include <ELCore/Context.hpp>
-#include "EntBrush2D.hpp"
-#include "EntBrush3D.hpp"
-#include "EntRenderable.hpp"
-#include "Registry.hpp"
 
-constexpr const char *levelPrefix = "POO";
+World::~World()
+{
+	for (Geometry* g : _geometry)
+		delete g;
+}
+
+void World::Clear(const Context& ctx)
+{
+	for (Geometry* g : _geometry)
+		delete g;
+
+	_geometry.Clear();
+
+	_entRoot.DeleteChildren(ctx);
+}
+
+void World::Update(float deltaTime)
+{
+	_entRoot.UpdateAll(deltaTime);
+}
+
+void World::Render(RenderQueue& q, const Frustum& f) const
+{
+	for (const Geometry* g : _geometry)
+		g->Render(q); //todo: frustum cull
+
+	_entRoot.RenderAll(q, f);
+}
+
+
+//IO
+#include "Registry.hpp"
+#include <ELSys/IO.hpp>
+
+namespace LevelVersions
+{
+	enum //This should be a byte... hopefully I won't need more than 256 level versions.
+	{
+		VERSION_1 = 0,
+		VERSION_2 = 1,		//Connectors are Entities instead of metadata
+		VERSION_3 = 2
+	};
+}
+
+constexpr const char* levelPrefix = "POO";
 constexpr const byte currentVersion = LevelVersions::VERSION_3;
 
 namespace LevelMessages
@@ -16,7 +56,6 @@ namespace LevelMessages
 	};
 }
 
-
 inline void WriteStringMessage(ByteWriter &buffer, const String &string, uint16 id)
 {
 	buffer.Write_byte(0);
@@ -25,26 +64,7 @@ inline void WriteStringMessage(ByteWriter &buffer, const String &string, uint16 
 	string.Write(buffer);
 }
 
-bool LevelIO::Write(const Entity &world, const char *filename, const Context& ctx)
-{
-	Buffer<byte> buffer1, buffer2;
-	ByteWriter writer1(buffer1), writer2(buffer2);
-	NumberedSet<String> strings;
-
-	writer1.Write(levelPrefix);
-	writer1.Write_byte(currentVersion);
-
-	world.WriteAllToFile(writer2, strings, ctx);
-
-	auto stringBuffer = strings.ToKVBuffer();
-	for (uint32 i = 0; i < stringBuffer.GetSize(); ++i)
-		WriteStringMessage(writer1, stringBuffer[i]->second, stringBuffer[i]->first);
-
-	Buffer<byte> finalBuffer = buffer1 + buffer2;
-	return IO::WriteFile(filename, finalBuffer.Data(), (uint32)finalBuffer.GetSize());
-}
-
-bool LevelIO::Read(Entity &world, const char *filename, const Context& ctx)
+bool World::Read(const char* filename, const Context& ctx)
 {
 	Buffer<byte> buffer = IO::ReadFile(filename);
 
@@ -52,7 +72,7 @@ bool LevelIO::Read(Entity &world, const char *filename, const Context& ctx)
 	{
 		NumberedSet<String> strings;
 		ByteReader reader(buffer);
-		
+
 		if (reader.Read<String>() != levelPrefix)
 		{
 			Debug::Error("Is this even a level file? I don't think so.");
@@ -79,7 +99,7 @@ bool LevelIO::Read(Entity &world, const char *filename, const Context& ctx)
 					uint16 stringID = reader.Read_uint16();
 					strings[stringID].Read(reader);
 				}
-					break;
+				break;
 				}
 			}
 			else
@@ -88,9 +108,9 @@ bool LevelIO::Read(Entity &world, const char *filename, const Context& ctx)
 				{
 					if (id == (byte)EEntityID::LEVEL_CONNECTOR)
 					{
-						reader.IncrementIndex(9*4); //TRANSFORM (9 floats)
+						reader.IncrementIndex(9 * 4); //TRANSFORM (9 floats)
 						reader.Read<String>();
-						reader.IncrementIndex(1 + 6*4); // 1 byte + 6 floats
+						reader.IncrementIndex(1 + 6 * 4); // 1 byte + 6 floats
 						Debug::Message("This is a version 2 level, so a level connector has been removed", "Hey");
 						continue;
 					}
@@ -103,7 +123,7 @@ bool LevelIO::Read(Entity &world, const char *filename, const Context& ctx)
 					Entity* obj = registry->GetNode(id)->New();
 					if (obj)
 					{
-						obj->SetParent(&world);
+						obj->SetParent(&_entRoot);
 						obj->ReadData(reader, strings, ctx);
 					}
 					else Debug::Error("Could not create a new object");
@@ -119,4 +139,24 @@ bool LevelIO::Read(Entity &world, const char *filename, const Context& ctx)
 	}
 
 	return false;
+
+}
+
+bool World::Write(const char* filename, const Context& ctx) const
+{
+	Buffer<byte> buffer1, buffer2;
+	ByteWriter writer1(buffer1), writer2(buffer2);
+	NumberedSet<String> strings;
+
+	writer1.Write(levelPrefix);
+	writer1.Write_byte(currentVersion);
+
+	_entRoot.WriteAllToFile(writer2, strings, ctx);
+
+	auto stringBuffer = strings.ToKVBuffer();
+	for (uint32 i = 0; i < stringBuffer.GetSize(); ++i)
+		WriteStringMessage(writer1, stringBuffer[i]->second, stringBuffer[i]->first);
+
+	Buffer<byte> finalBuffer = buffer1 + buffer2;
+	return IO::WriteFile(filename, finalBuffer.Data(), (uint32)finalBuffer.GetSize());
 }

@@ -165,7 +165,7 @@ int Main()
 
 	//
 	//This will allocate and initialise all of the asset managers
-	engine.Init(EEngineCreateFlags::ALL, nullptr);
+	engine.Init(EEngineCreateFlags::ALL);
 
 	//Add Windows/Fonts directory so I can load some TTF fonts from it
 	engine.pFontManager->AddPath(Utilities::GetSystemFontDir());

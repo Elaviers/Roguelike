@@ -7,7 +7,7 @@ class MeshManager;
 class ModelManager : public AssetManager<Model>
 {
 protected:
-	virtual Model* _CreateResource(const String&, const String&, const String&, const Context&) override;
+	virtual Model* _CreateResource(const Buffer<byte>& data, const String& name, const String& extension, const Context&) override;
 
 	Model _line;
 	Model _cube;

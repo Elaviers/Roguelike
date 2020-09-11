@@ -39,7 +39,7 @@ void EntPlayer::_Jump()
 
 void EntPlayer::Update(float deltaTime)
 {
-	Entity* spinner = GameInstance::Instance().world->FindChildWithName("spin");
+	Entity* spinner = GameInstance::Instance().world->RootEntity().FindChild("spin");
 	if (spinner)
 		spinner->AddRelativeRotation(Vector3(0.f, deltaTime * 30.f, 0.f));
 
@@ -48,7 +48,7 @@ void EntPlayer::Update(float deltaTime)
 
 	//Overlap printout
 	if (false) {
-		Buffer<Entity*> ents = GameInstance::Instance().world->FindChildrenOfType<Entity>();
+		Buffer<Entity*> ents = GameInstance::Instance().world->RootEntity().FindChildrenOfType<Entity>();
 		for (size_t i = 0; i < ents.GetSize(); ++i)
 		{
 			if (ents[i]->GetUID() != GetUID() && !ents[i]->IsChildOf(this) && ents[i]->Overlaps(*this) == EOverlapResult::OVERLAPPING)
@@ -96,7 +96,7 @@ void EntPlayer::Update(float deltaTime)
 		Transform desiredTransform = Transform(worldTransform.GetPosition() + movement, worldTransform.GetRotation(), worldTransform.GetScale());
 
 		Vector3 penetration;
-		Buffer<Entity*> ents = GameInstance::Instance().world->FindChildrenOfType<Entity>();
+		Buffer<Entity*> ents = GameInstance::Instance().world->RootEntity().FindChildrenOfType<Entity>();
 		for (size_t i = 0; i < ents.GetSize(); ++i)
 			if (ents[i]->GetUID() != GetUID() &&
 				!ents[i]->IsChildOf(this) &&

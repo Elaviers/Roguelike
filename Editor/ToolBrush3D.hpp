@@ -13,7 +13,7 @@ public:
 	ToolBrush3D(Editor &level) : Tool(level), _placing(false) {}
 	virtual ~ToolBrush3D() {}
 
-	virtual void Initialise();
+	virtual void Initialise() override;
 
 	virtual void Activate(UIContainer& properties, UIContainer& toolProperties) override;
 

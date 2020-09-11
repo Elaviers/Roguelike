@@ -80,7 +80,7 @@ LRESULT HierachyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 			LPNMTREEVIEW nmtv = (LPNMTREEVIEW)lparam;
 
-			hw->_owner->tools.select.Select(hw->_currentRoot->FindChildWithUID((uint32)nmtv->itemNew.lParam));
+			hw->_owner->tools.select.Select(hw->_currentRoot->FindChild((uint32)nmtv->itemNew.lParam));
 			hw->_owner->FocusVPArea();
 		}
 			break;
@@ -174,7 +174,7 @@ void HierachyWindow::BeginDrag(LPNMTREEVIEW nmtv)
 	// parent window. 
 	ShowCursor(FALSE);
 	SetCapture(GetParent(_treeView));
-	_dragObj = _owner->engine.pObjectTracker->Track(_currentRoot->FindChildWithUID((uint32)nmtv->itemNew.lParam));
+	_dragObj = _owner->engine.pObjectTracker->Track(_currentRoot->FindChild((uint32)nmtv->itemNew.lParam));
 }
 
 void HierachyWindow::MouseMove(int x, int y)
@@ -221,7 +221,7 @@ void HierachyWindow::MouseUp()
 			
 			TreeView_GetItem(_treeView, &item);
 
-			Entity* go = _currentRoot->FindChildWithUID((uint32)item.lParam);
+			Entity* go = _currentRoot->FindChild((uint32)item.lParam);
 
 			if (go != _dragObj.Ptr() && !go->IsChildOf(_dragObj.Ptr()))
 			{

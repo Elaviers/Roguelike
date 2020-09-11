@@ -28,7 +28,7 @@ void ToolConnector::Cancel()
 
 void ToolConnector::MouseMove(const MouseData &mouseData)
 {
-	if (mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
+	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 	{
 		Axes::EAxis fwdAxis = mouseData.viewport->gridAxis;
 		int fwdElement = fwdAxis;
@@ -80,7 +80,7 @@ void ToolConnector::KeySubmit()
 
 	EntConnector *clone = _connector.TypedClone();
 	//clone->SetRenderColour(Colour(0.f, 1.f, 0.f));
-	clone->SetParent(&_owner.LevelRef());
+	clone->SetParent(&_owner.WorldRef().RootEntity());
 }
 
 void ToolConnector::Render(RenderQueue& q) const

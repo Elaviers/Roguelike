@@ -1,5 +1,5 @@
 #include "LevelSegmentPicker.hpp"
-#include <Engine/LevelIO.hpp>
+#include <Engine/World.hpp>
 
 LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const String& rootLevelDir, const Context& ctx)
 {
@@ -28,9 +28,13 @@ LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const St
 			}
 			else if (tokens.GetSize() >= 2 && tokens[0] == "segment" && bag)
 			{
+				World subworld;
 				Entity* segment = Entity::Create();
-				if (LevelIO::Read(*segment, CSTR(rootLevelDir, tokens[1]), ctx))
+				if (subworld.Read(CSTR(rootLevelDir, tokens[1]), ctx))
 				{
+					for (Entity* child : subworld.RootEntity().Children())
+						child->SetParent(segment);
+
 					bag->bag.Add(segment, tokens.GetSize() > 2 ? tokens[2].ToFloat() : 1);
 					if (bagTotalOverride)
 						bag->bag.SetRemainingWeight(bagTotalOverride);

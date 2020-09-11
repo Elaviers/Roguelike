@@ -115,21 +115,21 @@ void Entity::SetParent(Entity* parent)
 	}
 }
 
-Entity* Entity::FindChildWithName(const String& name)
+Entity* Entity::FindChild(const String& name)
 {
 	if (_name == name)
 		return this;
 
 for (size_t i = 0; i < _children.GetSize(); ++i)
 {
-	Entity* result = _children[i]->FindChildWithName(name);
+	Entity* result = _children[i]->FindChild(name);
 	if (result) return result;
 }
 
 return nullptr;
 }
 
-Entity* Entity::FindChildWithUID(uint32 uid)
+Entity* Entity::FindChild(uint32 uid)
 {
 	if (uid == 0)
 		return nullptr;
@@ -139,7 +139,7 @@ Entity* Entity::FindChildWithUID(uint32 uid)
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
 	{
-		Entity* result = _children[i]->FindChildWithUID(uid);
+		Entity* result = _children[i]->FindChild(uid);
 		if (result) return result;
 	}
 
@@ -350,7 +350,7 @@ void Entity::CMD_Ent(const Buffer<String>& tokens, const Context& ctx)
 {
 	if (tokens.GetSize() >= 1)
 	{
-		Entity* obj = FindChildWithName(tokens[0]);
+		Entity* obj = FindChild(tokens[0]);
 
 		if (obj)
 		{

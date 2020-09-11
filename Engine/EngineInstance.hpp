@@ -1,12 +1,12 @@
 #pragma once
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include "Geometry.hpp"
 #include "Registry.hpp"
 #include <ELCore/Context.hpp>
 #include <ELCore/Tracker.hpp>
 
 class Console;
-class Entity;
 class AnimationManager;
 class AudioManager;
 class DebugManager;
@@ -16,6 +16,7 @@ class MaterialManager;
 class MeshManager;
 class ModelManager;
 class TextureManager;
+class TileManager;
 
 enum class EEngineCreateFlags : uint16
 {
@@ -29,6 +30,7 @@ enum class EEngineCreateFlags : uint16
 	MESHMGR = 0x80,
 	MODELMGR = 0x100,
 	TEXTUREMGR = 0x200,
+	TILEMGR = 0x400,
 
 	OBJTRACKER = 0x8000,
 
@@ -49,7 +51,6 @@ public:
 	Context context;
 
 	Console			*pConsole = nullptr;
-	Entity			*pWorld = nullptr;
 
 	AnimationManager*pAnimationManager = nullptr;
 	AudioManager	*pAudioManager = nullptr;
@@ -60,6 +61,7 @@ public:
 	MeshManager		*pMeshManager = nullptr;
 	ModelManager	*pModelManager = nullptr;
 	TextureManager	*pTextureManager = nullptr;
+	TileManager		*pTileManager = nullptr;
 
 	Tracker<Entity> *pObjectTracker = nullptr;
 
@@ -68,5 +70,5 @@ public:
 
 	FT_Library GetFTLibrary() { return _ftLib; }
 
-	void Init(EEngineCreateFlags, Entity* world);
+	void Init(EEngineCreateFlags);
 };

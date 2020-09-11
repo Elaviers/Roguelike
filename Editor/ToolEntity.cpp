@@ -68,7 +68,7 @@ void ToolEntity::MouseMove(const MouseData& mouseData)
 	{
 		EntCamera& camera = mouseData.viewport->camera;
 		Ray r = camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2((float)mouseData.x / camera.GetProjection().GetDimensions()[0], (float)mouseData.y / camera.GetProjection().GetDimensions()[1]));
-		Buffer<RaycastResult> results = _owner.LevelRef().Raycast(r);
+		Buffer<RaycastResult> results = _owner.WorldRef().RootEntity().Raycast(r);
 
 		if (results.GetSize() > 0)
 		{
@@ -91,7 +91,7 @@ void ToolEntity::MouseDown(const MouseData &mouseData)
 	if (_placement && _readyToPlace)
 	{
 		Entity* newObj = _owner.engine.registry.GetNode(_classID)->New();
-		newObj->SetParent(&_owner.LevelRef());
+		newObj->SetParent(&_owner.WorldRef().RootEntity());
 
 		Entity* from = (Entity*)(_owner.GetPropertyObject());
 		if (from)

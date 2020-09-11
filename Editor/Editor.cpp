@@ -92,8 +92,11 @@ void Editor::_Init()
 	_InitGL();
 
 	_fbxManager = FbxManager::Create();
-	engine.Init(EEngineCreateFlags::ALL, &_level);
+	engine.Init(EEngineCreateFlags::ALL);
 	engine.pFontManager->AddPath(Utilities::GetSystemFontDir());
+
+	//Set the mesh used for isometric tiles
+	GeoIsoTile::SetMesh(engine.pMeshManager->Get("iso/tile", engine.context));
 
 	InputManager* inputManager = engine.pInputManager;
 
@@ -115,8 +118,8 @@ void Editor::_Init()
 
 	inputManager->BindKeyDown(EKeycode::TILDE, Callback(this, &Editor::ToggleConsole));
 
-	_level.onNameChanged +=		Callback(this, &Editor::RefreshLevel);
-	_level.onChildChanged +=	Callback(this, &Editor::RefreshLevel);
+	_level.RootEntity().onNameChanged +=	Callback(this, &Editor::RefreshLevel);
+	_level.RootEntity().onChildChanged +=	Callback(this, &Editor::RefreshLevel);
 
 	//UI
 	SharedPointer<const Texture> gradient = engine.pTextureManager->Get("ui/gradient", engine.context);
@@ -127,7 +130,7 @@ void Editor::_Init()
 	_consoleCamera.GetProjection().SetNearFar(-100, 100);
 
 	_uiCamera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-	_uiCamera.GetProjection().SetNearFar(-100, 100);
+	_uiCamera.GetProjection().SetNearFar(0, 1000000);
 
 	_sideUI.SetParent(&_ui);
 	_vpAreaUI.SetParent(&_ui);
@@ -138,7 +141,7 @@ void Editor::_Init()
 	for (int i = 0; i < VIEWPORTCOUNT; ++i)
 	{
 		_viewports[i].ui.SetParent(&_vpAreaUI);
-		_viewports[i].bg.SetTexture(radialGradient).SetColour(vpColour).SetZ(100.f).SetFocusOnClick(false);
+		_viewports[i].bg.SetTexture(radialGradient).SetColour(vpColour).SetZ(_uiCamera.GetProjection().GetFar()).SetFocusOnClick(false);
 		_viewports[i].SetFont(vpFont);
 	}
 	
@@ -152,6 +155,7 @@ void Editor::_Init()
 		.SetButtonColourFalse(Colour::White).SetButtonColourTrue(Colour::Blue).SetButtonColourHover(Colour(.8f, .8f, .7f)).SetButtonColourHold(Colour::Grey)
 		.SetParent(&_ui).SetBounds(0.f, UICoord(1.f, -64.f), 1.f, UICoord(0.f, 64.f));
 	_toolbar.AddButton("Select", engine.pTextureManager->Get("editor/tools/select", engine.context), (uint16)ETool::SELECT);
+	_toolbar.AddButton("Iso", engine.pTextureManager->Get("editor/tools/iso", engine.context), (uint16)ETool::ISO);
 	_toolbar.AddButton("Brush2D", engine.pTextureManager->Get("editor/tools/brush2d", engine.context), (uint16)ETool::BRUSH2D);
 	_toolbar.AddButton("Brush3D", engine.pTextureManager->Get("editor/tools/brush3d", engine.context), (uint16)ETool::BRUSH3D);
 	_toolbar.AddButton("Entity", engine.pTextureManager->Get("editor/tools/entity", engine.context), (uint16)ETool::ENTITY);
@@ -187,11 +191,12 @@ void Editor::_Init()
 	propertySplitterHoriz->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
 
 	//Tool data init
+	tools.select.Initialise();
+	tools.iso.Initialise();
 	tools.brush2D.Initialise();
 	tools.brush3D.Initialise();
 	tools.connector.Initialise();
 	tools.entity.Initialise();
-	tools.select.Initialise();
 
 	SetTool(ETool::SELECT);
 
@@ -210,8 +215,8 @@ void Editor::_InitGL()
 	glEnable(GL_DEPTH_TEST);
 	wglSwapIntervalEXT(0);
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_MULTISAMPLE);
 
@@ -330,8 +335,8 @@ void Editor::Frame()
 		engine.pDebugManager->AddToWorld(DebugFrustum::FromCamera(_viewports[0].camera.GetWorldTransform(), _viewports[0].camera.GetProjection()));
 
 
-	Entity* dbgObjA = engine.pWorld->FindChildWithUID(dbgIDA);
-	Entity* dbgObjB = engine.pWorld->FindChildWithUID(dbgIDB);
+	Entity* dbgObjA = _level.RootEntity().FindChild(dbgIDA);
+	Entity* dbgObjB = _level.RootEntity().FindChild(dbgIDB);
 
 	if (dbgObjA && dbgObjB)
 	{
@@ -349,7 +354,7 @@ void Editor::Frame()
 		//Debug::PrintLine(dbgObjA->Overlaps(*dbgObjB) ? CSTR(dbgObjA->GetPenetrationVector(*dbgObjB)) : "no");
 	}
 
-	_level.UpdateAll(_deltaTime);
+	_level.Update(_deltaTime);
 
 	_ui.Update(_deltaTime);
 	Render();
@@ -402,7 +407,7 @@ void Editor::RenderViewport(Viewport& vp)
 	vp.renderQueue.ClearDynamicQueue();
 	Frustum frustum;
 	camera.GetProjection().ToFrustum(camera.GetWorldTransform(), frustum);
-	_level.RenderAll(vp.renderQueue, frustum);
+	_level.Render(vp.renderQueue, frustum);
 
 	if (_drawEditorFeatures)
 	{
@@ -527,6 +532,9 @@ void Editor::SetTool(ETool tool, bool changeToolbar)
 	{
 	case ETool::SELECT:
 		newTool = &tools.select;
+		break;
+	case ETool::ISO:
+		newTool = &tools.iso;
 		break;
 	case ETool::BRUSH2D:
 		newTool = &tools.brush2D;
@@ -727,7 +735,7 @@ void Editor::ToggleConsole()
 
 void Editor::RefreshLevel()
 {
-	_hierachyWindow.Refresh(_level);
+	_hierachyWindow.Refresh(_level.RootEntity());
 }
 
 void Editor::Zoom(float amount)
@@ -799,15 +807,15 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			{
 				String filename = IO::OpenFileDialog(L"\\Data\\Levels", levelDialogFilter);
 				editor->KeyCancel();
-				editor->_level.DeleteChildren(editor->engine.context);
-				LevelIO::Read(editor->_level, filename.GetData(), editor->engine.context);
+				editor->_level.Clear(editor->engine.context);
+				editor->_level.Read(filename.GetData(), editor->engine.context);
 			}
 			break;
 
 			case ID_FILE_SAVEAS:
 			{
 				String filename = IO::SaveFileDialog(L"\\Data\\Levels", levelDialogFilter);
-				LevelIO::Write(editor->_level, filename.GetData(), editor->engine.context);
+				editor->_level.Write(filename.GetData(), editor->engine.context);
 			}
 			break;
 
@@ -916,7 +924,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 			case ID_FILE_CLEAR:
 				editor->KeyCancel();
-				editor->_level.DeleteChildren(editor->engine.context);
+				editor->_level.Clear(editor->engine.context);
 				break;
 
 			case ID_VIEW_MATERIALS:

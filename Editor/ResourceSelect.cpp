@@ -143,6 +143,8 @@ public:
 
 	void Draw()
 	{
+		_camera.Use(); //todo: this should not be here but is needed for sprite.render....
+
 		renderQueue.ClearDynamicQueue();
 		_light.Render(renderQueue);
 		_object.Render(renderQueue);

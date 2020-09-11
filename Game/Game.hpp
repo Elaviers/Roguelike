@@ -1,6 +1,7 @@
 #pragma once
 #include <Engine/EngineInstance.hpp>
 #include <Engine/EntCamera.hpp>
+#include <Engine/World.hpp>
 #include <ELGraphics/RenderQueue.hpp>
 #include <ELSys/GLContext.hpp>
 #include <ELSys/GLCubemap.hpp>
@@ -34,7 +35,7 @@ private:
 	UIContainer _ui;
 	EntCamera _uiCamera;
 
-	Entity _world;
+	World _world;
 
 	GLCubemap _reflect;
 

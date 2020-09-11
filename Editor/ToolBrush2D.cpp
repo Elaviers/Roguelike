@@ -43,7 +43,7 @@ void ToolBrush2D::Cancel()
 
 void ToolBrush2D::MouseMove(const MouseData &mouseData)
 {
-	if (mouseData.viewport->gridAxis == Axes::Y)
+	if (mouseData.viewport && mouseData.viewport->gridAxis == Axes::Y)
 	{
 		Vector2 offset = mouseData.viewport->GetCameraType() == Viewport::ECameraType::ISOMETRIC ? Vector2(-_object.level, -_object.level) : Vector2();
 
@@ -67,17 +67,17 @@ void ToolBrush2D::MouseMove(const MouseData &mouseData)
 
 void ToolBrush2D::MouseDown(const MouseData &mouseData)
 {
-	if (mouseData.viewport->gridAxis == Axes::Y)
+	if (mouseData.viewport && mouseData.viewport->gridAxis == Axes::Y)
 		_placing = true;
 }
 
 void ToolBrush2D::MouseUp(const MouseData &mouseData)
 {
-	if (mouseData.viewport->gridAxis == Axes::Y)
+	if (mouseData.viewport && mouseData.viewport->gridAxis == Axes::Y)
 	{
 		_placing = false;
 
-		_object.Clone()->SetParent(&_owner.LevelRef());
+		_object.Clone()->SetParent(&_owner.WorldRef().RootEntity());
 	}
 }
 

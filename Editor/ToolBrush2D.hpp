@@ -7,14 +7,13 @@ class ToolBrush2D : public Tool
 	bool _placing;
 
 	EntBrush2D _object;
-	const PropertyCollection* _properties;
 
 	const PropertyCollection& _GetProperties();
 public:
-	ToolBrush2D(Editor &owner) : Tool(owner), _placing(false), _properties(nullptr) {}
+	ToolBrush2D(Editor &owner) : Tool(owner), _placing(false) {}
 	virtual ~ToolBrush2D() {}
 
-	virtual void Initialise();
+	virtual void Initialise() override;
 
 	virtual void Activate(UIContainer& properties, UIContainer& toolProperties) override;
 

@@ -2,7 +2,7 @@
 #include <ELGraphics/MeshManager.hpp>
 #include <ELPhys/CollisionBox.hpp>
 
-Model* ModelManager::_CreateResource(const String& data, const String& name, const String& ext, const Context& ctx)
+Model* ModelManager::_CreateResource(const Buffer<byte>& data, const String& name, const String& extension, const Context& ctx)
 {
 	Model* model = Asset::FromText<Model>(data, ctx);
 	if (model == nullptr)
