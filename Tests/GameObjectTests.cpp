@@ -158,7 +158,7 @@ namespace EngineTests
 			{
 				SRC(EntBrush2D);
 				src.SetMaterial(material);
-				src.level = 69.f;
+				src.SetLevel(69.f);
 				CheckRW(src, ctx);
 			}
 

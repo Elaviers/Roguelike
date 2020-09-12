@@ -29,7 +29,7 @@ void ToolEntity::_SetClassID(const byte &id)
 	if (_placement)
 		_placement->Delete(_owner.engine.context);
 	
-	_placement = _owner.engine.pObjectTracker->Track(_owner.engine.registry.GetNode(_classID)->New());
+	_placement = _owner.engine.pObjectTracker->Track(_owner.engine.entRegistry.GetNode(_classID)->New());
 
 	_owner.ChangePropertyEntity(_placement.Ptr());
 }
@@ -90,7 +90,7 @@ void ToolEntity::MouseDown(const MouseData &mouseData)
 {
 	if (_placement && _readyToPlace)
 	{
-		Entity* newObj = _owner.engine.registry.GetNode(_classID)->New();
+		Entity* newObj = _owner.engine.entRegistry.GetNode(_classID)->New();
 		newObj->SetParent(&_owner.WorldRef().RootEntity());
 
 		Entity* from = (Entity*)(_owner.GetPropertyObject());

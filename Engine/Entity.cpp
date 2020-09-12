@@ -168,7 +168,7 @@ void Entity::WriteAllToFile(ByteWriter& buffer, NumberedSet<String>& strings, co
 Entity* Entity::CreateFromData(ByteReader& reader, const NumberedSet<String>& strings, const Context& ctx)
 {
 	byte id = reader.Read_byte();
-	Registry* registry = ctx.GetPtr<Registry>();
+	Registry<Entity>* registry = ctx.GetPtr<Registry<Entity>>();
 	Entity* obj = registry->GetNode(id)->New();
 	if (obj)
 		obj->ReadData(reader, strings, ctx);

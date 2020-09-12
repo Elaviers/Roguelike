@@ -1,7 +1,11 @@
 #include "GeoIsoTile.hpp"
+#include "EGeometryID.hpp"
+#include <ELGraphics/MaterialManager.hpp>
 #include <ELGraphics/RenderQueue.hpp>
 
 SharedPointer<const Mesh> GeoIsoTile::_mesh;
+
+const byte GeoIsoTile::TypeID = (byte)EGeometryID::ISO_TILE;
 
 void GeoIsoTile::Render(RenderQueue& q) const
 {
@@ -15,6 +19,24 @@ void GeoIsoTile::Render(RenderQueue& q) const
 		e.AddSetUVScale();
 		e.AddRenderMesh(*_mesh);
 	}
+}
+
+void GeoIsoTile::WriteData(ByteWriter& data, NumberedSet<String>& strings, const Context& ctx) const
+{
+	data.Write<Vector3>(_renderTransform.GetPosition());
+	data.Write<Vector3>(_renderTransform.GetScale());
+
+	data.Write_uint16(_material ? strings.Add(ctx.GetPtr<MaterialManager>()->FindNameOf(_material.Ptr())) : 0);
+}
+
+void GeoIsoTile::ReadData(ByteReader& data, const NumberedSet<String>& strings, const Context& ctx)
+{
+	_renderTransform.SetPosition(data.Read<Vector3>());
+	_renderTransform.SetScale(data.Read<Vector3>());
+
+	const String* mname = strings.Get(data.Read_uint16());
+	if (mname)
+		_material = ctx.GetPtr<MaterialManager>()->Get(*mname, ctx);
 }
 
 void GeoIsoTile::SetTransform(const Vector3& position, const Vector2& size)

@@ -15,16 +15,24 @@ protected:
 	static SharedPointer<const Mesh> _mesh;
 
 public:
+	//Needed for registry
+	static const byte TypeID;
+
 	static const SharedPointer<const Mesh>& GetMesh() { return _mesh; }
 	static void SetMesh(const SharedPointer<const Mesh>& mesh) { _mesh = mesh; }
 
 	GeoIsoTile() {}
 	virtual ~GeoIsoTile() {}
 
-	virtual void Render(RenderQueue& q) const override;
-
 	void SetTransform(const Vector3& position, const Vector2& size);
 
 	const SharedPointer<const Material>& GetMaterial() const { return _material; }
 	void SetMaterial(const SharedPointer<const Material> material) { _material = material; }
+
+	virtual void Render(RenderQueue& q) const override;
+
+	virtual void WriteData(ByteWriter&, NumberedSet<String>& strings, const Context& ctx) const override;
+	virtual void ReadData(ByteReader&, const NumberedSet<String>& strings, const Context& ctx) override;
+
+	virtual byte GetTypeID() { return TypeID; }
 };

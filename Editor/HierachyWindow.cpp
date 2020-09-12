@@ -117,7 +117,7 @@ void HierachyWindow::Initialise(HBRUSH brush)
 
 HTREEITEM HierachyWindow::_AddObject(Entity& obj, HTREEITEM parent, HTREEITEM after)
 {
-	auto regNode = _owner->engine.registry.GetNode(obj.GetTypeID());
+	const auto& regNode = _owner->engine.entRegistry.GetNode(obj.GetTypeID());
 	String name = regNode ? regNode->name : "???";
 
 	if (obj.GetName().GetLength())

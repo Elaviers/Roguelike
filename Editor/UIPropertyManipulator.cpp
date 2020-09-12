@@ -8,7 +8,7 @@
 
 byte StringToClassID(const String& string, EngineInstance& engine)
 {
-	Buffer<Pair<const byte*, RegistryNodeBase* const*>> types = engine.registry.GetRegisteredTypes();
+	Buffer<Pair<const byte*, RegistryNodeBase<Entity>* const*>> types = engine.entRegistry.GetRegisteredTypes();
 	for (size_t i = 0; i < types.GetSize(); ++i)
 	{
 		if ((*types[i].second)->name == string)
@@ -20,7 +20,7 @@ byte StringToClassID(const String& string, EngineInstance& engine)
 
 String ClassIDToString(byte id, EngineInstance& engine)
 {
-	Buffer<Pair<const byte*, RegistryNodeBase* const*>> types = engine.registry.GetRegisteredTypes();
+	Buffer<Pair<const byte*, RegistryNodeBase<Entity>* const*>> types = engine.entRegistry.GetRegisteredTypes();
 	for (size_t i = 0; i < types.GetSize(); ++i)
 	{
 		if (*types[i].first == id)
@@ -157,7 +157,7 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 			}
 			else
 			{
-				auto types = instance.engine.registry.GetRegisteredTypes();
+				auto types = instance.engine.entRegistry.GetRegisteredTypes();
 				for (uint32 i = 0; i < types.GetSize(); ++i)
 				{
 					comboBox->Add((*types[i].second)->name);

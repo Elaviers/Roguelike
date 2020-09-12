@@ -34,7 +34,7 @@
     <ClCompile Include="GeoIsoTile.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelManager.cpp" />
-    <ClCompile Include="Registry.cpp" />
+    <ClCompile Include="EGeometryID.hpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileManager.cpp" />
     <ClCompile Include="World.cpp" />

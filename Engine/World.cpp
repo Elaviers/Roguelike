@@ -50,9 +50,11 @@ constexpr const byte currentVersion = LevelVersions::VERSION_3;
 
 namespace LevelMessages
 {
-	enum ELevelMessage
+	enum ELevelMessage : byte
 	{
 		STRING = 0,
+		ENTITIES = 1,
+		GEOMETRY = 2
 	};
 }
 
@@ -86,6 +88,11 @@ bool World::Read(const char* filename, const Context& ctx)
 			return false;
 		}
 
+		//Here we go
+		Registry<Entity>* entRegistry = ctx.GetPtr<Registry<Entity>>();
+		Registry<Geometry>* geometryRegistry = ctx.GetPtr<Registry<Geometry>>();
+
+		bool geometryMode = false;
 		while (reader.IsValid())
 		{
 			byte id = reader.Read_byte();
@@ -95,42 +102,60 @@ bool World::Read(const char* filename, const Context& ctx)
 				switch (reader.Read_byte())
 				{
 				case LevelMessages::STRING:
-				{
-					uint16 stringID = reader.Read_uint16();
-					strings[stringID].Read(reader);
-				}
-				break;
+					strings[reader.Read_uint16()].Read(reader);
+					break;
+				case LevelMessages::ENTITIES:
+					geometryMode = false;
+					break;
+				case LevelMessages::GEOMETRY:
+					geometryMode = true;
+					break;
 				}
 			}
 			else
 			{
-				if (version == LevelVersions::VERSION_2)
+				if (!geometryMode)
 				{
-					if (id == (byte)EEntityID::LEVEL_CONNECTOR)
+					if (version == LevelVersions::VERSION_2)
 					{
-						reader.IncrementIndex(9 * 4); //TRANSFORM (9 floats)
-						reader.Read<String>();
-						reader.IncrementIndex(1 + 6 * 4); // 1 byte + 6 floats
-						Debug::Message("This is a version 2 level, so a level connector has been removed", "Hey");
-						continue;
+						if (id == (byte)EEntityID::LEVEL_CONNECTOR)
+						{
+							reader.IncrementIndex(9 * 4); //TRANSFORM (9 floats)
+							reader.Read<String>();
+							reader.IncrementIndex(1 + 6 * 4); // 1 byte + 6 floats
+							Debug::Message("This is a version 2 level, so a level connector has been removed", "Hey");
+							continue;
+						}
 					}
-				}
 
-				Registry* registry = ctx.GetPtr<Registry>();
-				RegistryNodeBase* node = registry->GetNode(id);
-				if (node)
-				{
-					Entity* obj = registry->GetNode(id)->New();
-					if (obj)
+					RegistryNodeBase<Entity>* node = entRegistry->GetNode(id);
+					if (node)
 					{
-						obj->SetParent(&_entRoot);
-						obj->ReadData(reader, strings, ctx);
+						Entity* obj = node->New();
+						if (obj)
+						{
+							obj->SetParent(&_entRoot);
+							obj->ReadData(reader, strings, ctx);
+						}
+						else Debug::Error("Could not create a new entity while loading level");
 					}
-					else Debug::Error("Could not create a new object");
+					else
+						Debug::Error(CSTR("Unsupported entity ID : ", id));
 				}
 				else
 				{
-					Debug::Error(CSTR("Unsupported object ID : ", id));
+					RegistryNodeBase<Geometry>* node = geometryRegistry->GetNode(id);
+					if (node)
+					{
+						Geometry* g = node->New();
+						if (g)
+						{
+							_geometry.Add(g);
+							g->ReadData(reader, strings, ctx);
+						}
+						else Debug::Error("Could not create new geometry while loading level");
+					}
+					else Debug::Error(CSTR("Unsupported geometry ID :", id));
 				}
 			}
 		}
@@ -151,7 +176,17 @@ bool World::Write(const char* filename, const Context& ctx) const
 	writer1.Write(levelPrefix);
 	writer1.Write_byte(currentVersion);
 
+	writer2.Write_byte(0);
+	writer2.Write_byte(LevelMessages::ENTITIES);
 	_entRoot.WriteAllToFile(writer2, strings, ctx);
+
+	writer2.Write_byte(0);
+	writer2.Write_byte(LevelMessages::GEOMETRY);
+	for (Geometry* g : _geometry)
+	{
+		writer2.Write_byte(g->GetTypeID());
+		g->WriteData(writer2, strings, ctx);
+	}
 
 	auto stringBuffer = strings.ToKVBuffer();
 	for (uint32 i = 0; i < stringBuffer.GetSize(); ++i)

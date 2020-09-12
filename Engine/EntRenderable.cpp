@@ -63,8 +63,8 @@ String EntRenderable::GetModelName(const Context& ctx) const
 }
 
 String EntRenderable::GetMaterialName(const Context& ctx) const
-{																	//todo: remove Smelly const cast
-	if (_material) return ctx.GetPtr<MaterialManager>()->FindNameOf(const_cast<Material*>(_material.Ptr()));
+{
+	if (_material) return ctx.GetPtr<MaterialManager>()->FindNameOf(_material.Ptr());
 	return "Unknown";
 }
 
@@ -82,8 +82,8 @@ void EntRenderable::WriteData(ByteWriter &writer, NumberedSet<String> &strings, 
 
 	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
 	if (!_materialIsDefault && _material)
-	{																	//todo: const cast removal
-		uint16 id = strings.Add(materialManager->FindNameOf(const_cast<Material*>(_material.Ptr())));
+	{
+		uint16 id = strings.Add(materialManager->FindNameOf(_material.Ptr()));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);

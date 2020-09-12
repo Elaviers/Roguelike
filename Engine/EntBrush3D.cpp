@@ -94,8 +94,8 @@ void EntBrush3D::WriteData(ByteWriter &writer, NumberedSet<String> &strings, con
 
 	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
 	if (materialManager && _material)
-	{																	//todo: const cast removal
-		uint16 id = strings.Add(materialManager->FindNameOf(const_cast<Material*>(_material.Ptr())));
+	{
+		uint16 id = strings.Add(materialManager->FindNameOf(_material.Ptr()));
 		writer.Write_uint16(id);
 	}
 	else writer.Write_uint16(0);

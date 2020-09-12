@@ -47,8 +47,9 @@ void EngineInstance::Init(EEngineCreateFlags flags)
 
 	context.Set(&_ftLib);
 	
-	registry.RegisterEngineObjects();
-	context.Set(&registry);
+	_InitRegistries();
+	context.Set(&entRegistry);
+	context.Set(&geometryRegistry);
 
 	pConsole =			CREATE<Console>(flags & EEngineCreateFlags::CONSOLE, context);
 	pAnimationManager = CREATE<AnimationManager>(flags & EEngineCreateFlags::ANIMATIONMGR, context);
@@ -125,4 +126,30 @@ void EngineInstance::Init(EEngineCreateFlags flags)
 		pFontManager->Initialise();
 		pFontManager->SetRootPath("Data/Fonts/");
 	}
+}
+
+#include "Entity.hpp"
+#include "EntRenderable.hpp"
+#include "EntSkeletal.hpp"
+#include "EntBrush3D.hpp"
+#include "EntBrush2D.hpp"
+#include "EntLight.hpp"
+#include "EntSprite.hpp"
+#include "EntConnector.hpp"
+#include "EntCamera.hpp"
+#include "GeoIsoTile.hpp"
+
+void EngineInstance::_InitRegistries()
+{
+	entRegistry.RegisterObjectClass<Entity>("Entity");
+	entRegistry.RegisterObjectClass<EntRenderable>("Renderable");
+	entRegistry.RegisterObjectClass<EntSkeletal>("Skeletal");
+	entRegistry.RegisterObjectClass<EntBrush3D>("Brush");
+	entRegistry.RegisterObjectClass<EntBrush2D>("Plane");
+	entRegistry.RegisterObjectClass<EntLight>("Light");
+	entRegistry.RegisterObjectClass<EntSprite>("Sprite");
+	entRegistry.RegisterObjectClass<EntConnector>("Level Connector");
+	entRegistry.RegisterObjectClass<EntCamera>("Camera");
+
+	geometryRegistry.RegisterObjectClass<GeoIsoTile>("Iso Tile");
 }

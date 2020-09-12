@@ -23,7 +23,7 @@ void EntBrush2D::_OnPointChanged()
 	float h = Maths::Abs(_point1.y - _point2.y);
 
 	_updatingTransform = true;
-	SetRelativePosition(Vector3(x, level, z));
+	SetRelativePosition(Vector3(x, _level, z));
 	SetRelativeScale(Vector3(w, 0.f, h));
 	_updatingTransform = false;
 }
@@ -66,7 +66,7 @@ void EntBrush2D::ReadData(ByteReader &reader, const NumberedSet<String> &strings
 	if (materialName)
 		SetMaterial(*materialName, ctx);
 
-	level = GetRelativePosition().y;
+	_level = GetRelativePosition().y;
 	_point1.x = GetRelativePosition().x - GetRelativeScale().x / 2.f;
 	_point1.y = GetRelativePosition().z - GetRelativeScale().y / 2.f;
 	_point2.x = GetRelativePosition().x + GetRelativeScale().x / 2.f;
@@ -78,8 +78,6 @@ const PropertyCollection& EntBrush2D::GetProperties()
 	static PropertyCollection cvars;
 	
 	DO_ONCE_BEGIN;
-	_AddBaseProperties(cvars);
-
 	cvars.Add(
 		"Material",
 		ContextualMemberGetter<EntBrush2D, String>(&EntBrush2D::GetMaterialName),
@@ -97,9 +95,10 @@ const PropertyCollection& EntBrush2D::GetProperties()
 		MemberGetter<EntBrush2D, const Vector2&>(&EntBrush2D::GetPoint2),
 		MemberSetter<EntBrush2D, Vector2>(&EntBrush2D::SetPoint2));
 
-	cvars.Add<float>(
+	cvars.Add(
 		"Level",
-		offsetof(EntBrush2D, level));
+		MemberGetter<EntBrush2D, float>(&EntBrush2D::GetLevel),
+		MemberSetter<EntBrush2D, float>(&EntBrush2D::SetLevel));
 	DO_ONCE_END;
 
 	return cvars;

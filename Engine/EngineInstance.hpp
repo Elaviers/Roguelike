@@ -45,8 +45,11 @@ class EngineInstance
 private:
 	FT_Library _ftLib;
 
+	void _InitRegistries();
+
 public:
-	Registry registry;
+	Registry<Entity> entRegistry;
+	Registry<Geometry> geometryRegistry;
 
 	Context context;
 

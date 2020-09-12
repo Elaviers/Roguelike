@@ -16,9 +16,11 @@ const PropertyCollection& ToolBrush2D::_GetProperties()
 		offsetof(ToolBrush2D, _object),
 		PropertyFlags::MATERIAL);
 
-	properties.Add<float>(
+	properties.Add(
 		"Level",
-		offsetof(ToolBrush2D, _object.level));
+		MemberGetter<EntBrush2D, float>(&EntBrush2D::GetLevel),
+		MemberSetter<EntBrush2D, float>(&EntBrush2D::SetLevel),
+		offsetof(ToolBrush2D, _object));
 	DO_ONCE_END;
 
 	return properties;
@@ -45,7 +47,7 @@ void ToolBrush2D::MouseMove(const MouseData &mouseData)
 {
 	if (mouseData.viewport && mouseData.viewport->gridAxis == Axes::Y)
 	{
-		Vector2 offset = mouseData.viewport->GetCameraType() == Viewport::ECameraType::ISOMETRIC ? Vector2(-_object.level, -_object.level) : Vector2();
+		Vector2 offset = mouseData.viewport->GetCameraType() == Viewport::ECameraType::ISOMETRIC ? Vector2(-_object.GetLevel(), -_object.GetLevel()) : Vector2();
 
 		if (mouseData.isLeftDown)
 		{
