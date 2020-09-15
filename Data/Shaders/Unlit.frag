@@ -2,8 +2,9 @@
 uniform vec4 Colour;
 
 uniform bool Blend;
-uniform vec4 BlendFrom;
-uniform vec4 BlendTo;
+uniform vec4 BlendPrimary;
+uniform vec4 BlendSecondary;
+uniform vec4 BlendTertiary;
 
 uniform sampler2D T_Diffuse;
 uniform bool IsFont;
@@ -19,7 +20,7 @@ void main()
 	if (tex.a < 0.01) discard; //don't write invisible fragments
 
 	if (Blend) 
-		OutColour = mix(BlendFrom, BlendTo, tex.r) * vec4(1, 1, 1, tex.a);
+		OutColour = (BlendPrimary * tex.r + BlendSecondary * tex.g + BlendTertiary * tex.b) * vec4(1, 1, 1, tex.a);
 	else
 	{
 		if (IsFont)

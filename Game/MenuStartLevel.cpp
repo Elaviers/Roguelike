@@ -15,6 +15,7 @@ void MenuStartLevel::Initialise(const FunctionPointer<void, const String&> &onLe
 	_panel.SetParent(this);
 	_panel.SetMaterial(_buttonMaterial);
 	_panel.SetBorderSize(-8.f);
+	_panel.SetColour(UIColour(Colour(.2f, .2f, .2f), Colour::White));
 
 	Buffer<String> filenames = IO::FindFilesInDirectoryRecursive(LevelGeneration::ROOT_DIR, "*.*");
 

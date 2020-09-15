@@ -71,7 +71,7 @@ void GizmoBrushSizer2D::Update(const MouseData& mouseData, const Ray& mouseRay, 
 			Vector3 cp = Collision::ClosestPointOnLineSegment(_lineA, _lineB, pp);
 			float dist2 = (cp - pp).LengthSquared();
 
-			if (dist2 <= 0.05f * 0.05f)
+			if (dist2 <= 0.33f * 0.33f)
 			{
 				maxT = t;
 

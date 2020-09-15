@@ -67,6 +67,8 @@ private:
 
 	Viewport _viewports[VIEWPORTCOUNT];
 
+	ECursor _prevCursor;
+
 	//Rendering
 	GLContext _glContext;
 	GLProgram _shaderLit;
@@ -125,6 +127,8 @@ public:
 
 	Editor() : _fbxManager(nullptr), _hierachyWindow(this), tools(*this) {}
 	~Editor();
+
+	void SetCursor(ECursor cursor);
 
 	void Run();
 	void Frame();

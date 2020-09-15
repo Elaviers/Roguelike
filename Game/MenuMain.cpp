@@ -6,9 +6,9 @@
 
 void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelChosen, const Callback &onQuit, EngineInstance& engineInstance)
 {
-	const UIColour btnColour(Colour::Blue, Colour::Yellow);
-	const UIColour btnColourHover(Colour::Blue, Colour(.9f, .9f, .1f));
-	const UIColour btnColourHold(Colour::Red, Colour(.6f, .6f, .3f));
+	const UIColour btnColour(Colour::Yellow, Colour::Blue);
+	const UIColour btnColourHover(Colour(.9f, .9f, .1f), Colour::Blue);
+	const UIColour btnColourHold(Colour(.6f, .6f, .3f), Colour::Red);
 
 	_onLevelChosen = onLevelChosen;
 	_onQuit = onQuit;
@@ -24,6 +24,7 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	_panel.SetParent(this);
 	_panel.SetMaterial(panelMat);
 	_panel.SetBorderSize(-8.f);
+	_panel.SetColour(UIColour(Colour::White, Colour::Black));
 	
 	_buttonStart.SetParent(this);
 	_buttonStart.SetBounds(0.f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f));

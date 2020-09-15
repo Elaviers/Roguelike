@@ -123,7 +123,7 @@ void Editor::_Init()
 
 	//UI
 	SharedPointer<const Texture> gradient = engine.pTextureManager->Get("ui/gradient", engine.context);
-	SharedPointer<const Texture> radialGradient = engine.pTextureManager->Get("ui/radialgrad2", engine.context);
+	SharedPointer<const Texture> radialGradient = engine.pTextureManager->Get("ui/radialgrad", engine.context);
 	SharedPointer<const Texture> splitterTex = engine.pTextureManager->Get("editor/tools/splitter", engine.context);
 
 	_consoleCamera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
@@ -152,7 +152,10 @@ void Editor::_Init()
 
 	//Note: toolbar is added after the viewport background ui because containers pass events to last elements first
 	_toolbar.SetButtonMaterial(engine.pMaterialManager->Get("uibutton1", engine.context)).SetButtonBorderSize(2.f)
-		.SetButtonColourFalse(Colour::White).SetButtonColourTrue(Colour::Blue).SetButtonColourHover(Colour(.8f, .8f, .7f)).SetButtonColourHold(Colour::Grey)
+		.SetButtonColourFalse(UIColour(Colour::White, Colour::Black, Colour::Black))
+		.SetButtonColourTrue(UIColour(Colour::Blue, Colour::Black, Colour::Black))
+		.SetButtonColourHover(UIColour(Colour(.8f, .8f, .7f), Colour::Black, Colour::Black))
+		.SetButtonColourHold(UIColour(Colour::Grey, Colour::Black, Colour::Black))
 		.SetParent(&_ui).SetBounds(0.f, UICoord(1.f, -64.f), 1.f, UICoord(0.f, 64.f));
 	_toolbar.AddButton("Select", engine.pTextureManager->Get("editor/tools/select", engine.context), (uint16)ETool::SELECT);
 	_toolbar.AddButton("Iso", engine.pTextureManager->Get("editor/tools/iso", engine.context), (uint16)ETool::ISO);
@@ -243,6 +246,15 @@ void Editor::_InitGL()
 
 #pragma endregion
 
+void Editor::SetCursor(ECursor cursor)
+{
+	if (cursor != _prevCursor)
+	{
+		_prevCursor = cursor;
+		System::SetCursor(cursor);
+	}
+}
+
 void Editor::Run()
 {
 	_Init();
@@ -310,9 +322,9 @@ void Editor::Frame()
 		{
 			uint16 x = cursorPos.x - client.left;
 			uint16 y = _uiCamera.GetProjection().GetDimensions().y - (cursorPos.y - client.top);
-			_ui.OnMouseMove(x, y, false);
+			_ui.OnMouseMove(false, x, y);
 			
-			System::SetCursor(_ui.GetCursor());
+			SetCursor(_ui.GetCursor());
 
 			UpdateMousePosition(x, y);
 		}
@@ -559,6 +571,52 @@ void Editor::SetTool(ETool tool, bool changeToolbar)
 
 #pragma region Input
 
+void _CalcUnitXY(float x, float y, const Viewport& vp, float& unitX_out, float& unitY_out)
+{
+	const EntCamera& camera = vp.camera;
+	Vector3 right = camera.GetRelativeTransform().GetRightVector();
+	Vector3 up = camera.GetRelativeTransform().GetUpVector();
+
+	switch (vp.GetCameraType())
+	{
+	case Viewport::ECameraType::ORTHO_X:
+	case Viewport::ECameraType::ORTHO_Y:
+	case Viewport::ECameraType::ORTHO_Z:
+	{
+		int rightElement = right.x ? 0 : right.y ? 1 : 2;
+		int upElement = up.x ? 0 : up.y ? 1 : 2;
+		unitX_out = camera.GetRelativePosition()[rightElement] + x / camera.GetProjection().GetOrthographicScale();
+		unitY_out = camera.GetRelativePosition()[upElement] + y / camera.GetProjection().GetOrthographicScale();
+	}
+	break;
+
+	case Viewport::ECameraType::ISOMETRIC:
+	{
+		Ray r = camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2(x / camera.GetProjection().GetDimensions().x, y / camera.GetProjection().GetDimensions().y));
+		float t = Collision::IntersectRayPlane(r, Vector3(), Vector3(0.f, 1.f, 0.f));
+		if (t > 0.f)
+		{
+			Vector3 pp = r.origin + r.direction * t;
+			unitX_out = pp.x;
+			unitY_out = pp.z;
+		}
+		else
+			unitX_out = unitY_out = 0.f;
+	}
+	break;
+
+	default:
+		unitX_out = unitY_out = 0.f;
+		break;
+	}
+}
+
+inline void _CalcUnitXYFull(unsigned short x, unsigned short y, const Viewport& vp, float& unitX_out, float& unitY_out)
+{
+	const AbsoluteBounds& bounds = vp.ui.GetAbsoluteBounds();
+	_CalcUnitXY((float)x - (bounds.x + (bounds.w / 2.f)), (float)y - (bounds.y + (bounds.h / 2.f)), vp, unitX_out, unitY_out);
+}
+
 void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 {
 	Viewport* vp = nullptr;
@@ -586,9 +644,6 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 	{
 		if (_mouseData.isLeftDown)
 			LeftMouseUp();
-
-		if (_mouseData.isRightDown)
-			RightMouseUp();
 	}
 
 	const AbsoluteBounds& bounds = vp->ui.GetAbsoluteBounds();
@@ -602,67 +657,32 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 	_mouseData.x = x - (uint16)(bounds.x + (bounds.w / 2.f));
 	_mouseData.y = y - (uint16)(bounds.y + (bounds.h / 2.f));
 
-	EntCamera& camera = vp->camera;
-	Vector3 right = camera.GetRelativeTransform().GetRightVector();
-	Vector3 up = camera.GetRelativeTransform().GetUpVector();
+	//Update unitX and unitY
+	_CalcUnitXY(_mouseData.x, _mouseData.y, *_mouseData.viewport, _mouseData.unitX, _mouseData.unitY);
 
-	switch (_mouseData.viewport->GetCameraType())
+	if (_mouseData.isRightDown && _activeVP)
 	{
-	case Viewport::ECameraType::ORTHO_X:
-	case Viewport::ECameraType::ORTHO_Y:
-	case Viewport::ECameraType::ORTHO_Z:
-	{
-		int rightElement = right.x ? 0 : right.y ? 1 : 2;
-		int upElement = up.x ? 0 : up.y ? 1 : 2;
-		_mouseData.unitX = camera.GetRelativePosition()[rightElement] + (float)_mouseData.x / camera.GetProjection().GetOrthographicScale();
-		_mouseData.unitY = camera.GetRelativePosition()[upElement] + (float)_mouseData.y / camera.GetProjection().GetOrthographicScale();
-	}
-		break;
+		EntCamera& avpCam = _activeVP->camera;
 
-	case Viewport::ECameraType::ISOMETRIC:
-	{
-		Ray r = camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2((float)_mouseData.x / camera.GetProjection().GetDimensions().x, (float)_mouseData.y / camera.GetProjection().GetDimensions().y));
-		float t =  Collision::IntersectRayPlane(r, Vector3(), Vector3(0.f, 1.f, 0.f));
-		if (t > 0.f)
+		if (avpCam.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 		{
-			Vector3 pp = r.origin + r.direction * t;
-			_mouseData.unitX = pp.x;
-			_mouseData.unitY = pp.z;
-		}
-		else 
-			_mouseData.unitX = _mouseData.unitY = 0.f;
-	}
-		break;
+			float avpUnitX, avpUnitY;
+			_CalcUnitXYFull(x, y, *_activeVP, avpUnitX, avpUnitY);
 
-	default:
-		_mouseData.unitX = _mouseData.unitY = 0.f;
-		break;
-	}	
-
-	if (_mouseData.isRightDown && _mouseData.viewport == prevViewport)
-	{
-		if (camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
-		{
-			camera.RelativeMove(right * (_mouseData.prevUnitX - _mouseData.unitX) + up * (_mouseData.prevUnitY - _mouseData.unitY));
-
-			_mouseData.unitX = _mouseData.prevUnitX;
-			_mouseData.unitY = _mouseData.prevUnitY;
-			//_mouseData.unitX = camera.GetRelativePosition()[rightElement] + (float)_mouseData.x / camera.GetProjection().GetOrthographicScale();
-			//_mouseData.unitY = camera.GetRelativePosition()[upElement] + (float)_mouseData.y / camera.GetProjection().GetOrthographicScale();
+			Vector3 avpRight = avpCam.GetRelativeTransform().GetRightVector();
+			Vector3 avpUp = avpCam.GetRelativeTransform().GetUpVector();
+			avpCam.RelativeMove(avpRight * (_mouseData.dragUnitX - avpUnitX) + avpUp * (_mouseData.dragUnitY - avpUnitY));
 		}
 		else
 		{
-			camera.AddRelativeRotation(Vector3((_mouseData.y - _mouseData.prevY) * .5f, (_mouseData.x - _mouseData.prevX) * .5f, 0.f));
+			avpCam.AddRelativeRotation(Vector3((_mouseData.y - _mouseData.prevY) * .5f, (_mouseData.x - _mouseData.prevX) * .5f, 0.f));
 		}
 	}
 
 	_mouseData.unitX_rounded = _mouseData.unitX < 0.f ? (int)(_mouseData.unitX - 1.f) : (int)_mouseData.unitX;
 	_mouseData.unitY_rounded = _mouseData.unitY < 0.f ? (int)(_mouseData.unitY - 1.f) : (int)_mouseData.unitY;
 
-	if (camera.GetProjection().GetType() != EProjectionType::PERSPECTIVE)
-		_window.SetTitle(CSTR("Mouse X:", _mouseData.x, " (", _mouseData.unitX, ") Mouse Y:", _mouseData.y, " (", _mouseData.unitY, ')'));
-	else
-		_window.SetTitle(CSTR("Mouse X:", _mouseData.x, " Mouse Y:", _mouseData.y));
+	_window.SetTitle(CSTR("Mouse X:", _mouseData.x, " (", _mouseData.unitX, ") Mouse Y:", _mouseData.y, " (", _mouseData.unitY, ')'));
 
 	if (_currentTool)
 		_currentTool->MouseMove(_mouseData);
@@ -695,8 +715,10 @@ void Editor::LeftMouseUp()
 void Editor::RightMouseDown()
 {
 	_mouseData.isRightDown = true;
+	_mouseData.dragUnitX = _mouseData.unitX;
+	_mouseData.dragUnitY = _mouseData.unitY;
 
-	if (_mouseData.viewport && _mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::PERSPECTIVE)
+	if (_mouseData.viewport)
 		_activeVP = _mouseData.viewport;
 }
 
@@ -1013,7 +1035,7 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 	case WM_LBUTTONDOWN:
 		::SetFocus(hwnd);
-		if (!editor->_ui.OnMouseDown())
+		if (!editor->_ui.KeyDown(EKeycode::MOUSE_LEFT))
 			editor->LeftMouseDown();
 		else
 			editor->engine.pInputManager->Reset();
@@ -1021,7 +1043,7 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 		break;
 
 	case WM_LBUTTONUP:
-		if (!editor->_ui.OnMouseUp())
+		if (!editor->_ui.KeyUp(EKeycode::MOUSE_LEFT))
 			editor->LeftMouseUp();
 		else
 			editor->engine.pInputManager->Reset();
@@ -1038,12 +1060,12 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 		break;
 
 	case WM_CHAR:
-		editor->_ui.OnCharInput((char)wparam);
+		editor->_ui.InputChar((char)wparam);
 		break;
 
 	case WM_SYSKEYDOWN:
 	case WM_KEYDOWN:
-		if (!editor->_ui.OnKeyDown((EKeycode)wparam))
+		if (!editor->_ui.KeyDown((EKeycode)wparam))
 		{
 			if (lparam & (1 << 30))
 				break; //Key repeats ignored
@@ -1055,7 +1077,7 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 	case WM_SYSKEYUP:
 	case WM_KEYUP:
-		if (!editor->_ui.OnKeyUp((EKeycode)wparam))
+		if (!editor->_ui.KeyUp((EKeycode)wparam))
 			editor->engine.pInputManager->KeyUp((EKeycode)wparam);
 
 		break;

@@ -12,6 +12,7 @@ class ToolSelect : public Tool
 	bool _placing;
 	bool _shouldCopy;
 
+	EntityPointer _dragObject;
 	EntityPointer _hoverObject;
 	bool _hoverObjectIsSelected;
 
@@ -48,6 +49,7 @@ class ToolSelect : public Tool
 	void _CloneSelection();
 
 	bool _ViewportCanRaySelect(const Viewport&) const;
+	bool _ViewportIsOrtho(const Viewport&) const;
 
 public:
 	ToolSelect(Editor& level) : Tool(level),

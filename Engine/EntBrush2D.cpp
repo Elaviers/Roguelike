@@ -8,7 +8,7 @@ void EntBrush2D::_OnTransformChanged()
 	if (!_updatingTransform)
 	{
 		float hw = GetRelativeScale().x / 2.f;
-		float hh = GetRelativeScale().y / 2.f;
+		float hh = GetRelativeScale().z / 2.f;
 
 		_point1 = Vector2(GetRelativePosition().x - hw, GetRelativePosition().z - hh);
 		_point2 = Vector2(GetRelativePosition().x + hh, GetRelativePosition().z + hh);
@@ -43,7 +43,6 @@ void EntBrush2D::Render(RenderQueue& q) const
 		e.AddCommand(RCMDRenderMesh::PLANE);
 	}
 }
-
 
 void EntBrush2D::WriteData(ByteWriter& writer, NumberedSet<String>& strings, const Context& ctx) const
 {

@@ -249,7 +249,7 @@ void Game::MouseMove(uint16 x, uint16 y)
 {
 	if (_uiIsActive)
 	{
-		_ui.OnMouseMove((float)x, (float)(_uiCamera.GetProjection().GetDimensions().y - y), false);
+		_ui.SetCursorPos((float)x, (float)(_uiCamera.GetProjection().GetDimensions().y - y));
 	}
 }
 
@@ -257,7 +257,7 @@ void Game::MouseUp()
 {
 	if (_uiIsActive)
 	{
-		_ui.OnMouseUp();
+		_ui.KeyUp(EKeycode::MOUSE_LEFT);
 	}
 }
 
@@ -265,14 +265,14 @@ void Game::MouseDown()
 {
 	if (_uiIsActive)
 	{
-		_ui.OnMouseDown();
+		_ui.KeyDown(EKeycode::MOUSE_LEFT);
 	}
 }
 
 void Game::KeyDown(EKeycode key)
 {
 	if (_uiIsActive)
-		_ui.OnKeyDown(key);
+		_ui.KeyDown(key);
 
 	_engine.pInputManager->KeyDown(key);
 
@@ -286,7 +286,7 @@ void Game::KeyDown(EKeycode key)
 void Game::KeyUp(EKeycode key)
 {
 	if (_uiIsActive)
-		_ui.OnKeyUp(key);
+		_ui.KeyUp(key);
 	
 	_engine.pInputManager->KeyUp(key);
 }
@@ -294,7 +294,7 @@ void Game::KeyUp(EKeycode key)
 void Game::InputChar(char character)
 {
 	if (_uiIsActive)
-		_ui.OnCharInput(character);
+		_ui.InputChar(character);
 
 	if (_consoleIsActive)
 	{

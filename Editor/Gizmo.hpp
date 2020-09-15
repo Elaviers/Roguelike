@@ -96,4 +96,13 @@ public:
 		for (const GizmoComponent* c : _components)
 			c->Render(q);
 	}
+
+	bool IsBeingDragged() const
+	{
+		for (const GizmoComponent* c : _components)
+			if (c->_isDragging)
+				return true;
+
+		return false;
+	}
 };

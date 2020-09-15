@@ -19,6 +19,9 @@ struct MouseData
 	float prevUnitX = 0.f;
 	float prevUnitY = 0.f;
 
+	float dragUnitX = 0.f;
+	float dragUnitY = 0.f;
+
 	bool isLeftDown = false;
 	bool isRightDown = false;
 

@@ -105,9 +105,10 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 	bool readOnly = property.GetFlags() & PropertyFlags::READONLY;
 
 	const float borderSize = 2.f;
-	const UIColour buttonColourInactive(Colour::Black, Colour(.6f, .6f, .6f));
-	const UIColour buttonColourHover(Colour::Grey, Colour(.8f, .8f, .8f));
-	const UIColour buttonColourHold(Colour::Black, Colour(.2f, .2f, .2f));
+	const UIColour buttonColourInactive(Colour(.6f, .6f, .6f), Colour::Black, Colour::Black);
+	const UIColour buttonColourHover(Colour(.8f, .8f, .8f), Colour::Black, Colour::Grey);
+	const UIColour buttonColourHold(Colour(.2f, .2f, .2f), Colour::Black, Colour::Black);
+	const UIColour textboxColour(Colour(.6f, .6f, .6f), Colour::Black, Colour(.5f, .5f, .5f));
 	const UIColour textColour(readOnly ? Colour::Grey : Colour::White);
 	const UIColour textShadowColour(Colour(0.f, 0.f, 0.12f));
 	const Vector2 textShadowOffset(2.f, -2.f);
@@ -185,7 +186,7 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 	_textbox->SetBounds(.5f, 0.f, UICoord(.5f, tbWidthOffset), 1.f);
 	_textbox->SetReadOnly(readOnly).SetMaterial(btnMat).SetBorderSize(borderSize)
 		.SetFont(font).SetTextColour(textColour).SetTextShadowColour(textShadowColour).SetTextShadowOffset(textShadowOffset)
-		.SetString(GetPropertyString(_property, _object, _editorInstance.engine)).SetColour(buttonColourInactive);
+		.SetString(GetPropertyString(_property, _object, _editorInstance.engine)).SetColour(textboxColour);
 
 	if (!readOnly)
 		_textbox->onStringChanged += FunctionPointer<void, UITextbox&>(this, &UIPropertyManipulator::_OnStringChanged);

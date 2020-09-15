@@ -56,9 +56,9 @@ Vector3 ToolSelect::_GizmoMove(const Vector3& delta)
 
 		if (!_gizmoIsLocal && _snapToWorld && _gridSnap)
 		{
-			endPos.x = Maths::Trunc(endPos.x, _gridSnap);
-			endPos.y = Maths::Trunc(endPos.y, _gridSnap);
-			endPos.z = Maths::Trunc(endPos.z, _gridSnap);
+			endPos.x = Maths::Round(endPos.x, _gridSnap);
+			endPos.y = Maths::Round(endPos.y, _gridSnap);
+			endPos.z = Maths::Round(endPos.z, _gridSnap);
 		}
 
 		if (_shouldCopy && (endPos != startPos))
@@ -136,7 +136,7 @@ void ToolSelect::_GizmoSetSidePos(E2DBrushEdge edge, const Vector3& delta)
 		if (_snapToWorld)
 		{
 			finalEdgePos = edgePos + delta;
-			finalEdgePos[elem] = Maths::Trunc(finalEdgePos[elem], _gridSnap);
+			finalEdgePos[elem] = Maths::Round(finalEdgePos[elem], _gridSnap);
 		}
 		else
 		{
@@ -175,21 +175,29 @@ void ToolSelect::_UpdateGizmoTransform()
 
 void ToolSelect::_SetHoverObject(Entity* ho)
 {
-	_hoverObject = _owner.engine.pObjectTracker->Track(ho);
+	if (ho != _hoverObject.Ptr())
+	{
+		_hoverObject = _owner.engine.pObjectTracker->Track(ho);
 
-	_hoverObjectIsSelected = false;
+		_hoverObjectIsSelected = false;
 
-	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
-		if (_hoverObject == _selectedObjects[i])
-		{
-			_hoverObjectIsSelected = true;
-			break;
-		}
+		for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
+			if (_hoverObject == _selectedObjects[i])
+			{
+				_hoverObjectIsSelected = true;
+				break;
+			}
+	}
 }
 
 bool ToolSelect::_ViewportCanRaySelect(const Viewport& vp) const
 {
 	return vp.GetCameraType() == Viewport::ECameraType::PERSPECTIVE || vp.GetCameraType() == Viewport::ECameraType::ISOMETRIC;
+}
+
+bool ToolSelect::_ViewportIsOrtho(const Viewport& vp) const
+{
+	return vp.GetCameraType() != Viewport::ECameraType::PERSPECTIVE;
 }
 
 void ToolSelect::Initialise()
@@ -235,9 +243,28 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 {
 	_hoverObjectIsSelected = false;
 
-	bool canRaySelect = _ViewportCanRaySelect(*mouseData.viewport);
+	EntCamera& camera = mouseData.viewport->camera;
 
-	if (!canRaySelect)
+	Ray r(camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2((float)mouseData.x / camera.GetProjection().GetDimensions().x, (float)mouseData.y / camera.GetProjection().GetDimensions().y)));
+
+	if (_activeGizmo) {
+		float t = INFINITY;
+		_activeGizmo->Update(mouseData, r, t);
+
+		if (_activeGizmo->IsBeingDragged()) {
+			_owner.RefreshProperties();
+			return;
+		}
+
+		if (t < INFINITY)
+		{
+			_hoverObject.Clear();
+			_owner.SetCursor(ECursor::HAND);
+			return;
+		}
+	}
+
+	if (mouseData.viewport && _ViewportIsOrtho(*mouseData.viewport))
 	{
 		Axes::EAxis fwdAxis = mouseData.viewport->gridAxis;
 		int fwdElement = fwdAxis;
@@ -262,7 +289,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 				v[fwdElement] = _sbPoint2[fwdElement];
 				_sbPoint2 = v;
 			}
-			else if (_hoverObject)
+			else if (_dragObject)
 			{
 				float deltaX = mouseData.unitX - mouseData.heldUnitX;
 				float deltaY = mouseData.unitY - mouseData.heldUnitY;
@@ -321,7 +348,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 
 				if (mouseData.unitX >= bounds.min[rightElement] && mouseData.unitX <= bounds.max[rightElement] && mouseData.unitY >= bounds.min[upElement] && mouseData.unitY <= bounds.max[upElement])
 				{
-					System::SetCursor(ECursor::HAND);
+					_owner.SetCursor(ECursor::HAND);
 					_hoverObject = _selectedObjects[i];
 					_hoverObjectIsSelected = true;
 					found = true;
@@ -336,20 +363,6 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 
 	if (!_placing)
 	{
-		EntCamera& camera = mouseData.viewport->camera;
-
-		Ray r(camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2((float)mouseData.x / camera.GetProjection().GetDimensions().x, (float)mouseData.y / camera.GetProjection().GetDimensions().y)));
-
-		if (_activeGizmo) {
-			float t = INFINITY;
-			_activeGizmo->Update(mouseData, r, t);
-
-			if (t < INFINITY)
-				System::SetCursor(ECursor::HAND);
-		}
-
-		_owner.RefreshProperties();
-
 		//Update hoverobject
 		Buffer<RaycastResult> results = _owner.WorldRef().RootEntity().Raycast(r);
 
@@ -358,7 +371,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 			_SetHoverObject(results[0].object);
 
 			if (_hoverObjectIsSelected == false)
-				System::SetCursor(ECursor::HAND);
+				_owner.SetCursor(ECursor::HAND);
 		}
 		else
 			_hoverObject.Clear();
@@ -377,6 +390,25 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 
 	if (mouseData.viewport)
 	{
+		bool ortho = _ViewportIsOrtho(*mouseData.viewport);
+		if (ortho)
+		{
+			if (_hoverObject && _hoverObjectIsSelected)
+			{
+				if (_owner.engine.pInputManager->IsKeyDown(EKeycode::ALT))
+					_shouldCopy = true;
+
+				Vector3 objPos = _hoverObject->GetWorldPosition();
+
+				_origObjectX = objPos[Axes::GetHorizontalAxis(mouseData.viewport->gridAxis)];
+				_origObjectY = objPos[Axes::GetVerticalAxis(mouseData.viewport->gridAxis)];
+
+				_placing = false;
+				_dragObject = _hoverObject;
+				return;
+			}
+		}
+
 		if (_ViewportCanRaySelect(*mouseData.viewport))
 		{
 			_placing = false;
@@ -389,25 +421,15 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 					ClearSelection();
 			}
 		}
-		else if (_hoverObject)
-		{
-			if (_owner.engine.pInputManager->IsKeyDown(EKeycode::ALT))
-				_shouldCopy = true;
-
-			Vector3 objPos = _hoverObject->GetWorldPosition();
-
-			_origObjectX = objPos[Axes::GetHorizontalAxis(mouseData.viewport->gridAxis)];
-			_origObjectY = objPos[Axes::GetVerticalAxis(mouseData.viewport->gridAxis)];
-
-			_placing = false;
-		}
-		else _placing = true;
+		else if (ortho) _placing = true;
 	}
 }
 
 void ToolSelect::MouseUp(const MouseData& mouseData)
 {
 	if (_activeGizmo) _activeGizmo->MouseUp();
+
+	_dragObject.Clear();
 }
 
 void ToolSelect::KeySubmit()

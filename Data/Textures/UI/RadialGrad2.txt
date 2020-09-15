@@ -1,2 +1,0 @@
-mag linear
-img UI/radialgrad2.png
