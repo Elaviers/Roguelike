@@ -73,7 +73,7 @@ void Entity::RenderAll(RenderQueue& q, const Frustum& cameraFrustum) const
 {
 	Bounds b = GetWorldBounds();
 
-	if (cameraFrustum.OverlapsAABB(b.min, b.max) || _flags & EFlags::DBG_ALWAYS_DRAW)
+	if (cameraFrustum.OverlapsAABB(b.min, b.max) || (_flags & EFlags::DBG_ALWAYS_DRAW) != EFlags::NONE)
 		Render(q);
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
@@ -150,7 +150,7 @@ Entity* Entity::FindChild(uint32 uid)
 
 void Entity::WriteAllToFile(ByteWriter& buffer, NumberedSet<String>& strings, const Context& ctx) const
 {
-	if (_flags & EFlags::SAVEABLE)
+	if ((_flags & EFlags::SAVEABLE) != EFlags::NONE)
 	{
 		byte id = GetTypeID();
 		if (id != 0)

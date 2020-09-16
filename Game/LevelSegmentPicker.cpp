@@ -32,8 +32,8 @@ LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const St
 				Entity* segment = Entity::Create();
 				if (subworld.Read(CSTR(rootLevelDir, tokens[1]), ctx))
 				{
-					for (Entity* child : subworld.RootEntity().Children())
-						child->SetParent(segment);
+					while (subworld.RootEntity().Children().GetSize())
+						subworld.RootEntity().Children()[0]->SetParent(segment);
 
 					bag->bag.Add(segment, tokens.GetSize() > 2 ? tokens[2].ToFloat() : 1);
 					if (bagTotalOverride)

@@ -28,9 +28,9 @@ EngineInstance::~EngineInstance()
 }
 
 template <typename T>
-inline T* CREATE(bool condition, Context& ctx)
+inline T* CREATE(EEngineCreateFlags flags, EEngineCreateFlags cflag, Context& ctx)
 {
-	if (condition)
+	if ((flags & cflag) != (EEngineCreateFlags)0)
 	{
 		T* ptr = new T();
 		ctx.Set(ptr);
@@ -51,18 +51,18 @@ void EngineInstance::Init(EEngineCreateFlags flags)
 	context.Set(&entRegistry);
 	context.Set(&geometryRegistry);
 
-	pConsole =			CREATE<Console>(flags & EEngineCreateFlags::CONSOLE, context);
-	pAnimationManager = CREATE<AnimationManager>(flags & EEngineCreateFlags::ANIMATIONMGR, context);
-	pAudioManager =		CREATE<AudioManager>(flags & EEngineCreateFlags::AUDIOMGR, context);
-	pDebugManager =		CREATE<DebugManager>(flags & EEngineCreateFlags::DEBUGMGR, context);
-	pFontManager =		CREATE<FontManager>(flags & EEngineCreateFlags::FONTMGR, context);
-	pInputManager =		CREATE<InputManager>(flags & EEngineCreateFlags::INPUTMGR, context);
-	pMaterialManager =	CREATE<MaterialManager>(flags & EEngineCreateFlags::MATERIALMGR, context);
-	pMeshManager =		CREATE<MeshManager>(flags & EEngineCreateFlags::MESHMGR, context);
-	pModelManager =		CREATE<ModelManager>(flags & EEngineCreateFlags::MODELMGR, context);
-	pTextureManager =	CREATE<TextureManager>(flags & EEngineCreateFlags::TEXTUREMGR, context);
-	pTileManager =		CREATE<TileManager>(flags & EEngineCreateFlags::TILEMGR, context);
-	pObjectTracker =	CREATE<Tracker<Entity>>(flags & EEngineCreateFlags::OBJTRACKER, context);
+	pConsole =			CREATE<Console>(flags, EEngineCreateFlags::CONSOLE, context);
+	pAnimationManager = CREATE<AnimationManager>(flags, EEngineCreateFlags::ANIMATIONMGR, context);
+	pAudioManager =		CREATE<AudioManager>(flags, EEngineCreateFlags::AUDIOMGR, context);
+	pDebugManager =		CREATE<DebugManager>(flags, EEngineCreateFlags::DEBUGMGR, context);
+	pFontManager =		CREATE<FontManager>(flags, EEngineCreateFlags::FONTMGR, context);
+	pInputManager =		CREATE<InputManager>(flags, EEngineCreateFlags::INPUTMGR, context);
+	pMaterialManager =	CREATE<MaterialManager>(flags, EEngineCreateFlags::MATERIALMGR, context);
+	pMeshManager =		CREATE<MeshManager>(flags, EEngineCreateFlags::MESHMGR, context);
+	pModelManager =		CREATE<ModelManager>(flags, EEngineCreateFlags::MODELMGR, context);
+	pTextureManager =	CREATE<TextureManager>(flags, EEngineCreateFlags::TEXTUREMGR, context);
+	pTileManager =		CREATE<TileManager>(flags, EEngineCreateFlags::TILEMGR, context);
+	pObjectTracker =	CREATE<Tracker<Entity>>(flags, EEngineCreateFlags::OBJTRACKER, context);
 
 	if (pConsole)
 	{
