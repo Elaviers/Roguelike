@@ -93,6 +93,9 @@
     <ClCompile Include="ToolIso.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="UITileSelector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EditorIO.hpp">
@@ -169,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="ToolIso.hpp">
       <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="UITileSelector.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

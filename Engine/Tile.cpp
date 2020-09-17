@@ -1,5 +1,6 @@
 #include "Tile.hpp"
 #include <ELGraphics/MaterialManager.hpp>
+#include <ELPhys/CollisionBox.hpp>
 
 const PropertyCollection& Tile::GetProperties()
 {
@@ -58,4 +59,24 @@ String Tile::_GetMaterialStr(const Context& ctx)
 {
 	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
 	return materialManager->FindNameOf(_material.Ptr());
+}
+
+const Collider& Tile::GetCollider() const
+{
+	static Collider block(ECollisionChannels::STATIC, CollisionBox(Box::FromMinMax(Vector3(-1.f, 0.f, 0.f), Vector3(0.f, 1.f, 1.f))));
+	static Collider wallL(ECollisionChannels::STATIC, CollisionBox(Box::FromMinMax(Vector3(-1.f, 0.f, 0.f), Vector3(0.f, 1.f, 1.f))));
+	static Collider wallR(ECollisionChannels::STATIC, CollisionBox(Box::FromMinMax(Vector3(-1.f, 0.f, 0.f), Vector3(0.f, 1.f, 1.f))));
+	static Collider none;
+
+	switch (_collisionType)
+	{
+	case ECollisionType::BLOCK:
+		return block;
+	case ECollisionType::WALL_L:
+		return wallL;
+	case ECollisionType::WALL_R:
+		return wallR;
+	}
+
+	return none;
 }

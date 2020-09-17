@@ -98,4 +98,3 @@ void ToolBrush3D::Render(RenderQueue& q) const
 {
 	_object.Render(q);
 }
-

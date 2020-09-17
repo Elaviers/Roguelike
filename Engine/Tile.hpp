@@ -2,6 +2,7 @@
 #include <ELCore/Asset.hpp>
 #include <ELCore/SharedPointer.hpp>
 #include <ELGraphics/Material.hpp>
+#include <ELPhys/Collider.hpp>
 
 class Tile : public Asset
 {
@@ -36,4 +37,6 @@ public:
 		t._ReadText(str, ctx);
 		return t;
 	}
+
+	const Collider& GetCollider() const;
 };

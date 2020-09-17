@@ -1,0 +1,10 @@
+grid
+texture UI/area
+rows 8 16 8
+columns 8 16 8
+
+//element r c texture uvscaleW uvscaleH
+element 0 1 UI/area_top 0.5 1
+element 1 0 UI/area_left 1 0.5
+element 1 2 UI/area_right 1 0.5
+element 2 1 UI/area_bottom 0.5 1

@@ -214,6 +214,7 @@ EXIT 0</Command>
     <ClCompile Include="ToolSelect.cpp" />
     <ClCompile Include="UIPropertyManipulator.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="UITileSelector.cpp" />
     <ClCompile Include="Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -231,6 +232,7 @@ EXIT 0</Command>
     <ClInclude Include="HierachyWindow.hpp" />
     <ClInclude Include="MouseData.hpp" />
     <ClInclude Include="ToolIso.hpp" />
+    <ClInclude Include="UITileSelector.hpp" />
     <ClInclude Include="Viewport.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceSelect.hpp" />

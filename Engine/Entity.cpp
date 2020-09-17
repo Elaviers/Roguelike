@@ -6,6 +6,23 @@
 #include <ELMaths/LineSegment.hpp>
 #include <ELCore/Tracker.hpp>
 
+void Entity::_OnTransformChanged()
+{
+	_wtValid = _wbValid = false;
+	onTransformChanged();
+
+	for (Entity* child : _children)
+		child->_OnTransformChanged();
+}
+
+void Entity::_OnChildChanged()
+{
+	onChildChanged();
+
+	if (_parent)
+		_parent->_OnChildChanged();
+}
+
 void Entity::_AddBaseProperties(PropertyCollection &cvars)
 {
 	cvars.Add(
@@ -100,6 +117,9 @@ void Entity::Delete(const Context& ctx)
 
 void Entity::SetParent(Entity* parent)
 {
+	if (parent == _parent)
+		return;
+
 	if (_parent)
 	{
 		_parent->_children.Remove(this);
@@ -113,6 +133,8 @@ void Entity::SetParent(Entity* parent)
 		_parent->_children.Add(this);
 		_parent->_OnChildChanged();
 	}
+
+	_wbValid = false;
 }
 
 Entity* Entity::FindChild(const String& name)
@@ -221,14 +243,21 @@ EOverlapResult Entity::AnyPartOverlapsCollider(const Collider& other, const Tran
 {
 	bool isTouching = false;
 
+	const Bounds& wb = GetWorldBounds();
+
 	for (ConstEntityIterator it = ConstEntityIterator(this); it.IsValid(); ++it)
 	{
-		EOverlapResult result = it->OverlapsCollider(other, otherTransform, sweep, out_Penetration);
-		if (result == EOverlapResult::OVERLAPPING)
-			return EOverlapResult::OVERLAPPING;
+		const Bounds& ob = it->GetWorldBounds();
 
-		if (!isTouching && result == EOverlapResult::TOUCHING)
-			isTouching = true;
+		if ((wb.centre - ob.centre).LengthSquared() <= wb.radius * wb.radius + ob.radius * ob.radius)
+		{
+			EOverlapResult result = it->OverlapsCollider(other, otherTransform, sweep, out_Penetration);
+			if (result == EOverlapResult::OVERLAPPING)
+				return EOverlapResult::OVERLAPPING;
+
+			if (!isTouching && result == EOverlapResult::TOUCHING)
+				isTouching = true;
+		}
 	}
 
 	return isTouching ? EOverlapResult::TOUCHING : EOverlapResult::SEPERATE;
@@ -301,11 +330,19 @@ Entity& Entity::operator=(Entity&& other) noexcept
 	_transform = other._transform;
 	_transform.SetCallback(Callback(this, &Entity::_OnTransformChanged));
 
+	_worldTransform = other._worldTransform;
+	_wtValid = other._wtValid;
+
+	_worldBounds = other._worldBounds;
+	_wbValid = other._wbValid;
 	return *this;
 }
 
 Bounds Entity::GetWorldBounds(bool noTranslation) const
 {
+	if (_wbValid)
+		return _worldBounds;
+
 	Bounds b = GetBounds();
 	Matrix4 wt = GetWorldTransform().GetTransformationMatrix();
 	if (noTranslation) wt[3][0] = wt[3][1] = wt[3][2] = 0.f;
@@ -331,7 +368,10 @@ Bounds Entity::GetWorldBounds(bool noTranslation) const
 		max = Vector3(Maths::Max(max.x, testPoints[i].x), Maths::Max(max.y, testPoints[i].y), Maths::Max(max.z, testPoints[i].z));
 	}
 
-	return Bounds(min, max);
+	//todo: eugghghhhhhhhhhhhhhhh const cast euuuuuughhhhhhhhhh
+	const_cast<Entity*>(this)->_worldBounds = Bounds::FromMinMax(min, max);
+	const_cast<Entity*>(this)->_wbValid = true;
+	return _worldBounds;
 }
 
 //

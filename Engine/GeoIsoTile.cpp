@@ -1,6 +1,6 @@
 #include "GeoIsoTile.hpp"
 #include "EGeometryID.hpp"
-#include <ELGraphics/MaterialManager.hpp>
+#include "TileManager.hpp"
 #include <ELGraphics/RenderQueue.hpp>
 
 SharedPointer<const Mesh> GeoIsoTile::_mesh;
@@ -9,12 +9,12 @@ const byte GeoIsoTile::TypeID = (byte)EGeometryID::ISO_TILE;
 
 void GeoIsoTile::Render(RenderQueue& q) const
 {
-	if (_material && _mesh)
+	if (_tile && _mesh && _tile->GetMaterial())
 	{
 		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::UNLIT);
 		e.AddSetTransform(_renderTransform.GetTransformationMatrix());
 		e.AddSetColour(); 
-		_material->Apply(e);
+		_tile->GetMaterial()->Apply(e);
 		e.AddSetUVOffset();
 		e.AddSetUVScale();
 		e.AddRenderMesh(*_mesh);
@@ -26,7 +26,7 @@ void GeoIsoTile::WriteData(ByteWriter& data, NumberedSet<String>& strings, const
 	data.Write<Vector3>(_renderTransform.GetPosition());
 	data.Write<Vector3>(_renderTransform.GetScale());
 
-	data.Write_uint16(_material ? strings.Add(ctx.GetPtr<MaterialManager>()->FindNameOf(_material.Ptr())) : 0);
+	data.Write_uint16(_tile ? strings.Add(ctx.GetPtr<TileManager>()->FindNameOf(_tile.Ptr())) : 0);
 }
 
 void GeoIsoTile::ReadData(ByteReader& data, const NumberedSet<String>& strings, const Context& ctx)
@@ -34,9 +34,9 @@ void GeoIsoTile::ReadData(ByteReader& data, const NumberedSet<String>& strings, 
 	_renderTransform.SetPosition(data.Read<Vector3>());
 	_renderTransform.SetScale(data.Read<Vector3>());
 
-	const String* mname = strings.Get(data.Read_uint16());
-	if (mname)
-		_material = ctx.GetPtr<MaterialManager>()->Get(*mname, ctx);
+	const String* tname = strings.Get(data.Read_uint16());
+	if (tname)
+		_tile = ctx.GetPtr<TileManager>()->Get(*tname, ctx);
 }
 
 void GeoIsoTile::SetTransform(const Vector3& position, const Vector2& size)

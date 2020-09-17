@@ -39,19 +39,18 @@ public:
 
 
 private:
-	Transform _transform;
-
 	String _name;
 
-	void _OnTransformChanged() { onTransformChanged(); }
+	Transform _transform;
 
-	void _OnChildChanged()
-	{
-		onChildChanged();
+	Transform _worldTransform;
+	bool _wtValid;
 
-		if (_parent)
-			_parent->_OnChildChanged();
-	}
+	Bounds _worldBounds;
+	bool _wbValid; //true if world bounds don't need recalc
+
+	void _OnTransformChanged();
+	void _OnChildChanged();
 protected:
 	static void* operator new(size_t size) { return ::operator new(size); }
 	void operator delete(void* ptr) { ::operator delete(ptr); }
@@ -85,7 +84,9 @@ public:
 		_flags(flags), 
 		_dynamic(false), 
 		_parent(nullptr), 
-		_transform(Callback(this, &Entity::_OnTransformChanged)) 
+		_transform(Callback(this, &Entity::_OnTransformChanged)),
+		_wtValid(false),
+		_wbValid(false)
 	{}
 
 	Entity(const Entity &other) : 
@@ -93,7 +94,10 @@ public:
 		_flags(other._flags), 
 		_dynamic(false), 
 		_parent(other._parent), 
-		_transform(other._transform)
+		_transform(other._transform),
+		_worldBounds(other._worldBounds),
+		_wtValid(other._wtValid),
+		_wbValid(other._wbValid)
 	{
 		_transform.SetCallback(Callback(this, &Entity::_OnTransformChanged));
 		CloneChildrenFrom(other);
@@ -130,10 +134,17 @@ public:
 
 	Transform GetWorldTransform() const
 	{
-		if (_parent)
-			return _transform * _parent->GetWorldTransform();
+		if (_wtValid)
+			return _worldTransform;
 
-		return _transform;
+		//todo: CONST					CAST					...
+		if (_parent)
+			const_cast<Entity*>(this)->_worldTransform = _transform * _parent->GetWorldTransform();
+		else
+			const_cast<Entity*>(this)->_worldTransform = _transform;
+
+		const_cast<Entity*>(this)->_wtValid = true;
+		return _worldTransform;
 	}
 
 	Vector3 GetWorldPosition() const						{ return GetWorldTransform().GetPosition(); }
@@ -146,6 +157,9 @@ public:
 			SetRelativeTransform(t * _parent->GetWorldTransform().Inverse());
 		else
 			SetRelativeTransform(t);
+
+		_worldTransform = t;
+		_wtValid = true;
 	}
 
 	void SetWorldPosition(const Vector3 &v) 
@@ -253,6 +267,8 @@ public:
 
 	virtual const PropertyCollection& GetProperties();
 
+	virtual Bounds GetBounds() const { return Bounds(); }
+
 	//IO
 	void WriteAllToFile(ByteWriter&, NumberedSet<String>& strings, const Context& ctx) const;
 	static Entity* CreateFromData(ByteReader&, const NumberedSet<String>& strings, const Context& ctx);
@@ -306,9 +322,6 @@ public:
 	Entity& operator=(Entity&& other) noexcept;
 
 	bool operator==(const Entity &other) const { return _uid == other._uid; }
-
-	//Other
-	virtual Bounds GetBounds() const { return Bounds(); }
 
 	Bounds GetWorldBounds(bool noTranslation = false) const;
 

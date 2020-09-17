@@ -1,5 +1,6 @@
 #pragma once
 #include "Geometry.hpp"
+#include "Tile.hpp"
 #include <ELCore/SharedPointer.hpp>
 #include <ELGraphics/Material.hpp>
 #include <ELMaths/Transform.hpp>
@@ -9,7 +10,7 @@ class GeoIsoTile : public Geometry
 protected:
 	Transform _renderTransform;
 
-	SharedPointer<const Material> _material;
+	SharedPointer<const Tile> _tile;
 
 	//todo: Perhaps this shouldn't be static.. but it is for now!
 	static SharedPointer<const Mesh> _mesh;
@@ -26,8 +27,8 @@ public:
 
 	void SetTransform(const Vector3& position, const Vector2& size);
 
-	const SharedPointer<const Material>& GetMaterial() const { return _material; }
-	void SetMaterial(const SharedPointer<const Material> material) { _material = material; }
+	const SharedPointer<const Tile>& GetTile() const { return _tile; }
+	void SetTile(const SharedPointer<const Tile>& tile) { _tile = tile; }
 
 	virtual void Render(RenderQueue& q) const override;
 

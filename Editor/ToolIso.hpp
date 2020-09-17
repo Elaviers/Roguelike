@@ -1,5 +1,6 @@
 #pragma once
 #include "Tool.hpp"
+#include "UITileSelector.hpp"
 #include <Engine/GeoIsoTile.hpp>
 
 class ToolIso : public Tool
@@ -10,12 +11,14 @@ protected:
 
 	GeoIsoTile _placementTile;
 
+	List<UITileSelector*> _tileSelectors;
+
 	const PropertyCollection& _GetProperties();
 
-	String _GetMaterial() const;
+	String _GetTileName() const;
 	const Vector2& _GetSize() const { return _size; }
 
-	void _SetMaterial(const String& material);
+	void _SetTileName(const String& material);
 	void _SetSize(const Vector2& size) 
 	{ 
 		_size = size; 
@@ -34,4 +37,6 @@ public:
 	virtual void MouseDown(const MouseData&) override;
 
 	virtual void Render(RenderQueue&) const override;
+
+	void TileSelected(UITileSelector& selector);
 };
