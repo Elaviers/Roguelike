@@ -91,8 +91,6 @@ void ToolIso::MouseMove(const MouseData& mouseData)
 void ToolIso::MouseDown(const MouseData& mouseData)
 {
 	_owner.WorldRef().AddGeometry(GeoIsoTile(_placementTile));
-
-
 }
 
 void ToolIso::Render(RenderQueue& q) const

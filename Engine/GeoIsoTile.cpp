@@ -33,6 +33,7 @@ void GeoIsoTile::ReadData(ByteReader& data, const NumberedSet<String>& strings, 
 {
 	_renderTransform.SetPosition(data.Read<Vector3>());
 	_renderTransform.SetScale(data.Read<Vector3>());
+	_bounds = Bounds(_renderTransform.GetScale() / 2.f, _renderTransform.GetPosition() + _renderTransform.GetScale() / 2.f);
 
 	const String* tname = strings.Get(data.Read_uint16());
 	if (tname)
@@ -64,4 +65,5 @@ void GeoIsoTile::SetTransform(const Vector3& position, const Vector2& size)
 	//Since we are using a custom mesh, the above isn't necessary at the moment
 	_renderTransform.SetPosition(position);
 	_renderTransform.SetScale(Vector3(size.x, size.y, size.x));
+	_bounds = Bounds(_renderTransform.GetScale() / 2.f, _renderTransform.GetPosition() + _renderTransform.GetScale() / 2.f);
 }

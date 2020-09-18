@@ -63,9 +63,10 @@ String Tile::_GetMaterialStr(const Context& ctx)
 
 const Collider& Tile::GetCollider() const
 {
-	static Collider block(ECollisionChannels::STATIC, CollisionBox(Box::FromMinMax(Vector3(-1.f, 0.f, 0.f), Vector3(0.f, 1.f, 1.f))));
-	static Collider wallL(ECollisionChannels::STATIC, CollisionBox(Box::FromMinMax(Vector3(-1.f, 0.f, 0.f), Vector3(0.f, 1.f, 1.f))));
-	static Collider wallR(ECollisionChannels::STATIC, CollisionBox(Box::FromMinMax(Vector3(-1.f, 0.f, 0.f), Vector3(0.f, 1.f, 1.f))));
+	static ECollisionChannels channels = ECollisionChannels::PLAYER | ECollisionChannels::STATIC;
+	static Collider block(channels, CollisionBox(Box::FromMinMax(Vector3(0.f, 0.f, 0.f), Vector3(1.f, 1.f, 1.f))));
+	static Collider wallL(channels, CollisionBox(Box::FromMinMax(Vector3(0.f, 0.f, 0.f), Vector3(.2f, 1.f, 1.f))));
+	static Collider wallR(channels, CollisionBox(Box::FromMinMax(Vector3(0.f, 0.f, 0.f), Vector3(1.f, 1.f, .2f))));
 	static Collider none;
 
 	switch (_collisionType)

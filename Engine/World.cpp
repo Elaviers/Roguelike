@@ -1,5 +1,8 @@
 #include "World.hpp"
+#include "EntityIterator.hpp"
 #include <ELCore/Context.hpp>
+#include <ELMaths/Frustum.hpp>
+#include <ELMaths/LineSegment.hpp>
 
 World::~World()
 {
@@ -25,9 +28,39 @@ void World::Update(float deltaTime)
 void World::Render(RenderQueue& q, const Frustum& f) const
 {
 	for (const Geometry* g : _geometry)
-		g->Render(q); //todo: frustum cull
+	{
+		const Bounds& b = g->GetBounds();
+		if (f.OverlapsAABB(b.min, b.max))
+			g->Render(q);
+	}
 
 	_entRoot.RenderAll(q, f);
+}
+
+void World::GetOverlaps(List<Pair<EOverlapResult, Vector3>>& results, const Collider& collider, const Transform& transform, const Entity* ignore, const Vector3& sweep) const
+{
+	Vector3 p;
+	EOverlapResult r;
+
+	ConstEntityIterator it(&_entRoot);
+	while (it.IsValid())
+	{
+		if (!ignore || (it->GetUID() != ignore->GetUID() && !it->IsChildOf(ignore)))
+		{
+			r = it->OverlapsCollider(collider, transform, sweep, &p);
+			if (r != EOverlapResult::SEPERATE)
+				results.Add(Pair(r, p));
+		}
+
+		it = it.Next();
+	}
+
+	for (const Geometry* g : _geometry)
+	{
+		r = g->Overlaps(collider, transform, sweep, &p);
+		if (r != EOverlapResult::SEPERATE)
+			results.Add(Pair(r, p));
+	}
 }
 
 
@@ -37,7 +70,7 @@ void World::Render(RenderQueue& q, const Frustum& f) const
 
 namespace LevelVersions
 {
-	enum //This should be a byte... hopefully I won't need more than 256 level versions.
+	enum : byte //This should be a byte... hopefully I won't need more than 256 level versions.
 	{
 		VERSION_1 = 0,
 		VERSION_2 = 1,		//Connectors are Entities instead of metadata

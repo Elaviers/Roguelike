@@ -95,18 +95,16 @@ void EntPlayer::Update(float deltaTime)
 
 		Transform desiredTransform = Transform(worldTransform.GetPosition() + movement, worldTransform.GetRotation(), worldTransform.GetScale());
 
-		Vector3 penetration;
-		Buffer<Entity*> ents = GameInstance::Instance().world->RootEntity().FindChildrenOfType<Entity>();
-		for (size_t i = 0; i < ents.GetSize(); ++i)
-			if (ents[i]->GetUID() != GetUID() &&
-				!ents[i]->IsChildOf(this) &&
-				ents[i]->OverlapsCollider(_COLLIDER, desiredTransform, Vector3(), &penetration) == EOverlapResult::OVERLAPPING)
+		List<Pair<EOverlapResult, Vector3>> overlaps;
+		GameInstance::Instance().world->GetOverlaps(overlaps, _COLLIDER, desiredTransform, this);
+		//todo: get all world overlaps
+		for (const Pair<EOverlapResult, Vector3>& overlap : overlaps) {
+			//Pair<Vector3> contacts = ents[i]->GetShallowContactPointsWithCollider(.1f, _COLLIDER, desiredTransform, .1f);
+			//Debug::PrintLine(CSTR(contacts.first, "\t", contacts.second));
+
+			const Vector3& penetration = overlap.second;
+			if (!(isnan(penetration.x) || isnan(penetration.y) || isnan(penetration.z)))
 			{
-				//Pair<Vector3> contacts = ents[i]->GetShallowContactPointsWithCollider(.1f, _COLLIDER, desiredTransform, .1f);
-				//Debug::PrintLine(CSTR(contacts.first, "\t", contacts.second));
-
-				if (isnan(penetration.x) || isnan(penetration.y) || isnan(penetration.z)) continue;
-
 				if (penetration.LengthSquared())
 				{
 					if (_velocity.LengthSquared())
@@ -125,6 +123,7 @@ void EntPlayer::Update(float deltaTime)
 					desiredTransform.Move(penetration);
 				}
 			}
+		}
 
 		SetWorldTransform(desiredTransform);
 	}

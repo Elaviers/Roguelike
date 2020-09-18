@@ -25,6 +25,9 @@ public:
 	void Update(float deltaTime);
 	void Render(RenderQueue&, const Frustum& cameraFrustum) const;
 
+	//Will add overlaps to results. Pairs consist of query result and penetration vector.
+	void GetOverlaps(List<Pair<EOverlapResult, Vector3>>& results, const Collider& collider, const Transform& transform, const Entity* ignore = nullptr, const Vector3& sweep = Vector3()) const;
+
 	bool Read(const char* filename, const Context& ctx);
 	bool Write(const char* filename, const Context& ctx) const;
 };

@@ -7,6 +7,7 @@
 #include <ELSys/Utilities.hpp>
 #include <Engine/Console.hpp>
 #include <Engine/EntLight.hpp>
+#include <Engine/GeoIsoTile.hpp>
 #include <windowsx.h>
 #include "EntPlayer.hpp"
 #include "GameInstance.hpp"
@@ -54,8 +55,9 @@ void Game::_Init()
 	_engine.pFontManager->AddPath(Utilities::GetSystemFontDir());
 
 	GameInstance::Instance().world = &_world;
-
 	GameInstance::Instance().Initialise(*this);
+
+	GeoIsoTile::SetMesh(_engine.pMeshManager->Get("iso/tile", _engine.context));
 
 	_consoleIsActive = false;
 	_uiIsActive = true;
@@ -231,6 +233,10 @@ void Game::Render()
 		activeCamera->Use();
 
 		_renderQueue.Render(ERenderChannels::SURFACE, *_engine.pMeshManager, *_engine.pTextureManager, _shaderLit.GetInt(DefaultUniformVars::intLightCount));
+	
+		_shaderUnlit.Use();
+		activeCamera->Use();
+		_renderQueue.Render(ERenderChannels::UNLIT, *_engine.pMeshManager, *_engine.pTextureManager, 0);
 	}
 
 	_window.SwapBuffers();
