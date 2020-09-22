@@ -45,7 +45,7 @@ void ToolBrush2D::Cancel()
 
 void ToolBrush2D::MouseMove(const MouseData &mouseData)
 {
-	if (mouseData.viewport && mouseData.viewport->gridAxis == Axes::Y)
+	if (mouseData.viewport && mouseData.viewport->gridAxis == EAxis::Y)
 	{
 		Vector2 offset = mouseData.viewport->GetCameraType() == Viewport::ECameraType::ISOMETRIC ? Vector2(-_object.GetLevel(), -_object.GetLevel()) : Vector2();
 
@@ -69,13 +69,13 @@ void ToolBrush2D::MouseMove(const MouseData &mouseData)
 
 void ToolBrush2D::MouseDown(const MouseData &mouseData)
 {
-	if (mouseData.viewport && mouseData.viewport->gridAxis == Axes::Y)
+	if (mouseData.viewport && mouseData.viewport->gridAxis == EAxis::Y)
 		_placing = true;
 }
 
 void ToolBrush2D::MouseUp(const MouseData &mouseData)
 {
-	if (mouseData.viewport && mouseData.viewport->gridAxis == Axes::Y)
+	if (mouseData.viewport && mouseData.viewport->gridAxis == EAxis::Y)
 	{
 		_placing = false;
 
@@ -85,5 +85,11 @@ void ToolBrush2D::MouseUp(const MouseData &mouseData)
 
 void ToolBrush2D::Render(RenderQueue& q) const
 {
+	RenderEntry& box = q.NewDynamicEntry(ERenderChannels::UNLIT);
+	box.AddSetLineWidth(2.f);
+	box.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
+	box.AddSetColour(Colour::Green);
+	box.AddBox(_object.GetWorldBounds().min, _object.GetWorldBounds().max);
+
 	_object.Render(q);
 }

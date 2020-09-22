@@ -95,9 +95,6 @@ void Editor::_Init()
 	engine.Init(EEngineCreateFlags::ALL);
 	engine.pFontManager->AddPath(Utilities::GetSystemFontDir());
 
-	//Set the mesh used for isometric tiles
-	GeoIsoTile::SetMesh(engine.pMeshManager->Get("iso/tile", engine.context));
-
 	InputManager* inputManager = engine.pInputManager;
 
 	inputManager->BindKeyAxis(EKeycode::W, &_axisMoveY, 1.f);
@@ -320,8 +317,8 @@ void Editor::Frame()
 		RECT client;
 		if (::GetWindowRect(_vpArea.GetHWND(), &client))
 		{
-			uint16 x = cursorPos.x - client.left;
-			uint16 y = _uiCamera.GetProjection().GetDimensions().y - (cursorPos.y - client.top);
+			uint16 x = (uint16)(cursorPos.x - client.left);
+			uint16 y = _uiCamera.GetProjection().GetDimensions().y - (uint16)(cursorPos.y - client.top);
 			_ui.OnMouseMove(false, x, y);
 			
 			SetCursor(_ui.GetCursor());
@@ -427,11 +424,13 @@ void Editor::RenderViewport(Viewport& vp)
 		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 		e.AddSetLineWidth(lineW);
 
+		float z = vp.gridAxis == EAxis::Y ? _gridZ : 0.f;
+
 		e.AddSetColour(Colour(.75f, .75f, .75f));
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridAxis, 1.f, gridLimit, 0.f, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridAxis, 1.f, gridLimit, 0.f, z);
 
 		e.AddSetColour(Colour(.5f, .5f, 1.f));
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridAxis, 10.f, gridLimit, 0.f, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridAxis, 10.f, gridLimit, 0.f, z);
 
 		engine.pDebugManager->RenderWorld(vp.renderQueue);
 	}
@@ -614,7 +613,9 @@ void _CalcUnitXY(float x, float y, const Viewport& vp, float& unitX_out, float& 
 inline void _CalcUnitXYFull(unsigned short x, unsigned short y, const Viewport& vp, float& unitX_out, float& unitY_out)
 {
 	const AbsoluteBounds& bounds = vp.ui.GetAbsoluteBounds();
-	_CalcUnitXY((float)x - (bounds.x + (bounds.w / 2.f)), (float)y - (bounds.y + (bounds.h / 2.f)), vp, unitX_out, unitY_out);
+	int ix = x - (uint16)(bounds.x + (bounds.w / 2.f));
+	int iy = y - (uint16)(bounds.y + (bounds.h / 2.f));
+	_CalcUnitXY((float)ix, (float)iy, vp, unitX_out, unitY_out);
 }
 
 void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
@@ -658,7 +659,7 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 	_mouseData.y = y - (uint16)(bounds.y + (bounds.h / 2.f));
 
 	//Update unitX and unitY
-	_CalcUnitXY(_mouseData.x, _mouseData.y, *_mouseData.viewport, _mouseData.unitX, _mouseData.unitY);
+	_CalcUnitXY((float)_mouseData.x, (float)_mouseData.y, *_mouseData.viewport, _mouseData.unitX, _mouseData.unitY);
 
 	if (_mouseData.isRightDown && _activeVP)
 	{
@@ -795,9 +796,9 @@ LRESULT CALLBACK AboutProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		case IDOK:
 			::DestroyWindow(hwnd);
 			break;
-
 		}
-
+		[[fallthrough]];
+	
 	default:
 		return ::DefWindowProc(hwnd, msg, wparam, lparam);
 	}

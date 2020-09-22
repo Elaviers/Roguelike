@@ -67,7 +67,7 @@ private:
 
 	Viewport _viewports[VIEWPORTCOUNT];
 
-	ECursor _prevCursor;
+	ECursor _prevCursor = ECursor::NONE;
 
 	//Rendering
 	GLContext _glContext;
@@ -90,6 +90,8 @@ private:
 	Tool *_currentTool = nullptr;
 
 	Viewport* _activeVP = nullptr;
+
+	float _gridZ;
 
 	MouseData _mouseData;
 
@@ -125,7 +127,7 @@ public:
 		_EditorTools(Editor& editor) : select(editor), iso(editor), brush2D(editor), brush3D(editor), entity(editor), connector(editor) {}
 	} tools;
 
-	Editor() : _fbxManager(nullptr), _hierachyWindow(this), tools(*this) {}
+	Editor() : _fbxManager(nullptr), _hierachyWindow(this), tools(*this), _gridZ(0.f) {}
 	~Editor();
 
 	void SetCursor(ECursor cursor);
@@ -172,6 +174,8 @@ public:
 	World& WorldRef() { return _level; }
 
 	Viewport& GetVP(int index) { return _viewports[index]; }
+
+	void SetGridZ(float gridZ) { _gridZ = gridZ; }
 
 	void FocusVPArea() { _vpArea.Focus(); }
 

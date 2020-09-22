@@ -1,5 +1,6 @@
 #pragma once
 #include <Engine/Entity.hpp>
+#include <ELCore/SharedPointer.hpp>
 #include <Engine/EntCamera.hpp>
 #include <Engine/EntSkeletal.hpp>
 
@@ -9,24 +10,28 @@ class EntPlayer : public Entity
 
 	EntSkeletal _mesh;
 
-	Entity _cameraPivot;
 	EntCamera _camera;
+
+	Transform _rootCameraTransform;
+
+	SharedPointer<const Texture> _targetTexture;
+	Transform _targetTransform;
 
 	static Collider _COLLIDER;
 
 	void _Jump();
 
-	bool _TryMovement(const Transform &wt, const Vector3 &movement, float testYOffset);
-
+	void _OnTransformChanged();
 public:
 	Entity_FUNCS(EntPlayer, 100);
 
-	EntPlayer() {}
+	EntPlayer();
 	virtual ~EntPlayer() {}
 
 	void Init(const Context&);
 
-	void Update(float deltaTime);
+	virtual void Update(float deltaTime) override;
+	virtual void Render(RenderQueue&) const override;
 
 	virtual const Collider* GetCollider() const override { return &_COLLIDER; };
 };

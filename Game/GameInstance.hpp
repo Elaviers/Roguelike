@@ -17,6 +17,8 @@ class GameInstance
 
 	uint16 _w, _h;
 
+	Vector2 _cursorPos;
+
 public:
 	World* world;
 
@@ -41,11 +43,15 @@ public:
 			OnResize(_w, _h);
 	}
 
+	void SetCursorPos(const Vector2& cursorPos) { _cursorPos = cursorPos; }
+
 	const EntCamera* GetActiveCamera() const	{ return _activeCamera; }
 
 	float GetAxisMoveForward() const	{ return _axisMoveForward; }
 	float GetAxisMoveRight() const		{ return _axisMoveRight; }
 	float GetAxisLookUp() const			{ return _axisLookUp; }
 	float GetAxisLookRight() const		{ return _axisLookRight; }
+
+	const Vector2& GetCursorPos() const { return _cursorPos; }
 };
 

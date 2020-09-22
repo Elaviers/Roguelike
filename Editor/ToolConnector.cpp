@@ -30,10 +30,10 @@ void ToolConnector::MouseMove(const MouseData &mouseData)
 {
 	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 	{
-		Axes::EAxis fwdAxis = mouseData.viewport->gridAxis;
-		int fwdElement = fwdAxis;
-		int rightElement = Axes::GetHorizontalAxis(fwdAxis);
-		int upElement = Axes::GetVerticalAxis(fwdAxis);
+		EAxis fwdAxis = mouseData.viewport->gridAxis;
+		int fwdElement = (int)fwdAxis;
+		int rightElement = (int)Axes::GetHorizontalAxis(fwdAxis);
+		int upElement = (int)Axes::GetVerticalAxis(fwdAxis);
 
 		if (mouseData.isLeftDown)
 		{

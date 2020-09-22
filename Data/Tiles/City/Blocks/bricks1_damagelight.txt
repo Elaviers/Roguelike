@@ -1,0 +1,1 @@
+material iso/city/blocks/bricks1_damagelight

@@ -266,10 +266,10 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 
 	if (mouseData.viewport && _ViewportIsOrtho(*mouseData.viewport))
 	{
-		Axes::EAxis fwdAxis = mouseData.viewport->gridAxis;
-		int fwdElement = fwdAxis;
-		int rightElement = Axes::GetHorizontalAxis(fwdAxis);
-		int upElement = Axes::GetVerticalAxis(fwdAxis);
+		EAxis fwdAxis = mouseData.viewport->gridAxis;
+		int fwdElement = (int)fwdAxis;
+		int rightElement = (int)Axes::GetHorizontalAxis(fwdAxis);
+		int upElement = (int)Axes::GetVerticalAxis(fwdAxis);
 
 		if (mouseData.isLeftDown)
 		{
@@ -400,8 +400,8 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 
 				Vector3 objPos = _hoverObject->GetWorldPosition();
 
-				_origObjectX = objPos[Axes::GetHorizontalAxis(mouseData.viewport->gridAxis)];
-				_origObjectY = objPos[Axes::GetVerticalAxis(mouseData.viewport->gridAxis)];
+				_origObjectX = objPos[(int)Axes::GetHorizontalAxis(mouseData.viewport->gridAxis)];
+				_origObjectY = objPos[(int)Axes::GetVerticalAxis(mouseData.viewport->gridAxis)];
 
 				_placing = false;
 				_dragObject = _hoverObject;

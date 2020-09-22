@@ -25,7 +25,7 @@ protected:
 	void _OnComboBoxItemSelected(UIComboBox&);
 
 public:
-	Axes::EAxis gridAxis = Axes::EAxis::Y;
+	EAxis gridAxis = EAxis::Y;
 
 	EntCamera camera;
 

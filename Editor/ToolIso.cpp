@@ -9,6 +9,11 @@ const PropertyCollection& ToolIso::_GetProperties()
 	static PropertyCollection properties;
 
 	DO_ONCE_BEGIN;
+	properties.Add<float>(
+		"Level",
+		offsetof(ToolIso, _pos.y)
+	);
+
 	properties.Add(
 		"Size",
 		MemberGetter<ToolIso, const Vector2&>(&ToolIso::_GetSize),
@@ -82,19 +87,42 @@ void ToolIso::MouseMove(const MouseData& mouseData)
 {
 	if (mouseData.viewport && mouseData.viewport->GetCameraType() == Viewport::ECameraType::ISOMETRIC)
 	{
-		_pos.x = mouseData.unitX_rounded;
-		_pos.z = mouseData.unitY_rounded;
-		_UpdatePlacementTransform();
+		float newX = mouseData.unitX_rounded - _pos.y;
+		float newZ = mouseData.unitY_rounded - _pos.y;
+
+		if (_pos.x != newX || _pos.z != newZ)
+		{
+			_pos.x = mouseData.unitX_rounded - _pos.y;
+			_pos.z = mouseData.unitY_rounded - _pos.y;
+			_UpdatePlacementTransform();
+
+			if (_dragging)
+				_owner.WorldRef().AddGeometry(GeoIsoTile(_placementTile));
+		}
 	}
 }
 
 void ToolIso::MouseDown(const MouseData& mouseData)
 {
 	_owner.WorldRef().AddGeometry(GeoIsoTile(_placementTile));
+
+	_dragging = true;
+}
+
+void ToolIso::MouseUp(const MouseData& mouseData)
+{
+	_dragging = false;
 }
 
 void ToolIso::Render(RenderQueue& q) const
 {
+	RenderEntry& box = q.NewDynamicEntry(ERenderChannels::UNLIT);
+	box.AddSetLineWidth(2.f);
+	box.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
+	box.AddSetColour(Colour::Green);
+
+	box.AddBox(Vector3(_pos.x, 0.f, _pos.z), _pos + Vector3(1.f, 1.f, 1.f));
+
 	_placementTile.Render(q);
 }
 

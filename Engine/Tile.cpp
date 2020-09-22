@@ -1,5 +1,6 @@
 #include "Tile.hpp"
 #include <ELGraphics/MaterialManager.hpp>
+#include <ELGraphics/MeshManager.hpp>
 #include <ELPhys/CollisionBox.hpp>
 
 const PropertyCollection& Tile::GetProperties()
@@ -9,6 +10,7 @@ const PropertyCollection& Tile::GetProperties()
 	DO_ONCE_BEGIN;
 	properties.Add("collision", MemberGetter<Tile, String>(&Tile::_GetCollisionTypeStr), MemberSetter<Tile, String>(&Tile::_SetCollisionTypeStr));
 	properties.Add("material", ContextualMemberGetter<Tile, String>(&Tile::_GetMaterialStr), ContextualMemberSetter<Tile, String>(&Tile::_SetMaterialStr));
+	properties.Add("mesh", ContextualMemberGetter<Tile, String>(&Tile::_GetMeshStr), ContextualMemberSetter<Tile, String>(&Tile::_SetMeshStr));
 	properties.Add<Vector2>("size", offsetof(Tile, _size));
 	DO_ONCE_END;
 
@@ -59,6 +61,18 @@ String Tile::_GetMaterialStr(const Context& ctx)
 {
 	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
 	return materialManager->FindNameOf(_material.Ptr());
+}
+
+void Tile::_SetMeshStr(const String& string, const Context& ctx)
+{
+	MeshManager* meshManager = ctx.GetPtr<MeshManager>();
+	_mesh = meshManager->Get(string, ctx);
+}
+
+String Tile::_GetMeshStr(const Context& ctx)
+{
+	MeshManager* meshManager = ctx.GetPtr<MeshManager>();
+	return meshManager->FindNameOf(_mesh.Ptr());
 }
 
 const Collider& Tile::GetCollider() const

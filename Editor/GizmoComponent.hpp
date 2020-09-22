@@ -20,6 +20,7 @@ protected:
 	bool _isDragging;
 
 	GizmoComponent(const Colour& colour) : 
+		_owner(nullptr),
 		_colour(colour), 
 		_canDrag(false),
 		_isDragging(false)

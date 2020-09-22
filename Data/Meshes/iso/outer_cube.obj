@@ -1,5 +1,6 @@
-# Blender v2.90.0 OBJ File: 'test1.blend'
+# Blender v2.90.0 OBJ File: 'isorender_floor.blend'
 # www.blender.org
+o OuterCubeRender_Plane.003
 v 0.500000 0.000000 -0.500000
 v -0.500000 0.000000 0.500000
 v 1.500000 1.000000 0.500000

@@ -6,6 +6,8 @@
 class ToolIso : public Tool
 {
 protected:
+	bool _dragging;
+
 	Vector3 _pos;
 	Vector2 _size;
 
@@ -26,7 +28,7 @@ protected:
 
 	void _UpdatePlacementTransform();
 public:
-	ToolIso(Editor& owner) : Tool(owner) {}
+	ToolIso(Editor& owner) : Tool(owner), _dragging(false) {}
 	virtual ~ToolIso() {}
 
 	virtual void Initialise() override;
@@ -35,6 +37,7 @@ public:
 
 	virtual void MouseMove(const MouseData&) override;
 	virtual void MouseDown(const MouseData&) override;
+	virtual void MouseUp(const MouseData&) override;
 
 	virtual void Render(RenderQueue&) const override;
 

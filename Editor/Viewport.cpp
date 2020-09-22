@@ -1,6 +1,6 @@
 #include "Viewport.hpp"
 
-Viewport::Viewport()
+Viewport::Viewport() : _cameraType(ECameraType::PERSPECTIVE)
 {
 	_comboBox.SetParent(&ui);
 	bg.SetParent(&ui);
@@ -39,7 +39,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 	{
 	case Viewport::ECameraType::PERSPECTIVE:
 		_comboBox.SetString("Perspective");
-		gridAxis = Axes::Y;
+		gridAxis = EAxis::Y;
 		camera.GetProjection().SetType(EProjectionType::PERSPECTIVE);
 		camera.GetProjection().SetNearFar(0.001f, 100.f);
 		camera.SetRelativePosition(Vector3(-5.f, 5.f, -5.f));
@@ -48,7 +48,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 
 	case Viewport::ECameraType::ISOMETRIC:
 		_comboBox.SetString("Isometric");
-		gridAxis = Axes::Y;
+		gridAxis = EAxis::Y;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(8.f);
 		camera.GetProjection().SetNearFar(0.f, 20000.f);
@@ -58,7 +58,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 
 	case Viewport::ECameraType::ORTHO_X:
 		_comboBox.SetString("X");
-		gridAxis = Axes::X;
+		gridAxis = EAxis::X;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(8.f);
 		camera.GetProjection().SetNearFar(0.f, 20000.f);
@@ -68,7 +68,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 
 	case Viewport::ECameraType::ORTHO_Y:
 		_comboBox.SetString("Y");
-		gridAxis = Axes::Y;
+		gridAxis = EAxis::Y;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(8.f);
 		camera.GetProjection().SetNearFar(0.f, 20000.f);
@@ -78,7 +78,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 
 	case Viewport::ECameraType::ORTHO_Z:
 		_comboBox.SetString("Z");
-		gridAxis = Axes::Z;
+		gridAxis = EAxis::Z;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(8.f);
 		camera.GetProjection().SetNearFar(0.f, 20000.f);

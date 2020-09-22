@@ -22,9 +22,9 @@ LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const St
 				else
 					bag = &*result._otherBags.Emplace();
 
-				bagTotalOverride = tokens.GetSize() >= 2 ? tokens[1].ToInt() : 0.f;
-				bag->minimumDepth = tokens.GetSize() >= 3 ? tokens[2].ToInt() : 0.f;
-				bag->maximumDepth = tokens.GetSize() >= 4 ? tokens[3].ToInt() : 1000000.f;
+				bagTotalOverride = tokens.GetSize() >= 2 ? tokens[1].ToFloat() : 0.f;
+				bag->minimumDepth = tokens.GetSize() >= 3 ? tokens[2].ToInt() : 0;
+				bag->maximumDepth = tokens.GetSize() >= 4 ? tokens[3].ToInt() : 1000000;
 			}
 			else if (tokens.GetSize() >= 2 && tokens[0] == "segment" && bag)
 			{
@@ -80,7 +80,7 @@ const Entity* LevelSegmentPicker::TakeNextSegment(Random& random, unsigned int d
 	size_t numOptions = options.GetSize();
 	if (numOptions > 0)
 	{
-		List<SegmentBag>::Iterator chosen = *options.Get(random.Next(numOptions));
+		List<SegmentBag>::Iterator chosen = *options.Get(random.Next((uint32)numOptions));
 		const Entity* segment = chosen->bag.TakeNext(random, 1.f);
 
 		if (chosen->bag.GetRemainingWeight() <= 0.f)

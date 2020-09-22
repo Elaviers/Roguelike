@@ -41,10 +41,10 @@ void ToolBrush3D::MouseMove(const MouseData &mouseData)
 {
 	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 	{
-		Axes::EAxis fwdAxis = mouseData.viewport->gridAxis;
-		int fwdElement = fwdAxis;
-		int rightElement = Axes::GetHorizontalAxis(fwdAxis);
-		int upElement = Axes::GetVerticalAxis(fwdAxis);
+		EAxis fwdAxis = mouseData.viewport->gridAxis;
+		int fwdElement = (int)fwdAxis;
+		int rightElement = (int)Axes::GetHorizontalAxis(fwdAxis);
+		int upElement = (int)Axes::GetVerticalAxis(fwdAxis);
 
 		if (mouseData.isLeftDown)
 		{
@@ -96,5 +96,11 @@ void ToolBrush3D::KeySubmit()
 
 void ToolBrush3D::Render(RenderQueue& q) const
 {
+	RenderEntry& box = q.NewDynamicEntry(ERenderChannels::UNLIT);
+	box.AddSetLineWidth(2.f);
+	box.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
+	box.AddSetColour(Colour::Green);
+	box.AddBox(_object.GetWorldBounds().min, _object.GetWorldBounds().max);
+
 	_object.Render(q);
 }

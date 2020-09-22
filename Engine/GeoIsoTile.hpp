@@ -2,7 +2,6 @@
 #include "Geometry.hpp"
 #include "Tile.hpp"
 #include <ELCore/SharedPointer.hpp>
-#include <ELGraphics/Material.hpp>
 #include <ELMaths/LineSegment.hpp>
 #include <ELMaths/Transform.hpp>
 
@@ -15,15 +14,9 @@ protected:
 
 	SharedPointer<const Tile> _tile;
 
-	//todo: Perhaps this shouldn't be static.. but it is for now!
-	static SharedPointer<const Mesh> _mesh;
-
 public:
 	//Needed for registry
 	static const byte TypeID;
-
-	static const SharedPointer<const Mesh>& GetMesh() { return _mesh; }
-	static void SetMesh(const SharedPointer<const Mesh>& mesh) { _mesh = mesh; }
 
 	GeoIsoTile() {}
 	virtual ~GeoIsoTile() {}

@@ -7,8 +7,8 @@ class LevelSegmentPicker
 	struct SegmentBag
 	{
 		RandomBag<const Entity*> bag;
-		unsigned int minimumDepth;
-		unsigned int maximumDepth;
+		unsigned int minimumDepth = 0;
+		unsigned int maximumDepth = 0;
 	};
 
 	List<SegmentBag> _essentialBags;
@@ -30,7 +30,7 @@ public:
 		SegmentBag* _bag;
 
 	public:
-		BagItem() {}
+		BagItem() : _isEssential(false), _owner(nullptr), _bag(nullptr), segment(nullptr) {}
 		BagItem(bool essential, LevelSegmentPicker* owner, SegmentBag* bag, const Entity* segment) : _isEssential(essential), _owner(owner), _bag(bag), segment(segment) {}
 		BagItem(const BagItem&) = delete;
 		BagItem(BagItem&&) = delete;

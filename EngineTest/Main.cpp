@@ -407,11 +407,11 @@ void Frame()
 		RenderEntry& e = renderQueue.NewDynamicEntry(ERenderChannels::UNLIT);
 		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 		e.AddSetColour(Colour::Red);
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), Axes::X, 1.f, limit, 0.f, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), EAxis::X, 1.f, limit, 0.f, 0.f);
 		e.AddSetColour(Colour::Green);
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), Axes::Y, 1.f, limit, 0.f, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), EAxis::Y, 1.f, limit, 0.f, 0.f);
 		e.AddSetColour(Colour::Blue);
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), Axes::Z, 1.f, limit, 0.f, 0.f);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), EAxis::Z, 1.f, limit, 0.f, 0.f);
 
 		//UI
 		//fps string

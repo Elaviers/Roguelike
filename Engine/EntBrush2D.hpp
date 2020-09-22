@@ -8,7 +8,7 @@
 class EntBrush2D : public EntRenderable
 {
 protected:
-	Axes::EAxis _axis;
+	EAxis _axis;
 
 	Vector2 _point1;
 	Vector2 _point2;
@@ -22,12 +22,18 @@ protected:
 public:
 	Entity_FUNCS(EntBrush2D, EEntityID::PLANE)
 
-	EntBrush2D() : _updatingTransform(false), _level(0.f) 
+	EntBrush2D() : _axis(EAxis::Y), _updatingTransform(false), _level(0.f) 
 	{ 
 		onTransformChanged += Callback(this, &EntBrush2D::_OnTransformChanged);
 	}
 
-	EntBrush2D(const EntBrush2D& other) : EntRenderable(other), _point1(other._point1), _point2(other._point2), _level(other._level), _updatingTransform(false)
+	EntBrush2D(const EntBrush2D& other) : 
+		EntRenderable(other), 
+		_axis(other._axis),
+		_point1(other._point1), 
+		_point2(other._point2), 
+		_level(other._level), 
+		_updatingTransform(false)
 	{
 		onTransformChanged += Callback(this, &EntBrush2D::_OnTransformChanged);
 	}

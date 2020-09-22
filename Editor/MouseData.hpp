@@ -5,7 +5,7 @@ class Viewport;
 
 struct MouseData
 {
-	Viewport* viewport;
+	Viewport* viewport = nullptr;
 	int x = 0;
 	int y = 0;
 	int prevX = 0;

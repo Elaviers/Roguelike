@@ -3,13 +3,11 @@
 #include "TileManager.hpp"
 #include <ELGraphics/RenderQueue.hpp>
 
-SharedPointer<const Mesh> GeoIsoTile::_mesh;
-
 const byte GeoIsoTile::TypeID = (byte)EGeometryID::ISO_TILE;
 
 void GeoIsoTile::Render(RenderQueue& q) const
 {
-	if (_tile && _mesh && _tile->GetMaterial())
+	if (_tile && _tile->GetMesh() && _tile->GetMaterial())
 	{
 		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::UNLIT);
 		e.AddSetTransform(_renderTransform.GetTransformationMatrix());
@@ -17,7 +15,7 @@ void GeoIsoTile::Render(RenderQueue& q) const
 		_tile->GetMaterial()->Apply(e);
 		e.AddSetUVOffset();
 		e.AddSetUVScale();
-		e.AddRenderMesh(*_mesh);
+		e.AddRenderMesh(*_tile->GetMesh());
 	}
 }
 
@@ -64,6 +62,6 @@ void GeoIsoTile::SetTransform(const Vector3& position, const Vector2& size)
 
 	//Since we are using a custom mesh, the above isn't necessary at the moment
 	_renderTransform.SetPosition(position);
-	_renderTransform.SetScale(Vector3(size.x, size.y, size.x));
+	_renderTransform.SetScale(Vector3(size.x * (66.f/64.f), size.y * (66.f/64.f), size.x * (66.f/64.f)));
 	_bounds = Bounds(_renderTransform.GetScale() / 2.f, _renderTransform.GetPosition() + _renderTransform.GetScale() / 2.f);
 }

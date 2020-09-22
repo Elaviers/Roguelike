@@ -57,8 +57,6 @@ void Game::_Init()
 	GameInstance::Instance().world = &_world;
 	GameInstance::Instance().Initialise(*this);
 
-	GeoIsoTile::SetMesh(_engine.pMeshManager->Get("iso/tile", _engine.context));
-
 	_consoleIsActive = false;
 	_uiIsActive = true;
 
@@ -253,6 +251,12 @@ void Game::Resize(uint16 w, uint16 h)
 
 void Game::MouseMove(uint16 x, uint16 y)
 {
+	Vector2 cp(x, y);
+	cp /= _uiCamera.GetProjection().GetDimensions();
+	cp.y = 1.f - cp.y;
+	cp += Vector2(-0.5f, -0.5f);
+	GameInstance::Instance().SetCursorPos(cp);
+
 	if (_uiIsActive)
 	{
 		_ui.SetCursorPos((float)x, (float)(_uiCamera.GetProjection().GetDimensions().y - y));
