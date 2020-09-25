@@ -1,6 +1,7 @@
 #include "World.hpp"
 #include "EntityIterator.hpp"
 #include <ELCore/Context.hpp>
+#include <ELGraphics/RenderQueue.hpp>
 #include <ELMaths/Frustum.hpp>
 #include <ELMaths/LineSegment.hpp>
 
@@ -63,6 +64,72 @@ void World::GetOverlaps(List<Pair<EOverlapResult, Vector3>>& results, const Coll
 	}
 }
 
+void World::RenderIDMap(RenderQueue& q, const Frustum& f) const
+{
+	for (const Geometry* geom : _geometry)
+	{
+		const Bounds& b = geom->GetBounds();
+		if (f.OverlapsAABB(b.min, b.max))
+		{
+			uint32 uid = geom->GetUID();
+
+			byte b = uid & 0x000000FF;
+			byte g = (uid & 0x0000FF00) >> 8;
+			byte r = (uid & 0x007F0000) >> 16;
+			
+			q.NewDynamicEntry(ERenderChannels::ALL).AddSetColourOverride(Colour(r, g, b));
+			geom->Render(q);
+			q.NewDynamicEntry(ERenderChannels::ALL).AddPopColourOverride();
+		}
+	}
+
+	ConstEntityIterator ent(&_entRoot);
+	while (ent.IsValid())
+	{
+		Bounds b = ent->GetWorldBounds();
+
+		if (f.OverlapsAABB(b.min, b.max))
+		{
+			uint32 uid = ent->GetUID();
+
+			byte b = uid & 0x000000FF;
+			byte g = (uid & 0x0000FF00) >> 8;
+			byte r = 0x80 | ((uid & 0x007F0000) >> 16);
+			q.NewDynamicEntry(ERenderChannels::ALL).AddSetColourOverride(Colour(r, g, b));
+			ent->Render(q);
+			q.NewDynamicEntry(ERenderChannels::ALL).AddPopColourOverride();
+		}
+
+		ent = ent.Next();
+	}
+}
+
+World::IDMapResult World::DecodeIDMapValue(byte r, byte g, byte b)
+{
+	IDMapResult result = {};
+	uint32 val = ((r & 0x7F) << 16) + (g << 8) + b;
+	if (val)
+	{
+		if (result.isEntity = r & 0x80)
+		{
+			result.entity = _entRoot.FindChild(val);
+		}
+		else
+		{
+			result.geometry = nullptr;
+			for (Geometry* geom : _geometry)
+			{
+				if (geom->GetUID() == val)
+				{
+					result.geometry = geom;
+					break;
+				}
+			}
+		}
+	}
+
+	return result;
+}
 
 //IO
 #include "Registry.hpp"
@@ -83,7 +150,7 @@ constexpr const byte currentVersion = LevelVersions::VERSION_3;
 
 namespace LevelMessages
 {
-	enum ELevelMessage : byte
+	enum EPropertyFlags : byte
 	{
 		STRING = 0,
 		ENTITIES = 1,

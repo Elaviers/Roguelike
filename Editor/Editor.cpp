@@ -226,6 +226,7 @@ void Editor::_InitGL()
 
 	_shaderLit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Phong.frag");
 	_shaderUnlit.Load("Data/Shaders/Shader.vert", "Data/Shaders/Unlit.frag");
+	_shaderIDMap.Load("Data/Shaders/Basic.vert", "Data/Shaders/IDMap.frag");
 
 	TextureData faces[6];
 	for (int i = 0; i < 6; ++i)
@@ -364,9 +365,28 @@ void Editor::Frame()
 	}
 
 	_level.Update(_deltaTime);
-
 	_ui.Update(_deltaTime);
 	Render();
+
+	//calculate hover entity/geometry
+	if (_mouseData.viewport)
+	{
+		uint32 x = _mouseData.x + _mouseData.viewport->ui.GetAbsoluteBounds().w / 2.f;
+		uint32 y = _mouseData.y + _mouseData.viewport->ui.GetAbsoluteBounds().h / 2.f;
+		Colour c = _mouseData.viewport->SampleFramebuffer(x, y);
+
+		World::IDMapResult r = _level.DecodeIDMapValue((byte)(c.r * 255.f), (byte)(c.g * 255.f), (byte)(c.b * 255.f));
+		if (r.isEntity)
+		{
+			_mouseData.hoverEntity = r.entity;
+			_mouseData.hoverGeometry = nullptr;
+		}
+		else
+		{
+			_mouseData.hoverEntity = nullptr;
+			_mouseData.hoverGeometry = r.geometry;
+		}
+	}
 }
 
 void Editor::Render()
@@ -414,9 +434,12 @@ void Editor::RenderViewport(Viewport& vp)
 	camera.Use((int)bounds.x, (int)bounds.y);
 
 	vp.renderQueue.ClearDynamicQueue();
+	vp.renderQueue2.ClearDynamicQueue();
+
 	Frustum frustum;
 	camera.GetProjection().ToFrustum(camera.GetWorldTransform(), frustum);
 	_level.Render(vp.renderQueue, frustum);
+	_level.RenderIDMap(vp.renderQueue2, frustum);
 
 	if (_drawEditorFeatures)
 	{
@@ -449,6 +472,30 @@ void Editor::RenderViewport(Viewport& vp)
 	_shaderUnlit.Use();
 	camera.Use((int)bounds.x, (int)bounds.y);
 	vp.renderQueue.Render(_unlitRenderChannels | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), *engine.pMeshManager, *engine.pTextureManager, 0);
+
+	///////// ID MAP
+	vp.BindFramebuffer();
+	glClearColor(0, 0, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	_shaderIDMap.Use();
+	camera.Use();
+	vp.renderQueue2.Render(ERenderChannels::SURFACE | ERenderChannels::UNLIT | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), *engine.pMeshManager, *engine.pTextureManager, 0);
+	GLFramebuffer::Unbind();
+
+	/* IDMAP DEBUG
+	_shaderUnlit.Use();
+	camera.Use((int)bounds.x, (int)bounds.y);
+	RenderQueue t;
+	RenderEntry& te = t.NewDynamicEntry(ERenderChannels::UNLIT);
+	te.AddSetTransform(Matrix4::Transformation(Vector3(0.f, 1.5f, 0.f), Vector3(), Vector3(3.f, 3.f, 3.f)));
+	te.AddSetColour(Colour::White);
+	te.AddSetUVScale(Vector2(1.f, -1.f));
+	te.AddSetUVOffset();
+	te.AddSetTextureGL(vp.GetFramebufferTexGL(), 0);
+	te.AddCommand(RCMDRenderMesh::PLANE);
+	t.Render(ERenderChannels::UNLIT, *engine.pMeshManager, *engine.pTextureManager, 0);
+	*/
 }
 
 void Editor::ResizeViews(uint16 w, uint16 h)
@@ -458,9 +505,10 @@ void Editor::ResizeViews(uint16 w, uint16 h)
 	_ui.SetBounds(0.f, 0.f, UICoord(0.f, w), UICoord(0.f, h));
 
 	if (_running)
+	{
+		_RefreshVPs();
 		Render();
-
-	_RefreshVPs();
+	}
 }
 
 void Editor::_RefreshVPs()
@@ -468,7 +516,7 @@ void Editor::_RefreshVPs()
 	for (int i = 0; i < VIEWPORTCOUNT; ++i)
 	{
 		const AbsoluteBounds& bounds = _viewports[i].ui.GetAbsoluteBounds();
-		_viewports[i].camera.GetProjection().SetDimensions(Vector2T((uint16)bounds.w, (uint16)bounds.h));
+		_viewports[i].Resize(Vector2T((uint16)bounds.w, (uint16)bounds.h));
 	}
 }
 
@@ -521,7 +569,7 @@ void* Editor::GetToolPropertyObject() const
 void Editor::ChangePropertyEntity(Entity* ent)
 {
 	ClearProperties();
-	UIPropertyManipulator::AddPropertiesToContainer(PROPERTY_HEIGHT, *this, ent->GetProperties(), ent, _propertyContainer);
+	UIPropertyManipulator::AddPropertiesToContainer(1.f, PROPERTY_HEIGHT, *this, ent->GetProperties(), ent, _propertyContainer);
 }
 
 void Editor::RefreshProperties()
@@ -1024,7 +1072,6 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 	case WM_SIZE:
 		editor->ResizeViews(LOWORD(lparam), HIWORD(lparam));
-		editor->_RefreshVPs();
 		break;
 
 	case WM_MOUSEWHEEL:

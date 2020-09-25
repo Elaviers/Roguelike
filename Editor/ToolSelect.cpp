@@ -229,7 +229,7 @@ void ToolSelect::Initialise()
 
 void ToolSelect::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
-	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
+	UIPropertyManipulator::AddPropertiesToContainer(1.f, Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
 }
 
 void ToolSelect::Cancel()
@@ -363,12 +363,9 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 
 	if (!_placing)
 	{
-		//Update hoverobject
-		Buffer<RaycastResult> results = _owner.WorldRef().RootEntity().Raycast(r);
-
-		if (results.GetSize())
+		if (mouseData.hoverEntity)
 		{
-			_SetHoverObject(results[0].object);
+			_SetHoverObject(mouseData.hoverEntity);
 
 			if (_hoverObjectIsSelected == false)
 				_owner.SetCursor(ECursor::HAND);

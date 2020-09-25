@@ -11,7 +11,8 @@ const PropertyCollection& Tile::GetProperties()
 	properties.Add("collision", MemberGetter<Tile, String>(&Tile::_GetCollisionTypeStr), MemberSetter<Tile, String>(&Tile::_SetCollisionTypeStr));
 	properties.Add("material", ContextualMemberGetter<Tile, String>(&Tile::_GetMaterialStr), ContextualMemberSetter<Tile, String>(&Tile::_SetMaterialStr));
 	properties.Add("mesh", ContextualMemberGetter<Tile, String>(&Tile::_GetMeshStr), ContextualMemberSetter<Tile, String>(&Tile::_SetMeshStr));
-	properties.Add<Vector2>("size", offsetof(Tile, _size));
+	properties.Add("size", MemberGetter<Tile, const Vector2&>(&Tile::_GetSize), MemberSetter<Tile, Vector2>(&Tile::_SetSize));
+	properties.Add("extra", MemberGetter<Tile, const Vector2&>(&Tile::_GetExtra), MemberSetter<Tile, Vector2>(&Tile::_SetExtra));
 	DO_ONCE_END;
 
 	return properties;
@@ -55,6 +56,7 @@ void Tile::_SetMaterialStr(const String& string, const Context& ctx)
 {
 	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
 	_material = materialManager->Get(string, ctx);
+	_UpdateRenderSize();
 }
 
 String Tile::_GetMaterialStr(const Context& ctx)
@@ -73,6 +75,25 @@ String Tile::_GetMeshStr(const Context& ctx)
 {
 	MeshManager* meshManager = ctx.GetPtr<MeshManager>();
 	return meshManager->FindNameOf(_mesh.Ptr());
+}
+
+void Tile::_UpdateRenderSize()
+{
+	_renderSize = _size;
+	
+	if (_material && (_extra.x || _extra.y))
+	{
+		const SharedPointer<const Texture>& t = _material->GetDefaultTexture();
+
+		if (t)
+		{
+			float w = (float)t->GetWidth();
+			float h = (float)t->GetHeight();
+
+			_renderSize.x *= w / (w - _extra.x);
+			_renderSize.y *= h / (h - _extra.y);
+		}
+	}
 }
 
 const Collider& Tile::GetCollider() const

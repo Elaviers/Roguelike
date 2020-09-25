@@ -38,6 +38,12 @@ void GeoIsoTile::ReadData(ByteReader& data, const NumberedSet<String>& strings, 
 		_tile = ctx.GetPtr<TileManager>()->Get(*tname, ctx);
 }
 
+void GeoIsoTile::SetPosition(const Vector3& position)
+{
+	_renderTransform.SetPosition(position);
+	_bounds = Bounds(_renderTransform.GetScale() / 2.f, _renderTransform.GetPosition() + _renderTransform.GetScale() / 2.f);
+}
+
 void GeoIsoTile::SetTransform(const Vector3& position, const Vector2& size)
 {
 
@@ -61,7 +67,12 @@ void GeoIsoTile::SetTransform(const Vector3& position, const Vector2& size)
 	*/
 
 	//Since we are using a custom mesh, the above isn't necessary at the moment
+	Vector2 finalSize = size;
+
+	if (_tile)
+		finalSize *= _tile->GetSize();
+
 	_renderTransform.SetPosition(position);
-	_renderTransform.SetScale(Vector3(size.x * (66.f/64.f), size.y * (66.f/64.f), size.x * (66.f/64.f)));
+	_renderTransform.SetScale(Vector3(finalSize.x, finalSize.y, finalSize.x));
 	_bounds = Bounds(_renderTransform.GetScale() / 2.f, _renderTransform.GetPosition() + _renderTransform.GetScale() / 2.f);
 }

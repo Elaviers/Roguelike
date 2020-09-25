@@ -34,7 +34,7 @@ public:
 	{
 		NONE = 0,
 		SAVEABLE = 0x1,
-		DBG_ALWAYS_DRAW = 0x2
+		ALWAYS_DRAW = 0x2
 	};
 
 
@@ -64,6 +64,8 @@ protected:
 	Buffer<Entity*> _children;
 
 	void _AddBaseProperties(PropertyCollection&);
+
+	void _InvalidateWorldBounds() { _wbValid = false; }
 
 	static uint32 _TakeNextUID()
 	{
@@ -200,6 +202,9 @@ public:
 	Entity* FindChild(const String& name);
 	Entity* FindChild(uint32 uid);
 
+	const Entity* FindChild(const String& name) const { return const_cast<Entity*>(this)->FindChild(name); }
+	const Entity* FindChild(uint32 uid) const { return const_cast<Entity*>(this)->FindChild(uid); }
+
 	template<typename T>
 	void FindChildrenOfType(Buffer<T*>& out)
 	{
@@ -323,7 +328,7 @@ public:
 
 	bool operator==(const Entity &other) const { return _uid == other._uid; }
 
-	Bounds GetWorldBounds(bool noTranslation = false) const;
+	Bounds GetWorldBounds() const;
 
 	template<typename T>
 	bool IsType() const { return dynamic_cast<const T*>(this) != nullptr; }

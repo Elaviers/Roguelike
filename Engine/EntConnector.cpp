@@ -32,23 +32,20 @@ void EntConnector::_OnPointChanged()
 }
 
 void EntConnector::Render(RenderQueue& q) const {
-	/*
 	static const Matrix4 planeT = Matrix4::RotationY(180.f);
 
 	RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
 	e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
-	e.AddSetColour(Colour::Green);
+	e.AddSetColour(Colour(0.f, 0.5f, 0.f));
 	e.AddSetTransform(planeT * GetTransformationMatrix());
 	e.AddCommand(RCMDRenderMesh::PLANE);
 
-	e.AddSetColour(Colour::Red);
+	e.AddSetColour(Colour(0.5f, 0.f, 0.f));
 	e.AddSetTransform(GetTransformationMatrix());
 	e.AddCommand(RCMDRenderMesh::PLANE);
-	*/
 
-	RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
 	e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
-	e.AddSetColour(Colour::Green);
+	e.AddSetColour(Colour(0.f, 0.5f, 0.f));
 	e.AddSetLineWidth(2.f);
 	e.AddBox(_point1, _point2);
 }

@@ -9,6 +9,12 @@ const PropertyCollection& ToolIso::_GetProperties()
 	static PropertyCollection properties;
 
 	DO_ONCE_BEGIN;
+	properties.Add(
+		"Mode",
+		MemberGetter<ToolIso, String>(&ToolIso::_GetModeName),
+		MemberSetter<ToolIso, String>(&ToolIso::_SetModeName)
+		);
+
 	properties.Add<float>(
 		"Level",
 		offsetof(ToolIso, _pos.y)
@@ -22,6 +28,38 @@ const PropertyCollection& ToolIso::_GetProperties()
 	DO_ONCE_END;
 
 	return properties;
+}
+
+String ToolIso::_GetModeName() const
+{
+	switch (_mode)
+	{
+	case Mode::ADD:
+		return "Add";
+	case Mode::MOVE:
+		return "Move";
+	case Mode::REMOVE:
+		return "Delete";
+	case Mode::REMOVEZ:
+		return "Delete on level";
+	}
+
+	return "???";
+}
+
+void ToolIso::_SetModeName(const String& name)
+{
+	String l = name.ToLower();
+	if (l == "add")
+		_mode = Mode::ADD;
+	else if (l == "move")
+		_mode = Mode::MOVE;
+	else if (l == "delete")
+		_mode = Mode::REMOVE;
+	else if (l == "delete on level")
+		_mode = Mode::REMOVEZ;
+	else
+		Debug::Message("ToolIso::_SetModeName was given an invalid name..", "Good job!");
 }
 
 String ToolIso::_GetTileName() const
@@ -39,6 +77,57 @@ void ToolIso::_UpdatePlacementTransform()
 	_placementTile.SetTransform(_pos, _size);
 }
 
+void ToolIso::_PlaceTile()
+{
+	if (_mode == Mode::REMOVEZ)
+	{
+		for (Geometry* g : _owner.WorldRef().GetGeometry())
+		{
+			GeoIsoTile* tile = dynamic_cast<GeoIsoTile*>(g);
+			if (tile->GetPosition() == _placementTile.GetPosition())
+			{
+				_owner.WorldRef().RemoveGeometry(g->GetUID());
+				return;
+			}
+		}
+	}
+	else if (_mode == Mode::ADD)
+	{
+		for (Geometry* g : _owner.WorldRef().GetGeometry())
+		{
+			GeoIsoTile* tile = dynamic_cast<GeoIsoTile*>(g);
+			if (tile->GetPosition() == _placementTile.GetPosition())
+			{
+				*tile = _placementTile;
+				return;
+			}
+		}
+
+		_owner.WorldRef().AddGeometry(GeoIsoTile(_placementTile));
+	}
+	else if (_mode == Mode::MOVE && _dragGeometry)
+	{
+		Vector3 pos = _dragGeometry->GetPosition();
+		pos.x = _pos.x + _pos.y - pos.y;
+		pos.z = _pos.z + _pos.y - pos.y;
+		_dragGeometry->SetPosition(pos);
+	}
+}
+
+void ToolIso::_DeleteHoverTile(MouseData& md)
+{
+	if (_mode == Mode::REMOVE)
+	{
+		if (_dragging && md.hoverGeometry)
+		{
+			_owner.WorldRef().RemoveGeometry(md.hoverGeometry->GetUID());
+			md.hoverGeometry = nullptr;
+		}
+
+		return;
+	}
+}
+
 void ToolIso::Initialise()
 {
 	_SetSize(Vector2(1.f, 1.f));
@@ -46,7 +135,11 @@ void ToolIso::Initialise()
 
 void ToolIso::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
-	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
+	//Properties here done manually for the combobox..
+	float ih = Editor::PROPERTY_HEIGHT;
+	(new UIPropertyManipulator(UICoord(1.f, -ih), ih, _owner, *_GetProperties().Find("Mode"), this, &toolProperties, { "Add", "Move", "Delete", "Delete on level" }))->SetZ(-1.f);
+	new UIPropertyManipulator(UICoord(1.f, -2.f * ih), ih, _owner, *_GetProperties().Find("Level"), this, &toolProperties);
+	new UIPropertyManipulator(UICoord(1.f, -3.f * ih), ih, _owner, *_GetProperties().Find("Size"), this, &toolProperties);
 
 	_tileSelectors.Clear();
 
@@ -85,6 +178,14 @@ void ToolIso::Activate(UIContainer& properties, UIContainer& toolProperties)
 
 void ToolIso::MouseMove(const MouseData& mouseData)
 {
+	if (_mode == Mode::REMOVE)
+	{
+		if (_dragging && mouseData.hoverGeometry)
+			_DeleteHoverTile(const_cast<MouseData&>(mouseData)); //TODO TODO TODO... just get a non-const mousedata ref here!!!!
+
+		return;
+	}
+
 	if (mouseData.viewport && mouseData.viewport->GetCameraType() == Viewport::ECameraType::ISOMETRIC)
 	{
 		float newX = mouseData.unitX_rounded - _pos.y;
@@ -97,33 +198,58 @@ void ToolIso::MouseMove(const MouseData& mouseData)
 			_UpdatePlacementTransform();
 
 			if (_dragging)
-				_owner.WorldRef().AddGeometry(GeoIsoTile(_placementTile));
+				_PlaceTile();
 		}
 	}
 }
 
 void ToolIso::MouseDown(const MouseData& mouseData)
 {
-	_owner.WorldRef().AddGeometry(GeoIsoTile(_placementTile));
-
 	_dragging = true;
+	_dragGeometry = dynamic_cast<GeoIsoTile*>(mouseData.hoverGeometry);
+
+	if (_mode == Mode::REMOVE)
+		_DeleteHoverTile(const_cast<MouseData&>(mouseData)); //TODO TODO TODO... just get a non-const mousedata ref here!!!!
+	else
+		_PlaceTile();
 }
 
 void ToolIso::MouseUp(const MouseData& mouseData)
 {
 	_dragging = false;
+	_dragGeometry = nullptr;
 }
 
 void ToolIso::Render(RenderQueue& q) const
 {
+	if (_mode == Mode::REMOVE || (_mode == Mode::MOVE && _dragGeometry == nullptr))
+		return;
+
 	RenderEntry& box = q.NewDynamicEntry(ERenderChannels::UNLIT);
 	box.AddSetLineWidth(2.f);
 	box.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
+
+	Vector3 pos = _pos;
+	if (_mode == Mode::MOVE)
+		pos = _dragGeometry->GetPosition();
+
+	int startY = Maths::Min(0, (int)pos.y);
+	int endY = Maths::Max(0, (int)pos.y);
+
+	box.AddSetColour(Colour(.1f, .5f, .1f));
+	for (int y = startY; y < endY; ++y)
+		box.AddBox(Vector3(pos.x, (float)y, pos.z), Vector3(pos.x + 1.f, y + 1.f, pos.z + 1.f));
+
 	box.AddSetColour(Colour::Green);
+	box.AddBox(Vector3(pos.x, 0.f, pos.z), pos + Vector3(1.f, 1.f, 1.f));
 
-	box.AddBox(Vector3(_pos.x, 0.f, _pos.z), _pos + Vector3(1.f, 1.f, 1.f));
+	if (_mode == Mode::REMOVEZ)
+		box.AddSetColour(Colour::Red);
 
-	_placementTile.Render(q);
+	box.AddBox(pos, pos + Vector3(1.f, 1.f, 1.f));
+
+	if (_mode == Mode::ADD)
+		_placementTile.Render(q);
 }
 
 void ToolIso::TileSelected(UITileSelector& selector)

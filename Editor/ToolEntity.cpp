@@ -46,7 +46,7 @@ void ToolEntity::Initialise()
 
 void ToolEntity::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
-	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
+	UIPropertyManipulator::AddPropertiesToContainer(1.f, Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
 
 	//Creates the placement object
 	_SetClassID((byte)_classID);
@@ -73,7 +73,7 @@ void ToolEntity::MouseMove(const MouseData& mouseData)
 		if (results.GetSize() > 0)
 		{
 			Vector3 pos = r.origin + r.direction * results[0].entryTime;
-			pos.y -= _placement->GetWorldBounds(true).min.y;
+			pos.y += _placement->GetWorldBounds().centre.y - _placement->GetWorldBounds().min.y;
 			_placement->SetRelativePosition(pos);
 		
 			_owner.RefreshProperties();

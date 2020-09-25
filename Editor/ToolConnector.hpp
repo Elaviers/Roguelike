@@ -13,8 +13,6 @@ public:
 	ToolConnector(Editor &level) : Tool(level), _placing(false) {}
 	virtual ~ToolConnector() {}
 
-	virtual void Initialise() override;
-
 	virtual void Activate(UIContainer& properties, UIContainer& toolProperties) override;
 
 	virtual void Cancel() override;

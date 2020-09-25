@@ -249,6 +249,7 @@ EXIT 0</Command>
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Data\Shaders\IDMap.frag" />
     <None Include="..\Data\Shaders\Phong.frag">
       <FileType>Document</FileType>
     </None>

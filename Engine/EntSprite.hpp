@@ -4,7 +4,6 @@
 #include <ELGraphics/Colour.hpp>
 #include <ELGraphics/MaterialManager.hpp>
 #include <ELGraphics/Material_Sprite.hpp>
-#include <ELPhys/CollisionSphere.hpp>
 
 class EntSprite : public Entity
 {
@@ -34,11 +33,6 @@ public:
 	virtual void Render(RenderQueue&) const override;
 
 	virtual Bounds GetBounds() const override { return Bounds(_size / 2.f); }
-	virtual const Collider* GetCollider() const override 
-	{ 
-		static Collider editorCollider(ECollisionChannels::EDITOR, CollisionSphere(0.5f)); 
-		return &editorCollider;
-	}
 
 	virtual const PropertyCollection& GetProperties() override;
 

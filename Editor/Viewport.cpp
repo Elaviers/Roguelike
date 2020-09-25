@@ -16,6 +16,11 @@ Viewport::Viewport() : _cameraType(ECameraType::PERSPECTIVE)
 	_comboBox.onStringChanged += FunctionPointer(this, &Viewport::_OnComboBoxItemSelected);
 }
 
+Viewport::~Viewport()
+{
+	_idMap.Delete();
+}
+
 void Viewport::_OnComboBoxItemSelected(UIComboBox& comboBox)
 {
 	String string = comboBox.GetString().ToLower();
@@ -29,6 +34,13 @@ void Viewport::_OnComboBoxItemSelected(UIComboBox& comboBox)
 		SetCameraType(Viewport::ECameraType::ORTHO_Y);
 	else if (string == "z")
 		SetCameraType(Viewport::ECameraType::ORTHO_Z);
+}
+
+void Viewport::Resize(const Vector2T<uint16>& dimensions)
+{
+	camera.GetProjection().SetDimensions(dimensions);
+
+	_idMap.CreateColourDepth(dimensions.x, dimensions.y);
 }
 
 void Viewport::SetCameraType(Viewport::ECameraType type)

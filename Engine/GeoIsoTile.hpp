@@ -21,6 +21,8 @@ public:
 	GeoIsoTile() {}
 	virtual ~GeoIsoTile() {}
 
+	const Vector3& GetPosition() const { return _renderTransform.GetPosition(); }
+	void SetPosition(const Vector3& position);
 	void SetTransform(const Vector3& position, const Vector2& size);
 
 	const SharedPointer<const Tile>& GetTile() const { return _tile; }

@@ -32,7 +32,14 @@ class UIPropertyManipulator : public UIContainer
 	void _OnStateChanged(UICheckbox&);
 
 public:
-	UIPropertyManipulator(float height, Editor& instance, Property& property, void* object, UIElement* parent = nullptr);
+	UIPropertyManipulator(
+		const UICoord& y, float height, 
+		Editor& instance, 
+		Property& property, 
+		void* object, 
+		UIElement* parent = nullptr, 
+		const Buffer<String>& comboBoxOptions = Buffer<String>());
+
 	virtual ~UIPropertyManipulator() {}
 
 	void Refresh();
@@ -40,15 +47,17 @@ public:
 	void* GetObject() const { return _object; }
 	void SetObject(void* object) { _object = object; }
 
-	static void AddPropertiesToContainer(float height, Editor& instance, const PropertyCollection& properties, void* object, UIContainer& container)
+	static float AddPropertiesToContainer(const UICoord& y, float height, Editor& instance, const PropertyCollection& properties, void* object, UIContainer& container)
 	{
 		const Buffer<Property*>& buffer = properties.GetAll();
 
-		for (size_t i = 0; i < buffer.GetSize(); ++i)
-		{
-			UIPropertyManipulator* p = new UIPropertyManipulator(height, instance, *buffer[i], object, &container);
-			p->SetBounds(0.f, UICoord(1.f, -height * (i + 1)), 1.f, UICoord(0.f, height));
-		}
+		size_t i = 0;
+		for (; i < buffer.GetSize(); ++i)
+			UIPropertyManipulator* p = new UIPropertyManipulator(
+				UICoord(y.relative, y.absolute - height * (i + 1)), height, 
+				instance, *buffer[i], object, &container);
+
+		return height * i;
 	}
 
 	static void RefreshPropertiesInContainer(const UIContainer& container)

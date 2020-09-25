@@ -15,7 +15,16 @@ protected:
 	SharedPointer<const Material> _material;
 	SharedPointer<const Mesh> _mesh;
 
+	Vector2 _renderSize;
 	Vector2 _size;
+	Vector2 _extra;
+
+	void _UpdateRenderSize();
+
+	void _SetSize(const Vector2& size) { _size = size; _UpdateRenderSize(); }
+	void _SetExtra(const Vector2& extra) { _extra = extra; _UpdateRenderSize(); }
+	const Vector2& _GetSize() const { return _size; }
+	const Vector2& _GetExtra() const { return _extra; }
 
 	void _SetCollisionTypeStr(const String&);
 	String _GetCollisionTypeStr() const;
@@ -26,7 +35,7 @@ protected:
 	void _SetMeshStr(const String&, const Context&);
 	String _GetMeshStr(const Context&);
 public:
-	Tile() : _collisionType(ECollisionType::NONE) {}
+	Tile() : _collisionType(ECollisionType::NONE), _size(1.f, 1.f) {}
 	~Tile() {}
 
 	virtual const PropertyCollection& GetProperties() override;
@@ -34,7 +43,7 @@ public:
 	ECollisionType GetCollisionType() const { return _collisionType; }
 	const SharedPointer<const Material>& GetMaterial() const { return _material; }
 	const SharedPointer<const Mesh>& GetMesh() const { return _mesh; }
-	const Vector2& GetSize() const { return _size; }
+	const Vector2& GetSize() const { return _renderSize; }
 
 	static Tile FromText(const String& str, const Context& ctx)
 	{

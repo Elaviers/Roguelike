@@ -1,9 +1,10 @@
 #pragma once
 #include "Entity.hpp"
-#include <ELPhys/CollisionBox.hpp>
 
 class EntLight : public Entity
 {
+	Bounds _bounds;
+
 	Vector3 _colour;
 	float _radius;
 
@@ -11,7 +12,7 @@ class EntLight : public Entity
 public:
 	Entity_FUNCS(EntLight, EEntityID::LIGHT)
 
-	EntLight() : Entity(EFlags::SAVEABLE), _radius(-1.f), _colour(1.f, 1.f, 1.f) { }
+	EntLight() : Entity(EFlags::SAVEABLE | EFlags::ALWAYS_DRAW), _radius(-1.f), _colour(1.f, 1.f, 1.f) { }
 	virtual ~EntLight() {}
 
 	static bool drawLightSources;
@@ -20,7 +21,7 @@ public:
 	float GetRadius() const { return _radius; }
 
 	void SetColour(const Vector3 &colour) { _colour = colour; }
-	void SetRadius(float radius) { _radius = radius; }
+	void SetRadius(const float& radius);
 
 	void Render(RenderQueue&) const override;
 
@@ -28,14 +29,7 @@ public:
 
 	virtual Bounds GetBounds() const 
 	{
-		static Bounds bounds(_radius);
-		return bounds;
-	}
-
-	virtual const Collider* GetCollider() const 
-	{
-		static Collider editorCollider(ECollisionChannels::EDITOR, CollisionBox(Box(_editorBoxExtent)));
-		return &editorCollider;
+		return _bounds;
 	}
 
 	//File IO

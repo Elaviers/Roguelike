@@ -28,8 +28,8 @@ void ToolBrush3D::Initialise()
 
 void ToolBrush3D::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
-	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _object.GetProperties(), &_object, properties);
-	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
+	UIPropertyManipulator::AddPropertiesToContainer(1.f, Editor::PROPERTY_HEIGHT, _owner, _object.GetProperties(), &_object, properties);
+	UIPropertyManipulator::AddPropertiesToContainer(1.f, Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
 }
 
 void ToolBrush3D::Cancel()

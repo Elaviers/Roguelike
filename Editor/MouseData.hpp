@@ -2,6 +2,8 @@
 #include <ELCore/Types.hpp>
 
 class Viewport;
+class Entity;
+class Geometry;
 
 struct MouseData
 {
@@ -29,4 +31,7 @@ struct MouseData
 	int unitY_rounded = 0;
 	int heldUnitX_rounded = 0;
 	int heldUnitY_rounded = 0;
+
+	Entity* hoverEntity = nullptr;
+	Geometry* hoverGeometry = nullptr;
 };

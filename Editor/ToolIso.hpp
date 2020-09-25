@@ -6,7 +6,16 @@
 class ToolIso : public Tool
 {
 protected:
+	enum class Mode
+	{
+		ADD,
+		MOVE,
+		REMOVE,
+		REMOVEZ
+	} _mode;
+
 	bool _dragging;
+	GeoIsoTile* _dragGeometry;
 
 	Vector3 _pos;
 	Vector2 _size;
@@ -17,9 +26,11 @@ protected:
 
 	const PropertyCollection& _GetProperties();
 
+	String _GetModeName() const;
 	String _GetTileName() const;
 	const Vector2& _GetSize() const { return _size; }
 
+	void _SetModeName(const String& mode);
 	void _SetTileName(const String& material);
 	void _SetSize(const Vector2& size) 
 	{ 
@@ -27,8 +38,11 @@ protected:
 	}
 
 	void _UpdatePlacementTransform();
+
+	void _PlaceTile();
+	void _DeleteHoverTile(MouseData&);
 public:
-	ToolIso(Editor& owner) : Tool(owner), _dragging(false) {}
+	ToolIso(Editor& owner) : Tool(owner), _mode(Mode::ADD), _dragging(false), _dragGeometry(nullptr) {}
 	virtual ~ToolIso() {}
 
 	virtual void Initialise() override;

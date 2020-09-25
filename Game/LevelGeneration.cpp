@@ -64,10 +64,7 @@ Entity* CreateConnectedSegment(World& world, const EntConnector &parentConnector
 
 					if (it->GetCollider())
 					{
-						Collider c = *it->GetCollider();
-						c.SetChannels(c.GetChannels() & ~ECollisionChannels::EDITOR);
-
-						if (world.RootEntity().AnyPartOverlapsCollider(c, t) == EOverlapResult::OVERLAPPING)
+						if (world.RootEntity().AnyPartOverlapsCollider(*it->GetCollider(), t) == EOverlapResult::OVERLAPPING)
 						{
 							cannotFit = true;
 							break;

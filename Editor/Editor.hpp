@@ -73,6 +73,7 @@ private:
 	GLContext _glContext;
 	GLProgram _shaderLit;
 	GLProgram _shaderUnlit;
+	GLProgram _shaderIDMap;
 
 	RenderQueue _uiQueue;
 	RenderQueue _consoleQueue;

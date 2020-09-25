@@ -17,12 +17,25 @@ const PropertyCollection& EntLight::GetProperties()
 		"Colour", 
 		offsetof(EntLight, _colour));
 
-	cvars.Add<float>(
+	cvars.Add(
 		"Radius", 
-		offsetof(EntLight, _radius));
+		MemberGetter<EntLight, float>(&EntLight::GetRadius),
+		MemberSetter<EntLight, float>(&EntLight::SetRadius));
 	DO_ONCE_END;
 
 	return cvars;
+}
+
+void EntLight::SetRadius(const float& radius)
+{
+	_radius = radius; 
+	_bounds = Bounds(Maths::Min(_radius, 0.f));
+	_InvalidateWorldBounds();
+
+	if (_radius < 0.f)
+		_flags |= EFlags::ALWAYS_DRAW;
+	else
+		_flags &= ~EFlags::ALWAYS_DRAW;
 }
 
 void EntLight::Render(RenderQueue& q) const

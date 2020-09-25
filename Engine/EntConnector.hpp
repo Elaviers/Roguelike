@@ -1,6 +1,5 @@
 #pragma once
 #include "Entity.hpp"
-#include <ELPhys/CollisionBox.hpp>
 
 class EntConnector : public Entity
 {
@@ -41,10 +40,5 @@ public:
 	{
 		static Bounds bounds(Vector3(.5f, .5f, .5f));
 		return bounds;
-	}
-
-	virtual const Collider* GetCollider() const override {
-		static Collider collider(ECollisionChannels::EDITOR, CollisionBox(Box(Vector3(), Vector3(.5f, .5f, .5f))));
-		return &collider;
 	}
 };

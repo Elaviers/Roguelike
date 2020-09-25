@@ -9,10 +9,25 @@ class RenderQueue;
 class Geometry
 {
 protected:
-	Geometry() {}
+	static uint32 _TakeNextUID()
+	{
+		static uint32 uid = 1;
+		return uid++;
+	}
 
+	const uint32 _uid;
+	
+	Geometry() : _uid(_TakeNextUID()) {}
+	Geometry(const Geometry& other) : _uid(_TakeNextUID()) {}
+	Geometry(Geometry&& other) noexcept : _uid(other._uid) {}
+
+	Geometry& operator=(const Geometry& other) { return *this; }
+	Geometry& operator=(Geometry&& other) noexcept { const_cast<uint32&>(_uid) = other._uid; return *this; }
+	
 public:
 	virtual ~Geometry() {}
+
+	uint32 GetUID() const { return _uid; }
 
 	virtual void Render(RenderQueue& q) const {}
 

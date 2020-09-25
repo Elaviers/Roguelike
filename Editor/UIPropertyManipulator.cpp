@@ -99,7 +99,7 @@ void UIPropertyManipulator::_OnStringChanged(UIComboBox& combobox)
 		SetPropertyString(_property, _object, combobox.GetString(), _editorInstance.engine);
 }
 
-UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property& property, void* object, UIElement* parent) : 
+UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& instance, Property& property, void* object, UIElement* parent, const Buffer<String>& comboStrings) : 
 	UIContainer(parent), _editorInstance(instance), _label(this), _object(object), _property(property), _textbox(nullptr), _checkbox(nullptr), _combobox(nullptr), _refreshing(false)
 {
 	bool readOnly = property.GetFlags() & PropertyFlags::READONLY;
@@ -113,7 +113,7 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 	const UIColour textShadowColour(Colour(0.f, 0.f, 0.12f));
 	const Vector2 textShadowOffset(2.f, -2.f);
 
-	SetBounds(0.f, 0.f, 1.f, UICoord(0.f, h));
+	SetBounds(0.f, y, 1.f, UICoord(0.f, h));
 
 	SharedPointer<const Font> font = instance.engine.pFontManager->Get("arial", instance.engine.context);
 	SharedPointer<const Material> btnMat = instance.engine.pMaterialManager->Get("uibutton1", instance.engine.context);
@@ -136,7 +136,7 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 
 		browse->onPressed += FunctionPointer<void, UIButton&>(this, &UIPropertyManipulator::_OnPressed);
 	}
-	else if (property.GetFlags() & PropertyFlags::DIRECTION || property.GetFlags() & PropertyFlags::CLASSID)
+	else if (property.GetFlags() & PropertyFlags::DIRECTION || property.GetFlags() & PropertyFlags::CLASSID || comboStrings.GetSize())
 	{
 		UIComboBox* comboBox = new UIComboBox(this);
 		comboBox->SetBounds(.5f, 0.f, .5f, 1.f);
@@ -149,7 +149,12 @@ UIPropertyManipulator::UIPropertyManipulator(float h, Editor& instance, Property
 		{
 			comboBox->onStringChanged += FunctionPointer<void, UIComboBox&>(this, &UIPropertyManipulator::_OnStringChanged);
 
-			if (property.GetFlags() & PropertyFlags::DIRECTION)
+			if (comboStrings.GetSize())
+			{
+				for (const String& str : comboStrings)
+					comboBox->Add(str);
+			}
+			else if (property.GetFlags() & PropertyFlags::DIRECTION)
 			{
 				comboBox->Add("north");
 				comboBox->Add("east");

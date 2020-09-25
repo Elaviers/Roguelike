@@ -11,14 +11,9 @@ const PropertyCollection& ToolConnector::_GetProperties()
 	return properties;
 }
 
-void ToolConnector::Initialise()
-{
-	//_connector.SetRenderColour(Colour(0.f, 1.f, 0.f, .5f));
-}
-
 void ToolConnector::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
-	UIPropertyManipulator::AddPropertiesToContainer(Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
+	UIPropertyManipulator::AddPropertiesToContainer(1.f, Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
 }
 
 void ToolConnector::Cancel()
@@ -79,11 +74,12 @@ void ToolConnector::KeySubmit()
 	_placing = false;
 
 	EntConnector *clone = _connector.TypedClone();
-	//clone->SetRenderColour(Colour(0.f, 1.f, 0.f));
 	clone->SetParent(&_owner.WorldRef().RootEntity());
 }
 
 void ToolConnector::Render(RenderQueue& q) const
 {
+	q.NewDynamicEntry(ERenderChannels::EDITOR).AddSetColourOverride(Colour(0.f, 1.f, 0.f));
 	_connector.Render(q);
+	q.NewDynamicEntry(ERenderChannels::EDITOR).AddPopColourOverride();
 }

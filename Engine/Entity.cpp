@@ -90,7 +90,7 @@ void Entity::RenderAll(RenderQueue& q, const Frustum& cameraFrustum) const
 {
 	Bounds b = GetWorldBounds();
 
-	if (cameraFrustum.OverlapsAABB(b.min, b.max) || (_flags & EFlags::DBG_ALWAYS_DRAW) != EFlags::NONE)
+	if ((_flags & EFlags::ALWAYS_DRAW) != EFlags::NONE || cameraFrustum.OverlapsAABB(b.min, b.max))
 		Render(q);
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
@@ -142,13 +142,13 @@ Entity* Entity::FindChild(const String& name)
 	if (_name == name)
 		return this;
 
-for (size_t i = 0; i < _children.GetSize(); ++i)
-{
-	Entity* result = _children[i]->FindChild(name);
-	if (result) return result;
-}
+	for (size_t i = 0; i < _children.GetSize(); ++i)
+	{
+		Entity* result = _children[i]->FindChild(name);
+		if (result) return result;
+	}
 
-return nullptr;
+	return nullptr;
 }
 
 Entity* Entity::FindChild(uint32 uid)
@@ -339,15 +339,14 @@ Entity& Entity::operator=(Entity&& other) noexcept
 	return *this;
 }
 
-Bounds Entity::GetWorldBounds(bool noTranslation) const
+Bounds Entity::GetWorldBounds() const
 {
 	if (_wbValid)
 		return _worldBounds;
 
 	Bounds b = GetBounds();
 	Matrix4 wt = GetWorldTransform().GetTransformationMatrix();
-	if (noTranslation) wt[3][0] = wt[3][1] = wt[3][2] = 0.f;
-
+	
 	//Yeah, this is not optimised at all...
 	Vector3 testPoints[8] = {
 		(Vector4(b.min, 1.f) * wt).GetXYZ(),
