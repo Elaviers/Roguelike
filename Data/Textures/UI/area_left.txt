@@ -2,4 +2,5 @@ min nearest
 mag nearest
 mips 0
 aniso 0
+wrap clamp repeat
 img UI/area_left.png

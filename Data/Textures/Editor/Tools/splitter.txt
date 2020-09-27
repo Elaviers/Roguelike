@@ -1,0 +1,2 @@
+wrap repeat clamp
+img editor/tools/splitter.png

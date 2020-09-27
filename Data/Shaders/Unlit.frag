@@ -16,8 +16,6 @@ out vec4 OutColour;
 
 void main()
 {
-	vec2 sz = textureSize(T_Diffuse, 0);
-
 	vec4 tex = texture(T_Diffuse, UV);
 	if (tex.a < 0.01) discard; //don't write invisible fragments
 
