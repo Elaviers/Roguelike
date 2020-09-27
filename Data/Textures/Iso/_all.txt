@@ -1,3 +1,4 @@
 mips 1
 min linear
 mag nearest
+wrap clamp

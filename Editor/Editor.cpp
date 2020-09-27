@@ -892,7 +892,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 			case ID_IMPORT_ANIMATION:
 			{
-				Buffer<String> skeletalModelNames = editor->engine.pModelManager->GetAllPossibleKeys();
+				Buffer<String> skeletalModelNames = editor->engine.pModelManager->GetAllPossibleKeys(editor->engine.context);
 
 				for (size_t i = 0; i < skeletalModelNames.GetSize();)
 				{

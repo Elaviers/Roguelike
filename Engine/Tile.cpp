@@ -55,8 +55,7 @@ String Tile::_GetCollisionTypeStr() const
 void Tile::_SetMaterialStr(const String& string, const Context& ctx)
 {
 	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
-	_material = materialManager->Get(string, ctx);
-	_UpdateRenderSize();
+	SetMaterial(materialManager->Get(string, ctx));
 }
 
 String Tile::_GetMaterialStr(const Context& ctx)
@@ -87,10 +86,15 @@ void Tile::_UpdateRenderSize()
 
 		if (t)
 		{
+			//law of cosines
+			float hyp = Maths::SquareRoot(3.f * _renderSize.x * _renderSize.x);
+
 			float w = (float)t->GetWidth();
 			float h = (float)t->GetHeight();
 
-			_renderSize.x *= w / (w - _extra.x);
+			hyp *= w / (w - _extra.x);
+
+			_renderSize.x *= Maths::SquareRoot((hyp * hyp) / 3.f);
 			_renderSize.y *= h / (h - _extra.y);
 		}
 	}

@@ -1,2 +1,0 @@
-material iso/ir2
-collision wall_r

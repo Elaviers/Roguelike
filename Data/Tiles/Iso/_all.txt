@@ -1,2 +1,2 @@
 mesh iso/outer_cube_t
-extra 2 1
+extra 2 2

@@ -144,7 +144,7 @@ void ToolIso::Activate(UIContainer& properties, UIContainer& toolProperties)
 	_tileSelectors.Clear();
 
 	TileManager* tileManager = _owner.engine.pTileManager;
-	Buffer<String> tiles = tileManager->GetAllPossibleKeys();
+	Buffer<String> tiles = tileManager->GetAllPossibleKeys(_owner.engine.context);
 
 	SharedPointer<const Material> panelMat = _owner.engine.pMaterialManager->Get("uiarea", _owner.engine.context);
 

@@ -1,2 +1,0 @@
-material iso/ir4
-collision block

@@ -45,6 +45,8 @@ public:
 	const SharedPointer<const Mesh>& GetMesh() const { return _mesh; }
 	const Vector2& GetSize() const { return _renderSize; }
 
+	void SetMaterial(const SharedPointer<const Material>& material) { _material = material; _UpdateRenderSize(); }
+
 	static Tile FromText(const String& str, const Context& ctx)
 	{
 		Tile t;

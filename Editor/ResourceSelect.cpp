@@ -236,9 +236,9 @@ INT_PTR RSDialog::DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		Buffer<String> keynames;
 
 		if (rs->isModelSelect)
-			keynames = rs->engine.pModelManager->GetAllPossibleKeys();
+			keynames = rs->engine.pModelManager->GetAllPossibleKeys(rs->engine.context);
 		else
-			keynames = rs->engine.pMaterialManager->GetAllPossibleKeys();
+			keynames = rs->engine.pMaterialManager->GetAllPossibleKeys(rs->engine.context);
 
 		for (uint32 i = 0; i < keynames.GetSize(); ++i)
 		{

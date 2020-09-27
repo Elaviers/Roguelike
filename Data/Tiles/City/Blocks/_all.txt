@@ -1,1 +1,0 @@
-mesh iso/outer_cube_t
