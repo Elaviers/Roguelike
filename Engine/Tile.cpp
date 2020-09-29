@@ -78,6 +78,8 @@ String Tile::_GetMeshStr(const Context& ctx)
 
 void Tile::_UpdateRenderSize()
 {
+	static const float sqrt3 = Maths::SquareRoot(3.f);
+
 	_renderSize = _size;
 	
 	if (_material && (_extra.x || _extra.y))
@@ -86,15 +88,10 @@ void Tile::_UpdateRenderSize()
 
 		if (t)
 		{
-			//law of cosines
-			float hyp = Maths::SquareRoot(3.f * _renderSize.x * _renderSize.x);
-
 			float w = (float)t->GetWidth();
-			float h = (float)t->GetHeight();
+			float h = (float)t->GetHeight();	
 
-			hyp *= w / (w - _extra.x);
-
-			_renderSize.x *= Maths::SquareRoot((hyp * hyp) / 3.f);
+			_renderSize.x *= w / (w - _extra.x);
 			_renderSize.y *= h / (h - _extra.y);
 		}
 	}

@@ -205,13 +205,16 @@ void ToolIso::MouseMove(const MouseData& mouseData)
 
 void ToolIso::MouseDown(const MouseData& mouseData)
 {
-	_dragging = true;
-	_dragGeometry = dynamic_cast<GeoIsoTile*>(mouseData.hoverGeometry);
+	if (mouseData.viewport->GetCameraType() == Viewport::ECameraType::ISOMETRIC)
+	{
+		_dragging = true;
+		_dragGeometry = dynamic_cast<GeoIsoTile*>(mouseData.hoverGeometry);
 
-	if (_mode == Mode::REMOVE)
-		_DeleteHoverTile(const_cast<MouseData&>(mouseData)); //TODO TODO TODO... just get a non-const mousedata ref here!!!!
-	else
-		_PlaceTile();
+		if (_mode == Mode::REMOVE)
+			_DeleteHoverTile(const_cast<MouseData&>(mouseData)); //TODO TODO TODO... just get a non-const mousedata ref here!!!!
+		else
+			_PlaceTile();
+	}
 }
 
 void ToolIso::MouseUp(const MouseData& mouseData)
@@ -225,9 +228,13 @@ void ToolIso::Render(RenderQueue& q) const
 	if (_mode == Mode::REMOVE || (_mode == Mode::MOVE && _dragGeometry == nullptr))
 		return;
 
+	if (_mode == Mode::ADD)
+		_placementTile.Render(q);
+
 	RenderEntry& box = q.NewDynamicEntry(ERenderChannels::UNLIT);
 	box.AddSetLineWidth(2.f);
 	box.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
+	box.AddCommand(RCMDSetDepthFunc::ALWAYS);
 
 	Vector3 pos = _pos;
 	if (_mode == Mode::MOVE)
@@ -247,9 +254,7 @@ void ToolIso::Render(RenderQueue& q) const
 		box.AddSetColour(Colour::Red);
 
 	box.AddBox(pos, pos + Vector3(1.f, 1.f, 1.f));
-
-	if (_mode == Mode::ADD)
-		_placementTile.Render(q);
+	box.AddCommand(RCMDSetDepthFunc::LEQUAL);
 }
 
 void ToolIso::TileSelected(UITileSelector& selector)

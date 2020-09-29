@@ -1,1 +1,1 @@
-mesh iso/outer_cube
+mesh iso/outer_cube_t

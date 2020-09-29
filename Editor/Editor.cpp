@@ -142,10 +142,10 @@ void Editor::_Init()
 		_viewports[i].SetFont(vpFont);
 	}
 	
-	_viewports[0].SetCameraType(Viewport::ECameraType::PERSPECTIVE);
+	_viewports[0].SetCameraType(Viewport::ECameraType::ISOMETRIC);
 	_viewports[1].SetCameraType(Viewport::ECameraType::ORTHO_Y);
 	_viewports[2].SetCameraType(Viewport::ECameraType::ORTHO_Z);
-	_viewports[3].SetCameraType(Viewport::ECameraType::ORTHO_X);
+	_viewports[3].SetCameraType(Viewport::ECameraType::PERSPECTIVE);
 
 	//Note: toolbar is added after the viewport background ui because containers pass events to last elements first
 	_toolbar.SetButtonMaterial(engine.pMaterialManager->Get("uibutton1", engine.context)).SetButtonBorderSize(2.f)
@@ -371,8 +371,8 @@ void Editor::Frame()
 	//calculate hover entity/geometry
 	if (_mouseData.viewport)
 	{
-		uint32 x = _mouseData.x + _mouseData.viewport->ui.GetAbsoluteBounds().w / 2.f;
-		uint32 y = _mouseData.y + _mouseData.viewport->ui.GetAbsoluteBounds().h / 2.f;
+		uint32 x = _mouseData.x + (uint32)_mouseData.viewport->ui.GetAbsoluteBounds().w / 2;
+		uint32 y = _mouseData.y + (uint32)_mouseData.viewport->ui.GetAbsoluteBounds().h / 2;
 		Colour c = _mouseData.viewport->SampleFramebuffer(x, y);
 
 		World::IDMapResult r = _level.DecodeIDMapValue((byte)(c.r * 255.f), (byte)(c.g * 255.f), (byte)(c.b * 255.f));
