@@ -715,12 +715,19 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 
 		if (avpCam.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 		{
-			float avpUnitX, avpUnitY;
-			_CalcUnitXYFull(x, y, *_activeVP, avpUnitX, avpUnitY);
-
+			bool iso = _activeVP->GetCameraType() == Viewport::ECameraType::ISOMETRIC;
 			Vector3 avpRight = avpCam.GetRelativeTransform().GetRightVector();
 			Vector3 avpUp = avpCam.GetRelativeTransform().GetUpVector();
-			avpCam.RelativeMove(avpRight * (_mouseData.dragUnitX - avpUnitX) + avpUp * (_mouseData.dragUnitY - avpUnitY));
+			int rightElement = iso ? 0 : (avpRight.x ? 0 : avpRight.y ? 1 : 2);
+			int upElement = iso ? 2 : (avpUp.x ? 0 : avpUp.y ? 1 : 2);
+
+			Vector3 duvec;
+			duvec[rightElement] = _mouseData.dragUnitX;
+			duvec[upElement] = _mouseData.dragUnitY;
+
+			avpCam.SetRelativePosition(Collision::ClosestPointOnPlane(avpCam.GetRelativePosition(), avpCam.GetRelativeTransform().GetForwardVector(), duvec));
+			avpCam.RelativeMove(avpRight * (-_mouseData.x / avpCam.GetProjection().GetOrthographicScale()) +
+								avpUp * (-_mouseData.y / avpCam.GetProjection().GetOrthographicScale()));
 		}
 		else
 		{
@@ -753,8 +760,6 @@ void Editor::LeftMouseDown()
 
 void Editor::LeftMouseUp()
 {
-	_ui.FocusElement(nullptr);
-
 	_mouseData.isLeftDown = false;
 
 	if (_currentTool)
