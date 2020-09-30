@@ -74,7 +74,7 @@ void ToolIso::_SetTileName(const String& name)
 
 void ToolIso::_UpdatePlacementTransform()
 {
-	_placementTile.SetTransform(_pos, _size);
+	_placementTile.SetPositionSize(_pos, _size);
 }
 
 void ToolIso::_PlaceTile()
@@ -231,7 +231,7 @@ void ToolIso::Render(RenderQueue& q) const
 	if (_mode == Mode::ADD)
 		_placementTile.Render(q);
 
-	RenderEntry& box = q.NewDynamicEntry(ERenderChannels::UNLIT);
+	RenderEntry& box = q.CreateEntry(ERenderChannels::UNLIT);
 	box.AddSetLineWidth(2.f);
 	box.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 	box.AddCommand(RCMDSetDepthFunc::ALWAYS);
@@ -242,18 +242,25 @@ void ToolIso::Render(RenderQueue& q) const
 
 	int startY = Maths::Min(0, (int)pos.y);
 	int endY = Maths::Max(0, (int)pos.y);
+	Vector2 sz = _placementTile.GetTile() ? (_size * _placementTile.GetTile()->GetSize()) : _size;
 
 	box.AddSetColour(Colour(.1f, .5f, .1f));
 	for (int y = startY; y < endY; ++y)
-		box.AddBox(Vector3(pos.x, (float)y, pos.z), Vector3(pos.x + 1.f, y + 1.f, pos.z + 1.f));
+		box.AddBox(Vector3(pos.x, (float)y, pos.z), Vector3(pos.x + sz.x, y + 1.f, pos.z + sz.x));
+
+	Vector3 topCorner = pos + Vector3(sz.x, sz.y, sz.x);
 
 	box.AddSetColour(Colour::Green);
-	box.AddBox(Vector3(pos.x, 0.f, pos.z), pos + Vector3(1.f, 1.f, 1.f));
+	box.AddBox(Vector3(pos.x, 0.f, pos.z), topCorner);
 
 	if (_mode == Mode::REMOVEZ)
+	{
 		box.AddSetColour(Colour::Red);
+		box.AddBox(pos, pos + Vector3(1.f, 1.f, 1.f));
+	}
+	else
+		box.AddBox(pos, topCorner);
 
-	box.AddBox(pos, pos + Vector3(1.f, 1.f, 1.f));
 	box.AddCommand(RCMDSetDepthFunc::LEQUAL);
 }
 

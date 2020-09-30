@@ -2,11 +2,16 @@
 #include "Geometry.hpp"
 #include "Tile.hpp"
 #include <ELCore/SharedPointer.hpp>
+#include <ELGraphics/RenderEntry.hpp>
 #include <ELMaths/LineSegment.hpp>
 #include <ELMaths/Transform.hpp>
 
 class GeoIsoTile : public Geometry
 {
+private:
+	RenderEntry _renderEntry;
+	void _UpdateRenderEntry();
+
 protected:
 	Transform _renderTransform;
 
@@ -14,19 +19,40 @@ protected:
 
 	SharedPointer<const Tile> _tile;
 
+	Vector2 _size;
+
 public:
 	//Needed for registry
 	static const byte TypeID;
 
-	GeoIsoTile() {}
+	GeoIsoTile() : _renderEntry(ERenderChannels::UNLIT) { }
+	GeoIsoTile(const GeoIsoTile& other) : 
+		Geometry(other), 
+		_renderEntry(ERenderChannels::UNLIT), 
+		_renderTransform(other._renderTransform), 
+		_bounds(other._bounds), 
+		_tile(other._tile)
+	{
+		_UpdateRenderEntry();
+	}
+
 	virtual ~GeoIsoTile() {}
+
+	GeoIsoTile& operator=(const GeoIsoTile& other)
+	{
+		_renderTransform = other._renderTransform;
+		_bounds = other._bounds;
+		_tile = other._tile;
+		_UpdateRenderEntry();
+		return *this;
+	}
 
 	const Vector3& GetPosition() const { return _renderTransform.GetPosition(); }
 	void SetPosition(const Vector3& position);
-	void SetTransform(const Vector3& position, const Vector2& size);
+	void SetPositionSize(const Vector3& position, const Vector2& size);
 
 	const SharedPointer<const Tile>& GetTile() const { return _tile; }
-	void SetTile(const SharedPointer<const Tile>& tile) { _tile = tile; }
+	void SetTile(const SharedPointer<const Tile>& tile) { _tile = tile; _UpdateRenderEntry(); }
 
 	virtual void Render(RenderQueue& q) const override;
 

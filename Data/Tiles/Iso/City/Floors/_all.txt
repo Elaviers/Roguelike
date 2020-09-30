@@ -1,1 +1,2 @@
 mesh iso/plane0_t
+collision floor

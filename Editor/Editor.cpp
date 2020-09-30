@@ -115,6 +115,9 @@ void Editor::_Init()
 
 	inputManager->BindKeyDown(EKeycode::TILDE, Callback(this, &Editor::ToggleConsole));
 
+	inputManager->BindKeyDown(EKeycode::SQBRACKETLEFT, Callback(this, &Editor::DecreaseGridUnit));
+	inputManager->BindKeyDown(EKeycode::SQBRACKETRIGHT, Callback(this, &Editor::IncreaseGridUnit));
+
 	_level.RootEntity().onNameChanged +=	Callback(this, &Editor::RefreshLevel);
 	_level.RootEntity().onChildChanged +=	Callback(this, &Editor::RefreshLevel);
 
@@ -159,7 +162,7 @@ void Editor::_Init()
 	_toolbar.AddButton("Brush2D", engine.pTextureManager->Get("editor/tools/brush2d", engine.context), (uint16)ETool::BRUSH2D);
 	_toolbar.AddButton("Brush3D", engine.pTextureManager->Get("editor/tools/brush3d", engine.context), (uint16)ETool::BRUSH3D);
 	_toolbar.AddButton("Entity", engine.pTextureManager->Get("editor/tools/entity", engine.context), (uint16)ETool::ENTITY);
-	_toolbar.AddButton("Connector", engine.pTextureManager->Get("editor/tools/connector", engine.context), (uint16)ETool::CONNECTOR);
+	//_toolbar.AddButton("Connector", engine.pTextureManager->Get("editor/tools/connector", engine.context), (uint16)ETool::CONNECTOR);
 	_toolbar.onItemSelected += FunctionPointer<void, UIToolbarItem&>(this, &Editor::_OnToolbarItemSelection);
 
 	UIColour splitterColour(Colour::White, Colour(1.f, 1.f, 1.f, 0.5f));
@@ -391,7 +394,7 @@ void Editor::Frame()
 
 void Editor::Render()
 {
-	_uiQueue.ClearDynamicQueue();
+	_uiQueue.Clear();
 	_ui.Render(_uiQueue);
 
 	_glContext.Use(_vpArea);
@@ -409,7 +412,7 @@ void Editor::Render()
 	
 
 	//Console
-	_consoleQueue.ClearDynamicQueue();
+	_consoleQueue.Clear();
 	engine.pConsole->Render(_consoleQueue, *_consoleFont, _deltaTime);
 
 	_glContext.Use(_consoleWindow);
@@ -433,8 +436,8 @@ void Editor::RenderViewport(Viewport& vp)
 	_shaderLit.Use();
 	camera.Use((int)bounds.x, (int)bounds.y);
 
-	vp.renderQueue.ClearDynamicQueue();
-	vp.renderQueue2.ClearDynamicQueue();
+	vp.renderQueue.Clear();
+	vp.renderQueue2.Clear();
 
 	Frustum frustum;
 	camera.GetProjection().ToFrustum(camera.GetWorldTransform(), frustum);
@@ -443,17 +446,20 @@ void Editor::RenderViewport(Viewport& vp)
 
 	if (_drawEditorFeatures)
 	{
-		RenderEntry& e = vp.renderQueue.NewDynamicEntry(ERenderChannels::EDITOR);
+		RenderEntry& e = vp.renderQueue.CreateEntry(ERenderChannels::EDITOR);
 		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 		e.AddSetLineWidth(lineW);
 
 		float z = vp.gridAxis == EAxis::Y ? _gridZ : 0.f;
 
 		e.AddSetColour(Colour(.75f, .75f, .75f));
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridAxis, 1.f, gridLimit, 0.f, z);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridAxis, _gridUnit, gridLimit, 0.f, z);
 
 		e.AddSetColour(Colour(.5f, .5f, 1.f));
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridAxis, 10.f, gridLimit, 0.f, z);
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridAxis, 16.f, gridLimit, 0.f, z);
+
+		e.AddSetColour(Colour(.5f, 1.f, 1.f));
+		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), vp.gridAxis, 1000000.f, gridLimit, 0.f, z);
 
 		engine.pDebugManager->RenderWorld(vp.renderQueue);
 	}
@@ -474,20 +480,23 @@ void Editor::RenderViewport(Viewport& vp)
 	vp.renderQueue.Render(_unlitRenderChannels | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), *engine.pMeshManager, *engine.pTextureManager, 0);
 
 	///////// ID MAP
-	vp.BindFramebuffer();
-	glClearColor(0, 0, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	if (&vp == _mouseData.viewport)
+	{
+		vp.BindFramebuffer();
+		glClearColor(0, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	_shaderIDMap.Use();
-	camera.Use();
-	vp.renderQueue2.Render(ERenderChannels::SURFACE | ERenderChannels::UNLIT | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), *engine.pMeshManager, *engine.pTextureManager, 0);
-	GLFramebuffer::Unbind();
+		_shaderIDMap.Use();
+		camera.Use();
+		vp.renderQueue2.Render(ERenderChannels::SURFACE | ERenderChannels::UNLIT | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), *engine.pMeshManager, *engine.pTextureManager, 0);
+		GLFramebuffer::Unbind();
+	}
 
 	/* IDMAP DEBUG
 	_shaderUnlit.Use();
 	camera.Use((int)bounds.x, (int)bounds.y);
 	RenderQueue t;
-	RenderEntry& te = t.NewDynamicEntry(ERenderChannels::UNLIT);
+	RenderEntry& te = t.CreateEntry(ERenderChannels::UNLIT);
 	te.AddSetTransform(Matrix4::Transformation(Vector3(0.f, 1.5f, 0.f), Vector3(), Vector3(3.f, 3.f, 3.f)));
 	te.AddSetColour(Colour::White);
 	te.AddSetUVScale(Vector2(1.f, -1.f));
@@ -658,14 +667,6 @@ void _CalcUnitXY(float x, float y, const Viewport& vp, float& unitX_out, float& 
 	}
 }
 
-inline void _CalcUnitXYFull(unsigned short x, unsigned short y, const Viewport& vp, float& unitX_out, float& unitY_out)
-{
-	const AbsoluteBounds& bounds = vp.ui.GetAbsoluteBounds();
-	int ix = x - (uint16)(bounds.x + (bounds.w / 2.f));
-	int iy = y - (uint16)(bounds.y + (bounds.h / 2.f));
-	_CalcUnitXY((float)ix, (float)iy, vp, unitX_out, unitY_out);
-}
-
 void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 {
 	Viewport* vp = nullptr;
@@ -706,9 +707,7 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 	_mouseData.x = x - (uint16)(bounds.x + (bounds.w / 2.f));
 	_mouseData.y = y - (uint16)(bounds.y + (bounds.h / 2.f));
 
-	//Update unitX and unitY
-	_CalcUnitXY((float)_mouseData.x, (float)_mouseData.y, *_mouseData.viewport, _mouseData.unitX, _mouseData.unitY);
-
+	//Drag movement
 	if (_mouseData.isRightDown && _activeVP)
 	{
 		EntCamera& avpCam = _activeVP->camera;
@@ -725,16 +724,22 @@ void Editor::UpdateMousePosition(unsigned short x, unsigned short y)
 			duvec[rightElement] = _mouseData.dragUnitX;
 			duvec[upElement] = _mouseData.dragUnitY;
 
+			AbsoluteBounds avpBounds = _activeVP->ui.GetAbsoluteBounds();
+			int avpX = x - (uint16)(avpBounds.x + (avpBounds.w / 2.f));
+			int avpY = y - (uint16)(avpBounds.y + (avpBounds.h / 2.f));
+
 			avpCam.SetRelativePosition(Collision::ClosestPointOnPlane(avpCam.GetRelativePosition(), avpCam.GetRelativeTransform().GetForwardVector(), duvec));
-			avpCam.RelativeMove(avpRight * (-_mouseData.x / avpCam.GetProjection().GetOrthographicScale()) +
-								avpUp * (-_mouseData.y / avpCam.GetProjection().GetOrthographicScale()));
+			avpCam.RelativeMove(avpRight * (-avpX / avpCam.GetProjection().GetOrthographicScale()) +
+				avpUp * (-avpY / avpCam.GetProjection().GetOrthographicScale()));
 		}
-		else
+		else if (_mouseData.viewport == prevViewport)
 		{
 			avpCam.AddRelativeRotation(Vector3((_mouseData.y - _mouseData.prevY) * .5f, (_mouseData.x - _mouseData.prevX) * .5f, 0.f));
 		}
 	}
 
+	//Update unitX and unitY
+	_CalcUnitXY((float)_mouseData.x, (float)_mouseData.y, *_mouseData.viewport, _mouseData.unitX, _mouseData.unitY);
 	_mouseData.unitX_rounded = _mouseData.unitX < 0.f ? (int)(_mouseData.unitX - 1.f) : (int)_mouseData.unitX;
 	_mouseData.unitY_rounded = _mouseData.unitY < 0.f ? (int)(_mouseData.unitY - 1.f) : (int)_mouseData.unitY;
 
@@ -797,6 +802,16 @@ void Editor::KeyDelete()
 {
 	if (_currentTool)
 		_currentTool->KeyDelete();
+}
+
+void Editor::IncreaseGridUnit()
+{
+	_gridUnit = Maths::Min(_gridUnit * 2.f, 8.f);
+}
+
+void Editor::DecreaseGridUnit()
+{
+	_gridUnit = Maths::Max(_gridUnit / 2.f, 1.f);
 }
 
 void Editor::ToggleConsole()

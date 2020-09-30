@@ -195,8 +195,8 @@ void Game::Frame()
 
 void Game::Render()
 {
-	_renderQueue.ClearDynamicQueue();
-	_uiQueue.ClearDynamicQueue();
+	_renderQueue.Clear();
+	_uiQueue.Clear();
 
 	const EntCamera* activeCamera = GameInstance::Instance().GetActiveCamera();
 	if (activeCamera)

@@ -85,7 +85,7 @@ void ToolBrush2D::MouseUp(const MouseData &mouseData)
 
 void ToolBrush2D::Render(RenderQueue& q) const
 {
-	RenderEntry& box = q.NewDynamicEntry(ERenderChannels::UNLIT);
+	RenderEntry& box = q.CreateEntry(ERenderChannels::UNLIT);
 	box.AddSetLineWidth(2.f);
 	box.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 	box.AddSetColour(Colour::Green);

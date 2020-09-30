@@ -391,8 +391,8 @@ void Frame()
 	//
 	{
 		//Prepare queue
-		renderQueue.ClearDynamicQueue();
-		uiQueue.ClearDynamicQueue();
+		renderQueue.Clear();
+		uiQueue.Clear();
 
 		light1.Render(renderQueue);
 		light2.Render(renderQueue);
@@ -404,7 +404,7 @@ void Frame()
 
 		//grid
 		float limit = camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC ? 1.f : 10.f;
-		RenderEntry& e = renderQueue.NewDynamicEntry(ERenderChannels::UNLIT);
+		RenderEntry& e = renderQueue.CreateEntry(ERenderChannels::UNLIT);
 		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 		e.AddSetColour(Colour::Red);
 		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), EAxis::X, 1.f, limit, 0.f, 0.f);
@@ -416,7 +416,7 @@ void Frame()
 		//UI
 		//fps string
 		static Transform fontTransform(Vector3(0, 0, 0), Rotation(), Vector3(64, 0, 0));
-		RenderEntry& strEntry = uiQueue.NewDynamicEntry(ERenderChannels::UNLIT);
+		RenderEntry& strEntry = uiQueue.CreateEntry(ERenderChannels::UNLIT);
 		strEntry.AddSetColour(Colour::Yellow);
 		engine.pFontManager->Get(fontName, engine.context)->RenderString(strEntry, fpsString.GetData(), fontTransform);
 

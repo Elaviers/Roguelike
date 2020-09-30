@@ -114,7 +114,7 @@ void Console::Render(RenderQueue& q, const Font& font, float deltaTime)
 	Transform transform;
 	transform.SetScale(Vector3(16, 16, 1));
 
-	RenderEntry& e = q.NewDynamicEntry(ERenderChannels::UNLIT);
+	RenderEntry& e = q.CreateEntry(ERenderChannels::UNLIT);
 
 	if (_charBuffer.GetSize())
 	{

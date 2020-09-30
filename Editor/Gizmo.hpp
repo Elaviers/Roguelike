@@ -35,7 +35,7 @@ public:
 	}
 
 	const Transform& GetTransform() const { return _transform; }
-	void SetTransform(const Transform& t) 
+	void SetPositionSize(const Transform& t) 
 	{ 
 		_transform = t; 
 

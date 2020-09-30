@@ -36,7 +36,7 @@ void GizmoRing::SetGizmoTransform(const Transform& gizmoTransform)
 
 void GizmoRing::Render(RenderQueue& q) const
 {
-	RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
+	RenderEntry& e = q.CreateEntry(ERenderChannels::EDITOR);
 
 	if (_canDrag)
 		e.AddSetColour(Colour(1.f - _colour.r, 1.f - _colour.g, 1.f - _colour.b));

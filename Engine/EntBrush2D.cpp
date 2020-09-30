@@ -32,7 +32,7 @@ void EntBrush2D::Render(RenderQueue& q) const
 {
 	if (_material)
 	{
-		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SURFACE, 0);
+		RenderEntry& e = q.CreateEntry(ERenderChannels::SURFACE, 0);
 		_material->Apply(e);
 		e.AddSetUVScale(Vector2(GetRelativeScale().x, GetRelativeScale().z));
 		e.AddCommand(RCMDSetUVOffset::Default());

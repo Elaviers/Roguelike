@@ -102,6 +102,8 @@ private:
 	float _axisLookX = 0.f;
 	float _axisLookY = 0.f;
 
+	float _gridUnit = 1.f;
+
 	static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
 	static LRESULT CALLBACK _vpAreaProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -150,6 +152,9 @@ public:
 	void KeySubmit();
 	void KeyCancel();
 	void KeyDelete();
+
+	void IncreaseGridUnit();
+	void DecreaseGridUnit();
 
 	void ToggleConsole();
 	void RefreshLevel();

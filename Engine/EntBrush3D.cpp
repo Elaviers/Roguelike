@@ -37,7 +37,7 @@ void EntBrush3D::Render(RenderQueue& q) const
 {
 	if (_material)
 	{
-		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SURFACE, 0);
+		RenderEntry& e = q.CreateEntry(ERenderChannels::SURFACE, 0);
 		_material->Apply(e);
 		e.AddCommand(RCMDSetUVOffset::Default());
 		e.AddSetColour(Colour::White);

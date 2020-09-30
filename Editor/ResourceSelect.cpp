@@ -145,12 +145,12 @@ public:
 	{
 		_camera.Use(); //todo: this should not be here but is needed for sprite.render....
 
-		renderQueue.ClearDynamicQueue();
+		renderQueue.Clear();
 		_light.Render(renderQueue);
 		_object.Render(renderQueue);
 		_sprite.Render(renderQueue);
 
-		RenderEntry& e = renderQueue.NewDynamicEntry(ERenderChannels::UNLIT);
+		RenderEntry& e = renderQueue.CreateEntry(ERenderChannels::UNLIT);
 		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 		e.AddSetColour(Colour::Red);
 		e.AddLine(Vector3(-1.f, 0.f, 0.f), Vector3(1.f, 0.f, 0.f));

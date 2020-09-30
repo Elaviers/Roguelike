@@ -9,7 +9,7 @@ void EntSprite::Render(RenderQueue& q) const
 {
 	if (_material)
 	{
-		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SPRITE);
+		RenderEntry& e = q.CreateEntry(ERenderChannels::SPRITE);
 
 		Matrix4 t;
 

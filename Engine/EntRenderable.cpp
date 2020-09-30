@@ -4,6 +4,24 @@
 #include <ELGraphics/RenderCommand.hpp>
 #include <ELGraphics/RenderQueue.hpp>
 
+void EntRenderable::_UpdateRenderEntry()
+{
+	_renderEntry.Clear();
+
+	if (_model)
+	{
+		if (_material)
+			_material->Apply(_renderEntry);
+
+		_renderEntry.AddCommand(RCMDSetUVOffset::Default());
+		_renderEntry.AddCommand(RCMDSetUVScale::Default());
+
+		_renderEntry.AddSetColour(_colour);
+		_renderEntry.AddSetTransform(GetTransformationMatrix());
+		_renderEntry.AddRenderMesh(*_model->GetMesh());
+	}
+}
+
 const PropertyCollection& EntRenderable::GetProperties()
 {
 	static PropertyCollection cvars;
@@ -30,22 +48,7 @@ const PropertyCollection& EntRenderable::GetProperties()
 
 void EntRenderable::Render(RenderQueue& q) const
 {
-	if (_model)
-	{
-		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SURFACE);
-
-		if (_material)
-		{
-			_material->Apply(e);
-		}
-
-		e.AddCommand(RCMDSetUVOffset::Default());
-		e.AddCommand(RCMDSetUVScale::Default());
-
-		e.AddSetColour(_colour);
-		e.AddSetTransform(GetTransformationMatrix());
-		e.AddRenderMesh(*_model->GetMesh());
-	}
+	q.AddEntry(&_renderEntry);
 }
 
 const Collider* EntRenderable::GetCollider() const
@@ -66,6 +69,21 @@ String EntRenderable::GetMaterialName(const Context& ctx) const
 {
 	if (_material) return ctx.GetPtr<MaterialManager>()->FindNameOf(_material.Ptr());
 	return "Unknown";
+}
+
+void EntRenderable::SetModel(const SharedPointer<const Model>& model, const Context& ctx)
+{
+	_model = model;
+
+	if (_model && _model->GetDefaultMaterialName().GetLength() != 0)
+	{
+		SetMaterial(model->GetDefaultMaterialName(), ctx);
+		_materialIsDefault = true;
+	}
+	else SetMaterial(SharedPointer<const Material>());
+
+	_OnMeshChanged();
+	_UpdateRenderEntry();
 }
 
 void EntRenderable::WriteData(ByteWriter &writer, NumberedSet<String> &strings, const Context& ctx) const

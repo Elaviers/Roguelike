@@ -27,6 +27,8 @@ void Tile::_SetCollisionTypeStr(const String& string)
 		_collisionType = ECollisionType::WALL_L;
 	else if (s == "wall_r")
 		_collisionType = ECollisionType::WALL_R;
+	else if (s == "floor")
+		_collisionType = ECollisionType::FLOOR;
 	else if (s == "none")
 		_collisionType = ECollisionType::NONE;
 	else
@@ -43,6 +45,8 @@ String Tile::_GetCollisionTypeStr() const
 		return "wall_l";
 	case ECollisionType::WALL_R:
 		return "wall_r";
+	case ECollisionType::FLOOR:
+		return "floor";
 	case ECollisionType::NONE:
 		return "none";
 
@@ -103,6 +107,7 @@ const Collider& Tile::GetCollider() const
 	static Collider block(channels, CollisionBox(Box::FromMinMax(Vector3(0.f, 0.f, 0.f), Vector3(1.f, 1.f, 1.f))));
 	static Collider wallL(channels, CollisionBox(Box::FromMinMax(Vector3(0.f, 0.f, 0.f), Vector3(.2f, 1.f, 1.f))));
 	static Collider wallR(channels, CollisionBox(Box::FromMinMax(Vector3(0.f, 0.f, 0.f), Vector3(1.f, 1.f, .2f))));
+	static Collider floor(channels, CollisionBox(Box::FromMinMax(Vector3(0.f, -.2f, 0.f), Vector3(1.f, 0.f, 1.f))));
 	static Collider none;
 
 	switch (_collisionType)
@@ -113,6 +118,8 @@ const Collider& Tile::GetCollider() const
 		return wallL;
 	case ECollisionType::WALL_R:
 		return wallR;
+	case ECollisionType::FLOOR:
+		return floor;
 	}
 
 	return none;

@@ -96,7 +96,7 @@ void ToolBrush3D::KeySubmit()
 
 void ToolBrush3D::Render(RenderQueue& q) const
 {
-	RenderEntry& box = q.NewDynamicEntry(ERenderChannels::UNLIT);
+	RenderEntry& box = q.CreateEntry(ERenderChannels::UNLIT);
 	box.AddSetLineWidth(2.f);
 	box.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 	box.AddSetColour(Colour::Green);

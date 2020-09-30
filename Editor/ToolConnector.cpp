@@ -23,6 +23,7 @@ void ToolConnector::Cancel()
 
 void ToolConnector::MouseMove(const MouseData &mouseData)
 {
+	/* old
 	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 	{
 		EAxis fwdAxis = mouseData.viewport->gridAxis;
@@ -62,6 +63,7 @@ void ToolConnector::MouseMove(const MouseData &mouseData)
 			_connector.SetPoint2(v);
 		}
 	}
+	*/
 }
 
 void ToolConnector::MouseDown(const MouseData &mouseData)
@@ -79,7 +81,7 @@ void ToolConnector::KeySubmit()
 
 void ToolConnector::Render(RenderQueue& q) const
 {
-	q.NewDynamicEntry(ERenderChannels::EDITOR).AddSetColourOverride(Colour(0.f, 1.f, 0.f));
+	q.CreateEntry(ERenderChannels::EDITOR).AddSetColourOverride(Colour(0.f, 1.f, 0.f));
 	_connector.Render(q);
-	q.NewDynamicEntry(ERenderChannels::EDITOR).AddPopColourOverride();
+	q.CreateEntry(ERenderChannels::EDITOR).AddPopColourOverride();
 }

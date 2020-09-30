@@ -77,9 +77,9 @@ void World::RenderIDMap(RenderQueue& q, const Frustum& f) const
 			byte g = (uid & 0x0000FF00) >> 8;
 			byte r = (uid & 0x007F0000) >> 16;
 			
-			q.NewDynamicEntry(ERenderChannels::ALL).AddSetColourOverride(Colour(r, g, b));
+			q.CreateEntry(ERenderChannels::ALL).AddSetColourOverride(Colour(r, g, b));
 			geom->Render(q);
-			q.NewDynamicEntry(ERenderChannels::ALL).AddPopColourOverride();
+			q.CreateEntry(ERenderChannels::ALL).AddPopColourOverride();
 		}
 	}
 
@@ -95,9 +95,9 @@ void World::RenderIDMap(RenderQueue& q, const Frustum& f) const
 			byte b = uid & 0x000000FF;
 			byte g = (uid & 0x0000FF00) >> 8;
 			byte r = 0x80 | ((uid & 0x007F0000) >> 16);
-			q.NewDynamicEntry(ERenderChannels::ALL).AddSetColourOverride(Colour(r, g, b));
+			q.CreateEntry(ERenderChannels::ALL).AddSetColourOverride(Colour(r, g, b));
 			ent->Render(q);
-			q.NewDynamicEntry(ERenderChannels::ALL).AddPopColourOverride();
+			q.CreateEntry(ERenderChannels::ALL).AddPopColourOverride();
 		}
 
 		ent = ent.Next();

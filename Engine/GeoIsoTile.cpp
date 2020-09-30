@@ -5,74 +5,63 @@
 
 const byte GeoIsoTile::TypeID = (byte)EGeometryID::ISO_TILE;
 
-void GeoIsoTile::Render(RenderQueue& q) const
+void GeoIsoTile::_UpdateRenderEntry()
 {
+	_renderEntry.Clear();
+
 	if (_tile && _tile->GetMesh() && _tile->GetMaterial())
 	{
-		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::UNLIT);
-		e.AddSetTransform(_renderTransform.GetTransformationMatrix());
-		e.AddSetColour(); 
-		_tile->GetMaterial()->Apply(e);
-		e.AddSetUVOffset();
-		e.AddSetUVScale();
-		e.AddRenderMesh(*_tile->GetMesh());
+		_renderEntry.AddSetTransform(_renderTransform.GetTransformationMatrix());
+		_renderEntry.AddSetColour();
+		_tile->GetMaterial()->Apply(_renderEntry);
+		_renderEntry.AddSetUVOffset();
+		_renderEntry.AddSetUVScale();
+		_renderEntry.AddRenderMesh(*_tile->GetMesh());
 	}
+}
+
+void GeoIsoTile::Render(RenderQueue& q) const
+{
+	q.AddEntry(&_renderEntry);
 }
 
 void GeoIsoTile::WriteData(ByteWriter& data, NumberedSet<String>& strings, const Context& ctx) const
 {
 	data.Write<Vector3>(_renderTransform.GetPosition());
-	data.Write<Vector3>(_renderTransform.GetScale());
+	data.Write<Vector2>(_size);
 
 	data.Write_uint16(_tile ? strings.Add(ctx.GetPtr<TileManager>()->FindNameOf(_tile.Ptr())) : 0);
 }
 
 void GeoIsoTile::ReadData(ByteReader& data, const NumberedSet<String>& strings, const Context& ctx)
 {
-	_renderTransform.SetPosition(data.Read<Vector3>());
-	_renderTransform.SetScale(data.Read<Vector3>());
+	Vector3 pos = data.Read<Vector3>();
+	Vector2 size = data.Read<Vector2>();
 	_bounds = Bounds(_renderTransform.GetScale() / 2.f, _renderTransform.GetPosition() + _renderTransform.GetScale() / 2.f);
 
 	const String* tname = strings.Get(data.Read_uint16());
 	if (tname)
 		_tile = ctx.GetPtr<TileManager>()->Get(*tname, ctx);
+
+	SetPositionSize(pos, size);
 }
 
 void GeoIsoTile::SetPosition(const Vector3& position)
 {
 	_renderTransform.SetPosition(position);
 	_bounds = Bounds(_renderTransform.GetScale() / 2.f, _renderTransform.GetPosition() + _renderTransform.GetScale() / 2.f);
+	_UpdateRenderEntry();
 }
 
-void GeoIsoTile::SetTransform(const Vector3& position, const Vector2& size)
+void GeoIsoTile::SetPositionSize(const Vector3& position, const Vector2& size)
 {
-
-	/* -- SET TRANSFORM FOR PLANE MESH  -- */
-	/*
-	float pitch = Maths::ArcTangent(1.f / Maths::SQRT2_F);
-
-	//Assuming sprite lines are at a slope of 1/2 instead of tan(30), stretch vertically
-	float stretch = Maths::TangentDegrees(30.f) / 0.5f;
-
-	//Multiply by root 2 because we want a hypotenuse length
-	float w = size.x * Maths::SQRT2_F * (66.f / 64.f); //todo: the 66/64 is temporary! It's because the textures have a 1px overlap right now
-	float h = size.y * stretch * Maths::SQRT2_F * (66.f / 64.f);
-
-	//        --Hypotenuse to centre bottom--
-	float m = Maths::Sine(pitch) * h * 0.5f / Maths::SQRT2_F;
-
-	_renderTransform.SetRotation(Vector3(-35.264f, 45.f, 0.f));
-	_renderTransform.SetPosition(position + Vector3(m, Maths::Cosine(pitch) * h * 0.5f, m));
-	_renderTransform.SetScale(Vector3(w, h, 1.f));
-	*/
-
-	//Since we are using a custom mesh, the above isn't necessary at the moment
-	Vector2 finalSize = size;
+	Vector2 finalSize = _size = size;
 
 	if (_tile)
-		finalSize *= _tile->GetSize();
+		finalSize *= _tile->GetRenderSize();
 
 	_renderTransform.SetPosition(position);
 	_renderTransform.SetScale(Vector3(finalSize.x, finalSize.y, finalSize.x));
 	_bounds = Bounds(_renderTransform.GetScale() / 2.f, _renderTransform.GetPosition() + _renderTransform.GetScale() / 2.f);
+	_UpdateRenderEntry();
 }

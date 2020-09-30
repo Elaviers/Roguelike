@@ -77,7 +77,7 @@ void EntPlayer::Update(float deltaTime)
 {
 	//Camera
 	Ray r = _camera.GetProjection().ScreenToWorld(_rootCameraTransform, GameInstance::Instance().GetCursorPos());
-	Vector3 cameraPos = r.origin + r.direction * Collision::IntersectRayPlane(r, GetWorldPosition(), Vector3(0.f, 1.f, 0.f));
+	Vector3 cameraPos = r.origin + r.direction * Collision::IntersectRayPlane(r, GetWorldPosition() - Vector3(0.f, .5f, 0.f), Vector3(0.f, 1.f, 0.f));
 	Vector3 targetPos = cameraPos + (cameraPos - GetWorldPosition());
 	cameraPos += _camera.GetWorldTransform().GetForwardVector() * -5000.f;
 	
@@ -106,6 +106,25 @@ void EntPlayer::Update(float deltaTime)
 	//rotate by 45 degrees
 	_velocity.x = relVelX * sc45 + relVelZ * sc45;
 	_velocity.z = relVelZ * sc45 - relVelX * sc45;
+	_velocity.y -= 9.8f * deltaTime;
+
+	List<Pair<EOverlapResult, Vector3>> overlaps;
+	GameInstance::Instance().world->GetOverlaps(overlaps, _COLLIDER, GetWorldTransform(), this);
+	for (const auto& overlap : overlaps)
+	{
+		if (overlap.first == EOverlapResult::OVERLAPPING && overlap.second.LengthSquared())
+		{
+			Vector3 dir = -overlap.second.Normalised();
+
+			_velocity -= dir * _velocity.Dot(dir);
+
+			if (overlap.second.LengthSquared() > 10.f)
+				Debug::PrintLine("OOF");
+
+			SetWorldPosition(GetWorldPosition() + overlap.second);
+		}
+	}
+
 	SetWorldPosition(GetWorldPosition() + _velocity * deltaTime);
 }
 
@@ -113,7 +132,7 @@ void EntPlayer::Render(RenderQueue& q) const
 {
 	if (_targetTexture)
 	{
-		RenderEntry& te = q.NewDynamicEntry(ERenderChannels::UNLIT);
+		RenderEntry& te = q.CreateEntry(ERenderChannels::UNLIT);
 		te.AddSetColour();
 		te.AddSetUVScale();
 		te.AddSetUVOffset();

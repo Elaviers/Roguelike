@@ -7,7 +7,7 @@
 class Tile : public Asset
 {
 public:
-	enum class ECollisionType { NONE, BLOCK, WALL_L, WALL_R };
+	enum class ECollisionType { NONE, BLOCK, WALL_L, WALL_R, FLOOR };
 
 protected:
 	ECollisionType _collisionType;
@@ -43,7 +43,8 @@ public:
 	ECollisionType GetCollisionType() const { return _collisionType; }
 	const SharedPointer<const Material>& GetMaterial() const { return _material; }
 	const SharedPointer<const Mesh>& GetMesh() const { return _mesh; }
-	const Vector2& GetSize() const { return _renderSize; }
+	const Vector2& GetSize() const { return _size; }
+	const Vector2& GetRenderSize() const { return _renderSize; }
 
 	void SetMaterial(const SharedPointer<const Material>& material) { _material = material; _UpdateRenderSize(); }
 

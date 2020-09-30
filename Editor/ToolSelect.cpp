@@ -156,7 +156,7 @@ void ToolSelect::_GizmoSetSidePos(E2DBrushEdge edge, const Vector3& delta)
 void ToolSelect::_UpdateGizmoTransform()
 {
 	if (_gizmoIsLocal && _selectedObjects.GetSize() == 1)
-		_gizmo.SetTransform(Transform(_selectedObjects[0]->GetWorldPosition(), _selectedObjects[0]->GetWorldRotation()));
+		_gizmo.SetPositionSize(Transform(_selectedObjects[0]->GetWorldPosition(), _selectedObjects[0]->GetWorldRotation()));
 	else
 	{
 		Vector3 avgPosition;
@@ -166,7 +166,7 @@ void ToolSelect::_UpdateGizmoTransform()
 
 		avgPosition /= (float)_selectedObjects.GetSize();
 
-		_gizmo.SetTransform(Transform(avgPosition));
+		_gizmo.SetPositionSize(Transform(avgPosition));
 
 		if (_selectedObjects.GetSize())
 			_brushGizmo.SetObjectTransform(_selectedObjects[0]->GetWorldTransform());
@@ -462,7 +462,7 @@ void ToolSelect::Render(RenderQueue& q) const
 {
 	if (_placing)
 	{
-		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
+		RenderEntry& e = q.CreateEntry(ERenderChannels::EDITOR);
 		e.AddSetColour(Colour::Cyan);
 		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 		e.AddBox(_sbPoint1, _sbPoint2);
@@ -470,16 +470,16 @@ void ToolSelect::Render(RenderQueue& q) const
 	
 	if (_activeGizmo)
 	{
-		RenderEntry& pre = q.NewDynamicEntry(ERenderChannels::EDITOR);
+		RenderEntry& pre = q.CreateEntry(ERenderChannels::EDITOR);
 		pre.AddCommand(RCMDSetDepthFunc::ALWAYS);
 		_activeGizmo->Render(q);
-		RenderEntry& post = q.NewDynamicEntry(ERenderChannels::EDITOR);
+		RenderEntry& post = q.CreateEntry(ERenderChannels::EDITOR);
 		post.AddCommand(RCMDSetDepthFunc::LEQUAL);
 	}
 	
 	if (_activeGizmo != &_brushGizmo && _selectedObjects.GetSize())
 	{
-		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::EDITOR);
+		RenderEntry& e = q.CreateEntry(ERenderChannels::EDITOR);
 		e.AddSetColour(Colour::Cyan);
 		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 

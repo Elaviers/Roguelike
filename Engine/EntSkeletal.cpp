@@ -58,7 +58,7 @@ void EntSkeletal::Render(RenderQueue& q) const
 {
 	if (_model)
 	{
-		RenderEntry& e = q.NewDynamicEntry(ERenderChannels::SURFACE);
+		RenderEntry& e = q.CreateEntry(ERenderChannels::SURFACE);
 		
 		if (_material)
 		{
