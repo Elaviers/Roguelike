@@ -63,8 +63,8 @@ void Editor::_Init()
 		windowClass.lpfnWndProc = _vpAreaProc;
 		::RegisterClassEx(&windowClass);
 
-		windowClass.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
-		windowClass.hIconSm = ::LoadIcon(NULL, IDI_APPLICATION);
+		HINSTANCE instance = ::GetModuleHandle(NULL);
+		windowClass.hIcon = windowClass.hIconSm = ::LoadIcon(instance, MAKEINTRESOURCE(IDI_ICON));
 		windowClass.lpszClassName = classNameWindow;
 		windowClass.lpfnWndProc = _WindowProc;
 		windowClass.lpszMenuName = MAKEINTRESOURCE(IDR_MENU);
@@ -102,7 +102,7 @@ void Editor::_Init()
 	inputManager->BindKeyAxis(EKeycode::D, &_axisMoveX, 1.f);
 	inputManager->BindKeyAxis(EKeycode::A, &_axisMoveX, -1.f);
 	inputManager->BindKeyAxis(EKeycode::SPACE, &_axisMoveZ, 1.f);
-	inputManager->BindKeyAxis(EKeycode::SHIFT, &_axisMoveZ, -1.f);
+	inputManager->BindKeyAxis(EKeycode::LSHIFT, &_axisMoveZ, -1.f);
 
 	inputManager->BindKeyAxis(EKeycode::UP, &_axisLookY, 1.f);
 	inputManager->BindKeyAxis(EKeycode::DOWN, &_axisLookY, -1.f);
@@ -1138,7 +1138,7 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			if (lparam & (1 << 30))
 				break; //Key repeats ignored
 
-			editor->engine.pInputManager->KeyDown((EKeycode)wparam);
+			editor->engine.pInputManager->KeyDown((EKeycode)WindowFunctions::SplitKeyWPARAMLeftRight(wparam));
 		}
 
 		break;
@@ -1146,7 +1146,7 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 	case WM_SYSKEYUP:
 	case WM_KEYUP:
 		if (!editor->_ui.KeyUp((EKeycode)wparam))
-			editor->engine.pInputManager->KeyUp((EKeycode)wparam);
+			editor->engine.pInputManager->KeyUp((EKeycode)WindowFunctions::SplitKeyWPARAMLeftRight(wparam));
 
 		break;
 

@@ -3,13 +3,10 @@
 
 class GizmoPlane : public GizmoComponent
 {
-	Vector3 _grabOffset;
+	Vector3 _grabPos;
 
 	Transform _relativeTransform;
 	Transform _transform;
-
-	Vector3 _moveDelta;
-		
 public:
 	GizmoPlane(const Colour& colour, const Transform& relativeTransform) :
 		GizmoComponent(colour),

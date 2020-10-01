@@ -37,8 +37,8 @@ void GizmoAxis::Update(const MouseData& mouseData, const Ray& mouseRay, float & 
 	{
 		if (t != 0.f)
 		{
-			Vector3 planeDelta = pp - (_position + _grabOffset);
-			_owner->GetMoveFunction()(_fv * _fv.Dot(planeDelta));
+			Vector3 planeDelta = pp - _grabPos;
+			_grabPos += _owner->GetMoveFunction()(_fv * _fv.Dot(planeDelta));
 		}
 	}
 	else
@@ -51,9 +51,7 @@ void GizmoAxis::Update(const MouseData& mouseData, const Ray& mouseRay, float & 
 			if (dist2 <= 0.05f * 0.05f)
 			{
 				maxT = t;
-
-				_grabOffset = pp - _position;
-
+				_grabPos = pp;
 				_canDrag = true;
 				return;
 			}

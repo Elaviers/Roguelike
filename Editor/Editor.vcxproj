@@ -267,6 +267,8 @@ EXIT 0</Command>
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="icon.ico" />
+    <Image Include="icon1.ico" />
     <Image Include="ToolBrush.bmp" />
     <Image Include="ToolConnector.bmp" />
     <Image Include="ToolEdit.bmp" />

@@ -9,17 +9,21 @@ class Viewport;
 
 class ToolSelect : public Tool
 {
+	bool _dragging;
 	bool _placing;
 	bool _shouldCopy;
 
-	EntityPointer _dragObject;
 	EntityPointer _hoverObject;
 	bool _hoverObjectIsSelected;
 
-	Buffer<EntityPointer> _selectedObjects;
+	struct EntitySelection
+	{
+		EntityPointer entity;
+		float dragStartX;
+		float dragStartY;
+	};
 
-	float _origObjectX;
-	float _origObjectY;
+	Buffer<EntitySelection> _selection;
 
 	float _gridSnap;
 	bool _snapToWorld;
@@ -53,12 +57,11 @@ class ToolSelect : public Tool
 
 public:
 	ToolSelect(Editor& level) : Tool(level),
+		_dragging(false),
 		_placing(false),
 		_shouldCopy(false),
 		_hoverObject(),
 		_hoverObjectIsSelected(false),
-		_origObjectX(0.f),
-		_origObjectY(0.f),
 		_gridSnap(1.f),
 		_snapToWorld(0),
 		_gizmoIsLocal(0),

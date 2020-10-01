@@ -343,8 +343,9 @@ protected:
 	{
 		Entity *go = new T(other);
 		const_cast<bool&>(go->_dynamic) = true;
-		go->SetParent(other._parent);
 		const_cast<EFlags&>(go->_flags) = other._flags;
+		go->_parent = nullptr;
+		go->SetParent(other._parent); //force set parent
 		return dynamic_cast<T*>(go);
 	}
 };

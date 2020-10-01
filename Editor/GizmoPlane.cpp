@@ -34,8 +34,8 @@ void GizmoPlane::Update(const MouseData& mouseData, const Ray& ray, float& maxT)
 		float t = Collision::IntersectRayPlane(ray, _transform.GetPosition(), _transform.GetForwardVector());
 		if (t)
 		{
-			_moveDelta += ray.origin + ray.direction * t - (_transform.GetPosition() + _grabOffset);
-			_moveDelta -= _owner->GetMoveFunction()(_moveDelta);
+			Vector3 moveDelta = (ray.origin + ray.direction * t) - _grabPos;
+			_grabPos += _owner->GetMoveFunction()(moveDelta);
 		}
 	}
 	else
@@ -49,9 +49,8 @@ void GizmoPlane::Update(const MouseData& mouseData, const Ray& ray, float& maxT)
 		if (t && t < maxT)
 		{
 			maxT = t;
-			_grabOffset = ray.origin + ray.direction * t - _transform.GetPosition();
+			_grabPos = ray.origin + ray.direction * t;
 			_canDrag = true;
-			_moveDelta.x = _moveDelta.y = _moveDelta.z = 0.f;
 		}
 		else
 			_canDrag = false;

@@ -49,9 +49,11 @@ Vector3 ToolSelect::_GizmoMove(const Vector3& delta)
 		d.z = Maths::Trunc(d.z, _gridSnap);
 	}
 
-	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
+	Vector3 savg;
+	Vector3 eavg;
+	for (size_t i = 0; i < _selection.GetSize(); ++i)
 	{
-		Vector3 startPos = _selectedObjects[i]->GetWorldPosition();
+		Vector3 startPos = _selection[i].entity->GetWorldPosition();
 		Vector3 endPos = startPos + d;
 
 		if (!_gizmoIsLocal && _snapToWorld && _gridSnap)
@@ -67,10 +69,15 @@ Vector3 ToolSelect::_GizmoMove(const Vector3& delta)
 			_CloneSelection();
 		}
 
-		_selectedObjects[i]->SetWorldPosition(endPos);
+		_selection[i].entity->SetWorldPosition(endPos);
+
+		savg += startPos;
+		eavg += endPos;
 	}
 
-	return d;
+	savg /= _selection.GetSize();
+	eavg /= _selection.GetSize();
+	return eavg - savg;
 }
 
 float ToolSelect::_GizmoRotate(const Vector3 &axis, float angle)
@@ -83,12 +90,12 @@ float ToolSelect::_GizmoRotate(const Vector3 &axis, float angle)
 		_CloneSelection();
 	}
 
-	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
+	for (size_t i = 0; i < _selection.GetSize(); ++i)
 	{
-		_selectedObjects[i]->SetWorldPosition(
-			VectorMaths::RotateAbout(_selectedObjects[i]->GetWorldPosition(), _gizmo.GetTransform().GetPosition(), rotation));
+		_selection[i].entity->SetWorldPosition(
+			VectorMaths::RotateAbout(_selection[i].entity->GetWorldPosition(), _gizmo.GetTransform().GetPosition(), rotation));
 
-		_selectedObjects[i]->SetWorldRotation(_selectedObjects[i]->GetWorldRotation() * rotation);
+		_selection[i].entity->SetWorldRotation(_selection[i].entity->GetWorldRotation() * rotation);
 	}
 
 	return _gizmoIsLocal ? 0.f : angle;
@@ -98,7 +105,7 @@ void ToolSelect::_GizmoSetSidePos(E2DBrushEdge edge, const Vector3& delta)
 {
 	//note: will not work for any plane that is not axis-aligned!
 
-	Entity* ent = _selectedObjects[0].Ptr();
+	Entity* ent = _selection[0].entity.Ptr();
 	Transform wt = ent->GetWorldTransform();
 	Vector3 scale = wt.GetScale();
 
@@ -155,21 +162,21 @@ void ToolSelect::_GizmoSetSidePos(E2DBrushEdge edge, const Vector3& delta)
 
 void ToolSelect::_UpdateGizmoTransform()
 {
-	if (_gizmoIsLocal && _selectedObjects.GetSize() == 1)
-		_gizmo.SetPositionSize(Transform(_selectedObjects[0]->GetWorldPosition(), _selectedObjects[0]->GetWorldRotation()));
+	if (_gizmoIsLocal && _selection.GetSize() == 1)
+		_gizmo.SetPositionSize(Transform(_selection[0].entity->GetWorldPosition(), _selection[0].entity->GetWorldRotation()));
 	else
 	{
 		Vector3 avgPosition;
 
-		for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
-			avgPosition += _selectedObjects[i]->GetWorldPosition();
+		for (size_t i = 0; i < _selection.GetSize(); ++i)
+			avgPosition += _selection[i].entity->GetWorldPosition();
 
-		avgPosition /= (float)_selectedObjects.GetSize();
+		avgPosition /= (float)_selection.GetSize();
 
 		_gizmo.SetPositionSize(Transform(avgPosition));
 
-		if (_selectedObjects.GetSize())
-			_brushGizmo.SetObjectTransform(_selectedObjects[0]->GetWorldTransform());
+		if (_selection.GetSize())
+			_brushGizmo.SetObjectTransform(_selection[0].entity->GetWorldTransform());
 	}
 }
 
@@ -181,8 +188,8 @@ void ToolSelect::_SetHoverObject(Entity* ho)
 
 		_hoverObjectIsSelected = false;
 
-		for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
-			if (_hoverObject == _selectedObjects[i])
+		for (size_t i = 0; i < _selection.GetSize(); ++i)
+			if (_hoverObject == _selection[i].entity)
 			{
 				_hoverObjectIsSelected = true;
 				break;
@@ -289,7 +296,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 				v[fwdElement] = _sbPoint2[fwdElement];
 				_sbPoint2 = v;
 			}
-			else if (_dragObject)
+			else if (_dragging)
 			{
 				float deltaX = mouseData.unitX - mouseData.heldUnitX;
 				float deltaY = mouseData.unitY - mouseData.heldUnitY;
@@ -300,13 +307,13 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 					deltaY = Maths::Round(deltaY, _gridSnap);
 				}
 
-				for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
+				for (size_t i = 0; i < _selection.GetSize(); ++i)
 				{
-					Vector3 startPos = _selectedObjects[i]->GetWorldPosition();
+					Vector3 startPos = _selection[i].entity->GetWorldPosition();
 					Vector3 endPos;
 					endPos[fwdElement] = startPos[fwdElement];
-					endPos[rightElement] = _origObjectX + deltaX;
-					endPos[upElement] = _origObjectY + deltaY;
+					endPos[rightElement] = _selection[i].dragStartX + deltaX;
+					endPos[upElement] = _selection[i].dragStartY + deltaY;
 
 					if (_snapToWorld && _gridSnap)
 					{
@@ -320,7 +327,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 						_CloneSelection();
 					}
 
-					_selectedObjects[i]->SetWorldPosition(endPos);
+					_selection[i].entity->SetWorldPosition(endPos);
 				}
 
 				_owner.RefreshProperties();
@@ -342,14 +349,14 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 			
 			bool found = false;
 
-			for (uint32 i = 0; i < _selectedObjects.GetSize(); ++i)
+			for (uint32 i = 0; i < _selection.GetSize(); ++i)
 			{
-				auto bounds = _selectedObjects[i]->GetWorldBounds();
+				auto bounds = _selection[i].entity->GetWorldBounds();
 
 				if (mouseData.unitX >= bounds.min[rightElement] && mouseData.unitX <= bounds.max[rightElement] && mouseData.unitY >= bounds.min[upElement] && mouseData.unitY <= bounds.max[upElement])
 				{
 					_owner.SetCursor(ECursor::HAND);
-					_hoverObject = _selectedObjects[i];
+					_hoverObject = _selection[i].entity;
 					_hoverObjectIsSelected = true;
 					found = true;
 					break;
@@ -379,7 +386,7 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 {
 	if (_activeGizmo && _activeGizmo->MouseDown())
 	{
-		if (_owner.engine.pInputManager->IsKeyDown(EKeycode::ALT))
+		if (_owner.engine.pInputManager->IsKeyDown(EKeycode::LALT))
 			_shouldCopy = true;
 
 		return;
@@ -392,16 +399,21 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 		{
 			if (_hoverObject && _hoverObjectIsSelected)
 			{
-				if (_owner.engine.pInputManager->IsKeyDown(EKeycode::ALT))
+				if (_owner.engine.pInputManager->IsKeyDown(EKeycode::LALT))
 					_shouldCopy = true;
 
-				Vector3 objPos = _hoverObject->GetWorldPosition();
+				int xElem = (int)Axes::GetHorizontalAxis(mouseData.viewport->gridAxis);
+				int yElem = (int)Axes::GetVerticalAxis(mouseData.viewport->gridAxis);
 
-				_origObjectX = objPos[(int)Axes::GetHorizontalAxis(mouseData.viewport->gridAxis)];
-				_origObjectY = objPos[(int)Axes::GetVerticalAxis(mouseData.viewport->gridAxis)];
+				for (size_t i = 0; i < _selection.GetSize(); ++i)
+				{
+					Vector3 objPos = _selection[i].entity->GetWorldPosition();
+					_selection[i].dragStartX = objPos[xElem];
+					_selection[i].dragStartY = objPos[yElem];
+				}
 
 				_placing = false;
-				_dragObject = _hoverObject;
+				_dragging = true;
 				return;
 			}
 		}
@@ -411,12 +423,7 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 			_placing = false;
 
 			if (!_hoverObjectIsSelected)
-			{
-				if (_hoverObject)
-					Select(_hoverObject.Ptr());
-				else if (!_owner.engine.pInputManager->IsKeyDown(EKeycode::LCTRL))
-					ClearSelection();
-			}
+				Select(_hoverObject.Ptr());
 		}
 		else if (ortho) _placing = true;
 	}
@@ -426,7 +433,7 @@ void ToolSelect::MouseUp(const MouseData& mouseData)
 {
 	if (_activeGizmo) _activeGizmo->MouseUp();
 
-	_dragObject.Clear();
+	_dragging = false;
 }
 
 void ToolSelect::KeySubmit()
@@ -436,24 +443,24 @@ void ToolSelect::KeySubmit()
 
 	Buffer<Entity*> result = _owner.WorldRef().RootEntity().FindOverlappingChildren(Collider(ECollisionChannels::ALL, CollisionBox(Box::FromPoints(_sbPoint1, _sbPoint2))));
 
-	_selectedObjects.SetSize(result.GetSize());
+	_selection.SetSize(result.GetSize());
 
-	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
+	for (size_t i = 0; i < _selection.GetSize(); ++i)
 	{
-		_selectedObjects[i] = _owner.engine.pObjectTracker->Track(result[i]);
-		_selectedObjects[i]->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
+		_selection[i].entity = _owner.engine.pObjectTracker->Track(result[i]);
+		_selection[i].entity->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
 	}
 
-	if (_selectedObjects.GetSize() > 0)
-		_owner.ChangePropertyEntity(_selectedObjects.Last().Ptr());
+	if (_selection.GetSize() > 0)
+		_owner.ChangePropertyEntity(_selection.Last().entity.Ptr());
 
 	_UpdateGizmoTransform();
 }
 
 void ToolSelect::KeyDelete()
 {
-	for (uint32 i = 0; i < _selectedObjects.GetSize(); ++i)
-		_selectedObjects[i]->Delete(_owner.engine.context);
+	for (uint32 i = 0; i < _selection.GetSize(); ++i)
+		_selection[i].entity->Delete(_owner.engine.context);
 
 	ClearSelection();
 }
@@ -463,63 +470,66 @@ void ToolSelect::Render(RenderQueue& q) const
 	if (_placing)
 	{
 		RenderEntry& e = q.CreateEntry(ERenderChannels::EDITOR);
+		e.AddSetLineWidth(2.f);
 		e.AddSetColour(Colour::Cyan);
 		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 		e.AddBox(_sbPoint1, _sbPoint2);
 	}
 	
-	if (_activeGizmo)
-	{
-		RenderEntry& pre = q.CreateEntry(ERenderChannels::EDITOR);
-		pre.AddCommand(RCMDSetDepthFunc::ALWAYS);
-		_activeGizmo->Render(q);
-		RenderEntry& post = q.CreateEntry(ERenderChannels::EDITOR);
-		post.AddCommand(RCMDSetDepthFunc::LEQUAL);
-	}
-	
-	if (_activeGizmo != &_brushGizmo && _selectedObjects.GetSize())
+	if (_selection.GetSize())
 	{
 		RenderEntry& e = q.CreateEntry(ERenderChannels::EDITOR);
+		e.AddSetLineWidth(2.f);
 		e.AddSetColour(Colour::Cyan);
 		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 
-		for (uint32 i = 0; i < _selectedObjects.GetSize(); ++i)
+		for (uint32 i = 0; i < _selection.GetSize(); ++i)
 		{
-			Bounds bounds = _selectedObjects[i]->GetWorldBounds();
+			Bounds bounds = _selection[i].entity->GetWorldBounds();
 
 			e.AddBox(bounds.min, bounds.max);
 		}
+	}
+
+	if (_activeGizmo)
+	{
+		q.CreateEntry(ERenderChannels::EDITOR).AddCommand(RCMDSetDepthFunc::ALWAYS);
+		_activeGizmo->Render(q);
+		q.CreateEntry(ERenderChannels::EDITOR).AddCommand(RCMDSetDepthFunc::LEQUAL);
 	}
 }
 
 void ToolSelect::Select(Entity* object)
 {
-	if (object == nullptr)
-	{
-		ClearSelection();
-		return;
-	}
-
 	if (!_owner.engine.pInputManager->IsKeyDown(EKeycode::LCTRL))
 		ClearSelection();
 
-	_selectedObjects.Add(_owner.engine.pObjectTracker->Track(object));
+	if (object == nullptr)
+		return;
 
-	_owner.ChangePropertyEntity(_selectedObjects.Last().Ptr());
-	_selectedObjects.Last()->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
+	_selection.Add(EntitySelection{_owner.engine.pObjectTracker->Track(object)});
+
+	_owner.ChangePropertyEntity(_selection.Last().entity.Ptr());
+	_selection.Last().entity->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
 	_UpdateGizmoTransform();
 
-	_activeGizmo = dynamic_cast<EntBrush2D*>(_selectedObjects[0].Ptr()) ? &_brushGizmo : &_gizmo;
+	if (_selection.GetSize() == 1)
+		_activeGizmo = dynamic_cast<EntBrush2D*>(_selection[0].entity.Ptr()) ? &_brushGizmo : &_gizmo;
+	else if (object)
+	{
+		if (_activeGizmo == &_brushGizmo && !dynamic_cast<EntBrush2D*>(object))
+			_activeGizmo = nullptr;
+	}
 }
 
 void ToolSelect::ClearSelection()
 {
-	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
-		if (_selectedObjects[i])
-			_selectedObjects[i]->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoTransform);
+	for (size_t i = 0; i < _selection.GetSize(); ++i)
+		if (_selection[i].entity)
+			_selection[i].entity->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoTransform);
 
 	_owner.ClearProperties();
-	_selectedObjects.SetSize(0);
+	_selection.SetSize(0);
 	_hoverObject.Clear();
 
 	_activeGizmo = nullptr;
@@ -527,22 +537,22 @@ void ToolSelect::ClearSelection()
 
 void ToolSelect::_CloneSelection()
 {
-	for (size_t i = 0; i < _selectedObjects.GetSize(); ++i)
+	for (size_t i = 0; i < _selection.GetSize(); ++i)
 	{
-		bool isHoverObject = _hoverObject == _selectedObjects[i];
-		_selectedObjects[i]->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoTransform);
+		bool isHoverObject = _hoverObject == _selection[i].entity;
+		_selection[i].entity->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoTransform);
 
-		Entity* newObject = _selectedObjects[i]->Clone();
-		newObject->GetProperties().Transfer(_selectedObjects[i].Ptr(), newObject, _owner.engine.context);
+		Entity* newObject = _selection[i].entity->Clone();
+		newObject->GetProperties().Transfer(_selection[i].entity.Ptr(), newObject, _owner.engine.context);
 
-		_selectedObjects[i] = _owner.engine.pObjectTracker->Track(newObject);
+		_selection[i].entity = _owner.engine.pObjectTracker->Track(newObject);
 		
-		if (isHoverObject) _hoverObject = _selectedObjects[i];
-		_selectedObjects[i]->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
+		if (isHoverObject) _hoverObject = _selection[i].entity;
+		_selection[i].entity->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
 	}
 	
 	_hoverObjectIsSelected = true;
-	_owner.ChangePropertyEntity(_selectedObjects.Last().Ptr());
+	_owner.ChangePropertyEntity(_selection.Last().entity.Ptr());
 
 	_UpdateGizmoTransform();
 }

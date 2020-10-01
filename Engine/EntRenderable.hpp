@@ -45,6 +45,7 @@ public:
 		_colour(other._colour),
 		_materialIsDefault(other._materialIsDefault)
 	{
+		onTransformChanged += Callback(this, &EntRenderable::_UpdateRenderEntry);
 		_UpdateRenderEntry();
 	}
 

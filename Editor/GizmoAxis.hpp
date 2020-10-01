@@ -14,7 +14,7 @@ class GizmoAxis : public GizmoComponent
 	Vector3 _axis;
 	float _length;
 
-	Vector3 _grabOffset;
+	Vector3 _grabPos;
 	Vector3 _fv;
 	Vector3 _lineEnd;
 
