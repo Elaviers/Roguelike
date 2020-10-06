@@ -294,7 +294,7 @@ void Editor::Run()
 				_consoleCamera.SetRelativePosition(Vector3(e.data.resize.w / 2.f, e.data.resize.h / 2.f, 0.f));
 				break;
 
-			case WM_CHAR:
+			case WindowEvent::CHAR:
 				engine.pConsole->InputChar(e.data.character, engine.context);
 				break;
 			}
@@ -362,8 +362,13 @@ void Editor::Frame()
 		*/
 
 		Vector3 penetration;
-		dbgObjA->Overlaps(*dbgObjB, Vector3(), &penetration);
-		Debug::PrintLine(CSTR(penetration));
+		EOverlapResult result = dbgObjA->Overlaps(*dbgObjB, Vector3(), &penetration);
+		
+		if (result == EOverlapResult::OVERLAPPING)
+			Debug::PrintLine(CSTR(penetration));
+		else if (result == EOverlapResult::TOUCHING)
+			Debug::PrintLine("Touch");
+
 		//Debug::PrintLine(dbgObjA->Overlaps(*dbgObjB) ? CSTR(dbgObjA->GetPenetrationVector(*dbgObjB)) : "no");
 	}
 
@@ -416,6 +421,7 @@ void Editor::Render()
 	engine.pConsole->Render(_consoleQueue, *_consoleFont, _deltaTime);
 
 	_glContext.Use(_consoleWindow);
+	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDepthFunc(GL_LEQUAL);
 

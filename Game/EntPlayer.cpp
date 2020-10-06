@@ -95,27 +95,37 @@ void EntPlayer::Update(float deltaTime)
 	static float relVelZ = 0.f;
 
 	Vector2 input(GameInstance::Instance().GetAxisMoveRight(), GameInstance::Instance().GetAxisMoveForward());
-	
+	InputManager* im = GameInstance::Instance().GetGame()->GetContext().GetPtr<InputManager>();
+	float iy = im->IsKeyDown(EKeycode::SPACE) ? 1.f : im->IsKeyDown(EKeycode::LSHIFT) ? -1.f : 0.f;
+
 	if (input.LengthSquared() > 1.f)
 		input.Normalise();
 	
 	relVelX = CalculateAccel(input.x, relVelX, deltaTime);
 	relVelZ = CalculateAccel(input.y, relVelZ, deltaTime);
-
+	relVelX = input.x;
+	relVelZ = input.y;
 
 	//rotate by 45 degrees
 	_velocity.x = relVelX * sc45 + relVelZ * sc45;
 	_velocity.z = relVelZ * sc45 - relVelX * sc45;
 	_velocity.y -= 9.8f * deltaTime;
+	
+	//debug
+	//_velocity.y = iy;
+	//_velocity *= 4.f;
 
+	
 	List<Pair<EOverlapResult, Vector3>> overlaps;
 	GameInstance::Instance().world->GetOverlaps(overlaps, _COLLIDER, GetWorldTransform(), this);
+	bool f = false;
 	for (const auto& overlap : overlaps)
 	{
 		if (overlap.first == EOverlapResult::OVERLAPPING && overlap.second.LengthSquared())
 		{
 			Vector3 dir = -overlap.second.Normalised();
-
+			f = true;
+			Debug::Print(CSTR('[', overlap.second, ']'));
 			_velocity -= dir * _velocity.Dot(dir);
 
 			if (overlap.second.LengthSquared() > 10.f)
@@ -124,6 +134,10 @@ void EntPlayer::Update(float deltaTime)
 			SetWorldPosition(GetWorldPosition() + overlap.second);
 		}
 	}
+
+	if (f)
+		Debug::Print("\n");
+	
 
 	SetWorldPosition(GetWorldPosition() + _velocity * deltaTime);
 }

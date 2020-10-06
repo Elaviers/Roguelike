@@ -84,7 +84,7 @@ void Console::Backspace()
 
 void Console::SubmitPrompt(const Context& ctx)
 {
-	Print(CSTR(_prePrompt, _prompt));
+	Print(CSTR(Colour::White.ToColourCode(), _prePrompt, _prompt, '\n', Colour::Grey.ToColourCode()));
 
 	String result = _cvars.HandleCommand(_prompt.Split(" "), ctx);
 	

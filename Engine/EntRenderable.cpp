@@ -1,23 +1,28 @@
 #include "EntRenderable.hpp"
 #include <ELCore/Context.hpp>
+#include <ELGraphics/MaterialParam.hpp>
 #include <ELGraphics/MeshManager.hpp>
 #include <ELGraphics/RenderCommand.hpp>
 #include <ELGraphics/RenderQueue.hpp>
 
 void EntRenderable::_UpdateRenderEntry()
 {
+	if (!_static)
+		return;
+
 	_renderEntry.Clear();
 
 	if (_model)
 	{
-		if (_material)
-			_material->Apply(_renderEntry);
-
 		_renderEntry.AddCommand(RCMDSetUVOffset::Default());
 		_renderEntry.AddCommand(RCMDSetUVScale::Default());
 
 		_renderEntry.AddSetColour(_colour);
 		_renderEntry.AddSetTransform(GetTransformationMatrix());
+
+		if (_material)
+			_material->Apply(_renderEntry);
+
 		_renderEntry.AddRenderMesh(*_model->GetMesh());
 	}
 }
@@ -48,7 +53,31 @@ const PropertyCollection& EntRenderable::GetProperties()
 
 void EntRenderable::Render(RenderQueue& q) const
 {
-	q.AddEntry(&_renderEntry);
+	if (_static)
+		q.AddEntry(&_renderEntry);
+	else
+	{
+		if (_model)
+		{
+			RenderEntry& e = q.CreateEntry(ERenderChannels::SURFACE);
+			e.AddCommand(RCMDSetUVOffset::Default());
+			e.AddCommand(RCMDSetUVScale::Default());
+
+			e.AddSetColour(_colour);
+			e.AddSetTransform(GetTransformationMatrix());
+
+			if (_material)
+			{
+				MaterialParam param;
+				param.type = MaterialParam::EType::SPRITESHEET_PARAM;
+				param.spritesheetData.time = _age;
+
+				_material->Apply(e, &param);
+			}
+
+			e.AddRenderMesh(*_model->GetMesh());
+		}
+	}
 }
 
 const Collider* EntRenderable::GetCollider() const

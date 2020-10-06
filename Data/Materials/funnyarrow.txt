@@ -1,0 +1,5 @@
+spritesheet
+tex funnyarrow
+framesize 64 64
+framecount 32
+framerate 24

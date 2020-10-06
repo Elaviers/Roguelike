@@ -249,8 +249,8 @@ EOverlapResult Entity::AnyPartOverlapsCollider(const Collider& other, const Tran
 	{
 		const Bounds& ob = it->GetWorldBounds();
 
-		//todo: temporarily disabled because doesn't work correctly... this is very important for perfomance!!
-		//if ((wb.centre - ob.centre).LengthSquared() <= wb.radius * wb.radius + ob.radius * ob.radius)
+		float combinedRadii = wb.radius + ob.radius;
+		if ((wb.centre - ob.centre).LengthSquared() <= combinedRadii * combinedRadii)
 		{
 			EOverlapResult result = it->OverlapsCollider(other, otherTransform, sweep, out_Penetration);
 			if (result == EOverlapResult::OVERLAPPING)
