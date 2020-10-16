@@ -101,45 +101,59 @@ void EntPlayer::Update(float deltaTime)
 	if (input.LengthSquared() > 1.f)
 		input.Normalise();
 	
-	relVelX = CalculateAccel(input.x, relVelX, deltaTime);
-	relVelZ = CalculateAccel(input.y, relVelZ, deltaTime);
-	relVelX = input.x;
-	relVelZ = input.y;
+	Transform worldTransform = GetWorldTransform();
+	Transform cameraT = _camera.GetWorldTransform();
 
-	//rotate by 45 degrees
-	_velocity.x = relVelX * sc45 + relVelZ * sc45;
-	_velocity.z = relVelZ * sc45 - relVelX * sc45;
 	_velocity.y -= 9.8f * deltaTime;
-	
-	//debug
-	//_velocity.y = iy;
-	//_velocity *= 4.f;
 
-	
+	Vector3 dv;
+	float amountForward = input.y * 10;
+	if (amountForward)
+		dv += cameraT.GetForwardVector() * (deltaTime * amountForward);
+
+	float amountRight = input.x * 10;
+	if (amountRight)
+		dv += cameraT.GetRightVector() * (deltaTime * amountRight);
+
+	_velocity.x += dv.x;
+	_velocity.z += dv.z;
+
+
+	Vector3 movement = _velocity * deltaTime;
+
+	Transform desiredTransform = Transform(worldTransform.GetPosition() + movement, worldTransform.GetRotation(), worldTransform.GetScale());
+
 	List<Pair<EOverlapResult, Vector3>> overlaps;
-	GameInstance::Instance().world->GetOverlaps(overlaps, _COLLIDER, GetWorldTransform(), this);
-	bool f = false;
-	for (const auto& overlap : overlaps)
-	{
-		if (overlap.first == EOverlapResult::OVERLAPPING && overlap.second.LengthSquared())
+	GameInstance::Instance().world->GetOverlaps(overlaps, _COLLIDER, desiredTransform, this);
+	//todo: get all world overlaps
+	for (const Pair<EOverlapResult, Vector3>& overlap : overlaps) {
+		//Pair<Vector3> contacts = ents[i]->GetShallowContactPointsWithCollider(.1f, _COLLIDER, desiredTransform, .1f);
+		//Debug::PrintLine(CSTR(contacts.first, "\t", contacts.second));
+
+		const Vector3& penetration = overlap.second;
+		if (!(isnan(penetration.x) || isnan(penetration.y) || isnan(penetration.z)))
 		{
-			Vector3 dir = -overlap.second.Normalised();
-			f = true;
-			Debug::Print(CSTR('[', overlap.second, ']'));
-			_velocity -= dir * _velocity.Dot(dir);
+			if (penetration.LengthSquared())
+			{
+				if (_velocity.LengthSquared())
+				{
+					Vector3 forbiddenDir = -penetration.Normalised();
 
-			if (overlap.second.LengthSquared() > 10.f)
-				Debug::PrintLine("OOF");
+					_velocity -= 1.5f * forbiddenDir * forbiddenDir.Dot(_velocity);
+				}
 
-			SetWorldPosition(GetWorldPosition() + overlap.second);
+				if (Maths::AlmostEquals(_velocity.y, 0.f, 0.1f))
+				{
+					_velocity.x *= .998f;
+					_velocity.z *= .998f;
+				}
+
+				desiredTransform.Move(penetration);
+			}
 		}
 	}
 
-	if (f)
-		Debug::Print("\n");
-	
-
-	SetWorldPosition(GetWorldPosition() + _velocity * deltaTime);
+	SetWorldTransform(desiredTransform);
 }
 
 void EntPlayer::Render(RenderQueue& q) const

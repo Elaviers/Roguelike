@@ -243,21 +243,25 @@ EOverlapResult Entity::AnyPartOverlapsCollider(const Collider& other, const Tran
 {
 	bool isTouching = false;
 
-	const Bounds& wb = GetWorldBounds();
+	Vector3 colliderCentre = otherTransform.GetPosition();
+	float colliderRadius = other.GetMaximumRadius() * Maths::Max(otherTransform.GetScale().GetData(), 3);
 
 	for (ConstEntityIterator it = ConstEntityIterator(this); it.IsValid(); ++it)
 	{
-		const Bounds& ob = it->GetWorldBounds();
-
-		float combinedRadii = wb.radius + ob.radius;
-		if ((wb.centre - ob.centre).LengthSquared() <= combinedRadii * combinedRadii)
+		if (it->GetCollider())
 		{
-			EOverlapResult result = it->OverlapsCollider(other, otherTransform, sweep, out_Penetration);
-			if (result == EOverlapResult::OVERLAPPING)
-				return EOverlapResult::OVERLAPPING;
+			Vector3 itCentre = it->GetWorldTransform().GetPosition();
+			float itRadius = it->GetCollider()->GetMaximumRadius() * Maths::Max(it->GetWorldTransform().GetScale().GetData(), 3);
 
-			if (!isTouching && result == EOverlapResult::TOUCHING)
-				isTouching = true;
+			if ((colliderCentre - itCentre).LengthSquared() <= colliderRadius * colliderRadius + itRadius * itRadius)
+			{
+				EOverlapResult result = it->OverlapsCollider(other, otherTransform, sweep, out_Penetration);
+				if (result == EOverlapResult::OVERLAPPING)
+					return EOverlapResult::OVERLAPPING;
+
+				if (!isTouching && result == EOverlapResult::TOUCHING)
+					isTouching = true;
+			}
 		}
 	}
 
