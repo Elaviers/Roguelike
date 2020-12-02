@@ -49,6 +49,8 @@ void Game::_InitGL()
 		delete faces[i].data;
 }
 
+#include <ELSys/TextManager.hpp>
+
 void Game::_Init()
 {
 	_engine.Init(EEngineCreateFlags::ALL);

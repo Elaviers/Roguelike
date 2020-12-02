@@ -123,34 +123,42 @@ void EntPlayer::Update(float deltaTime)
 
 	Transform desiredTransform = Transform(worldTransform.GetPosition() + movement, worldTransform.GetRotation(), worldTransform.GetScale());
 
-	List<Pair<EOverlapResult, Vector3>> overlaps;
-	GameInstance::Instance().world->GetOverlaps(overlaps, _COLLIDER, desiredTransform, this);
-	//todo: get all world overlaps
-	for (const Pair<EOverlapResult, Vector3>& overlap : overlaps) {
-		//Pair<Vector3> contacts = ents[i]->GetShallowContactPointsWithCollider(.1f, _COLLIDER, desiredTransform, .1f);
-		//Debug::PrintLine(CSTR(contacts.first, "\t", contacts.second));
+	for (int _IT = 0; _IT < 20; ++_IT)
+	{
+		List<Pair<EOverlapResult, Vector3>> overlaps;
+		GameInstance::Instance().world->GetOverlaps(overlaps, _COLLIDER, desiredTransform, this);
+		if (overlaps.IsEmpty()) break;
 
-		const Vector3& penetration = overlap.second;
-		if (!(isnan(penetration.x) || isnan(penetration.y) || isnan(penetration.z)))
+		const Pair<EOverlapResult, Vector3>* largestOverlap = nullptr;
+		float largestLengthSq = -1.f;
+		for (const Pair<EOverlapResult, Vector3>& overlap : overlaps)
 		{
-			if (penetration.LengthSquared())
+			if (overlap.first == EOverlapResult::OVERLAPPING)
 			{
-				if (_velocity.LengthSquared())
+				float lensq = overlap.second.LengthSquared();
+				if (lensq > largestLengthSq)
 				{
-					Vector3 forbiddenDir = -penetration.Normalised();
-
-					_velocity -= 1.5f * forbiddenDir * forbiddenDir.Dot(_velocity);
+					largestOverlap = &overlap;
+					largestLengthSq = lensq;
 				}
-
-				if (Maths::AlmostEquals(_velocity.y, 0.f, 0.1f))
-				{
-					_velocity.x *= .998f;
-					_velocity.z *= .998f;
-				}
-
-				desiredTransform.Move(penetration);
 			}
 		}
+
+		if (largestOverlap)
+		{
+			const Vector3& penetration = largestOverlap->second;
+			Vector3 forbiddenDir = -penetration.Normalised();
+
+			_velocity -= 1.5f * forbiddenDir * forbiddenDir.Dot(_velocity);
+
+			desiredTransform.Move(penetration);
+		}
+	}
+
+	if (Maths::AlmostEquals(_velocity.y, 0.f, 0.1f))
+	{
+		_velocity.x *= .998f;
+		_velocity.z *= .998f;
 	}
 
 	SetWorldTransform(desiredTransform);

@@ -9,6 +9,7 @@
 #include <ELSys/InputManager.hpp>
 #include <ELGraphics/MaterialManager.hpp>
 #include <ELGraphics/MeshManager.hpp>
+#include <ELSys/TextManager.hpp>
 #include <ELGraphics/TextureManager.hpp>
 
 EngineInstance::~EngineInstance()
@@ -21,6 +22,7 @@ EngineInstance::~EngineInstance()
 	delete pInputManager;
 	delete pMaterialManager;
 	delete pMeshManager;
+	delete pTextManager;
 	delete pTextureManager;
 	delete pObjectTracker;
 
@@ -60,6 +62,7 @@ void EngineInstance::Init(EEngineCreateFlags flags)
 	pMaterialManager =	CREATE<MaterialManager>(flags, EEngineCreateFlags::MATERIALMGR, context);
 	pMeshManager =		CREATE<MeshManager>(flags, EEngineCreateFlags::MESHMGR, context);
 	pModelManager =		CREATE<ModelManager>(flags, EEngineCreateFlags::MODELMGR, context);
+	pTextManager =		CREATE<TextManager>(flags, EEngineCreateFlags::TEXTMGR, context);
 	pTextureManager =	CREATE<TextureManager>(flags, EEngineCreateFlags::TEXTUREMGR, context);
 	pTileManager =		CREATE<TileManager>(flags, EEngineCreateFlags::TILEMGR, context);
 	pObjectTracker =	CREATE<Tracker<Entity>>(flags, EEngineCreateFlags::OBJTRACKER, context);
@@ -101,6 +104,12 @@ void EngineInstance::Init(EEngineCreateFlags flags)
 			pModelManager->Initialise(*pMeshManager);
 			pModelManager->SetRootPath("Data/Models/");
 		}
+	}
+
+	if (pTextManager)
+	{
+		pTextManager->Initialise();
+		pTextManager->SetRootPath("Data/Text/");
 	}
 
 	if (pTextureManager)

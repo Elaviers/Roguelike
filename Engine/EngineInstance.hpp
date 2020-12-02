@@ -15,6 +15,7 @@ class InputManager;
 class MaterialManager;
 class MeshManager;
 class ModelManager;
+class TextManager;
 class TextureManager;
 class TileManager;
 
@@ -29,8 +30,9 @@ enum class EEngineCreateFlags : uint16
 	MATERIALMGR = 0x40,
 	MESHMGR = 0x80,
 	MODELMGR = 0x100,
-	TEXTUREMGR = 0x200,
-	TILEMGR = 0x400,
+	TEXTMGR = 0x200,
+	TEXTUREMGR = 0x400,
+	TILEMGR = 0x800,
 
 	OBJTRACKER = 0x8000,
 
@@ -63,6 +65,7 @@ public:
 	MaterialManager	*pMaterialManager = nullptr;
 	MeshManager		*pMeshManager = nullptr;
 	ModelManager	*pModelManager = nullptr;
+	TextManager		*pTextManager = nullptr;
 	TextureManager	*pTextureManager = nullptr;
 	TileManager		*pTileManager = nullptr;
 
