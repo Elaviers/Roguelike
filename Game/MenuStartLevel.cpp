@@ -25,18 +25,18 @@ void MenuStartLevel::Initialise(const FunctionPointer<void, const String&> &onLe
 	{
 		UITextButton *button = new UITextButton();
 		button->SetFont(_buttonFont);
-		button->SetBounds(0.f, UICoord(1.f, -((i + 1) * btnH)), 1.f, UICoord(0.f, btnH));
+		button->SetBounds(UIBounds(0.f, UICoord(1.f, -((i + 1) * btnH)), 1.f, UICoord(0.f, btnH)));
 		button->SetBorderSize(_buttonBorderSize);
 		button->onPressed += FunctionPointer<void, UIButton&>(this, &MenuStartLevel::ButtonLevel);
 		button->SetColour(_buttonColourInactive);
 		button->SetColourHold(_buttonColourActive);
 		button->SetMaterial(_buttonMaterial);
-		button->SetString(filenames[i]);
+		button->SetText(Text(filenames[i]));
 		button->SetParent(this);
 	}
 }
 
 void MenuStartLevel::ButtonLevel(UIButton &button)
 {
-	_onLevelChosen(String(LevelGeneration::ROOT_DIR) + ((UITextButton&)button).GetString());
+	_onLevelChosen(String(LevelGeneration::ROOT_DIR) + ((UITextButton&)button).GetText().ToString());
 }

@@ -64,6 +64,7 @@ public:
 	virtual const Bounds& GetBounds() const { return _bounds; }
 	virtual EOverlapResult Overlaps(const Collider& collider, const Transform& transform, const Vector3& sweep, Vector3* penOut) const 
 	{
-		return _tile->GetCollider().Overlaps(_renderTransform, collider, transform, &LineSegment(Vector3(), sweep), penOut);
+		LineSegment sweepLine(Vector3(), sweep);
+		return _tile->GetCollider().Overlaps(_renderTransform, collider, transform, &sweepLine, penOut);
 	}
 };

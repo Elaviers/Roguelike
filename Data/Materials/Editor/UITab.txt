@@ -1,0 +1,4 @@
+grid
+texture Editor/UITab
+rows 30
+columns 30 4 30

@@ -80,7 +80,7 @@ void Game::Run()
 	_Init();
 
 	MenuMain *menu = new MenuMain();
-	menu->SetBounds(UICoord(0.5f, -256.f), UICoord(0.5f, -256.f), UICoord(0.f, 512.f), UICoord(0.f, 512.f));
+	menu->SetBounds(UIBounds(UICoord(0.5f, -256.f), UICoord(0.5f, -256.f), UICoord(0.f, 512.f), UICoord(0.f, 512.f)));
 	menu->Initialise(FunctionPointer<void, const String&>(this, &Game::StartLevel), Callback(this, &Game::ButtonQuit), _engine);
 	menu->SetParent(&_ui);
 
@@ -246,7 +246,7 @@ void Game::Resize(uint16 w, uint16 h)
 {
 	GameInstance::Instance().OnResize(w, h);
 
-	_ui.SetBounds(0, 0, UICoord(0.f, w), UICoord(0.f, h));
+	_ui.SetBounds(UIBounds(0.f, 0.f, UICoord(0.f, w), UICoord(0.f, h)));
 	_uiCamera.GetProjection().SetDimensions(Vector2T(w, h));
 	_uiCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
 }

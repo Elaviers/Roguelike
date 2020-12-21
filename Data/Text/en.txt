@@ -1,0 +1,21 @@
+dir_north=North
+dir_east=East
+dir_south=South
+dir_west=West
+
+editor_page_level=Level Editor
+
+vp_camera_perspective=Perspective
+vp_camera_isometric=Isometric
+vp_camera_ortho_x=Ortho X
+vp_camera_ortho_y=Ortho Y
+vp_camera_ortho_z=Ortho Z
+
+tool_iso_add=Add
+tool_iso_move=Move
+tool_iso_delete=Delete
+tool_iso_deleteonlevel=Delete on Z level
+
+mainmenu_start=Start
+mainmenu_quit=Quit
+mainmenu_loadlevel=Load Level...

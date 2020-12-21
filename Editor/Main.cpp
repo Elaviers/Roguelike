@@ -9,15 +9,15 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-Editor editor;
-
 int Main()
 {
 	Window::Win32SetIconResource(IDI_ICON);
 
 	::InitCommonControls();
 
-	editor.Run();
+	Editor* editor = new Editor();
+	editor->Run();
+	delete editor;
 
 	return 0;
 }

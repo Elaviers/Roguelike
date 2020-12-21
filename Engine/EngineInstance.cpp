@@ -110,6 +110,11 @@ void EngineInstance::Init(EEngineCreateFlags flags)
 	{
 		pTextManager->Initialise();
 		pTextManager->SetRootPath("Data/Text/");
+
+		pTextProvider = pTextManager->Get("default", context).Ptr();
+		if (pTextProvider == nullptr) pTextProvider = pTextManager->Get("en_uk", context).Ptr();
+		if (pTextProvider == nullptr) pTextProvider = pTextManager->Get("en", context).Ptr();
+		if (pTextProvider == nullptr) pTextProvider = pTextManager->Get("core", context).Ptr();
 	}
 
 	if (pTextureManager)

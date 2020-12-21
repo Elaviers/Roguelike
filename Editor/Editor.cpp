@@ -2,6 +2,7 @@
 #include <Engine/Console.hpp>
 #include <Engine/EntLight.hpp>
 #include <Engine/EntRenderable.hpp>
+#include <ELCore/TextProvider.hpp>
 #include <ELGraphics/Colour.hpp>
 #include <ELGraphics/DebugFrustum.hpp>
 #include <ELGraphics/DebugLine.hpp>
@@ -17,6 +18,7 @@
 #include <ELSys/System.hpp>
 #include <ELSys/Utilities.hpp>
 #include <ELUI/Splitter.hpp>
+#include <ELUI/TabBook.hpp>
 #include "EditorIO.hpp"
 #include "resource.h"
 #include "ResourceSelect.hpp"
@@ -122,6 +124,8 @@ void Editor::_Init()
 	_level.RootEntity().onChildChanged +=	Callback(this, &Editor::RefreshLevel);
 
 	//UI
+	SharedPointer<const Font> vpFont = engine.pFontManager->Get("consolas", engine.context);
+
 	SharedPointer<const Texture> gradient = engine.pTextureManager->Get("ui/gradient", engine.context);
 	SharedPointer<const Texture> radialGradient = engine.pTextureManager->Get("ui/radialgrad", engine.context);
 	SharedPointer<const Texture> splitterTex = engine.pTextureManager->Get("editor/tools/splitter", engine.context);
@@ -132,14 +136,27 @@ void Editor::_Init()
 	_uiCamera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 	_uiCamera.GetProjection().SetNearFar(0, 1000000);
 
-	_sideUI.SetParent(&_ui);
-	_vpAreaUI.SetParent(&_ui);
+	UITabBook* tabbook = new UITabBook(&_ui);
+
+	auto tabMat = engine.pMaterialManager->Get("editor/uitab", engine.context);
+	tabbook->SetTabMaterial(tabMat).SetTabMaterialHover(tabMat).SetTabMaterialSelected(tabMat);
+	tabbook->SetTabColour(UIColour(Colour(0.f, 0.f, 0.5f), Colour(0.f, 0.f, .6f), Colour::Black));
+	tabbook->SetTabColourHover(UIColour(Colour(0.f, 0.f, 0.7f), Colour(0.f, 0.f, .8f), Colour::White));
+	tabbook->SetTabColourSelected(UIColour(Colour(0.f, 0.f, 0.2f), Colour(0.f, 0.f, .3f), Colour::Black));
+	tabbook->SetTabFont(vpFont);
+
+	UIContainer* mainPage = new UIContainer(tabbook);
+	tabbook->SetTabBorderSize(12.f);
+	tabbook->SetTabName(*mainPage, engine.pTextProvider->Get("editor_page_level"));
+	tabbook->SetActiveTab(mainPage);
+
+	_sideUI.SetParent(mainPage);
+	_vpAreaUI.SetParent(mainPage);
 
 	UIColour vpColour(Colour::Black, Colour(.1f, .1f, .1f));
-
-	SharedPointer<const Font> vpFont = engine.pFontManager->Get("consolas", engine.context);
 	for (int i = 0; i < VIEWPORTCOUNT; ++i)
 	{
+		_viewports[i].Initialise(*engine.pTextProvider);
 		_viewports[i].ui.SetParent(&_vpAreaUI);
 		_viewports[i].bg.SetTexture(radialGradient).SetColour(vpColour).SetZ(_uiCamera.GetProjection().GetFar()).SetFocusOnClick(false);
 		_viewports[i].SetFont(vpFont);
@@ -156,12 +173,12 @@ void Editor::_Init()
 		.SetButtonColourTrue(UIColour(Colour::Blue, Colour::Black, Colour::Black))
 		.SetButtonColourHover(UIColour(Colour(.8f, .8f, .7f), Colour::Black, Colour::Black))
 		.SetButtonColourHold(UIColour(Colour::Grey, Colour::Black, Colour::Black))
-		.SetParent(&_ui).SetBounds(0.f, UICoord(1.f, -64.f), 1.f, UICoord(0.f, 64.f));
-	_toolbar.AddButton("Select", engine.pTextureManager->Get("editor/tools/select", engine.context), (uint16)ETool::SELECT);
-	_toolbar.AddButton("Iso", engine.pTextureManager->Get("editor/tools/iso", engine.context), (uint16)ETool::ISO);
-	_toolbar.AddButton("Brush2D", engine.pTextureManager->Get("editor/tools/brush2d", engine.context), (uint16)ETool::BRUSH2D);
-	_toolbar.AddButton("Brush3D", engine.pTextureManager->Get("editor/tools/brush3d", engine.context), (uint16)ETool::BRUSH3D);
-	_toolbar.AddButton("Entity", engine.pTextureManager->Get("editor/tools/entity", engine.context), (uint16)ETool::ENTITY);
+		.SetParent(mainPage).SetBounds(UIBounds(0.f, UICoord(1.f, -64.f), 1.f, UICoord(0.f, 64.f)));
+	_toolbar.AddButton(Text("Select"), engine.pTextureManager->Get("editor/tools/select", engine.context), (uint16)ETool::SELECT);
+	_toolbar.AddButton(Text("Iso"), engine.pTextureManager->Get("editor/tools/iso", engine.context), (uint16)ETool::ISO);
+	_toolbar.AddButton(Text("Brush2D"), engine.pTextureManager->Get("editor/tools/brush2d", engine.context), (uint16)ETool::BRUSH2D);
+	_toolbar.AddButton(Text("Brush3D"), engine.pTextureManager->Get("editor/tools/brush3d", engine.context), (uint16)ETool::BRUSH3D);
+	_toolbar.AddButton(Text("Entity"), engine.pTextureManager->Get("editor/tools/entity", engine.context), (uint16)ETool::ENTITY);
 	//_toolbar.AddButton("Connector", engine.pTextureManager->Get("editor/tools/connector", engine.context), (uint16)ETool::CONNECTOR);
 	_toolbar.onItemSelected += FunctionPointer<void, UIToolbarItem&>(this, &Editor::_OnToolbarItemSelection);
 
@@ -169,28 +186,28 @@ void Editor::_Init()
 	UISplitter* splitterHoriz = new UISplitter(&_vpAreaUI);
 	UISplitter* splitterVert = new UISplitter(&_vpAreaUI);
 
-	splitterHoriz->ShowSiblingAfter(&_viewports[0].ui).ShowSiblingAfter(&_viewports[1].ui).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(0.f, UICoord(.5f, -2.5f), 1.f, UICoord(0.f, 5.f));
-	splitterVert->ShowSiblingAfter(&_viewports[1].ui).ShowSiblingAfter(&_viewports[3].ui).SetIsHorizontal(false).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UICoord(.5f, -2.5f), 0.f, UICoord(0.f, 5.f), 1.f);
+	splitterHoriz->ShowSiblingAfter(&_viewports[0].ui).ShowSiblingAfter(&_viewports[1].ui).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UIBounds(0.f, UICoord(.5f, -2.5f), 1.f, UICoord(0.f, 5.f)));
+	splitterVert->ShowSiblingAfter(&_viewports[1].ui).ShowSiblingAfter(&_viewports[3].ui).SetIsHorizontal(false).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UIBounds(UICoord(.5f, -2.5f), 0.f, UICoord(0.f, 5.f), 1.f));
 
 	splitterHoriz->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
 	splitterVert->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
 
 	//This is a laugh
 	UIRect* propertyRect = new UIRect(&_sideUI);
-	propertyRect->SetTexture(gradient).SetColour(UIColour(Colour(.11f, .1f, .1f), Colour(.22f, .2f, .2f))).SetBounds(0.f, .5f, 1.f, .5f);
+	propertyRect->SetTexture(gradient).SetColour(UIColour(Colour(.11f, .1f, .1f), Colour(.22f, .2f, .2f))).SetBounds(UIBounds(0.f, .5f, 1.f, .5f));
 	
 	UIRect* toolPropertyRect = new UIRect(&_sideUI);
-	toolPropertyRect->SetTexture(gradient).SetColour(UIColour(Colour(.1f, .1f, .11f), Colour(.2f, .2f, .22f))).SetBounds(0.f, 0.f, 1.f, .5f);
+	toolPropertyRect->SetTexture(gradient).SetColour(UIColour(Colour(.1f, .1f, .11f), Colour(.2f, .2f, .22f))).SetBounds(UIBounds(0.f, 0.f, 1.f, .5f));
 
 	_propertyContainer.SetParent(&_sideUI);
 	_toolPropertyContainer.SetParent(&_sideUI);
 
-	UISplitter* sideSplitter = new UISplitter(&_ui);
-	sideSplitter->ShowSiblingAfter(&_sideUI).SetIsHorizontal(false).SetUseAbsolute(true).SetMin(-1000.f).SetMax(-100.f).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UICoord(1.f, -400.f), 0.f, UICoord(0.f, 5.f), 1.f);
+	UISplitter* sideSplitter = new UISplitter(mainPage);
+	sideSplitter->ShowSiblingAfter(&_sideUI).SetIsHorizontal(false).SetUseAbsolute(true).SetMin(-1000.f).SetMax(-100.f).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UIBounds(UICoord(1.f, -400.f), 0.f, UICoord(0.f, 5.f), 1.f));
 	sideSplitter->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
 
 	UISplitter* propertySplitterHoriz = new UISplitter(&_sideUI);
-	propertySplitterHoriz->ShowSiblingAfter(propertyRect).ShowSiblingAfter(&_propertyContainer).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(0.f, UICoord(.5f, -2.5f), 1.f, UICoord(0.f, 5.f));
+	propertySplitterHoriz->ShowSiblingAfter(propertyRect).ShowSiblingAfter(&_propertyContainer).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UIBounds(0.f, UICoord(.5f, -2.5f), 1.f, UICoord(0.f, 5.f)));
 	propertySplitterHoriz->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
 
 	//Tool data init
@@ -517,7 +534,7 @@ void Editor::ResizeViews(uint16 w, uint16 h)
 {
 	_uiCamera.GetProjection().SetDimensions(Vector2T(w, h));
 	_uiCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
-	_ui.SetBounds(0.f, 0.f, UICoord(0.f, w), UICoord(0.f, h));
+	_ui.SetBounds(UIBounds(0.f, 0.f, UICoord(0.f, w), UICoord(0.f, h)));
 
 	if (_running)
 	{

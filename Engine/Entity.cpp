@@ -233,7 +233,8 @@ EOverlapResult Entity::OverlapsCollider(const Collider& other, const Transform& 
 		if (sweep.LengthSquared() == 0.f)
 			return collider->Overlaps(GetWorldTransform(), other, otherTransform, nullptr, out_Penetration);
 
-		collider->Overlaps(GetWorldTransform(), other, otherTransform, &LineSegment(Vector3(), sweep), out_Penetration);
+		LineSegment sweepLine(Vector3(), sweep);
+		collider->Overlaps(GetWorldTransform(), other, otherTransform, &sweepLine, out_Penetration);
 	}
 
 	return EOverlapResult::SEPERATE;
@@ -276,7 +277,8 @@ float Entity::MinimumDistanceToCollider(const Collider& other, const Transform& 
 		if (sweep.LengthSquared() == 0.f)
 			return collider->MinimumDistanceTo(GetWorldTransform(), other, otherTransform, out_PointA, out_PointB);
 	
-		return collider->MinimumDistanceTo(GetWorldTransform(), other, otherTransform, out_PointA, out_PointB, &LineSegment(Vector3(), sweep));
+		LineSegment sweepLine(Vector3(), sweep);
+		return collider->MinimumDistanceTo(GetWorldTransform(), other, otherTransform, out_PointA, out_PointB, &sweepLine);
 	}
 
 	return -1.f;

@@ -16,6 +16,7 @@ class MaterialManager;
 class MeshManager;
 class ModelManager;
 class TextManager;
+class TextProvider;
 class TextureManager;
 class TileManager;
 
@@ -66,6 +67,7 @@ public:
 	MeshManager		*pMeshManager = nullptr;
 	ModelManager	*pModelManager = nullptr;
 	TextManager		*pTextManager = nullptr;
+	TextProvider	*pTextProvider = nullptr;
 	TextureManager	*pTextureManager = nullptr;
 	TileManager		*pTileManager = nullptr;
 

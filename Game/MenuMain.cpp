@@ -1,4 +1,5 @@
 #include "MenuMain.hpp"
+#include <ELCore/TextProvider.hpp>
 #include <Engine/EngineInstance.hpp>
 #include <ELGraphics/FontManager.hpp>
 #include <ELGraphics/MaterialManager.hpp>
@@ -27,15 +28,15 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	_panel.SetColour(UIColour(Colour::White, Colour::Black));
 	
 	_buttonStart.SetParent(this);
-	_buttonStart.SetBounds(0.f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f));
+	_buttonStart.SetBounds(UIBounds(0.f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f)));
 	_buttonStart.onPressed += FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonStart);
 	
 	_buttonQuit.SetParent(this);
-	_buttonQuit.SetBounds(.6f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f));
+	_buttonQuit.SetBounds(UIBounds(.6f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f)));
 	_buttonQuit.onPressed += FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonQuit);
 
 	_buttonSingleLevel.SetParent(this);
-	_buttonSingleLevel.SetBounds(0.f, 0.f, 1.f, UICoord(0.f, 64.f));
+	_buttonSingleLevel.SetBounds(UIBounds(0.f, 0.f, 1.f, UICoord(0.f, 64.f)));
 	_buttonSingleLevel.onPressed += FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonSingleLevel);
 
 	_buttonStart.SetMaterial(material);
@@ -58,9 +59,9 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	_buttonQuit.SetColourHover(btnColourHover);
 	_buttonSingleLevel.SetColourHover(btnColourHover);
 
-	_buttonStart.SetString("Start");
-	_buttonQuit.SetString("Exit");
-	_buttonSingleLevel.SetString("Load Level");
+	_buttonStart.SetText(engineInstance.pTextProvider->Get("mainmenu_start"));
+	_buttonQuit.SetText(engineInstance.pTextProvider->Get("mainmenu_quit"));
+	_buttonSingleLevel.SetText(engineInstance.pTextProvider->Get("mainmenu_loadlevel"));
 }
 
 void MenuMain::ButtonStart(UIButton&)

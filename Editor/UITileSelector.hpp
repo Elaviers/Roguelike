@@ -18,8 +18,6 @@ class UITileSelector : public UIContainer
 	bool _hold;
 	bool _selected;
 
-	virtual void _OnBoundsChanged() override;
-
 public:
 	Event<UITileSelector&> onPressed;
 
@@ -37,7 +35,7 @@ public:
 
 	bool GetSelected() const { return _selected; }
 
-	UITileSelector& SetPanelBorderSize(float size) { _panel.SetBorderSize(size); _OnBoundsChanged(); return *this; }
+	UITileSelector& SetPanelBorderSize(float size) { _panel.SetBorderSize(size); UpdateBounds(); return *this; }
 	UITileSelector& SetPanelColour(const UIColour& colour) { _panelColour = colour; if (!_hover && !_selected) _panel.SetColour(colour); return *this; }
 	UITileSelector& SetPanelColourHover(const UIColour& colour) { _panelColourHover = colour; if (_hover && !_selected) _panel.SetColour(colour); return *this; }
 	UITileSelector& SetPanelColourSelected(const UIColour& colour) { _panelColourSelected = colour; if (_selected) _panel.SetColour(colour); return *this; }
@@ -57,6 +55,8 @@ public:
 
 		return *this;
 	}
+
+	virtual void UpdateBounds() override;
 
 	virtual void OnHoverStart() override;
 	virtual void OnHoverStop() override;

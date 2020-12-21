@@ -2,6 +2,7 @@
 #include "Editor.hpp"
 #include "UIPropertyManipulator.hpp"
 #include <Engine/TileManager.hpp>
+#include <ELCore/TextProvider.hpp>
 #include <ELPhys/Collision.hpp>
 
 const PropertyCollection& ToolIso::_GetProperties()
@@ -11,8 +12,8 @@ const PropertyCollection& ToolIso::_GetProperties()
 	DO_ONCE_BEGIN;
 	properties.Add(
 		"Mode",
-		MemberGetter<ToolIso, String>(&ToolIso::_GetModeName),
-		MemberSetter<ToolIso, String>(&ToolIso::_SetModeName)
+		MemberGetter<ToolIso, Text>(&ToolIso::_GetModeName),
+		MemberSetter<ToolIso, Text>(&ToolIso::_SetModeName)
 		);
 
 	properties.Add<float>(
@@ -30,36 +31,35 @@ const PropertyCollection& ToolIso::_GetProperties()
 	return properties;
 }
 
-String ToolIso::_GetModeName() const
+Text ToolIso::_GetModeName() const
 {
 	switch (_mode)
 	{
 	case Mode::ADD:
-		return "Add";
+		return _textAdd;
 	case Mode::MOVE:
-		return "Move";
+		return _textMove;
 	case Mode::REMOVE:
-		return "Delete";
+		return _textDelete;
 	case Mode::REMOVEZ:
-		return "Delete on level";
+		return _textDeleteOnLevel;
 	}
 
-	return "???";
+	return Text("???");
 }
 
-void ToolIso::_SetModeName(const String& name)
+void ToolIso::_SetModeName(const Text& name)
 {
-	String l = name.ToLower();
-	if (l == "add")
+	if (name == _textAdd)
 		_mode = Mode::ADD;
-	else if (l == "move")
+	else if (name == _textMove)
 		_mode = Mode::MOVE;
-	else if (l == "delete")
+	else if (name == _textDelete)
 		_mode = Mode::REMOVE;
-	else if (l == "delete on level")
+	else if (name == _textDeleteOnLevel)
 		_mode = Mode::REMOVEZ;
 	else
-		Debug::Message("ToolIso::_SetModeName was given an invalid name..", "Good job!");
+		Debug::Message("ToolIso::_SetModeName was given an unsupported name..", "Good job!");
 }
 
 String ToolIso::_GetTileName() const
@@ -131,13 +131,25 @@ void ToolIso::_DeleteHoverTile(MouseData& md)
 void ToolIso::Initialise()
 {
 	_SetSize(Vector2(1.f, 1.f));
+
+	_textAdd = _owner.engine.pTextProvider->Get("tool_iso_add");
+	_textMove = _owner.engine.pTextProvider->Get("tool_iso_move");
+	_textDelete = _owner.engine.pTextProvider->Get("tool_iso_delete");
+	_textDeleteOnLevel = _owner.engine.pTextProvider->Get("tool_iso_deleteonlevel");
 }
 
 void ToolIso::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
 	//Properties here done manually for the combobox..
 	float ih = Editor::PROPERTY_HEIGHT;
-	(new UIPropertyManipulator(UICoord(1.f, -ih), ih, _owner, *_GetProperties().Find("Mode"), this, &toolProperties, { "Add", "Move", "Delete", "Delete on level" }))->SetZ(-1.f);
+	(new UIPropertyManipulator(UICoord(1.f, -ih), ih, _owner, *_GetProperties().Find("Mode"), this, &toolProperties, 
+		{ 
+			_textAdd, 
+			_textMove,
+			_textDelete,
+			_textDeleteOnLevel
+		}))->SetZ(-1.f);
+
 	new UIPropertyManipulator(UICoord(1.f, -2.f * ih), ih, _owner, *_GetProperties().Find("Level"), this, &toolProperties);
 	new UIPropertyManipulator(UICoord(1.f, -3.f * ih), ih, _owner, *_GetProperties().Find("Size"), this, &toolProperties);
 
@@ -164,7 +176,7 @@ void ToolIso::Activate(UIContainer& properties, UIContainer& toolProperties)
 			.SetPanelColourHover(UIColour(Colour(.6f, .6f, .6f, .6f), Colour::White))
 			.SetPanelColourSelected(UIColour(Colour(0.f, 0.f, 1.f, .5f), Colour::Black))
 			.SetTile(tileManager->Get(tilename, _owner.engine.context));
-		ts->SetBounds(c * w, UICoord(1.f, -y), w, UICoord(0.f, h));
+		ts->SetBounds(UIBounds(c * w, UICoord(1.f, -y), w, UICoord(0.f, h)));
 		ts->onPressed += FunctionPointer(this, &ToolIso::TileSelected);
 		_tileSelectors.Add(ts);
 

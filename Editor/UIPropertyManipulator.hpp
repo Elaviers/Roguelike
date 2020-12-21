@@ -38,7 +38,7 @@ public:
 		Property& property, 
 		void* object, 
 		UIElement* parent = nullptr, 
-		const Buffer<String>& comboBoxOptions = Buffer<String>());
+		const Buffer<Text>& comboBoxOptions = Buffer<Text>());
 
 	virtual ~UIPropertyManipulator() {}
 

@@ -70,5 +70,9 @@ public:
 	};
 
 	IDMapResult DecodeIDMapValue(byte r, byte g, byte b);
-	IDMapResultConst DecodeIDMapValue(byte r, byte g, byte b) const { return *reinterpret_cast<IDMapResultConst*>(&const_cast<World*>(this)->DecodeIDMapValue(r, g, b)); }
+	IDMapResultConst DecodeIDMapValue(byte r, byte g, byte b) const 
+	{ 
+		IDMapResult result = const_cast<World*>(this)->DecodeIDMapValue(r, g, b);
+		return *reinterpret_cast<IDMapResultConst*>(&result); 
+	}
 };

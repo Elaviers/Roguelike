@@ -115,15 +115,17 @@ namespace EngineTests
 				Assert::IsTrue(list.GetSize() == size + 4 && *list.Get(0) == eval, L"List insert error");
 
 				for (size_t listSize = list.GetSize(); listSize > 0; --listSize)
-					list.Remove(list.Get(random.Next(0, (uint32)listSize - 1)));
+					list.Remove(list.Get((size_t)random.Next(0, (uint32)listSize - 1)));
 
 				Assert::IsTrue(list.GetSize() == 0, L"List remove error");
 			}
 		}
 
 		template<typename T>
-		void TestMap(T& map)
+		void TestMap()
 		{
+			T map = T();
+
 			constexpr int size = 1000;
 			const int halfSize = size / 2;
 
@@ -143,12 +145,12 @@ namespace EngineTests
 
 		TEST_METHOD(TestMap)
 		{
-			TestMap(Map<int, int>());
+			TestMap<Map<int, int>>();
 		}
 
 		TEST_METHOD(TestHashmap)
 		{
-			TestMap(Hashmap<int, int>());
+			TestMap<Hashmap<int, int>>();
 		}
 
 		TEST_METHOD(TestSet)

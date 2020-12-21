@@ -1,19 +1,16 @@
 #include "Viewport.hpp"
+#include <ELLib/ELCore/TextProvider.hpp>
 
 Viewport::Viewport() : _cameraType(ECameraType::PERSPECTIVE)
 {
 	_comboBox.SetParent(&ui);
 	bg.SetParent(&ui);
 
-	_comboBox.SetBounds(UICoord(1.f, -128.f), UICoord(1.f, -16.f), UICoord(0.f, 110.f), UICoord(0.f, 16.f));
+	_comboBox.SetBounds(UIBounds(UICoord(1.f, -128.f), UICoord(1.f, -16.f), UICoord(0.f, 110.f), UICoord(0.f, 16.f)));
 	_comboBox.SetTextAlignment(ETextAlignment::RIGHT).SetTextMargin(0.f).SetColour(Colour::Invisible).SetColourHover(Colour(0.f, 0.f, 1.f, 0.25f)).SetColourHold(Colour(0.f, 0.f, 1.f, 0.5f)).SetBorderSize(0.f);
 	_comboBox.SetListColour(Colour::Invisible).SetListTextAlignment(ETextAlignment::RIGHT).SetListTextMargin(0.f).SetListItemHeight(16.f);
-	_comboBox.Add("Perspective");
-	_comboBox.Add("Isometric");
-	_comboBox.Add("X");
-	_comboBox.Add("Y");
-	_comboBox.Add("Z");
-	_comboBox.onStringChanged += FunctionPointer(this, &Viewport::_OnComboBoxItemSelected);
+	
+	_comboBox.onSelectionChanged += FunctionPointer(this, &Viewport::_OnComboBoxItemSelected);
 }
 
 Viewport::~Viewport()
@@ -21,18 +18,34 @@ Viewport::~Viewport()
 	_idMap.Delete();
 }
 
+void Viewport::Initialise(const TextProvider& tp)
+{
+	_textPerspective = tp.Get("vp_camera_perspective");
+	_textIsometric = tp.Get("vp_camera_isometric");
+	_textOrthoX = tp.Get("vp_camera_ortho_x");
+	_textOrthoY = tp.Get("vp_camera_ortho_y");
+	_textOrthoZ = tp.Get("vp_camera_ortho_z");
+
+	_comboBox.Add(_textPerspective);
+	_comboBox.Add(_textIsometric);
+	_comboBox.Add(_textOrthoX);
+	_comboBox.Add(_textOrthoY);
+	_comboBox.Add(_textOrthoZ);
+}
+
 void Viewport::_OnComboBoxItemSelected(UIComboBox& comboBox)
 {
-	String string = comboBox.GetString().ToLower();
-	if (string == "perspective")
+	const Text& item = comboBox.GetText();
+	
+	if (item == _textPerspective)
 		SetCameraType(Viewport::ECameraType::PERSPECTIVE);
-	else if (string == "isometric")
+	else if (item == _textIsometric)
 		SetCameraType(Viewport::ECameraType::ISOMETRIC);
-	else if (string == "x")
+	else if (item == _textOrthoX)
 		SetCameraType(Viewport::ECameraType::ORTHO_X);
-	else if (string == "y")
+	else if (item == _textOrthoY)
 		SetCameraType(Viewport::ECameraType::ORTHO_Y);
-	else if (string == "z")
+	else if (item == _textOrthoZ)
 		SetCameraType(Viewport::ECameraType::ORTHO_Z);
 }
 
@@ -50,7 +63,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 	switch (type)
 	{
 	case Viewport::ECameraType::PERSPECTIVE:
-		_comboBox.SetString("Perspective");
+		_comboBox.SetText(_textPerspective);
 		gridAxis = EAxis::Y;
 		camera.GetProjection().SetType(EProjectionType::PERSPECTIVE);
 		camera.GetProjection().SetNearFar(0.001f, 100.f);
@@ -59,7 +72,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		break;
 
 	case Viewport::ECameraType::ISOMETRIC:
-		_comboBox.SetString("Isometric");
+		_comboBox.SetText(_textIsometric);
 		gridAxis = EAxis::Y;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(8.f);
@@ -69,7 +82,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		break;
 
 	case Viewport::ECameraType::ORTHO_X:
-		_comboBox.SetString("X");
+		_comboBox.SetText(_textOrthoX);
 		gridAxis = EAxis::X;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(8.f);
@@ -79,7 +92,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		break;
 
 	case Viewport::ECameraType::ORTHO_Y:
-		_comboBox.SetString("Y");
+		_comboBox.SetText(_textOrthoY);
 		gridAxis = EAxis::Y;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(8.f);
@@ -89,7 +102,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		break;
 
 	case Viewport::ECameraType::ORTHO_Z:
-		_comboBox.SetString("Z");
+		_comboBox.SetText(_textOrthoZ);
 		gridAxis = EAxis::Z;
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(8.f);

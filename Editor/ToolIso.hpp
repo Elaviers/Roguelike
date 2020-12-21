@@ -2,6 +2,7 @@
 #include "Tool.hpp"
 #include "UITileSelector.hpp"
 #include <Engine/GeoIsoTile.hpp>
+#include <ELCore/Text.hpp>
 
 class ToolIso : public Tool
 {
@@ -24,13 +25,18 @@ protected:
 
 	List<UITileSelector*> _tileSelectors;
 
+	Text _textAdd;
+	Text _textMove;
+	Text _textDelete;
+	Text _textDeleteOnLevel;
+
 	const PropertyCollection& _GetProperties();
 
-	String _GetModeName() const;
+	Text _GetModeName() const;
 	String _GetTileName() const;
 	const Vector2& _GetSize() const { return _size; }
 
-	void _SetModeName(const String& mode);
+	void _SetModeName(const Text& mode);
 	void _SetTileName(const String& material);
 	void _SetSize(const Vector2& size) 
 	{ 

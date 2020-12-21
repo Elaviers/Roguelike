@@ -1,5 +1,6 @@
 #include "UIPropertyManipulator.hpp"
 #include "Editor.hpp"
+#include <ELCore/TextProvider.hpp>
 #include <ELGraphics/FontManager.hpp>
 #include <ELGraphics/MaterialManager.hpp>
 #include <ELUI/ComboBox.hpp>
@@ -47,7 +48,7 @@ void UIPropertyManipulator::_OnPressed(UIButton& button)
 		if (string.GetLength() > 0)
 		{
 			_property.SetAsString(_object, string, _editorInstance.engine.context);
-			_textbox->SetString(string);
+			_textbox->SetText(Text(string));
 		}
 	}
 }
@@ -60,7 +61,7 @@ void UIPropertyManipulator::_OnStateChanged(UICheckbox& checkbox)
 		if (boolProperty)
 		{
 			boolProperty->Set(_object, checkbox.GetState(), _editorInstance.engine.context);
-			_textbox->SetString(checkbox.GetState() ? "True" : "False");
+			_textbox->SetText(Text(checkbox.GetState() ? "True" : "False"));
 		}
 	}
 }
@@ -90,16 +91,16 @@ void SetPropertyString(Property& property, void* object, const String& string, E
 void UIPropertyManipulator::_OnStringChanged(UITextbox& textbox)
 {
 	if (!_refreshing)
-		SetPropertyString(_property, _object, textbox.GetString(), _editorInstance.engine);
+		SetPropertyString(_property, _object, textbox.GetText().ToString(), _editorInstance.engine);
 }
 
 void UIPropertyManipulator::_OnStringChanged(UIComboBox& combobox)
 {
 	if (!_refreshing)
-		SetPropertyString(_property, _object, combobox.GetString(), _editorInstance.engine);
+		SetPropertyString(_property, _object, combobox.GetText().ToString(), _editorInstance.engine);
 }
 
-UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& instance, Property& property, void* object, UIElement* parent, const Buffer<String>& comboStrings) : 
+UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& instance, Property& property, void* object, UIElement* parent, const Buffer<Text>& comboText) : 
 	UIContainer(parent), _editorInstance(instance), _label(this), _object(object), _property(property), _textbox(nullptr), _checkbox(nullptr), _combobox(nullptr), _refreshing(false)
 {
 	bool readOnly = property.GetFlags() & PropertyFlags::READONLY;
@@ -113,13 +114,13 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 	const UIColour textShadowColour(Colour(0.f, 0.f, 0.12f));
 	const Vector2 textShadowOffset(2.f, -2.f);
 
-	SetBounds(0.f, y, 1.f, UICoord(0.f, h));
+	SetBounds(UIBounds(0.f, y, 1.f, UICoord(0.f, h)));
 
 	SharedPointer<const Font> font = instance.engine.pFontManager->Get("arial", instance.engine.context);
 	SharedPointer<const Material> btnMat = instance.engine.pMaterialManager->Get("uibutton1", instance.engine.context);
 
-	_label.SetFont(font).SetColour(textColour).SetShadowColour(textShadowColour).SetShadowOffset(textShadowOffset).SetString(_property.GetName());
-	_label.SetBounds(0.f, 0.f, .5f, 1.f);
+	_label.SetFont(font).SetColour(textColour).SetShadowColour(textShadowColour).SetShadowOffset(textShadowOffset).SetText(Text(_property.GetName()));
+	_label.SetBounds(UIBounds(0.f, 0.f, .5f, 1.f));
 
 	float tbWidthOffset = 0.f;
 
@@ -128,45 +129,45 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 		tbWidthOffset = -30.f;
 
 		UITextButton* browse = new UITextButton(this);
-		browse->SetBounds(UICoord(1.f, -30.f), 0.f, UICoord(0.f, 30.f), 1.f);
-		browse->SetString("...").SetFont(font)
+		browse->SetBounds(UIBounds(UICoord(1.f, -30.f), 0.f, UICoord(0.f, 30.f), 1.f));
+		browse->SetText(Text("...")).SetFont(font)
 			.SetTextColour(textColour).SetTextShadowColour(textShadowColour).SetTextShadowOffset(textShadowOffset)
 			.SetMaterial(btnMat).SetBorderSize(borderSize)
 			.SetColour(buttonColourInactive).SetColourHover(buttonColourHover).SetColourHold(buttonColourHold);
 
 		browse->onPressed += FunctionPointer<void, UIButton&>(this, &UIPropertyManipulator::_OnPressed);
 	}
-	else if (property.GetFlags() & PropertyFlags::DIRECTION || property.GetFlags() & PropertyFlags::CLASSID || comboStrings.GetSize())
+	else if (property.GetFlags() & PropertyFlags::DIRECTION || property.GetFlags() & PropertyFlags::CLASSID || comboText.GetSize())
 	{
 		UIComboBox* comboBox = new UIComboBox(this);
-		comboBox->SetBounds(.5f, 0.f, .5f, 1.f);
+		comboBox->SetBounds(UIBounds(.5f, 0.f, .5f, 1.f));
 		comboBox->SetReadOnly(readOnly).SetListFont(font).SetListMaterial(btnMat).SetListBorderSize(borderSize).SetListColour(buttonColourInactive)
 			.SetListTextColour(textColour).SetListTextShadowColour(textShadowColour).SetListTextShadowOffset(textShadowOffset).SetListItemHeight(h)
-			.SetString(GetPropertyString(_property, _object, _editorInstance.engine)).SetFont(font).SetTextColour(textColour).SetTextShadowColour(textShadowColour).SetTextShadowOffset(textShadowOffset)
+			.SetText(Text(GetPropertyString(_property, _object, _editorInstance.engine))).SetFont(font).SetTextColour(textColour).SetTextShadowColour(textShadowColour).SetTextShadowOffset(textShadowOffset)
 			.SetMaterial(btnMat).SetBorderSize(borderSize).SetColour(buttonColourInactive).SetColourHover(buttonColourHover).SetColourHold(buttonColourHold);
 
 		if (!readOnly)
 		{
-			comboBox->onStringChanged += FunctionPointer<void, UIComboBox&>(this, &UIPropertyManipulator::_OnStringChanged);
+			comboBox->onSelectionChanged += FunctionPointer<void, UIComboBox&>(this, &UIPropertyManipulator::_OnStringChanged);
 
-			if (comboStrings.GetSize())
+			if (comboText.GetSize())
 			{
-				for (const String& str : comboStrings)
-					comboBox->Add(str);
+				for (const Text& txt : comboText)
+					comboBox->Add(txt);
 			}
 			else if (property.GetFlags() & PropertyFlags::DIRECTION)
 			{
-				comboBox->Add("north");
-				comboBox->Add("east");
-				comboBox->Add("south");
-				comboBox->Add("west");
+				comboBox->Add(instance.engine.pTextProvider->Get("dir_north"));
+				comboBox->Add(instance.engine.pTextProvider->Get("dir_east"));
+				comboBox->Add(instance.engine.pTextProvider->Get("dir_south"));
+				comboBox->Add(instance.engine.pTextProvider->Get("dir_west"));
 			}
 			else
 			{
 				auto types = instance.engine.entRegistry.GetRegisteredTypes();
 				for (uint32 i = 0; i < types.GetSize(); ++i)
 				{
-					comboBox->Add((*types[i].second)->name);
+					comboBox->Add(Text((*types[i].second)->name));
 				}
 			}
 		}
@@ -179,7 +180,7 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 		tbWidthOffset = -h;
 
 		UICheckbox* check = new UICheckbox(this);
-		check->SetBounds(UICoord(1.f, -h), 0.f, UICoord(0.f, h), UICoord(0.f, h));
+		check->SetBounds(UIBounds(UICoord(1.f, -h), 0.f, UICoord(0.f, h), UICoord(0.f, h)));
 		check->SetState(dynamic_cast<VariableProperty<bool>&>(_property).Get(_object, _editorInstance.engine.context)).SetReadOnly(readOnly).SetTextureTrue(instance.engine.pTextureManager->Get("ui/checkmark", instance.engine.context)).
 			SetMaterial(btnMat).SetBorderSize(borderSize).SetColourFalse(buttonColourInactive).SetColourTrue(buttonColourInactive).SetColourHover(buttonColourHover).SetColourHold(buttonColourHold);
 		
@@ -188,10 +189,10 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 	}
 
 	_textbox = new UITextbox(this);
-	_textbox->SetBounds(.5f, 0.f, UICoord(.5f, tbWidthOffset), 1.f);
+	_textbox->SetBounds(UIBounds(.5f, 0.f, UICoord(.5f, tbWidthOffset), 1.f));
 	_textbox->SetReadOnly(readOnly).SetMaterial(btnMat).SetBorderSize(borderSize)
 		.SetFont(font).SetTextColour(textColour).SetTextShadowColour(textShadowColour).SetTextShadowOffset(textShadowOffset)
-		.SetString(GetPropertyString(_property, _object, _editorInstance.engine)).SetColour(textboxColour);
+		.SetText(Text(GetPropertyString(_property, _object, _editorInstance.engine))).SetColour(textboxColour);
 
 	if (!readOnly)
 		_textbox->onStringChanged += FunctionPointer<void, UITextbox&>(this, &UIPropertyManipulator::_OnStringChanged);
@@ -203,7 +204,7 @@ void UIPropertyManipulator::Refresh()
 
 	if (_textbox)
 	{
-		_textbox->SetString(GetPropertyString(_property, _object, _editorInstance.engine));
+		_textbox->SetText(Text(GetPropertyString(_property, _object, _editorInstance.engine)));
 	}
 
 	if (_checkbox)
@@ -215,7 +216,7 @@ void UIPropertyManipulator::Refresh()
 
 	if (_combobox)
 	{
-		_combobox->SetString(GetPropertyString(_property, _object, _editorInstance.engine));
+		_combobox->SetText(Text(GetPropertyString(_property, _object, _editorInstance.engine)));
 	}
 
 	_refreshing = false;

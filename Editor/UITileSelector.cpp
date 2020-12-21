@@ -1,15 +1,6 @@
 #include "UITileSelector.hpp"
 #include <ELGraphics/Material_Sprite.hpp>
 
-void UITileSelector::_OnBoundsChanged()
-{
-	UIContainer::_OnBoundsChanged();
-	
-	float bs = _panel.GetBorderSize();
-	float size = Maths::Min(_absoluteBounds.w - bs * 2.f, _absoluteBounds.h - bs * 2.f);
-	_rect.SetBounds(UICoord(0.f, bs), UICoord(0.f, bs), UICoord(0.f, size), UICoord(0.f, size));
-}
-
 UITileSelector::UITileSelector() : _hold(false), _selected(false)
 {
 	_panel.SetParent(this);
@@ -23,6 +14,15 @@ void UITileSelector::SetTile(const SharedPointer<const Tile>& tile)
 	const MaterialSprite* sprite = dynamic_cast<const MaterialSprite*>(_tile->GetMaterial().Ptr());
 	if (sprite)
 		_rect.SetTexture(sprite->GetDiffuse());
+}
+
+void UITileSelector::UpdateBounds()
+{
+	UIContainer::UpdateBounds();
+
+	float bs = _panel.GetBorderSize();
+	float size = Maths::Min(_absoluteBounds.w - bs * 2.f, _absoluteBounds.h - bs * 2.f);
+	_rect.SetBounds(UIBounds(UICoord(0.f, bs), UICoord(0.f, bs), UICoord(0.f, size), UICoord(0.f, size)));
 }
 
 void UITileSelector::OnHoverStart()

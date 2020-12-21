@@ -27,6 +27,12 @@ protected:
 
 	void _OnComboBoxItemSelected(UIComboBox&);
 
+	Text _textPerspective;
+	Text _textIsometric;
+	Text _textOrthoX;
+	Text _textOrthoY;
+	Text _textOrthoZ;
+
 public:
 	EAxis gridAxis = EAxis::Y;
 
@@ -40,6 +46,8 @@ public:
 
 	Viewport();
 	~Viewport();
+
+	void Initialise(const TextProvider& tp);
 
 	void Resize(const Vector2T<uint16>& dimensions);
 
