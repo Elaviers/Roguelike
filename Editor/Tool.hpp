@@ -21,9 +21,9 @@ public:
 
 	//Input
 	virtual void Cancel()						{}
-	virtual void MouseMove(const MouseData&)	{}
-	virtual void MouseDown(const MouseData&)	{}
-	virtual void MouseUp(const MouseData&)		{}
+	virtual void MouseMove(MouseData&)			{}
+	virtual void MouseDown(MouseData&)			{}
+	virtual void MouseUp(MouseData&)			{}
 	virtual void KeySubmit()					{}
 	virtual void KeyDelete()					{}
 

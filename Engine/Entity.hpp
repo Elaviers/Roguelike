@@ -18,7 +18,7 @@ public:																														\
 	virtual Entity* Clone() const { return Entity::_CreateCopy<CLASSNAME>(*this); }											\
 	CLASSNAME* TypedClone() const { return (CLASSNAME*)Clone(); }															\
 																															\
-	static CLASSNAME* Create() { CLASSNAME* obj = new CLASSNAME(); const_cast<bool&>(obj->_dynamic) = true; return obj; }	\
+	static CLASSNAME* Create() { CLASSNAME* obj = new CLASSNAME(); const_cast<bool&>(obj->dynamicBuffer) = true; return obj; }	\
 	static const byte TypeID = (byte)(ID);
 
 class Collider;
@@ -58,7 +58,7 @@ protected:
 	const uint32 _uid;
 
 	EFlags _flags;
-	const bool _dynamic;
+	const bool dynamicBuffer;
 
 	Entity *_parent;
 	Buffer<Entity*> _children;
@@ -84,7 +84,7 @@ public:
 		_name(name), 
 		_uid(_TakeNextUID()), 
 		_flags(flags), 
-		_dynamic(false), 
+		dynamicBuffer(false), 
 		_parent(nullptr), 
 		_transform(Callback(this, &Entity::_OnTransformChanged)),
 		_wtValid(false),
@@ -94,7 +94,7 @@ public:
 	Entity(const Entity &other) : 
 		_uid(_TakeNextUID()), 
 		_flags(other._flags), 
-		_dynamic(false), 
+		dynamicBuffer(false), 
 		_parent(other._parent), 
 		_transform(other._transform),
 		_worldBounds(other._worldBounds),
@@ -105,11 +105,11 @@ public:
 		CloneChildrenFrom(other);
 	}
 
-	Entity(Entity &&other) noexcept : _parent(nullptr), _uid(other._uid), _flags(other._flags), _dynamic(false) 
+	Entity(Entity &&other) noexcept : _parent(nullptr), _uid(other._uid), _flags(other._flags), dynamicBuffer(false) 
 	{ 
 		operator=(std::move(other)); 
 		
-		if (other._dynamic)
+		if (other.dynamicBuffer)
 			delete &other;
 	}
 
@@ -317,9 +317,9 @@ public:
 		return Pair<Vector3>();
 	}
 
-	bool OverlapsRay(const Ray&, RaycastResult& out_Result) const;
+	bool OverlapsRay(const Ray&, ECollisionChannels rayChannels, RaycastResult& out_Result) const;
 
-	Buffer<RaycastResult> Raycast(const Ray&);
+	Buffer<RaycastResult> Raycast(const Ray&, ECollisionChannels rayChannels);
 	Buffer<Entity*> FindOverlappingChildren(const Collider& other, const Transform& otherTransform = Transform());
 
 	//Operators
@@ -342,7 +342,7 @@ protected:
 	static T* _CreateCopy(const T& other)
 	{
 		Entity *go = new T(other);
-		const_cast<bool&>(go->_dynamic) = true;
+		const_cast<bool&>(go->dynamicBuffer) = true;
 		const_cast<EFlags&>(go->_flags) = other._flags;
 		go->_parent = nullptr;
 		go->SetParent(other._parent); //force set parent

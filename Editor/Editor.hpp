@@ -86,7 +86,7 @@ private:
 	ERenderChannels _litRenderChannels = ERenderChannels::NONE;
 	ERenderChannels _unlitRenderChannels = ERenderChannels(ERenderChannels::SURFACE | ERenderChannels::UNLIT);
 
-	World _level;
+	World _world;
 
 	Tool *_currentTool = nullptr;
 
@@ -177,7 +177,7 @@ public:
 	void SetTool(ETool tool, bool changeToolbarSelection = true);
 
 	//For Tools
-	World& WorldRef() { return _level; }
+	World& WorldRef() { return _world; }
 
 	Viewport& GetVP(int index) { return _viewports[index]; }
 

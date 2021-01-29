@@ -36,6 +36,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ELSys", "ELLib\ELSys\ELSys.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ELUI", "ELLib\ELUI\ELUI.vcxproj", "{F2B520D1-B1E0-4148-A0E4-DB8E8923533E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ELNet", "ELLib\ELNet\ELNet.vcxproj", "{3343F2DE-86EF-486B-9174-AE100A8A8C86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -140,6 +142,14 @@ Global
 		{F2B520D1-B1E0-4148-A0E4-DB8E8923533E}.Release|x64.Build.0 = Release|x64
 		{F2B520D1-B1E0-4148-A0E4-DB8E8923533E}.Release|x86.ActiveCfg = Release|Win32
 		{F2B520D1-B1E0-4148-A0E4-DB8E8923533E}.Release|x86.Build.0 = Release|Win32
+		{3343F2DE-86EF-486B-9174-AE100A8A8C86}.Debug|x64.ActiveCfg = Debug|x64
+		{3343F2DE-86EF-486B-9174-AE100A8A8C86}.Debug|x64.Build.0 = Debug|x64
+		{3343F2DE-86EF-486B-9174-AE100A8A8C86}.Debug|x86.ActiveCfg = Debug|Win32
+		{3343F2DE-86EF-486B-9174-AE100A8A8C86}.Debug|x86.Build.0 = Debug|Win32
+		{3343F2DE-86EF-486B-9174-AE100A8A8C86}.Release|x64.ActiveCfg = Release|x64
+		{3343F2DE-86EF-486B-9174-AE100A8A8C86}.Release|x64.Build.0 = Release|x64
+		{3343F2DE-86EF-486B-9174-AE100A8A8C86}.Release|x86.ActiveCfg = Release|Win32
+		{3343F2DE-86EF-486B-9174-AE100A8A8C86}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

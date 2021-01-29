@@ -13,6 +13,7 @@ void EntSprite::Render(RenderQueue& q) const
 
 		Matrix4 t;
 
+		/*
 		if (_fixedYaw)
 		{
 			Vector3 pos = GetWorldPosition();
@@ -25,11 +26,12 @@ void EntSprite::Render(RenderQueue& q) const
 		}
 		else
 			t = Matrix4::Transformation(GetWorldPosition(), EntCamera::Current()->GetWorldRotation().GetQuat(), Vector3(_size, _size, _size));
-		
+		*/
+
 		_material->Apply(e);
 		e.AddCommand(RCMDSetUVOffset::Default());
 		e.AddCommand(RCMDSetUVScale::Default());
-		e.AddSetTransform(t);
+		e.AddSetMat4(RCMDSetMat4::Type::TRANSFORM_CAMERAFACING_Y, t);
 		e.AddSetColour(_colour);
 		e.AddCommand(RCMDRenderMesh::PLANE);
 	}

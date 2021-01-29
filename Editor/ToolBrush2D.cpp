@@ -43,7 +43,7 @@ void ToolBrush2D::Cancel()
 	_placing = false;
 }
 
-void ToolBrush2D::MouseMove(const MouseData &mouseData)
+void ToolBrush2D::MouseMove(MouseData &mouseData)
 {
 	if (mouseData.viewport && mouseData.viewport->gridAxis == EAxis::Y)
 	{
@@ -67,13 +67,13 @@ void ToolBrush2D::MouseMove(const MouseData &mouseData)
 	}
 }
 
-void ToolBrush2D::MouseDown(const MouseData &mouseData)
+void ToolBrush2D::MouseDown(MouseData &mouseData)
 {
 	if (mouseData.viewport && mouseData.viewport->gridAxis == EAxis::Y)
 		_placing = true;
 }
 
-void ToolBrush2D::MouseUp(const MouseData &mouseData)
+void ToolBrush2D::MouseUp(MouseData &mouseData)
 {
 	if (mouseData.viewport && mouseData.viewport->gridAxis == EAxis::Y)
 	{

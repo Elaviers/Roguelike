@@ -188,12 +188,12 @@ void ToolIso::Activate(UIContainer& properties, UIContainer& toolProperties)
 	}
 }
 
-void ToolIso::MouseMove(const MouseData& mouseData)
+void ToolIso::MouseMove(MouseData& mouseData)
 {
 	if (_mode == Mode::REMOVE)
 	{
 		if (_dragging && mouseData.hoverGeometry)
-			_DeleteHoverTile(const_cast<MouseData&>(mouseData)); //TODO TODO TODO... just get a non-const mousedata ref here!!!!
+			_DeleteHoverTile(mouseData);
 
 		return;
 	}
@@ -215,7 +215,7 @@ void ToolIso::MouseMove(const MouseData& mouseData)
 	}
 }
 
-void ToolIso::MouseDown(const MouseData& mouseData)
+void ToolIso::MouseDown(MouseData& mouseData)
 {
 	if (mouseData.viewport->GetCameraType() == Viewport::ECameraType::ISOMETRIC)
 	{
@@ -223,13 +223,13 @@ void ToolIso::MouseDown(const MouseData& mouseData)
 		_dragGeometry = dynamic_cast<GeoIsoTile*>(mouseData.hoverGeometry);
 
 		if (_mode == Mode::REMOVE)
-			_DeleteHoverTile(const_cast<MouseData&>(mouseData)); //TODO TODO TODO... just get a non-const mousedata ref here!!!!
+			_DeleteHoverTile(const_cast<MouseData&>(mouseData));
 		else
 			_PlaceTile();
 	}
 }
 
-void ToolIso::MouseUp(const MouseData& mouseData)
+void ToolIso::MouseUp(MouseData& mouseData)
 {
 	_dragging = false;
 	_dragGeometry = nullptr;

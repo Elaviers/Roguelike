@@ -62,13 +62,13 @@ void ToolEntity::Deactivate()
 	_placement.Clear();
 }
 
-void ToolEntity::MouseMove(const MouseData& mouseData)
+void ToolEntity::MouseMove(MouseData& mouseData)
 {
 	if (mouseData.viewport && _placement && _ViewportCanPlace(*mouseData.viewport))
 	{
 		EntCamera& camera = mouseData.viewport->camera;
 		Ray r = camera.GetProjection().ScreenToWorld(camera.GetWorldTransform(), Vector2((float)mouseData.x / camera.GetProjection().GetDimensions()[0], (float)mouseData.y / camera.GetProjection().GetDimensions()[1]));
-		Buffer<RaycastResult> results = _owner.WorldRef().RootEntity().Raycast(r);
+		Buffer<RaycastResult> results = _owner.WorldRef().RootEntity().Raycast(r, ECollisionChannels::ALL);
 
 		if (results.GetSize() > 0)
 		{
@@ -86,7 +86,7 @@ void ToolEntity::MouseMove(const MouseData& mouseData)
 	_readyToPlace = false;
 }
 
-void ToolEntity::MouseDown(const MouseData &mouseData)
+void ToolEntity::MouseDown(MouseData &mouseData)
 {
 	if (_placement && _readyToPlace)
 	{

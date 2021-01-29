@@ -106,7 +106,7 @@ void Entity::Delete(const Context& ctx)
 	DeleteChildren(ctx);
 	SetParent(nullptr);
 
-	if (_dynamic)
+	if (dynamicBuffer)
 	{
 		delete this;
 		return;
@@ -214,13 +214,11 @@ void Entity::ReadData(ByteReader& reader, const NumberedSet<String>& strings, co
 
 //Collision
 
-bool Entity::OverlapsRay(const Ray& ray, RaycastResult& result) const
+bool Entity::OverlapsRay(const Ray& ray, ECollisionChannels rayChannels, RaycastResult& result) const
 {
 	const Collider* collider = GetCollider();
 	if (collider)
-		return collider->IntersectsRay(GetWorldTransform(), ray, ECollisionChannels::ALL, result);
-
-	//TODO- RAY NEEDS CHANNELS
+		return collider->IntersectsRay(GetWorldTransform(), ray, rayChannels, result);
 
 	return false;
 }
@@ -293,13 +291,13 @@ Pair<Vector3> Entity::GetShallowContactPointsWithCollider(float shrink, const Co
 	return Pair<Vector3>();
 }
 
-Buffer<RaycastResult> Entity::Raycast(const Ray &ray)
+Buffer<RaycastResult> Entity::Raycast(const Ray &ray, ECollisionChannels rayChannels)
 {
 	RaycastResult result;
 	Buffer<RaycastResult> results;
 
 	for (size_t i = 0; i < _children.GetSize(); ++i)
-		if (_children[i]->OverlapsRay(ray, result))
+		if (_children[i]->OverlapsRay(ray, rayChannels, result))
 		{
 			result.object = _children[i];
 

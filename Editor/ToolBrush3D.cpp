@@ -37,7 +37,7 @@ void ToolBrush3D::Cancel()
 	_placing = false;
 }
 
-void ToolBrush3D::MouseMove(const MouseData &mouseData)
+void ToolBrush3D::MouseMove(MouseData &mouseData)
 {
 	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
 	{
@@ -82,7 +82,7 @@ void ToolBrush3D::MouseMove(const MouseData &mouseData)
 	}
 }
 
-void ToolBrush3D::MouseDown(const MouseData &mouseData)
+void ToolBrush3D::MouseDown(MouseData &mouseData)
 {
 	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
 }

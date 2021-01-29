@@ -246,7 +246,7 @@ void ToolSelect::Cancel()
 	ClearSelection();
 }
 
-void ToolSelect::MouseMove(const MouseData &mouseData)
+void ToolSelect::MouseMove(MouseData &mouseData)
 {
 	_hoverObjectIsSelected = false;
 
@@ -382,7 +382,7 @@ void ToolSelect::MouseMove(const MouseData &mouseData)
 	}
 }
 
-void ToolSelect::MouseDown(const MouseData &mouseData)
+void ToolSelect::MouseDown(MouseData &mouseData)
 {
 	if (_activeGizmo && _activeGizmo->MouseDown())
 	{
@@ -429,7 +429,7 @@ void ToolSelect::MouseDown(const MouseData &mouseData)
 	}
 }
 
-void ToolSelect::MouseUp(const MouseData& mouseData)
+void ToolSelect::MouseUp(MouseData& mouseData)
 {
 	if (_activeGizmo) _activeGizmo->MouseUp();
 

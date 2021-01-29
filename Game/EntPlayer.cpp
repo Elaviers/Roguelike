@@ -31,7 +31,7 @@ void EntPlayer::Init(const Context& ctx)
 
 	_camera.SetParent(this);
 	_camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-	_camera.SetRelativeRotation(Vector3(-Maths::ArcTangentDegrees(1.f / Maths::SQRT2_F), 45.f, 0.f));
+	_camera.SetRelativeRotation(Vector3(Maths::RadiansToDegrees(-Maths::ArcTan(1.f / Maths::SQRT2_F)), 45.f, 0.f));
 	_camera.GetProjection().SetNearFar(0.f, 10000.f);
 	_camera.GetProjection().SetOrthographicScale(64.f);
 
@@ -81,7 +81,7 @@ void EntPlayer::Update(float deltaTime)
 	Vector3 targetPos = cameraPos + (cameraPos - GetWorldPosition());
 	cameraPos += _camera.GetWorldTransform().GetForwardVector() * -5000.f;
 	
-	_targetTransform = Transform(targetPos + Vector3(-.02f, .3f, 0.f), Vector3(-Maths::ArcTangentDegrees(1.f / Maths::SQRT2_F), 45.f, 0.f));
+	_targetTransform = Transform(targetPos + Vector3(-.02f, .3f, 0.f), Vector3(Maths::RadiansToDegrees(-Maths::ArcTan(1.f / Maths::SQRT2_F)), 45.f, 0.f));
 	_camera.SetWorldPosition(cameraPos);
 
 	//Movement

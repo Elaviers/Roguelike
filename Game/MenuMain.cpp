@@ -25,7 +25,7 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	_panel.SetParent(this);
 	_panel.SetMaterial(panelMat);
 	_panel.SetBorderSize(-8.f);
-	_panel.SetColour(UIColour(Colour::White, Colour::Black));
+	_panel.SetColour(UIColour(Colour(.7f, .7f, .7f), Colour::Black));
 	
 	_buttonStart.SetParent(this);
 	_buttonStart.SetBounds(UIBounds(0.f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f)));

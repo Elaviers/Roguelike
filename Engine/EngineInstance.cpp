@@ -72,14 +72,6 @@ void EngineInstance::Init(EEngineCreateFlags flags)
 		//Commands
 		pConsole->Cvars().CreateVar("TexMgr", CommandPtr(pConsole, &Console::CMD_texmgr));
 		pConsole->Cvars().CreateVar("Play", CommandPtr(pAudioManager, &AudioManager::CMD_play));
-
-		/* todo: move this to the world class
-		if (pWorld)
-		{
-			pConsole->Cvars().CreateVar("Ents", CommandPtr(pWorld, &Entity::CMD_List));
-			pConsole->Cvars().CreateVar("Ent", CommandPtr(pWorld, &Entity::CMD_Ent));
-		}
-		*/
 	}
 
 	if (pAnimationManager)

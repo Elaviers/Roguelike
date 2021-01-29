@@ -16,7 +16,7 @@ bool GizmoRing::_GetAngle(const Ray& ray, float& angleOut) const
 		float x = _rv.Dot(dir);
 		float y = -_uv.Dot(dir);
 
-		angleOut = Maths::ArcTangentDegrees2(y, x);
+		angleOut = Maths::RadiansToDegrees(Maths::ArcTan2(y, x));
 		return true;
 	}
 

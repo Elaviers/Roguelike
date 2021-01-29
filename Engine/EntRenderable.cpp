@@ -7,7 +7,7 @@
 
 void EntRenderable::_UpdateRenderEntry()
 {
-	if (!_static)
+	if (!staticBuffer)
 		return;
 
 	_renderEntry.Clear();
@@ -53,7 +53,7 @@ const PropertyCollection& EntRenderable::GetProperties()
 
 void EntRenderable::Render(RenderQueue& q) const
 {
-	if (_static)
+	if (staticBuffer)
 		q.AddEntry(&_renderEntry);
 	else
 	{

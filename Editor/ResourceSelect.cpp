@@ -143,9 +143,9 @@ public:
 
 	void Draw()
 	{
-		_camera.Use(); //todo: this should not be here but is needed for sprite.render....
 
 		renderQueue.Clear();
+		_camera.Use(renderQueue);
 		_light.Render(renderQueue);
 		_object.Render(renderQueue);
 		_sprite.Render(renderQueue);
@@ -169,7 +169,6 @@ public:
 		if (_object.GetMaterial())
 		{
 			programLit->Use();
-			_camera.Use();
 			programLit->SetVec4(DefaultUniformVars::vec4Colour, Colour::White);
 
 			programLit->SetInt(DefaultUniformVars::intTextureDiffuse, 0);
@@ -184,7 +183,6 @@ public:
 		}
 
 		programUnlit->Use();
-		_camera.Use();
 		renderQueue.Render(ERenderChannels::UNLIT | ERenderChannels::SPRITE, *engine.pMeshManager, *engine.pTextureManager, 0);
 
 		::SwapBuffers(viewportDC);

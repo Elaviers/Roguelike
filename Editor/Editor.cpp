@@ -31,8 +31,8 @@ constexpr GLfloat lineW = 1;
 
 const Buffer<Pair<const wchar_t*>> levelDialogFilter({ Pair<const wchar_t*>(L"Level File", L"*.lvl"), Pair<const wchar_t*>(L"All Files", L"*.*") });
 
-const Buffer<Pair<const wchar_t*>> openAnimationFilter({Pair<const wchar_t*>(L"FBX Scene", L"*.fbx")});
-const Buffer<Pair<const wchar_t*>> openModelFilter({Pair<const wchar_t*>(L"FBX Scene", L"*.fbx"), Pair<const wchar_t*>(L"OBJ Model", L"*.obj")});
+const Buffer<Pair<const wchar_t*>> openAnimationFilter({Pair<const wchar_t*>(L"FBX Scene", L"*.fbx"), Pair<const wchar_t*>(L"Animation", L"*.anim")});
+const Buffer<Pair<const wchar_t*>> openModelFilter({Pair<const wchar_t*>(L"FBX Scene", L"*.fbx"), Pair<const wchar_t*>(L"OBJ Model", L"*.obj"), Pair<const wchar_t*>(L"Mesh", L"*.mesh") });
 const Buffer<Pair<const wchar_t*>> openTextureFilter({Pair<const wchar_t*>(L"PNG Image", L"*.png")});
 
 const Buffer<Pair<const wchar_t*>> saveAnimationFilter({ Pair<const wchar_t*>(L"Animation", L"*.anim") });
@@ -120,8 +120,9 @@ void Editor::_Init()
 	inputManager->BindKeyDown(EKeycode::SQBRACKETLEFT, Callback(this, &Editor::DecreaseGridUnit));
 	inputManager->BindKeyDown(EKeycode::SQBRACKETRIGHT, Callback(this, &Editor::IncreaseGridUnit));
 
-	_level.RootEntity().onNameChanged +=	Callback(this, &Editor::RefreshLevel);
-	_level.RootEntity().onChildChanged +=	Callback(this, &Editor::RefreshLevel);
+	_world.Initialise(engine.context);
+	_world.RootEntity().onNameChanged +=	Callback(this, &Editor::RefreshLevel);
+	_world.RootEntity().onChildChanged +=	Callback(this, &Editor::RefreshLevel);
 
 	//UI
 	SharedPointer<const Font> vpFont = engine.pFontManager->Get("consolas", engine.context);
@@ -365,8 +366,8 @@ void Editor::Frame()
 		engine.pDebugManager->AddToWorld(DebugFrustum::FromCamera(_viewports[0].camera.GetWorldTransform(), _viewports[0].camera.GetProjection()));
 
 
-	Entity* dbgObjA = _level.RootEntity().FindChild(dbgIDA);
-	Entity* dbgObjB = _level.RootEntity().FindChild(dbgIDB);
+	Entity* dbgObjA = _world.RootEntity().FindChild(dbgIDA);
+	Entity* dbgObjB = _world.RootEntity().FindChild(dbgIDB);
 
 	if (dbgObjA && dbgObjB)
 	{
@@ -389,7 +390,7 @@ void Editor::Frame()
 		//Debug::PrintLine(dbgObjA->Overlaps(*dbgObjB) ? CSTR(dbgObjA->GetPenetrationVector(*dbgObjB)) : "no");
 	}
 
-	_level.Update(_deltaTime);
+	_world.Update(_deltaTime);
 	_ui.Update(_deltaTime);
 	Render();
 
@@ -400,7 +401,7 @@ void Editor::Frame()
 		uint32 y = _mouseData.y + (uint32)_mouseData.viewport->ui.GetAbsoluteBounds().h / 2;
 		Colour c = _mouseData.viewport->SampleFramebuffer(x, y);
 
-		World::IDMapResult r = _level.DecodeIDMapValue((byte)(c.r * 255.f), (byte)(c.g * 255.f), (byte)(c.b * 255.f));
+		World::IDMapResult r = _world.DecodeIDMapValue((byte)(c.r * 255.f), (byte)(c.g * 255.f), (byte)(c.b * 255.f));
 		if (r.isEntity)
 		{
 			_mouseData.hoverEntity = r.entity;
@@ -417,6 +418,7 @@ void Editor::Frame()
 void Editor::Render()
 {
 	_uiQueue.Clear();
+	_uiCamera.Use(_uiQueue);
 	_ui.Render(_uiQueue);
 
 	_glContext.Use(_vpArea);
@@ -428,13 +430,13 @@ void Editor::Render()
 		RenderViewport(_viewports[i]);
 
 	_shaderUnlit.Use();
-	_uiCamera.Use();
 	_uiQueue.Render(ERenderChannels::UNLIT, *engine.pMeshManager, *engine.pTextureManager, 0);	
 	_vpArea.SwapBuffers();
 	
 
 	//Console
 	_consoleQueue.Clear();
+	_consoleCamera.Use(_consoleQueue);
 	engine.pConsole->Render(_consoleQueue, *_consoleFont, _deltaTime);
 
 	_glContext.Use(_consoleWindow);
@@ -443,7 +445,6 @@ void Editor::Render()
 	glDepthFunc(GL_LEQUAL);
 
 	_shaderUnlit.Use();
-	_consoleCamera.Use();
 	_consoleQueue.Render(ERenderChannels::UNLIT, *engine.pMeshManager, *engine.pTextureManager, 0);
 	_consoleWindow.SwapBuffers();
 }
@@ -455,17 +456,18 @@ void Editor::RenderViewport(Viewport& vp)
 
 	const AbsoluteBounds& bounds = vp.ui.GetAbsoluteBounds();
 	
-	//The shader and camera are activated here so that EntCamera::Current() is valid
 	_shaderLit.Use();
-	camera.Use((int)bounds.x, (int)bounds.y);
 
 	vp.renderQueue.Clear();
 	vp.renderQueue2.Clear();
 
 	Frustum frustum;
 	camera.GetProjection().ToFrustum(camera.GetWorldTransform(), frustum);
-	_level.Render(vp.renderQueue, frustum);
-	_level.RenderIDMap(vp.renderQueue2, frustum);
+	camera.Use(vp.renderQueue, (int)bounds.x, (int)bounds.y);
+	_world.Render(vp.renderQueue, frustum);
+
+	camera.Use(vp.renderQueue2, (int)bounds.x, (int)bounds.y);
+	_world.RenderIDMap(vp.renderQueue2, frustum);
 
 	if (_drawEditorFeatures)
 	{
@@ -490,6 +492,7 @@ void Editor::RenderViewport(Viewport& vp)
 	if (_currentTool) _currentTool->Render(vp.renderQueue);
 
 	/////////
+	_shaderLit.Use();
 	_reflect.Bind(100);
 	_shaderLit.SetInt(DefaultUniformVars::intCubemap, 100);
 	_shaderLit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
@@ -499,7 +502,6 @@ void Editor::RenderViewport(Viewport& vp)
 	vp.renderQueue.Render(_litRenderChannels, *engine.pMeshManager, *engine.pTextureManager, _shaderLit.GetInt(DefaultUniformVars::intLightCount));
 
 	_shaderUnlit.Use();
-	camera.Use((int)bounds.x, (int)bounds.y);
 	vp.renderQueue.Render(_unlitRenderChannels | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), *engine.pMeshManager, *engine.pTextureManager, 0);
 
 	///////// ID MAP
@@ -510,7 +512,6 @@ void Editor::RenderViewport(Viewport& vp)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		_shaderIDMap.Use();
-		camera.Use();
 		vp.renderQueue2.Render(ERenderChannels::SURFACE | ERenderChannels::UNLIT | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), *engine.pMeshManager, *engine.pTextureManager, 0);
 		GLFramebuffer::Unbind();
 	}
@@ -849,7 +850,7 @@ void Editor::ToggleConsole()
 
 void Editor::RefreshLevel()
 {
-	_hierachyWindow.Refresh(_level.RootEntity());
+	_hierachyWindow.Refresh(_world.RootEntity());
 }
 
 void Editor::Zoom(float amount)
@@ -921,15 +922,15 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			{
 				String filename = IO::OpenFileDialog(L"\\Data\\Levels", levelDialogFilter);
 				editor->KeyCancel();
-				editor->_level.Clear(editor->engine.context);
-				editor->_level.Read(filename.GetData(), editor->engine.context);
+				editor->_world.Clear(editor->engine.context);
+				editor->_world.Read(filename.GetData(), editor->engine.context);
 			}
 			break;
 
 			case ID_FILE_SAVEAS:
 			{
 				String filename = IO::SaveFileDialog(L"\\Data\\Levels", levelDialogFilter);
-				editor->_level.Write(filename.GetData(), editor->engine.context);
+				editor->_world.Write(filename.GetData(), editor->engine.context);
 			}
 			break;
 
@@ -980,9 +981,9 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			}
 			break;
 
-			case ID_IMPORT_MODEL:
+			case ID_IMPORT_MESH:
 			{
-				String filename = IO::OpenFileDialog(L"\\Data\\Models", openModelFilter);
+				String filename = IO::OpenFileDialog(L"\\Data\\Meshes", openModelFilter);
 				if (filename.GetLength() == 0)
 					break;
 
@@ -998,10 +999,18 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 				{
 					mesh = IO::ReadOBJFile(filename.GetData());
 				}
+				else
+				{
+					Buffer<byte> data = IO::ReadFile(filename.GetData());
+					if (data.GetSize() <= 0)
+						break;
+
+					mesh = Mesh::FromData(data);
+				}
 
 				if (mesh && mesh->IsValid())
 				{
-					String dest = IO::SaveFileDialog(L"\\Data\\Models", saveModelFilter);
+					String dest = IO::SaveFileDialog(L"\\Data\\Meshes", saveModelFilter);
 
 					if (dest.GetLength())
 					{
@@ -1038,7 +1047,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 			case ID_FILE_CLEAR:
 				editor->KeyCancel();
-				editor->_level.Clear(editor->engine.context);
+				editor->_world.Clear(editor->engine.context);
 				break;
 
 			case ID_VIEW_MATERIALS:

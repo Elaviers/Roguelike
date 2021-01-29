@@ -56,6 +56,7 @@ void Game::_Init()
 	_engine.Init(EEngineCreateFlags::ALL);
 	_engine.pFontManager->AddPath(Utilities::GetSystemFontDir());
 
+	_world.Initialise(_engine.context);
 	GameInstance::Instance().world = &_world;
 	GameInstance::Instance().Initialise(*this);
 
@@ -205,8 +206,11 @@ void Game::Render()
 	{
 		Frustum cameraFrustum;
 		activeCamera->GetProjection().ToFrustum(activeCamera->GetWorldTransform(), cameraFrustum);
+		activeCamera->Use(_renderQueue);
 		_world.Render(_renderQueue, cameraFrustum);
 	}
+
+	_uiCamera.Use(_uiQueue);
 
 	if (_uiIsActive)
 		_ui.Render(_uiQueue);
@@ -218,7 +222,6 @@ void Game::Render()
 	glDepthFunc(GL_LEQUAL);
 
 	_shaderUnlit.Use();
-	_uiCamera.Use();
 	_uiQueue.Render(ERenderChannels::UNLIT, *_engine.pMeshManager, *_engine.pTextureManager, 0);
 
 	if (activeCamera)
@@ -230,12 +233,9 @@ void Game::Render()
 		_shaderLit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureReflection, 3);
 		_reflect.Bind(100);
-		activeCamera->Use();
-
 		_renderQueue.Render(ERenderChannels::SURFACE, *_engine.pMeshManager, *_engine.pTextureManager, _shaderLit.GetInt(DefaultUniformVars::intLightCount));
 	
 		_shaderUnlit.Use();
-		activeCamera->Use();
 		_renderQueue.Render(ERenderChannels::UNLIT, *_engine.pMeshManager, *_engine.pTextureManager, 0);
 	}
 

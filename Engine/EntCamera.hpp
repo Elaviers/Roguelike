@@ -1,22 +1,21 @@
 #pragma once
 #include "Entity.hpp"
+#include <ELGraphics/ERenderChannels.hpp>
 #include <ELMaths/Projection.hpp>
 
 class EntCamera : public Entity
 {
 private:
-	static const EntCamera* _currentCamera;
-
 	Projection _projection;
+
 public:
 	Entity_FUNCS(EntCamera, EEntityID::CAMERA)
 
 	EntCamera() { onTransformChanged += Callback(&_projection, &Projection::UpdateMatrix); }
 	~EntCamera() {}
 
-	void Use() const;
-	void Use(int vpX, int vpY) const;
-	static const EntCamera* Current() { return _currentCamera; }
+	void Use(class RenderQueue&, ERenderChannels channels = ERenderChannels::ALL) const;
+	void Use(class RenderQueue&, int vpX, int vpY, ERenderChannels channels = ERenderChannels::ALL) const;
 
 	Projection& GetProjection() { return _projection; }
 	const Projection& GetProjection() const { return _projection; }

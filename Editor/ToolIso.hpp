@@ -55,9 +55,9 @@ public:
 
 	virtual void Activate(UIContainer& properties, UIContainer& toolProperties) override;
 
-	virtual void MouseMove(const MouseData&) override;
-	virtual void MouseDown(const MouseData&) override;
-	virtual void MouseUp(const MouseData&) override;
+	virtual void MouseMove(MouseData&) override;
+	virtual void MouseDown(MouseData&) override;
+	virtual void MouseUp(MouseData&) override;
 
 	virtual void Render(RenderQueue&) const override;
 

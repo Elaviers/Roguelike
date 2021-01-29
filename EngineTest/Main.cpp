@@ -394,6 +394,7 @@ void Frame()
 		renderQueue.Clear();
 		uiQueue.Clear();
 
+		camera.Use(renderQueue, ERenderChannels::SURFACE | ERenderChannels::UNLIT); //Sky uses custom matrices
 		light1.Render(renderQueue);
 		light2.Render(renderQueue);
 		light3.Render(renderQueue);
@@ -427,9 +428,6 @@ void Frame()
 		{
 			//Bind the unlit shader to the current GL context
 			program_Unlit.Use();
-			
-			//Always do this after using a program. It applies the inverse transformation of the camera as well as the projection to the shader's uniform variables
-			camera.Use();
 
 			//This renders all the stuff in the queue
 			//This will only render entries in the queue that contain the channels UNLIT or EDITOR
@@ -438,16 +436,14 @@ void Frame()
 
 		{
 			program_Lit.Use();
-			camera.Use();
 
-			//The engine is a pooey in the aspect that the texture units 0, 1, 2, and 3 are always bound to the diffuse, normal, specular, and reflectivity textures respectively.
+			//The engine is a tad pooey in the aspect that the texture units 0, 1, 2, and 3 are always bound to the diffuse, normal, specular, and reflectivity textures respectively.
 			//No PBR yet!
 			program_Lit.SetInt(DefaultUniformVars::intCubemap, 100);
 			program_Lit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
 			program_Lit.SetInt(DefaultUniformVars::intTextureNormal, 1);
 			program_Lit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
 			program_Lit.SetInt(DefaultUniformVars::intTextureReflection, 3);
-
 
 			renderQueue.Render(ERenderChannels::SURFACE, *engine.pMeshManager, *engine.pTextureManager, program_Lit.GetInt(DefaultUniformVars::intLightCount));
 		}

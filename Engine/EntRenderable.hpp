@@ -11,7 +11,7 @@ class EntRenderable : public Entity
 private:
 	RenderEntry _renderEntry;
 
-	bool _static; //If static, render entry only calculated when object moves. Static objects are less efficient when they move frequently.
+	bool staticBuffer; //If static, render entry only calculated when object moves. Static objects are less efficient when they move frequently.
 
 	void _UpdateRenderEntry();
 
@@ -37,7 +37,7 @@ public:
 		_material(nullptr),
 		_colour(1.f, 1.f, 1.f),
 		_materialIsDefault(false),
-		_static(false)
+		staticBuffer(false)
 	{
 		onTransformChanged += Callback(this, &EntRenderable::_UpdateRenderEntry);
 	}
@@ -49,7 +49,7 @@ public:
 		_material(other._material),
 		_colour(other._colour),
 		_materialIsDefault(other._materialIsDefault),
-		_static(other._static)
+		staticBuffer(other.staticBuffer)
 	{
 		onTransformChanged += Callback(this, &EntRenderable::_UpdateRenderEntry);
 		_UpdateRenderEntry();
@@ -63,7 +63,7 @@ public:
 	const SharedPointer<const Material>& GetMaterial() const { return _material; }
 	const SharedPointer<const Model>& GetModel() const { return _model; }
 
-	void SetStatic(bool s) { _static = s; if (_static) _UpdateRenderEntry(); }
+	void SetStatic(bool s) { staticBuffer = s; if (staticBuffer) _UpdateRenderEntry(); }
 
 	void SetColour(const Colour& colour) { _colour = colour; _UpdateRenderEntry(); }
 	

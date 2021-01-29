@@ -75,9 +75,9 @@ public:
 
 	virtual void Cancel() override;
 
-	virtual void MouseMove(const MouseData&) override;
-	virtual void MouseDown(const MouseData&) override;
-	virtual void MouseUp(const MouseData&) override;
+	virtual void MouseMove(MouseData&) override;
+	virtual void MouseDown(MouseData&) override;
+	virtual void MouseUp(MouseData&) override;
 	virtual void KeySubmit() override;
 	virtual void KeyDelete() override;
 

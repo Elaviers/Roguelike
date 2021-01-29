@@ -77,7 +77,7 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
 		camera.GetProjection().SetOrthographicScale(8.f);
 		camera.GetProjection().SetNearFar(0.f, 20000.f);
-		camera.SetRelativeRotation(Vector3(-Maths::ArcTangentDegrees(1.f / Maths::SQRT2_F), 45.f, 0.f));
+		camera.SetRelativeRotation(Vector3(Maths::RadiansToDegrees(-Maths::ArcTan(1.f / Maths::SQRT2_F)), 45.f, 0.f));
 		camera.SetRelativePosition(camera.GetRelativeTransform().GetForwardVector() * -10000.f);
 		break;
 

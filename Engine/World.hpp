@@ -33,6 +33,8 @@ public:
 			}
 	}
 
+	void Initialise(const Context&);
+
 	void Clear(const Context&);
 
 	void Update(float deltaTime);

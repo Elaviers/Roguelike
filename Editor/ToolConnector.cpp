@@ -21,7 +21,7 @@ void ToolConnector::Cancel()
 	_placing = false;
 }
 
-void ToolConnector::MouseMove(const MouseData &mouseData)
+void ToolConnector::MouseMove(MouseData &mouseData)
 {
 	/* old
 	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC)
@@ -66,7 +66,7 @@ void ToolConnector::MouseMove(const MouseData &mouseData)
 	*/
 }
 
-void ToolConnector::MouseDown(const MouseData &mouseData)
+void ToolConnector::MouseDown(MouseData &mouseData)
 {
 	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
 }

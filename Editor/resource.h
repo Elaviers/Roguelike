@@ -1,3 +1,7 @@
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ generated include file.
+// Used by Resource.rc
+//
 #define IDI_ICON                        101
 #define IDR_MENU                        102
 #define IDD_RES_SELECT                  103
@@ -8,7 +12,7 @@
 #define IDC_VIEWPORT                    1002
 #define IDC_INFO                        1003
 #define IDC_NAME                        1004
-#define IDC_LIST						1005
+#define IDC_LIST                        1005
 #define ID_FILE_OPEN                    40001
 #define ID_FILE_SAVE                    40002
 #define ID_FILE_SAVEAS                  40003
@@ -21,13 +25,14 @@
 #define ID_SHADING_UNLIT                40010
 #define ID_SHADING_PHONG                40011
 #define ID_DRAWEDITORFEATURES           40012
+#define ID_IMPORT_MESH                  40013
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        107
-#define _APS_NEXT_COMMAND_VALUE         40013
+#define _APS_NEXT_COMMAND_VALUE         40014
 #define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

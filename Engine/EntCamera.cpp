@@ -1,22 +1,21 @@
 #include "EntCamera.hpp"
+#include <ELGraphics/RenderQueue.hpp>
 #include <ELSys/GLProgram.hpp>
 
-const EntCamera* EntCamera::_currentCamera = nullptr;
-
-void EntCamera::Use() const
+void EntCamera::Use(RenderQueue& queue, ERenderChannels channels) const
 {
-	_currentCamera = this;
-	glViewport(0, 0, _projection.GetDimensions().x, _projection.GetDimensions().y);
-	GLProgram::Current().SetMatrix4(DefaultUniformVars::mat4Projection, _projection.GetMatrix());
-	GLProgram::Current().SetMatrix4(DefaultUniformVars::mat4View, GetInverseTransformationMatrix());
+	RenderEntry& e = queue.CreateEntry(channels);
+	e.AddSetViewport(0, 0, _projection.GetDimensions().x, _projection.GetDimensions().y);
+	e.AddSetMat4(RCMDSetMat4::Type::VIEW, GetInverseTransformationMatrix());
+	e.AddSetMat4(RCMDSetMat4::Type::PROJECTION, _projection.GetMatrix());
 }
 
-void EntCamera::Use(int vpX, int vpY) const
+void EntCamera::Use(RenderQueue& queue, int vpX, int vpY, ERenderChannels channels) const
 {
-	_currentCamera = this;
-	glViewport(vpX, vpY, _projection.GetDimensions().x, _projection.GetDimensions().y);
-	GLProgram::Current().SetMatrix4(DefaultUniformVars::mat4Projection, _projection.GetMatrix());
-	GLProgram::Current().SetMatrix4(DefaultUniformVars::mat4View, GetInverseTransformationMatrix());
+	RenderEntry& e = queue.CreateEntry(channels);
+	e.AddSetViewport(vpX, vpY, _projection.GetDimensions().x, _projection.GetDimensions().y);
+	e.AddSetMat4(RCMDSetMat4::Type::VIEW, GetInverseTransformationMatrix());
+	e.AddSetMat4(RCMDSetMat4::Type::PROJECTION, _projection.GetMatrix());
 }
 
 const PropertyCollection& EntCamera::GetProperties()
