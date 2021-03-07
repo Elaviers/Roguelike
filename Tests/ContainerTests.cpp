@@ -64,6 +64,43 @@ namespace EngineTests
 
 				Assert::IsTrue(buffer.GetSize() == 0, L"RemoveIndex error");
 				Assert::IsTrue(buffer2.GetSize() == 0, L"Remove error");
+
+				buffer.Emplace(2);
+				buffer.Emplace(4);
+				buffer.Emplace(5);
+				buffer.Insert(0, 0);
+				buffer.Insert(1, 1);
+				buffer.Insert(3, 3);
+				buffer.Insert(6, 6);
+
+				for (int i = 0; i < buffer.GetSize(); ++i)
+					Assert::IsTrue(buffer[i] == i, L"Buffer insert error");
+
+				buffer.Insert(-1, 3);
+				Assert::IsTrue(buffer[3] == -1, L"Buffer insert error");
+
+				buffer.RemoveIndex(3);
+
+				for (int i = 0; i < buffer.GetSize(); ++i)
+					Assert::IsTrue(buffer[i] == i, L"Buffer insert error");
+
+				buffer.Clear();
+				buffer.Grow(3);
+				Assert::IsTrue(buffer.GetSize() == 3, L"Buffer::Grow error");
+				buffer[0] = 1; buffer[1] = 2; buffer[2] = 3;
+				
+				buffer.Grow(2);
+				Assert::IsTrue(buffer.GetSize() == 5 && buffer[0] == 1 && buffer[1] == 2 && buffer[2] == 3, L"Buffer::Grow error");
+				
+				buffer.Shrink(3);
+				Assert::IsTrue(buffer.GetSize() == 2 && buffer[0] == 1 && buffer[1] == 2, L"Buffer::Shrink error");
+				
+				buffer.Shrink(1);
+				Assert::IsTrue(buffer.GetSize() == 1 && buffer[0] == 1, L"Buffer::Shrink error");
+				buffer.SetSize(11);
+				Assert::IsTrue(buffer.GetSize() == 11 && buffer[0] == 1, L"Buffer::SetSize error");
+				buffer.SetSize(6);
+				Assert::IsTrue(buffer.GetSize() == 6 && buffer[0] == 1, L"Buffer::SetSize error");
 			}
 
 			{

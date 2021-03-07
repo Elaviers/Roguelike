@@ -37,11 +37,9 @@ void main()
 
 	vec2 UV = vec2(UV_IN.x, 1 - UV_IN.y);
 
-	vec3 UVNormal = texture(T_Normal, UV).rgb * 2 - 1;
-
 	vec3 WorldNormal;
 	if (FLAT)	WorldNormal = normalize(cross(dFdy(WorldPosition), dFdx(WorldPosition)));
-	else		WorldNormal = normalize(TBN * UVNormal).xyz;
+	else		WorldNormal = normalize(TBN * (texture(T_Normal, UV).rgb * 2 - 1)).xyz;
 
 	mat4 CameraTransform = inverse(M_View);
 	vec3 CameraPosition = vec3(CameraTransform[3][0], CameraTransform[3][1], CameraTransform[3][2]);
@@ -59,11 +57,12 @@ void main()
 		if (Lights[i].Radius != 0.0)
 		{
 			float Distance = length(Lights[i].Position - WorldPosition);
+
 			if (Lights[i].Radius > 0.0 && Distance > Lights[i].Radius) continue;
 
 			vec3 SurfaceToLight = normalize(Lights[i].Position - WorldPosition);
 			float DiffuseAmount = clamp(dot(WorldNormal, SurfaceToLight), 0.0, 1.0);
-	
+
 			if (DiffuseAmount > 0.0)
 			{
 				float Attenuation;

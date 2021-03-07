@@ -46,7 +46,7 @@ void EntLight::Render(RenderQueue& q) const
 	if (EntLight::drawLightSources)
 	{
 		const float colour[4] = { _colour.x, _colour.y, _colour.z, 1.f };
-		RenderEntry& de = q.CreateEntry(ERenderChannels::UNLIT);
+		RenderEntry& de = q.CreateEntry(ERenderChannels::EDITOR);
 		de.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 		de.AddSetColour(Colour(Vector4(_colour, 1.f)));
 		de.AddSetTransform(Matrix4::Scale(_editorBoxExtent * 2.f) * GetTransformationMatrix());

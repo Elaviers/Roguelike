@@ -150,7 +150,7 @@ void ToolIso::Activate(UIContainer& properties, UIContainer& toolProperties)
 			_textDeleteOnLevel
 		}))->SetZ(-1.f);
 
-	new UIPropertyManipulator(UICoord(1.f, -2.f * ih), ih, _owner, *_GetProperties().Find("Level"), this, &toolProperties);
+	auto p = new UIPropertyManipulator(UICoord(1.f, -2.f * ih), ih, _owner, *_GetProperties().Find("Level"), this, &toolProperties);
 	new UIPropertyManipulator(UICoord(1.f, -3.f * ih), ih, _owner, *_GetProperties().Find("Size"), this, &toolProperties);
 
 	_tileSelectors.Clear();
@@ -217,7 +217,7 @@ void ToolIso::MouseMove(MouseData& mouseData)
 
 void ToolIso::MouseDown(MouseData& mouseData)
 {
-	if (mouseData.viewport->GetCameraType() == Viewport::ECameraType::ISOMETRIC)
+	if (mouseData.viewport && mouseData.viewport->GetCameraType() == Viewport::ECameraType::ISOMETRIC)
 	{
 		_dragging = true;
 		_dragGeometry = dynamic_cast<GeoIsoTile*>(mouseData.hoverGeometry);

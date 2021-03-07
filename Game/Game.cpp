@@ -222,7 +222,7 @@ void Game::Render()
 	glDepthFunc(GL_LEQUAL);
 
 	_shaderUnlit.Use();
-	_uiQueue.Render(ERenderChannels::UNLIT, *_engine.pMeshManager, *_engine.pTextureManager, 0);
+	_uiQueue.Render(ERenderChannels::UNLIT, _engine.pMeshManager, _engine.pTextureManager, 0);
 
 	if (activeCamera)
 	{
@@ -233,10 +233,10 @@ void Game::Render()
 		_shaderLit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
 		_shaderLit.SetInt(DefaultUniformVars::intTextureReflection, 3);
 		_reflect.Bind(100);
-		_renderQueue.Render(ERenderChannels::SURFACE, *_engine.pMeshManager, *_engine.pTextureManager, _shaderLit.GetInt(DefaultUniformVars::intLightCount));
+		_renderQueue.Render(ERenderChannels::SURFACE, _engine.pMeshManager, _engine.pTextureManager, _shaderLit.GetInt(DefaultUniformVars::intLightCount));
 	
 		_shaderUnlit.Use();
-		_renderQueue.Render(ERenderChannels::UNLIT, *_engine.pMeshManager, *_engine.pTextureManager, 0);
+		_renderQueue.Render(ERenderChannels::UNLIT, _engine.pMeshManager, _engine.pTextureManager, 0);
 	}
 
 	_window.SwapBuffers();

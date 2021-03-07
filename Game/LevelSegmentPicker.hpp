@@ -32,8 +32,6 @@ public:
 	public:
 		BagItem() : _isEssential(false), _owner(nullptr), _bag(nullptr), segment(nullptr) {}
 		BagItem(bool essential, LevelSegmentPicker* owner, SegmentBag* bag, const Entity* segment) : _isEssential(essential), _owner(owner), _bag(bag), segment(segment) {}
-		BagItem(const BagItem&) = delete;
-		BagItem(BagItem&&) = delete;
 
 		const Entity* segment;
 

@@ -44,7 +44,7 @@ void Console::_ExpandBuffer()
 		_nextBufferIndex -= maxAllocSize;
 	}
 	else
-		_charBuffer.Append(allocUnitSize);
+		_charBuffer.Grow(allocUnitSize);
 }
 
 void Console::Print(const char* string)

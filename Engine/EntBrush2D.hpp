@@ -59,13 +59,13 @@ public:
 
 	virtual const Collider* GetCollider() const override
 	{
-		static Collider collider(ECollisionChannels::SURFACE, CollisionBox(Box(Vector3(), Vector3(.5f, .5f, .5f))));
+		static Collider collider(ECollisionChannels::SURFACE, CollisionBox(Box(Vector3(0.f, -.5f, 0.f), Vector3(.5f, .5f, .5f))));
 		return &collider;
 	}
 
 	virtual Bounds GetBounds() const override
 	{
-		static Bounds bounds(Vector3(.5f, .5f, .5f));
+		static Bounds bounds(Vector3(.5f, 0.f, .5f));
 		return bounds;
 	}
 	

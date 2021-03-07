@@ -53,6 +53,11 @@ namespace EngineTests
 			for (int i = 0; i < floats1_c; ++i)
 				w.Write_float(floats1[i]);
 
+			const int doubles1_c = 5;
+			double doubles1[doubles1_c] = { 0.0000000334455827732664, 20000.334775999000038832, 0, -124775858587457.33333, 12.000000000001 };
+			for (int i = 0; i < doubles1_c; ++i)
+				w.Write_double(doubles1[i]);
+
 			const int strings1_c = 4;
 			const String strings1[strings1_c] = {"", "Blah blah blah blah blah", "", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab01"};
 			for (int i = 0; i < strings1_c; ++i)
@@ -62,7 +67,7 @@ namespace EngineTests
 					w.Write(strings1[i]);
 
 			ByteReader r1(bb);
-			ByteReader r2(bb.Data(), bb.GetSize());
+			ByteReader r2(bb.Elements(), bb.GetSize());
 
 			for (int i = 0; i < ints1_c; ++i)
 			{
@@ -76,6 +81,12 @@ namespace EngineTests
 				Assert::AreEqual(floats1[i], r2.Read_float());
 			}
 
+			for (int i = 0; i < doubles1_c; ++i)
+			{
+				Assert::AreEqual(doubles1[i], r1.Read_double());
+				Assert::AreEqual(doubles1[i], r2.Read_double());
+			}
+			
 			for (int i = 0; i < strings1_c; ++i)
 			{
 				Assert::IsTrue(strings1[i] == r1.Read<String>());
@@ -84,13 +95,16 @@ namespace EngineTests
 
 			Buffer<byte> bb2;
 			bb2.SetSize(bb.GetSize());
-			w = ByteWriter(bb2.Data(), bb2.GetSize());
+			w = ByteWriter(bb2.Elements(), bb2.GetSize());
 
 			for (int i = 0; i < ints1_c; ++i)
 				w.Write_uint32(ints1[i]);
 
 			for (int i = 0; i < floats1_c; ++i)
 				w.Write_float(floats1[i]);
+
+			for (int i = 0; i < doubles1_c; ++i)
+				w.Write_double(doubles1[i]);
 
 			for (int i = 0; i < strings1_c; ++i)
 				if (i > 1)
@@ -110,6 +124,14 @@ namespace EngineTests
 				float reconv = binary32.ToFloat_ForceConversion();
 
 				Assert::AreEqual(f, reconv);
+			}
+
+			for (double d = -200; d < 200; d += 0.01)
+			{
+				Double_IEEE754 binary64 = Double_IEEE754::FromDouble_ForceConversion(d);
+				double reconv = binary64.ToDouble_ForceConversion();
+
+				Assert::AreEqual(d, reconv);
 			}
 		}
 	};

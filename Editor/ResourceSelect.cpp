@@ -179,11 +179,11 @@ public:
 			programLit->SetVec2(DefaultUniformVars::vec2UVOffset, Vector2());
 			programLit->SetVec2(DefaultUniformVars::vec2UVScale, Vector2(1, 1));
 
-			renderQueue.Render(ERenderChannels::SURFACE, *engine.pMeshManager, *engine.pTextureManager, programLit->GetInt(DefaultUniformVars::intLightCount));
+			renderQueue.Render(ERenderChannels::SURFACE, engine.pMeshManager, engine.pTextureManager, programLit->GetInt(DefaultUniformVars::intLightCount));
 		}
 
 		programUnlit->Use();
-		renderQueue.Render(ERenderChannels::UNLIT | ERenderChannels::SPRITE, *engine.pMeshManager, *engine.pTextureManager, 0);
+		renderQueue.Render(ERenderChannels::UNLIT | ERenderChannels::SPRITE, engine.pMeshManager, engine.pTextureManager, 0);
 
 		::SwapBuffers(viewportDC);
 	};

@@ -11,7 +11,7 @@ void EntBrush2D::_OnTransformChanged()
 		float hh = GetRelativeScale().z / 2.f;
 
 		_point1 = Vector2(GetRelativePosition().x - hw, GetRelativePosition().z - hh);
-		_point2 = Vector2(GetRelativePosition().x + hh, GetRelativePosition().z + hh);
+		_point2 = Vector2(GetRelativePosition().x + hw, GetRelativePosition().z + hh);
 	}
 }
 
@@ -24,7 +24,7 @@ void EntBrush2D::_OnPointChanged()
 
 	_updatingTransform = true;
 	SetRelativePosition(Vector3(x, _level, z));
-	SetRelativeScale(Vector3(w, 0.f, h));
+	SetRelativeScale(Vector3(w, 1.f, h));
 	_updatingTransform = false;
 }
 
@@ -67,9 +67,9 @@ void EntBrush2D::ReadData(ByteReader &reader, const NumberedSet<String> &strings
 
 	_level = GetRelativePosition().y;
 	_point1.x = GetRelativePosition().x - GetRelativeScale().x / 2.f;
-	_point1.y = GetRelativePosition().z - GetRelativeScale().y / 2.f;
+	_point1.y = GetRelativePosition().z - GetRelativeScale().z / 2.f;
 	_point2.x = GetRelativePosition().x + GetRelativeScale().x / 2.f;
-	_point2.y = GetRelativePosition().z + GetRelativeScale().y / 2.f;
+	_point2.y = GetRelativePosition().z + GetRelativeScale().z / 2.f;
 }
 
 const PropertyCollection& EntBrush2D::GetProperties()

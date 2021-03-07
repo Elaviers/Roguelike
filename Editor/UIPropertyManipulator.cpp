@@ -191,7 +191,7 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 	_textbox = new UITextbox(this);
 	_textbox->SetBounds(UIBounds(.5f, 0.f, UICoord(.5f, tbWidthOffset), 1.f));
 	_textbox->SetReadOnly(readOnly).SetMaterial(btnMat).SetBorderSize(borderSize)
-		.SetFont(font).SetTextColour(textColour).SetTextShadowColour(textShadowColour).SetTextShadowOffset(textShadowOffset)
+		.SetFont(font).SetTextColour(textColour).SetTextShadowColour(textShadowColour).SetTextShadowOffset(textShadowOffset).SetTextAlignment(ETextAlignment::LEFT)
 		.SetText(Text(GetPropertyString(_property, _object, _editorInstance.engine))).SetColour(textboxColour);
 
 	if (!readOnly)

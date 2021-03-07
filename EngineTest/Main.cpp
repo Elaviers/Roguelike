@@ -431,7 +431,7 @@ void Frame()
 
 			//This renders all the stuff in the queue
 			//This will only render entries in the queue that contain the channels UNLIT or EDITOR
-			renderQueue.Render(ERenderChannels::UNLIT | ERenderChannels::EDITOR, *engine.pMeshManager, *engine.pTextureManager, 0);
+			renderQueue.Render(ERenderChannels::UNLIT | ERenderChannels::EDITOR, engine.pMeshManager, engine.pTextureManager, 0);
 		}
 
 		{
@@ -445,7 +445,7 @@ void Frame()
 			program_Lit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
 			program_Lit.SetInt(DefaultUniformVars::intTextureReflection, 3);
 
-			renderQueue.Render(ERenderChannels::SURFACE, *engine.pMeshManager, *engine.pTextureManager, program_Lit.GetInt(DefaultUniformVars::intLightCount));
+			renderQueue.Render(ERenderChannels::SURFACE, engine.pMeshManager, engine.pTextureManager, program_Lit.GetInt(DefaultUniformVars::intLightCount));
 		}
 
 		//Draw sky
@@ -463,7 +463,7 @@ void Frame()
 			program_Sky.SetMatrix4(DefaultUniformVars::mat4View, skyView);
 
 			glDepthFunc(GL_LEQUAL);
-			renderQueue.Render(ERenderChannels::SKY, *engine.pMeshManager, *engine.pTextureManager, 0);
+			renderQueue.Render(ERenderChannels::SKY, engine.pMeshManager, engine.pTextureManager, 0);
 			glDepthFunc(GL_LESS);
 		}
 
@@ -472,7 +472,7 @@ void Frame()
 			program_Unlit.Use();
 			program_Unlit.SetMatrix4(DefaultUniformVars::mat4Projection, uiProjectionMatrix);
 			program_Unlit.SetMatrix4(DefaultUniformVars::mat4View, Matrix4::Identity());
-			uiQueue.Render(ERenderChannels::UNLIT, *engine.pMeshManager, *engine.pTextureManager, 0);
+			uiQueue.Render(ERenderChannels::UNLIT, engine.pMeshManager, engine.pTextureManager, 0);
 		}
 			
 		//

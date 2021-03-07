@@ -58,10 +58,9 @@ void main()
 
 	VertexColour = VertexColour_IN;
 	UV = UV_IN * UVScale + UVOffset;
-	TBN = 
-		mat3(
-			normalize((M_Model * vec4(tangent, 0)).xyz), 
-			normalize((M_Model * vec4(bitangent, 0)).xyz), 
-			normalize((M_Model * vec4(normal, 0)).xyz)
-			);
+	TBN = mat3(
+		normalize((M_Model * vec4(tangent, 0)).xyz), 
+		normalize((M_Model * vec4(bitangent, 0)).xyz), 
+		normalize((M_Model * vec4(normal, 0)).xyz)
+	);
 }

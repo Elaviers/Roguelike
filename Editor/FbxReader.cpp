@@ -154,7 +154,7 @@ class FbxMeshDataImporter
 				uint32 v3 = _GetIndexForVertex(_ReadMeshVertex(mesh, i, 2, uvSet));
 
 				size_t last = _elements.GetSize();
-				_elements.Append(3);
+				_elements.Grow(3);
 				_elements[last] = v1;
 				_elements[last + 1] = v2;
 				_elements[last + 2] = v3;
@@ -164,7 +164,7 @@ class FbxMeshDataImporter
 					uint32 v4 = _GetIndexForVertex(_ReadMeshVertex(mesh, i, 3, uvSet));
 
 					size_t last = _elements.GetSize();
-					_elements.Append(3);
+					_elements.Grow(3);
 					_elements[last] = v1;
 					_elements[last + 1] = v3;
 					_elements[last + 2] = v4;

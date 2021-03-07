@@ -266,7 +266,7 @@ void ToolSelect::MouseMove(MouseData &mouseData)
 		if (t < INFINITY)
 		{
 			_hoverObject.Clear();
-			_owner.SetCursor(ECursor::HAND);
+			_owner.TrySetCursor(ECursor::HAND);
 			return;
 		}
 	}
@@ -355,7 +355,7 @@ void ToolSelect::MouseMove(MouseData &mouseData)
 
 				if (mouseData.unitX >= bounds.min[rightElement] && mouseData.unitX <= bounds.max[rightElement] && mouseData.unitY >= bounds.min[upElement] && mouseData.unitY <= bounds.max[upElement])
 				{
-					_owner.SetCursor(ECursor::HAND);
+					_owner.TrySetCursor(ECursor::HAND);
 					_hoverObject = _selection[i].entity;
 					_hoverObjectIsSelected = true;
 					found = true;
@@ -375,7 +375,7 @@ void ToolSelect::MouseMove(MouseData &mouseData)
 			_SetHoverObject(mouseData.hoverEntity);
 
 			if (_hoverObjectIsSelected == false)
-				_owner.SetCursor(ECursor::HAND);
+				_owner.TrySetCursor(ECursor::HAND);
 		}
 		else
 			_hoverObject.Clear();
@@ -529,7 +529,7 @@ void ToolSelect::ClearSelection()
 			_selection[i].entity->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoTransform);
 
 	_owner.ClearProperties();
-	_selection.SetSize(0);
+	_selection.Clear();
 	_hoverObject.Clear();
 
 	_activeGizmo = nullptr;

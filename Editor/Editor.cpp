@@ -2,6 +2,9 @@
 #include <Engine/Console.hpp>
 #include <Engine/EntLight.hpp>
 #include <Engine/EntRenderable.hpp>
+#include <Engine/imgui/imgui.h>
+#include <Engine/imgui/imgui_impl_win32.h>
+#include <Engine/imgui/imgui_impl_opengl3.h>
 #include <ELCore/TextProvider.hpp>
 #include <ELGraphics/Colour.hpp>
 #include <ELGraphics/DebugFrustum.hpp>
@@ -25,6 +28,8 @@
 #include "StringSelect.hpp"
 #include "UIPropertyManipulator.hpp"
 
+#define IDMAP_DEBUG 0
+
 constexpr int tbImageSize = 32;
 
 constexpr GLfloat lineW = 1;
@@ -44,6 +49,9 @@ Editor::~Editor()
 {
 	if (_fbxManager)
 		_fbxManager->Destroy();
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplWin32_Shutdown();
 }
 
 #pragma region Init
@@ -119,6 +127,8 @@ void Editor::_Init()
 
 	inputManager->BindKeyDown(EKeycode::SQBRACKETLEFT, Callback(this, &Editor::DecreaseGridUnit));
 	inputManager->BindKeyDown(EKeycode::SQBRACKETRIGHT, Callback(this, &Editor::IncreaseGridUnit));
+	
+	inputManager->BindKeyDown(EKeycode::F1, [this]() { showUtilsPanel = !showUtilsPanel; });
 
 	_world.Initialise(engine.context);
 	_world.RootEntity().onNameChanged +=	Callback(this, &Editor::RefreshLevel);
@@ -221,9 +231,19 @@ void Editor::_Init()
 
 	SetTool(ETool::SELECT);
 
-
 	engine.pConsole->Cvars().Add<uint32>("dbga", dbgIDA);
 	engine.pConsole->Cvars().Add<uint32>("dbgb", dbgIDB);
+
+	//Third party (IMGUI)
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	
+	ImGui::StyleColorsDark();
+
+	ImGui::GetIO().IniFilename = NULL;
+
+	ImGui_ImplWin32_Init(_vpArea.GetHWND());
+	ImGui_ImplOpenGL3_Init("#version 410");
 }
 
 void Editor::_InitGL()
@@ -265,12 +285,17 @@ void Editor::_InitGL()
 
 #pragma endregion
 
-void Editor::SetCursor(ECursor cursor)
+void Editor::TrySetCursor(ECursor cursor)
 {
-	if (cursor != _prevCursor)
+	if (_canChangeCursor)
 	{
-		_prevCursor = cursor;
-		System::SetCursor(cursor);
+		if (cursor != _prevCursor)
+		{
+			_prevCursor = cursor;
+			System::SetCursor(cursor);
+		}
+		
+		_canChangeCursor = false;
 	}
 }
 
@@ -333,19 +358,47 @@ void Editor::Frame()
 	if (_deltaTime > .1f) //Do not allow very long time deltas, they screw up the physics
 		_deltaTime = 0.1f;
 
-	POINT cursorPos;
-	if (::GetCursorPos(&cursorPos))
 	{
-		RECT client;
-		if (::GetWindowRect(_vpArea.GetHWND(), &client))
-		{
-			uint16 x = (uint16)(cursorPos.x - client.left);
-			uint16 y = _uiCamera.GetProjection().GetDimensions().y - (uint16)(cursorPos.y - client.top);
-			_ui.OnMouseMove(false, x, y);
-			
-			SetCursor(_ui.GetCursor());
+		//IMGUI
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
 
-			UpdateMousePosition(x, y);
+		if (showDemoPanel)
+			ImGui::ShowDemoWindow(&showDemoPanel);
+
+		if (showUtilsPanel)
+		{
+			ImGui::Begin("Editor Utilities", &showUtilsPanel);
+			ImGui::Text("Average frametime is %.3f ms (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			if (ImGui::Button("Test ImGui"))
+				showDemoPanel = true;;
+
+			ImGui::End();
+		}
+	}
+
+	if (!ImGui::GetIO().WantCaptureMouse)
+	{
+		POINT clientCursorPos;
+		if (::GetCursorPos(&clientCursorPos) && ::ScreenToClient(_vpArea.GetHWND(), &clientCursorPos))
+		{
+			RECT client;
+			if (::GetClientRect(_vpArea.GetHWND(), &client))
+			{
+				if (clientCursorPos.x >= client.left && clientCursorPos.y >= client.top && clientCursorPos.x < client.right && clientCursorPos.y < client.bottom)
+				{
+					uint16 x = (uint16)(clientCursorPos.x - client.left);
+					uint16 y = _uiCamera.GetProjection().GetDimensions().y - (uint16)(clientCursorPos.y - client.top);
+					_ui.OnMouseMove(false, x, y);
+
+					_prevCursor = System::GetCursor();
+					_canChangeCursor = ::GetFocus() == _vpArea.GetHWND();
+					UpdateMousePosition(x, y);
+					TrySetCursor(_ui.GetCursor());
+					_canChangeCursor = false;
+				}
+			}
 		}
 	}
 
@@ -364,7 +417,6 @@ void Editor::Frame()
 
 	if (_viewports[0].GetCameraType() == Viewport::ECameraType::PERSPECTIVE)
 		engine.pDebugManager->AddToWorld(DebugFrustum::FromCamera(_viewports[0].camera.GetWorldTransform(), _viewports[0].camera.GetProjection()));
-
 
 	Entity* dbgObjA = _world.RootEntity().FindChild(dbgIDA);
 	Entity* dbgObjB = _world.RootEntity().FindChild(dbgIDB);
@@ -392,6 +444,7 @@ void Editor::Frame()
 
 	_world.Update(_deltaTime);
 	_ui.Update(_deltaTime);
+
 	Render();
 
 	//calculate hover entity/geometry
@@ -430,7 +483,12 @@ void Editor::Render()
 		RenderViewport(_viewports[i]);
 
 	_shaderUnlit.Use();
-	_uiQueue.Render(ERenderChannels::UNLIT, *engine.pMeshManager, *engine.pTextureManager, 0);	
+	_uiQueue.Render(ERenderChannels::UNLIT, engine.pMeshManager, engine.pTextureManager, 0);
+
+	//IMGUI RENDER
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 	_vpArea.SwapBuffers();
 	
 
@@ -445,7 +503,7 @@ void Editor::Render()
 	glDepthFunc(GL_LEQUAL);
 
 	_shaderUnlit.Use();
-	_consoleQueue.Render(ERenderChannels::UNLIT, *engine.pMeshManager, *engine.pTextureManager, 0);
+	_consoleQueue.Render(ERenderChannels::UNLIT, engine.pMeshManager, engine.pTextureManager, 0);
 	_consoleWindow.SwapBuffers();
 }
 
@@ -466,7 +524,7 @@ void Editor::RenderViewport(Viewport& vp)
 	camera.Use(vp.renderQueue, (int)bounds.x, (int)bounds.y);
 	_world.Render(vp.renderQueue, frustum);
 
-	camera.Use(vp.renderQueue2, (int)bounds.x, (int)bounds.y);
+	camera.Use(vp.renderQueue2, 0, 0);
 	_world.RenderIDMap(vp.renderQueue2, frustum);
 
 	if (_drawEditorFeatures)
@@ -499,10 +557,10 @@ void Editor::RenderViewport(Viewport& vp)
 	_shaderLit.SetInt(DefaultUniformVars::intTextureNormal, 1);
 	_shaderLit.SetInt(DefaultUniformVars::intTextureSpecular, 2);
 	_shaderLit.SetInt(DefaultUniformVars::intTextureReflection, 3);
-	vp.renderQueue.Render(_litRenderChannels, *engine.pMeshManager, *engine.pTextureManager, _shaderLit.GetInt(DefaultUniformVars::intLightCount));
+	vp.renderQueue.Render(_litRenderChannels, engine.pMeshManager, engine.pTextureManager, _shaderLit.GetInt(DefaultUniformVars::intLightCount));
 
 	_shaderUnlit.Use();
-	vp.renderQueue.Render(_unlitRenderChannels | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), *engine.pMeshManager, *engine.pTextureManager, 0);
+	vp.renderQueue.Render(_unlitRenderChannels | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), engine.pMeshManager, engine.pTextureManager, 0);
 
 	///////// ID MAP
 	if (&vp == _mouseData.viewport)
@@ -512,23 +570,28 @@ void Editor::RenderViewport(Viewport& vp)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		_shaderIDMap.Use();
-		vp.renderQueue2.Render(ERenderChannels::SURFACE | ERenderChannels::UNLIT | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), *engine.pMeshManager, *engine.pTextureManager, 0);
+		vp.renderQueue2.Render(ERenderChannels::SURFACE | ERenderChannels::UNLIT | (_drawEditorFeatures ? ERenderChannels::EDITOR : ERenderChannels::NONE), engine.pMeshManager, engine.pTextureManager, 0);
 		GLFramebuffer::Unbind();
-	}
 
-	/* IDMAP DEBUG
-	_shaderUnlit.Use();
-	camera.Use((int)bounds.x, (int)bounds.y);
-	RenderQueue t;
-	RenderEntry& te = t.CreateEntry(ERenderChannels::UNLIT);
-	te.AddSetTransform(Matrix4::Transformation(Vector3(0.f, 1.5f, 0.f), Vector3(), Vector3(3.f, 3.f, 3.f)));
-	te.AddSetColour(Colour::White);
-	te.AddSetUVScale(Vector2(1.f, -1.f));
-	te.AddSetUVOffset();
-	te.AddSetTextureGL(vp.GetFramebufferTexGL(), 0);
-	te.AddCommand(RCMDRenderMesh::PLANE);
-	t.Render(ERenderChannels::UNLIT, *engine.pMeshManager, *engine.pTextureManager, 0);
-	*/
+#if IDMAP_DEBUG
+		{
+			glViewport(bounds.x, bounds.y, bounds.w, bounds.h);
+
+			_shaderUnlit.Use();
+			RenderQueue t;
+			RenderEntry& te = t.CreateEntry(ERenderChannels::UNLIT);
+			te.AddSetMat4(RCMDSetMat4::Type::PROJECTION, Matrix4::ProjectionOrtho(-.5f, .5f, -.5f, .5f, -1.f, 1.f, 1.f));
+			te.AddSetMat4(RCMDSetMat4::Type::VIEW, Matrix4::Identity());
+			te.AddSetTransform(Matrix4::Transformation(Vector3(0.f, 0.f, -1.f), Quaternion(), Vector3(1.f, 1.f, 1.f)));
+			te.AddSetColour(Colour::White);
+			te.AddSetUVScale(Vector2(1.f, -1.f));
+			te.AddSetUVOffset();
+			te.AddSetTextureGL(vp.GetFramebufferTexGL(), 0);
+			te.AddCommand(RCMDRenderMesh::PLANE);
+			t.Render(ERenderChannels::UNLIT, engine.pMeshManager, engine.pTextureManager, 0);
+		}
+#endif
+	}
 }
 
 void Editor::ResizeViews(uint16 w, uint16 h)
@@ -909,6 +972,8 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 		LPCREATESTRUCT create = (LPCREATESTRUCT)lparam;
 		editor = (Editor*)create->lpCreateParams;
 		::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)editor);
+
+		::CheckMenuItem(::GetMenu(hwnd), ID_SHADING_UNLIT, MF_CHECKED);
 	}
 	break;
 
@@ -1065,11 +1130,17 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			case ID_SHADING_UNLIT:
 				editor->_litRenderChannels = ERenderChannels::NONE;
 				editor->_unlitRenderChannels = ERenderChannels::SURFACE | ERenderChannels::UNLIT;
+
+				::CheckMenuItem(::GetMenu(hwnd), ID_SHADING_UNLIT, MF_CHECKED);
+				::CheckMenuItem(::GetMenu(hwnd), ID_SHADING_PHONG, MF_UNCHECKED);
 				break;
 
 			case ID_SHADING_PHONG:
 				editor->_litRenderChannels = ERenderChannels::SURFACE;
 				editor->_unlitRenderChannels = ERenderChannels::UNLIT;
+
+				::CheckMenuItem(::GetMenu(hwnd), ID_SHADING_UNLIT, MF_UNCHECKED);
+				::CheckMenuItem(::GetMenu(hwnd), ID_SHADING_PHONG, MF_CHECKED);
 				break;
 
 			case ID_DRAWEDITORFEATURES:
@@ -1109,8 +1180,21 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 	return 0;
 }
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+	bool noInput = false;
+
+	if (ImGui::GetCurrentContext())
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		noInput = io.WantCaptureMouse || io.WantCaptureKeyboard;
+	}
+
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+		return TRUE;
+
 	Editor *editor = (Editor*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
 	switch (msg)
@@ -1120,12 +1204,22 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 		LPCREATESTRUCT create = (LPCREATESTRUCT)lparam;
 		::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)create->lpCreateParams);
 	}
-	break;
+	return 0;
 
 	case WM_SIZE:
 		editor->ResizeViews(LOWORD(lparam), HIWORD(lparam));
-		break;
+		return 0;
 
+	case WM_KILLFOCUS:
+		editor->engine.pInputManager->Reset();
+		return 0;
+	}
+
+	if (noInput)
+		return ::DefWindowProc(hwnd, msg, wparam, lparam);
+
+	switch (msg)
+	{
 	case WM_MOUSEWHEEL:
 		if ((signed short)HIWORD(wparam) > 0)
 			editor->Zoom(1.25f);
@@ -1147,7 +1241,7 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 			editor->LeftMouseUp();
 		else
 			editor->engine.pInputManager->Reset();
-		
+
 		break;
 
 	case WM_RBUTTONDOWN:
@@ -1180,10 +1274,6 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 		if (!editor->_ui.KeyUp((EKeycode)wparam))
 			editor->engine.pInputManager->KeyUp((EKeycode)WindowFunctions::SplitKeyWPARAMLeftRight(wparam));
 
-		break;
-
-	case WM_KILLFOCUS:
-		editor->engine.pInputManager->Reset();
 		break;
 
 	default: return ::DefWindowProc(hwnd, msg, wparam, lparam);

@@ -302,5 +302,5 @@ bool World::Write(const char* filename, const Context& ctx) const
 		WriteStringMessage(writer1, stringBuffer[i]->second, stringBuffer[i]->first);
 
 	Buffer<byte> finalBuffer = buffer1 + buffer2;
-	return IO::WriteFile(filename, finalBuffer.Data(), (uint32)finalBuffer.GetSize());
+	return IO::WriteFile(filename, finalBuffer.Elements(), (uint32)finalBuffer.GetSize());
 }

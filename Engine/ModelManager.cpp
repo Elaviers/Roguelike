@@ -1,4 +1,5 @@
 #include "ModelManager.hpp"
+#include <ELCore/Context.hpp>
 #include <ELGraphics/MeshManager.hpp>
 #include <ELPhys/CollisionBox.hpp>
 
@@ -10,6 +11,28 @@ Model* ModelManager::_CreateResource(const Buffer<byte>& data, const String& nam
 
 	return model;
 }
+
+bool ModelManager::_CreateAlternative(Model*& resource, const String& name, const Context& ctx)
+{
+	if (resource)
+	{
+		SharedPointer<const Mesh> mesh = ctx.GetPtr<MeshManager>()->Get(name, ctx);
+		if (mesh)
+		{
+			resource->SetMesh(mesh);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+Buffer<const AssetManagerBase*> ModelManager::_GetFallbackManagers(const Context& ctx) const
+{
+	return { (const AssetManagerBase*)ctx.GetPtr<MeshManager>() };
+}
+
 
 void ModelManager::Initialise(MeshManager& meshManager)
 {

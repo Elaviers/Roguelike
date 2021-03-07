@@ -67,6 +67,7 @@ private:
 
 	Viewport _viewports[VIEWPORTCOUNT];
 
+	bool _canChangeCursor = false;
 	ECursor _prevCursor = ECursor::NONE;
 
 	//Rendering
@@ -104,6 +105,10 @@ private:
 
 	float _gridUnit = 1.f;
 
+	//imgui
+	bool showUtilsPanel = false;
+	bool showDemoPanel = false;
+
 	static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
 	static LRESULT CALLBACK _vpAreaProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -133,7 +138,7 @@ public:
 	Editor() : _fbxManager(nullptr), _hierachyWindow(this), tools(*this), _gridZ(0.f) {}
 	~Editor();
 
-	void SetCursor(ECursor cursor);
+	void TrySetCursor(ECursor cursor);
 
 	void Run();
 	void Frame();

@@ -42,7 +42,9 @@ void GizmoBrushSizer2D::SetObjectTransform(const Transform& objectTransform)
 
 void GizmoBrushSizer2D::Render(RenderQueue& q) const
 {
-	RenderEntry& e = q.CreateEntry(ERenderChannels::EDITOR);
+	RenderEntry& e = q.CreateEntry(ERenderChannels::UNLIT);
+
+	e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 
 	if (_canDrag)
 		e.AddSetColour(Colour(1.f - _colour.r, 1.f - _colour.g, 1.f - _colour.b));
