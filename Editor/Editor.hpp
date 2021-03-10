@@ -70,6 +70,8 @@ private:
 	bool _canChangeCursor = false;
 	ECursor _prevCursor = ECursor::NONE;
 
+	Vector2T<uint16> _pendingResize;
+
 	//Rendering
 	GLContext _glContext;
 	GLProgram _shaderLit;
@@ -115,7 +117,6 @@ private:
 	void _Init();
 	void _InitGL();
 
-	void _OnSplitterDragged(UISplitter&) { _RefreshVPs(); }
 	void _RefreshVPs();
 
 	void _OnToolbarItemSelection(UIToolbarItem& item) { SetTool((ETool)item.GetUserData(), false); }
@@ -163,8 +164,6 @@ public:
 
 	void ToggleConsole();
 	void RefreshLevel();
-
-	void ResizeViews(uint16 w, uint16 h);
 
 	String SelectMaterialDialog();
 	String SelectModelDialog();

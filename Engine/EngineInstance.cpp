@@ -70,8 +70,8 @@ void EngineInstance::Init(EEngineCreateFlags flags)
 	if (pConsole)
 	{
 		//Commands
-		pConsole->Cvars().CreateVar("TexMgr", CommandPtr(pConsole, &Console::CMD_texmgr));
-		pConsole->Cvars().CreateVar("Play", CommandPtr(pAudioManager, &AudioManager::CMD_play));
+		pConsole->Cvars().CreateVar("TexMgr", CommandPtr(*pConsole, &Console::CMD_texmgr));
+		pConsole->Cvars().CreateVar("Play", CommandPtr(*pAudioManager, &AudioManager::CMD_play));
 	}
 
 	if (pAnimationManager)

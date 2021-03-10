@@ -24,7 +24,7 @@ public:
 
 	EntBrush2D() : _axis(EAxis::Y), _updatingTransform(false), _level(0.f) 
 	{ 
-		onTransformChanged += Callback(this, &EntBrush2D::_OnTransformChanged);
+		onTransformChanged += Callback(*this, &EntBrush2D::_OnTransformChanged);
 	}
 
 	EntBrush2D(const EntBrush2D& other) : 
@@ -35,7 +35,7 @@ public:
 		_level(other._level), 
 		_updatingTransform(false)
 	{
-		onTransformChanged += Callback(this, &EntBrush2D::_OnTransformChanged);
+		onTransformChanged += Callback(*this, &EntBrush2D::_OnTransformChanged);
 	}
 
 	virtual ~EntBrush2D() {}

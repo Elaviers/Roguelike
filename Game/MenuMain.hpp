@@ -13,14 +13,14 @@ class MenuMain : public UIContainer
 
 	UITextButton _buttonSingleLevel;
 
-	FunctionPointer<void, const String&> _onLevelChosen;
+	Function<void, const String&> _onLevelChosen;
 	Callback _onQuit;
 
 public:
 	MenuMain() {}
 	virtual ~MenuMain() {}
 
-	void Initialise(const FunctionPointer<void, const String&> &onLevelChosen, const Callback &onQuit, EngineInstance& engineInstance);
+	void Initialise(const Function<void, const String&> &onLevelChosen, const Callback &onQuit, EngineInstance& engineInstance);
 
 	void ButtonStart(UIButton&);
 	void ButtonQuit(UIButton&);

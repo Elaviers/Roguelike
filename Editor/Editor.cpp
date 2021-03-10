@@ -119,20 +119,20 @@ void Editor::_Init()
 	inputManager->BindKeyAxis(EKeycode::RIGHT, &_axisLookX, 1.f);
 	inputManager->BindKeyAxis(EKeycode::LEFT, &_axisLookX, -1.f);
 
-	inputManager->BindKeyDown(EKeycode::ENTER, Callback(this, &Editor::KeySubmit));
-	inputManager->BindKeyDown(EKeycode::ESCAPE, Callback(this, &Editor::KeyCancel));
-	inputManager->BindKeyDown(EKeycode::DEL, Callback(this, &Editor::KeyDelete));
+	inputManager->BindKeyDown(EKeycode::ENTER, Callback(*this, &Editor::KeySubmit));
+	inputManager->BindKeyDown(EKeycode::ESCAPE, Callback(*this, &Editor::KeyCancel));
+	inputManager->BindKeyDown(EKeycode::DEL, Callback(*this, &Editor::KeyDelete));
 
-	inputManager->BindKeyDown(EKeycode::TILDE, Callback(this, &Editor::ToggleConsole));
+	inputManager->BindKeyDown(EKeycode::TILDE, Callback(*this, &Editor::ToggleConsole));
 
-	inputManager->BindKeyDown(EKeycode::SQBRACKETLEFT, Callback(this, &Editor::DecreaseGridUnit));
-	inputManager->BindKeyDown(EKeycode::SQBRACKETRIGHT, Callback(this, &Editor::IncreaseGridUnit));
-	
+	inputManager->BindKeyDown(EKeycode::SQBRACKETLEFT, Callback(*this, &Editor::DecreaseGridUnit));
+	inputManager->BindKeyDown(EKeycode::SQBRACKETRIGHT, Callback(*this, &Editor::IncreaseGridUnit));
+
 	inputManager->BindKeyDown(EKeycode::F1, [this]() { showUtilsPanel = !showUtilsPanel; });
 
 	_world.Initialise(engine.context);
-	_world.RootEntity().onNameChanged +=	Callback(this, &Editor::RefreshLevel);
-	_world.RootEntity().onChildChanged +=	Callback(this, &Editor::RefreshLevel);
+	_world.RootEntity().onNameChanged += Callback(*this, &Editor::RefreshLevel);
+	_world.RootEntity().onChildChanged += Callback(*this, &Editor::RefreshLevel);
 
 	//UI
 	SharedPointer<const Font> vpFont = engine.pFontManager->Get("consolas", engine.context);
@@ -172,7 +172,7 @@ void Editor::_Init()
 		_viewports[i].bg.SetTexture(radialGradient).SetColour(vpColour).SetZ(_uiCamera.GetProjection().GetFar()).SetFocusOnClick(false);
 		_viewports[i].SetFont(vpFont);
 	}
-	
+
 	_viewports[0].SetCameraType(Viewport::ECameraType::ISOMETRIC);
 	_viewports[1].SetCameraType(Viewport::ECameraType::ORTHO_Y);
 	_viewports[2].SetCameraType(Viewport::ECameraType::ORTHO_Z);
@@ -191,7 +191,7 @@ void Editor::_Init()
 	_toolbar.AddButton(Text("Brush3D"), engine.pTextureManager->Get("editor/tools/brush3d", engine.context), (uint16)ETool::BRUSH3D);
 	_toolbar.AddButton(Text("Entity"), engine.pTextureManager->Get("editor/tools/entity", engine.context), (uint16)ETool::ENTITY);
 	//_toolbar.AddButton("Connector", engine.pTextureManager->Get("editor/tools/connector", engine.context), (uint16)ETool::CONNECTOR);
-	_toolbar.onItemSelected += FunctionPointer<void, UIToolbarItem&>(this, &Editor::_OnToolbarItemSelection);
+	_toolbar.onItemSelected += Function<void, UIToolbarItem&>(*this, &Editor::_OnToolbarItemSelection);
 
 	UIColour splitterColour(Colour::White, Colour(1.f, 1.f, 1.f, 0.5f));
 	UISplitter* splitterHoriz = new UISplitter(&_vpAreaUI);
@@ -200,13 +200,16 @@ void Editor::_Init()
 	splitterHoriz->ShowSiblingAfter(&_viewports[0].ui).ShowSiblingAfter(&_viewports[1].ui).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UIBounds(0.f, UICoord(.5f, -2.5f), 1.f, UICoord(0.f, 5.f)));
 	splitterVert->ShowSiblingAfter(&_viewports[1].ui).ShowSiblingAfter(&_viewports[3].ui).SetIsHorizontal(false).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UIBounds(UICoord(.5f, -2.5f), 0.f, UICoord(0.f, 5.f), 1.f));
 
-	splitterHoriz->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
-	splitterVert->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
+	auto p = [this](UISplitter&) { _RefreshVPs(); };
+	Function<void, UISplitter&> splitterDragged = Function<void, UISplitter&>(p);
+
+	splitterHoriz->onDragged += splitterDragged;
+	splitterVert->onDragged += splitterDragged;
 
 	//This is a laugh
 	UIRect* propertyRect = new UIRect(&_sideUI);
 	propertyRect->SetTexture(gradient).SetColour(UIColour(Colour(.11f, .1f, .1f), Colour(.22f, .2f, .2f))).SetBounds(UIBounds(0.f, .5f, 1.f, .5f));
-	
+
 	UIRect* toolPropertyRect = new UIRect(&_sideUI);
 	toolPropertyRect->SetTexture(gradient).SetColour(UIColour(Colour(.1f, .1f, .11f), Colour(.2f, .2f, .22f))).SetBounds(UIBounds(0.f, 0.f, 1.f, .5f));
 
@@ -215,11 +218,11 @@ void Editor::_Init()
 
 	UISplitter* sideSplitter = new UISplitter(mainPage);
 	sideSplitter->ShowSiblingAfter(&_sideUI).SetIsHorizontal(false).SetUseAbsolute(true).SetMin(-1000.f).SetMax(-100.f).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UIBounds(UICoord(1.f, -400.f), 0.f, UICoord(0.f, 5.f), 1.f));
-	sideSplitter->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
+	sideSplitter->onDragged += splitterDragged;
 
 	UISplitter* propertySplitterHoriz = new UISplitter(&_sideUI);
 	propertySplitterHoriz->ShowSiblingAfter(propertyRect).ShowSiblingAfter(&_propertyContainer).SetIsHorizontal(true).SetTexture(splitterTex).SetColour(splitterColour).SetBounds(UIBounds(0.f, UICoord(.5f, -2.5f), 1.f, UICoord(0.f, 5.f)));
-	propertySplitterHoriz->onDragged += FunctionPointer<void, UISplitter&>(this, &Editor::_OnSplitterDragged);
+	propertySplitterHoriz->onDragged += splitterDragged;
 
 	//Tool data init
 	tools.select.Initialise();
@@ -357,6 +360,16 @@ void Editor::Frame()
 
 	if (_deltaTime > .1f) //Do not allow very long time deltas, they screw up the physics
 		_deltaTime = 0.1f;
+
+	if (_pendingResize.x && _pendingResize.y)
+	{
+		_uiCamera.GetProjection().SetDimensions(_pendingResize);
+		_uiCamera.SetRelativePosition(Vector3(_pendingResize.x / 2.f, _pendingResize.y / 2.f, 0.f));
+		_ui.SetBounds(UIBounds(0.f, 0.f, UICoord(0.f, _pendingResize.x), UICoord(0.f, _pendingResize.y)));
+
+		_RefreshVPs();
+		_pendingResize = Vector2T<uint16>();
+	}
 
 	{
 		//IMGUI
@@ -594,19 +607,6 @@ void Editor::RenderViewport(Viewport& vp)
 	}
 }
 
-void Editor::ResizeViews(uint16 w, uint16 h)
-{
-	_uiCamera.GetProjection().SetDimensions(Vector2T(w, h));
-	_uiCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
-	_ui.SetBounds(UIBounds(0.f, 0.f, UICoord(0.f, w), UICoord(0.f, h)));
-
-	if (_running)
-	{
-		_RefreshVPs();
-		Render();
-	}
-}
-
 void Editor::_RefreshVPs()
 {
 	for (int i = 0; i < VIEWPORTCOUNT; ++i)
@@ -621,10 +621,7 @@ String Editor::SelectMaterialDialog()
 	String string = ResourceSelect::Dialog(engine, "Data/Materials/*.txt", _vpArea.GetHWND(),
 		EResourceType::MATERIAL, _glContext, _shaderLit, _shaderUnlit);
 
-	RECT rect;
-	::GetClientRect(_vpArea.GetHWND(), &rect);
-	ResizeViews((uint16)rect.right, (uint16)rect.bottom);
-
+	
 	return string;
 }
 
@@ -633,10 +630,7 @@ String Editor::SelectModelDialog()
 	String string = ResourceSelect::Dialog(engine, "Data/Models/*.txt", _vpArea.GetHWND(),
 		EResourceType::MODEL, _glContext, _shaderLit, _shaderUnlit);
 
-	RECT rect;
-	::GetClientRect(_vpArea.GetHWND(), &rect);
-	ResizeViews((uint16)rect.right, (uint16)rect.bottom);
-
+	
 	return string;
 }
 
@@ -1207,7 +1201,7 @@ LRESULT CALLBACK Editor::_vpAreaProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 	return 0;
 
 	case WM_SIZE:
-		editor->ResizeViews(LOWORD(lparam), HIWORD(lparam));
+		editor->_pendingResize = Vector2T<uint16>(LOWORD(lparam), HIWORD(lparam));
 		return 0;
 
 	case WM_KILLFOCUS:

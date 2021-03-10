@@ -37,8 +37,8 @@ class Console
 public:
 	Console() : _nextBufferIndex(0), _prePrompt('>')
 	{
-		_cvars.CreateVar("Echo", CommandPtr(this, &Console::_CMD_echo));
-		_cvars.CreateVar("Help", CommandPtr(this, &Console::_CMD_help));
+		_cvars.CreateVar("Echo", CommandPtr(*this, &Console::_CMD_echo));
+		_cvars.CreateVar("Help", CommandPtr(*this, &Console::_CMD_help));
 	}
 
 	~Console() {}

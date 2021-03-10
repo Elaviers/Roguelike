@@ -18,12 +18,12 @@ class Gizmo
 	Transform _transform;
 
 	//Returns amount moved
-	FunctionPointer<Vector3, const Vector3&> _fpMove;
+	Function<Vector3, const Vector3&> _fpMove;
 
 	//The function takes an axis and an angle(degrees) and returns the angle consumed
-	FunctionPointer<float, const Vector3&, float> _fpRotate;
+	Function<float, const Vector3&, float> _fpRotate;
 
-	FunctionPointer<void, E2DBrushEdge, const Vector3&> _fpSetSide;
+	Function<void, E2DBrushEdge, const Vector3&> _fpSetSide;
 
 	Setter<const Vector3&> _fpScale; //unused
 public:
@@ -49,15 +49,15 @@ public:
 			c->SetObjectTransform(objt);
 	}
 
-	const FunctionPointer<Vector3, const Vector3&>& GetMoveFunction() const { return _fpMove; }
-	const FunctionPointer<float, const Vector3&, float>& GetRotateFunction() const { return _fpRotate; }
+	const Function<Vector3, const Vector3&>& GetMoveFunction() const { return _fpMove; }
+	const Function<float, const Vector3&, float>& GetRotateFunction() const { return _fpRotate; }
 	const Setter<const Vector3&>& GetScaleFunction() const { return _fpScale; }
-	const FunctionPointer<void, E2DBrushEdge, const Vector3&>& GetSideFunction() const { return _fpSetSide; }
+	const Function<void, E2DBrushEdge, const Vector3&>& GetSideFunction() const { return _fpSetSide; }
 
-	void SetMoveFunction(const FunctionPointer<Vector3, const Vector3&>& move) { _fpMove = move; }
-	void SetRotateFunction(const FunctionPointer<float, const Vector3&, float>& rotate) { _fpRotate = rotate; }
+	void SetMoveFunction(const Function<Vector3, const Vector3&>& move) { _fpMove = move; }
+	void SetRotateFunction(const Function<float, const Vector3&, float>& rotate) { _fpRotate = rotate; }
 	void SetScaleFunction(const Setter<const Vector3&>& scale) { _fpScale = scale; }
-	void SetSideFunction(const FunctionPointer<void, E2DBrushEdge, const Vector3&>& setSide) { _fpSetSide = setSide; }
+	void SetSideFunction(const Function<void, E2DBrushEdge, const Vector3&>& setSide) { _fpSetSide = setSide; }
 
 	template <typename T>
 	requires Concepts::DerivedFrom<T, GizmoComponent>

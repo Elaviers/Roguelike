@@ -82,7 +82,7 @@ void Game::Run()
 
 	MenuMain *menu = new MenuMain();
 	menu->SetBounds(UIBounds(UICoord(0.5f, -256.f), UICoord(0.5f, -256.f), UICoord(0.f, 512.f), UICoord(0.f, 512.f)));
-	menu->Initialise(FunctionPointer<void, const String&>(this, &Game::StartLevel), Callback(this, &Game::ButtonQuit), _engine);
+	menu->Initialise(Function<void, const String&>(*this, &Game::StartLevel), Callback(*this, &Game::ButtonQuit), _engine);
 	menu->SetParent(&_ui);
 
 	_window.Show();

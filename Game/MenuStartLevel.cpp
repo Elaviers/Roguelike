@@ -8,7 +8,7 @@ MenuStartLevel::~MenuStartLevel()
 		delete _children[i];
 }
 
-void MenuStartLevel::Initialise(const FunctionPointer<void, const String&> &onLevelChosen)
+void MenuStartLevel::Initialise(const Function<void, const String&> &onLevelChosen)
 {
 	_onLevelChosen = onLevelChosen;
 
@@ -27,7 +27,7 @@ void MenuStartLevel::Initialise(const FunctionPointer<void, const String&> &onLe
 		button->SetFont(_buttonFont);
 		button->SetBounds(UIBounds(0.f, UICoord(1.f, -((i + 1) * btnH)), 1.f, UICoord(0.f, btnH)));
 		button->SetBorderSize(_buttonBorderSize);
-		button->onPressed += FunctionPointer<void, UIButton&>(this, &MenuStartLevel::ButtonLevel);
+		button->onPressed += Function<void, UIButton&>(*this, &MenuStartLevel::ButtonLevel);
 		button->SetColour(_buttonColourInactive);
 		button->SetColourHold(_buttonColourActive);
 		button->SetMaterial(_buttonMaterial);

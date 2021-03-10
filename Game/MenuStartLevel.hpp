@@ -10,7 +10,7 @@ class Material;
 class MenuStartLevel : protected UIContainer
 {
 protected:
-	FunctionPointer<void, const String&> _onLevelChosen;
+	Function<void, const String&> _onLevelChosen;
 
 	float _buttonBorderSize = 1.f;
 	UIColour _buttonColourInactive;
@@ -26,7 +26,7 @@ public:
 	MenuStartLevel(UIElement *parent = nullptr) : UIContainer(parent) {}
 	virtual ~MenuStartLevel();
 
-	void Initialise(const FunctionPointer<void, const String&> &onLevelChosen);
+	void Initialise(const Function<void, const String&> &onLevelChosen);
 
 	void SetBounds(const UIBounds& bounds) { UIContainer::SetBounds(bounds); }
 	void SetButtonBorderSize(float size) { _buttonBorderSize = size; }

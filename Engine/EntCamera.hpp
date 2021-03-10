@@ -11,7 +11,7 @@ private:
 public:
 	Entity_FUNCS(EntCamera, EEntityID::CAMERA)
 
-	EntCamera() { onTransformChanged += Callback(&_projection, &Projection::UpdateMatrix); }
+	EntCamera() { onTransformChanged += Callback(_projection, &Projection::UpdateMatrix); }
 	~EntCamera() {}
 
 	void Use(class RenderQueue&, ERenderChannels channels = ERenderChannels::ALL) const;

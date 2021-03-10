@@ -333,7 +333,7 @@ Entity& Entity::operator=(Entity&& other) noexcept
 		other._children[i]->SetParent(this);
 
 	_transform = other._transform;
-	_transform.SetCallback(Callback(this, &Entity::_OnTransformChanged));
+	_transform.SetCallback(Callback(*this, &Entity::_OnTransformChanged));
 
 	_worldTransform = other._worldTransform;
 	_wtValid = other._wtValid;

@@ -19,7 +19,7 @@ void EntPlayer::_OnTransformChanged()
 
 EntPlayer::EntPlayer()
 {
-	onTransformChanged += FunctionPointer(this, &EntPlayer::_OnTransformChanged);
+	onTransformChanged += Function(*this, &EntPlayer::_OnTransformChanged);
 }
 
 void EntPlayer::Init(const Context& ctx)
@@ -37,7 +37,7 @@ void EntPlayer::Init(const Context& ctx)
 
 	GameInstance::Instance().SetActiveCamera(&_camera);
 
-	ctx.GetPtr<InputManager>()->BindKeyDown(EKeycode::SPACE, Callback(this, &EntPlayer::_Jump));
+	ctx.GetPtr<InputManager>()->BindKeyDown(EKeycode::SPACE, Callback(*this, &EntPlayer::_Jump));
 
 	_targetTexture = ctx.GetPtr<TextureManager>()->Get("iso/targ_temp", ctx);
 }

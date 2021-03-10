@@ -135,7 +135,7 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 			.SetMaterial(btnMat).SetBorderSize(borderSize)
 			.SetColour(buttonColourInactive).SetColourHover(buttonColourHover).SetColourHold(buttonColourHold);
 
-		browse->onPressed += FunctionPointer<void, UIButton&>(this, &UIPropertyManipulator::_OnPressed);
+		browse->onPressed += Function<void, UIButton&>(*this, &UIPropertyManipulator::_OnPressed);
 	}
 	else if (property.GetFlags() & PropertyFlags::DIRECTION || property.GetFlags() & PropertyFlags::CLASSID || comboText.GetSize())
 	{
@@ -148,7 +148,7 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 
 		if (!readOnly)
 		{
-			comboBox->onSelectionChanged += FunctionPointer<void, UIComboBox&>(this, &UIPropertyManipulator::_OnStringChanged);
+			comboBox->onSelectionChanged += Function<void, UIComboBox&>(*this, &UIPropertyManipulator::_OnStringChanged);
 
 			if (comboText.GetSize())
 			{
@@ -185,7 +185,7 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 			SetMaterial(btnMat).SetBorderSize(borderSize).SetColourFalse(buttonColourInactive).SetColourTrue(buttonColourInactive).SetColourHover(buttonColourHover).SetColourHold(buttonColourHold);
 		
 		if (!readOnly)
-			check->onStateChanged += FunctionPointer<void, UICheckbox&>(this, &UIPropertyManipulator::_OnStateChanged);
+			check->onStateChanged += Function<void, UICheckbox&>(*this, &UIPropertyManipulator::_OnStateChanged);
 	}
 
 	_textbox = new UITextbox(this);
@@ -195,7 +195,7 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 		.SetText(Text(GetPropertyString(_property, _object, _editorInstance.engine))).SetColour(textboxColour);
 
 	if (!readOnly)
-		_textbox->onStringChanged += FunctionPointer<void, UITextbox&>(this, &UIPropertyManipulator::_OnStringChanged);
+		_textbox->onStringChanged += Function<void, UITextbox&>(*this, &UIPropertyManipulator::_OnStringChanged);
 }
 
 void UIPropertyManipulator::Refresh()

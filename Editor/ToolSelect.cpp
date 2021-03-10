@@ -228,10 +228,10 @@ void ToolSelect::Initialise()
 	_brushGizmo.AddComponent(GizmoBrushSizer2D(Colour::Yellow, E2DBrushEdge::NEG_Y));
 	_brushGizmo.AddComponent(GizmoBrushSizer2D(Colour::Yellow, E2DBrushEdge::POS_Y));
 
-	_gizmo.SetMoveFunction(FunctionPointer<Vector3, const Vector3&>(this, &ToolSelect::_GizmoMove));
-	_gizmo.SetRotateFunction(FunctionPointer<float, const Vector3&, float>(this, &ToolSelect::_GizmoRotate));
+	_gizmo.SetMoveFunction(Function<Vector3, const Vector3&>(*this, &ToolSelect::_GizmoMove));
+	_gizmo.SetRotateFunction(Function<float, const Vector3&, float>(*this, &ToolSelect::_GizmoRotate));
 
-	_brushGizmo.SetSideFunction(FunctionPointer<void, E2DBrushEdge, const Vector3&>(this, &ToolSelect::_GizmoSetSidePos));
+	_brushGizmo.SetSideFunction(Function<void, E2DBrushEdge, const Vector3&>(*this, &ToolSelect::_GizmoSetSidePos));
 }
 
 void ToolSelect::Activate(UIContainer& properties, UIContainer& toolProperties)
@@ -448,7 +448,7 @@ void ToolSelect::KeySubmit()
 	for (size_t i = 0; i < _selection.GetSize(); ++i)
 	{
 		_selection[i].entity = _owner.engine.pObjectTracker->Track(result[i]);
-		_selection[i].entity->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
+		_selection[i].entity->onTransformChanged += Callback(*this, &ToolSelect::_UpdateGizmoTransform);
 	}
 
 	if (_selection.GetSize() > 0)
@@ -510,7 +510,7 @@ void ToolSelect::Select(Entity* object)
 	_selection.Add(EntitySelection{_owner.engine.pObjectTracker->Track(object)});
 
 	_owner.ChangePropertyEntity(_selection.Last().entity.Ptr());
-	_selection.Last().entity->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
+	_selection.Last().entity->onTransformChanged += Callback(*this, &ToolSelect::_UpdateGizmoTransform);
 	_UpdateGizmoTransform();
 
 	if (_selection.GetSize() == 1)
@@ -526,7 +526,7 @@ void ToolSelect::ClearSelection()
 {
 	for (size_t i = 0; i < _selection.GetSize(); ++i)
 		if (_selection[i].entity)
-			_selection[i].entity->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoTransform);
+			_selection[i].entity->onTransformChanged.Clear(); //todo- events need to be able to identify/remove specific events! urgent stuff here!
 
 	_owner.ClearProperties();
 	_selection.Clear();
@@ -540,7 +540,7 @@ void ToolSelect::_CloneSelection()
 	for (size_t i = 0; i < _selection.GetSize(); ++i)
 	{
 		bool isHoverObject = _hoverObject == _selection[i].entity;
-		_selection[i].entity->onTransformChanged -= Callback(this, &ToolSelect::_UpdateGizmoTransform);
+		_selection[i].entity->onTransformChanged.Clear(); //todo- gotta have a remove function really...
 
 		Entity* newObject = _selection[i].entity->Clone();
 		newObject->GetProperties().Transfer(_selection[i].entity.Ptr(), newObject, _owner.engine.context);
@@ -548,7 +548,7 @@ void ToolSelect::_CloneSelection()
 		_selection[i].entity = _owner.engine.pObjectTracker->Track(newObject);
 		
 		if (isHoverObject) _hoverObject = _selection[i].entity;
-		_selection[i].entity->onTransformChanged += Callback(this, &ToolSelect::_UpdateGizmoTransform);
+		_selection[i].entity->onTransformChanged += Callback(*this, &ToolSelect::_UpdateGizmoTransform);
 	}
 	
 	_hoverObjectIsSelected = true;

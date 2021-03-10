@@ -19,12 +19,12 @@ public:
 
 	EntBrush3D() : _updatingTransform(false)
 	{ 
-		onTransformChanged += Callback(this, &EntBrush3D::_OnTransformChanged);
+		onTransformChanged += Callback(*this, &EntBrush3D::_OnTransformChanged);
 	}
 
 	EntBrush3D(const EntBrush3D& other) : EntRenderable(other), _point1(other._point1), _point2(other._point2), _updatingTransform(false)
 	{
-		onTransformChanged += Callback(this, &EntBrush3D::_OnTransformChanged);
+		onTransformChanged += Callback(*this, &EntBrush3D::_OnTransformChanged);
 	}
 
 	virtual ~EntBrush3D() {}

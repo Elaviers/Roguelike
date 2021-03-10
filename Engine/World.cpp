@@ -16,8 +16,8 @@ void World::Initialise(const Context& ctx)
 {
 	Console* pConsole = ctx.GetPtr<Console>();
 
-	pConsole->Cvars().CreateVar("Ents", CommandPtr(&_entRoot, &Entity::CMD_List));
-	pConsole->Cvars().CreateVar("Ent", CommandPtr(&_entRoot, &Entity::CMD_Ent));
+	pConsole->Cvars().CreateVar("Ents", CommandPtr(_entRoot, &Entity::CMD_List));
+	pConsole->Cvars().CreateVar("Ent", CommandPtr(_entRoot, &Entity::CMD_Ent));
 }
 
 void World::Clear(const Context& ctx)

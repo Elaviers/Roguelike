@@ -100,6 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>
@@ -123,6 +124,7 @@ EXIT 0</Command>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Engine.lib;user32.lib;gdi32.lib;ComCtl32.lib;ComDlg32.lib;Ole32.lib;Shell32.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;Advapi32.lib</AdditionalDependencies>

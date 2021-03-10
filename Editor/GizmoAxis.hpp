@@ -1,6 +1,6 @@
 #pragma once
 #include "GizmoComponent.hpp"
-#include <ELCore/FunctionPointer.hpp>
+#include <ELCore/Function.hpp>
 
 /*
 	GizmoAxis

@@ -15,8 +15,8 @@ public:
 		
 		Entry(const T& item, const W& weight) : item(item), weight(weight) {}
 		
-		template <typename... Args>
-		Entry(const W& weight, Args&&... args) : weight(weight), item(static_cast<Args&&>(args)...) {}
+		template <typename... ARGS>
+		Entry(const W& weight, ARGS&&... args) : weight(weight), item(static_cast<ARGS&&>(args)...) {}
 	};
 
 private:
@@ -59,8 +59,8 @@ public:
 		_entries.Add({item, weight});
 	}
 
-	template <typename... Args>
-	void Emplace(float weight, Args&&... args)
+	template <typename... ARGS>
+	void Emplace(float weight, ARGS&&... args)
 	{
 		_remainingWeight += weight;
 		_entries.Emplace(weight, args...);

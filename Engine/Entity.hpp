@@ -86,7 +86,7 @@ public:
 		_flags(flags), 
 		dynamicBuffer(false), 
 		_parent(nullptr), 
-		_transform(Callback(this, &Entity::_OnTransformChanged)),
+		_transform(Callback(*this, &Entity::_OnTransformChanged)),
 		_wtValid(false),
 		_wbValid(false)
 	{}
@@ -101,7 +101,7 @@ public:
 		_wtValid(other._wtValid),
 		_wbValid(other._wbValid)
 	{
-		_transform.SetCallback(Callback(this, &Entity::_OnTransformChanged));
+		_transform.SetCallback(Callback(*this, &Entity::_OnTransformChanged));
 		CloneChildrenFrom(other);
 	}
 

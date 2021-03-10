@@ -5,7 +5,7 @@
 #include <ELGraphics/MaterialManager.hpp>
 #include "MenuStartLevel.hpp"
 
-void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelChosen, const Callback &onQuit, EngineInstance& engineInstance)
+void MenuMain::Initialise(const Function<void, const String&> &onLevelChosen, const Callback &onQuit, EngineInstance& engineInstance)
 {
 	const UIColour btnColour(Colour::Yellow, Colour::Blue);
 	const UIColour btnColourHover(Colour(.9f, .9f, .1f), Colour::Blue);
@@ -29,15 +29,15 @@ void MenuMain::Initialise(const FunctionPointer<void, const String&> &onLevelCho
 	
 	_buttonStart.SetParent(this);
 	_buttonStart.SetBounds(UIBounds(0.f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f)));
-	_buttonStart.onPressed += FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonStart);
+	_buttonStart.onPressed += Function<void, UIButton&>(*this, &MenuMain::ButtonStart);
 	
 	_buttonQuit.SetParent(this);
 	_buttonQuit.SetBounds(UIBounds(.6f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f)));
-	_buttonQuit.onPressed += FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonQuit);
+	_buttonQuit.onPressed += Function<void, UIButton&>(*this, &MenuMain::ButtonQuit);
 
 	_buttonSingleLevel.SetParent(this);
 	_buttonSingleLevel.SetBounds(UIBounds(0.f, 0.f, 1.f, UICoord(0.f, 64.f)));
-	_buttonSingleLevel.onPressed += FunctionPointer<void, UIButton&>(this, &MenuMain::ButtonSingleLevel);
+	_buttonSingleLevel.onPressed += Function<void, UIButton&>(*this, &MenuMain::ButtonSingleLevel);
 
 	_buttonStart.SetMaterial(material);
 	_buttonQuit.SetMaterial(material);

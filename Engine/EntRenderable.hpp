@@ -39,7 +39,7 @@ public:
 		_materialIsDefault(false),
 		staticBuffer(false)
 	{
-		onTransformChanged += Callback(this, &EntRenderable::_UpdateRenderEntry);
+		onTransformChanged += Callback(*this, &EntRenderable::_UpdateRenderEntry);
 	}
 
 	EntRenderable(const EntRenderable& other) :
@@ -51,7 +51,7 @@ public:
 		_materialIsDefault(other._materialIsDefault),
 		staticBuffer(other.staticBuffer)
 	{
-		onTransformChanged += Callback(this, &EntRenderable::_UpdateRenderEntry);
+		onTransformChanged += Callback(*this, &EntRenderable::_UpdateRenderEntry);
 		_UpdateRenderEntry();
 	}
 
