@@ -1,12 +1,12 @@
 #pragma once
-#include <Engine/Entity.hpp>
+#include <Engine/WorldObject.hpp>
 #include "RandomBag.hpp"
 
 class LevelSegmentPicker
 {
 	struct SegmentBag
 	{
-		RandomBag<const Entity*> bag;
+		RandomBag<const WorldObject*> bag;
 		unsigned int minimumDepth = 0;
 		unsigned int maximumDepth = 0;
 	};
@@ -18,9 +18,9 @@ public:
 	LevelSegmentPicker() {}
 	~LevelSegmentPicker() {}
 
-	static LevelSegmentPicker FromString(const String& string, const String& rootLevelDir, const Context&);
+	static LevelSegmentPicker FromString(const String& string, const String& rootLevelDir, World& world);
 
-	const Entity* TakeNextSegment(Random& random, unsigned int depth);
+	const WorldObject* TakeNextSegment(Random& random, unsigned int depth);
 	
 	struct BagItem
 	{
@@ -31,9 +31,9 @@ public:
 
 	public:
 		BagItem() : _isEssential(false), _owner(nullptr), _bag(nullptr), segment(nullptr) {}
-		BagItem(bool essential, LevelSegmentPicker* owner, SegmentBag* bag, const Entity* segment) : _isEssential(essential), _owner(owner), _bag(bag), segment(segment) {}
+		BagItem(bool essential, LevelSegmentPicker* owner, SegmentBag* bag, const WorldObject* segment) : _isEssential(essential), _owner(owner), _bag(bag), segment(segment) {}
 
-		const Entity* segment;
+		const WorldObject* segment;
 
 		void TakeFromRelevantBag(float weight) const;
 	};

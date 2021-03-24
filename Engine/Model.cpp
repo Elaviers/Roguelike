@@ -45,7 +45,10 @@ void Model::_CMD_collision(const Buffer<String>& args, const Context& ctx)
 		{
 			if (_mesh && _mesh->IsValid())
 			{
-				_collider = Collider(ECollisionChannels::SURFACE, CollisionBox(Box::FromMinMax(_mesh->bounds.min, _mesh->bounds.max)));
+				Vector3 min, max;
+				_mesh->GetVolume()->Bounds_AABB(Transform::Identity(), min, max);
+
+				_collider = Collider(ECollisionChannels::SURFACE, CollisionBox(Box::FromMinMax(min, max)));
 			}
 			else Debug::Error("Box collision cannot be used without specifying the mesh first!");
 		}

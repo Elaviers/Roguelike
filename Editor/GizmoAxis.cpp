@@ -5,7 +5,6 @@
 #include <ELGraphics/RenderCommand.hpp>
 #include <ELGraphics/RenderQueue.hpp>
 #include <ELPhys/Collision.hpp>
-#include <ELPhys/RaycastResult.hpp>
 
 void GizmoAxis::SetGizmoTransform(const Transform& gizmoTransform)
 {

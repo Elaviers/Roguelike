@@ -27,6 +27,7 @@ public:
 	virtual void KeySubmit()					{}
 	virtual void KeyDelete()					{}
 
+	virtual void Update(float deltaSeconds)		{}
 	virtual void Render(RenderQueue&) const		{}
 };
 

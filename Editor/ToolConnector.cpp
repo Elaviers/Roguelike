@@ -13,7 +13,14 @@ const PropertyCollection& ToolConnector::_GetProperties()
 
 void ToolConnector::Activate(UIContainer& properties, UIContainer& toolProperties)
 {
+	_connector = _owner.WorldRef().CreateObject<OConnector>();
+	
 	UIPropertyManipulator::AddPropertiesToContainer(1.f, Editor::PROPERTY_HEIGHT, _owner, _GetProperties(), this, toolProperties);
+}
+
+void ToolConnector::Deactivate()
+{
+	_connector->Destroy();
 }
 
 void ToolConnector::Cancel()
@@ -68,20 +75,19 @@ void ToolConnector::MouseMove(MouseData &mouseData)
 
 void ToolConnector::MouseDown(MouseData &mouseData)
 {
-	if (mouseData.viewport && mouseData.viewport->camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
+	if (mouseData.viewport && mouseData.viewport->cameraProjection.GetType() == EProjectionType::ORTHOGRAPHIC) _placing = true;
 }
 
 void ToolConnector::KeySubmit()
 {
 	_placing = false;
 
-	EntConnector *clone = _connector.TypedClone();
-	clone->SetParent(&_owner.WorldRef().RootEntity());
+	_connector = _owner.WorldRef().CreateObject<OConnector>();
 }
 
 void ToolConnector::Render(RenderQueue& q) const
 {
-	q.CreateEntry(ERenderChannels::EDITOR).AddSetColourOverride(Colour(0.f, 1.f, 0.f));
-	_connector.Render(q);
+	q.CreateEntry(ERenderChannels::EDITOR).AddPushColourOverride(Colour(0.f, 1.f, 0.f));
+	_connector->Render(q);
 	q.CreateEntry(ERenderChannels::EDITOR).AddPopColourOverride();
 }

@@ -1,6 +1,7 @@
 #pragma once
-#include <Engine/EntCamera.hpp>
 #include <ELGraphics/RenderQueue.hpp>
+#include <ELMaths/Frustum.hpp>
+#include <ELMaths/Projection.hpp>
 #include <ELSys/GLFramebuffer.hpp>
 #include <ELUI/ComboBox.hpp>
 #include <ELUI/Container.hpp>
@@ -36,10 +37,11 @@ protected:
 public:
 	EAxis gridAxis = EAxis::Y;
 
-	EntCamera camera;
+	Projection cameraProjection;
+	Transform cameraTransform;
+	Frustum cameraFrustum;
 
 	RenderQueue renderQueue;
-	RenderQueue renderQueue2;
 	
 	UIContainer ui;
 	UIRect bg;
@@ -57,6 +59,6 @@ public:
 	void SetFont(const SharedPointer<const Font>&);
 
 	void BindFramebuffer() { _idMap.Bind(); }
-	Colour SampleFramebuffer(uint32 x, uint32 y) { return _idMap.SampleColour(x, y); }
+	bool SampleFramebuffer(uint32 x, uint32 y, uint32 colour[4]) { return _idMap.SampleIntegers(x, y, colour); }
 	GLuint GetFramebufferTexGL() const { return _idMap.GetColourTexGL(); }
 };

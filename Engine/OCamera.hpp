@@ -1,18 +1,20 @@
 #pragma once
-#include "Entity.hpp"
+#include "WorldObject.hpp"
 #include <ELGraphics/ERenderChannels.hpp>
 #include <ELMaths/Projection.hpp>
 
-class EntCamera : public Entity
+class OCamera : public WorldObject
 {
 private:
 	Projection _projection;
 
-public:
-	Entity_FUNCS(EntCamera, EEntityID::CAMERA)
+protected:
+	OCamera(World& world) : WorldObject(world) {}
 
-	EntCamera() { onTransformChanged += Callback(_projection, &Projection::UpdateMatrix); }
-	~EntCamera() {}
+public:
+	WORLDOBJECT_VFUNCS(OCamera, EObjectID::CAMERA)
+
+	virtual ~OCamera() {}
 
 	void Use(class RenderQueue&, ERenderChannels channels = ERenderChannels::ALL) const;
 	void Use(class RenderQueue&, int vpX, int vpY, ERenderChannels channels = ERenderChannels::ALL) const;
@@ -23,6 +25,6 @@ public:
 	virtual const PropertyCollection& GetProperties() override;
 
 	//File IO
-	virtual void WriteData(ByteWriter&, NumberedSet<String>& strings, const Context& ctx) const override;
-	virtual void ReadData(ByteReader&, const NumberedSet<String>& strings, const Context& ctx) override;
+	virtual void Read(ByteReader& buffer, ObjectIOContext& ctx) override;
+	virtual void Write(ByteWriter& buffer, ObjectIOContext& ctx) const override;
 };

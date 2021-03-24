@@ -149,8 +149,8 @@ EXIT 0</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -177,8 +177,8 @@ EXIT 0</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -205,13 +205,13 @@ EXIT 0</Command>
     <ClCompile Include="GizmoBrushSizer2D.cpp" />
     <ClCompile Include="GizmoPlane.cpp" />
     <ClCompile Include="GizmoRing.cpp" />
-    <ClCompile Include="HierachyWindow.cpp" />
+    <ClCompile Include="HierarchyWindow.cpp" />
     <ClCompile Include="ResourceSelect.cpp" />
     <ClCompile Include="StringSelect.cpp" />
     <ClCompile Include="ToolBrush2D.cpp" />
     <ClCompile Include="ToolBrush3D.cpp" />
     <ClCompile Include="ToolConnector.cpp" />
-    <ClCompile Include="ToolEntity.cpp" />
+    <ClCompile Include="ToolObject.cpp" />
     <ClCompile Include="ToolIso.cpp" />
     <ClCompile Include="ToolSelect.cpp" />
     <ClCompile Include="UIPropertyManipulator.cpp" />
@@ -231,7 +231,7 @@ EXIT 0</Command>
     <ClInclude Include="GizmoComponent.hpp" />
     <ClInclude Include="GizmoPlane.hpp" />
     <ClInclude Include="GizmoRing.hpp" />
-    <ClInclude Include="HierachyWindow.hpp" />
+    <ClInclude Include="HierarchyWindow.hpp" />
     <ClInclude Include="MouseData.hpp" />
     <ClInclude Include="ToolIso.hpp" />
     <ClInclude Include="UITileSelector.hpp" />
@@ -243,7 +243,7 @@ EXIT 0</Command>
     <ClInclude Include="ToolBrush2D.hpp" />
     <ClInclude Include="ToolBrush3D.hpp" />
     <ClInclude Include="ToolConnector.hpp" />
-    <ClInclude Include="ToolEntity.hpp" />
+    <ClInclude Include="ToolObject.hpp" />
     <ClInclude Include="ToolSelect.hpp" />
     <ClInclude Include="UIPropertyManipulator.hpp" />
   </ItemGroup>

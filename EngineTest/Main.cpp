@@ -1,7 +1,8 @@
 #include <Engine/EngineInstance.hpp>
-#include <Engine/EntCamera.hpp>
-#include <Engine/EntLight.hpp>
-#include <Engine/EntRenderable.hpp>
+#include <Engine/OCamera.hpp>
+#include <Engine/OLight.hpp>
+#include <Engine/ORenderable.hpp>
+#include <Engine/World.hpp>
 #include <ELCore/StackAllocator.hpp>
 #include <ELGraphics/FontManager.hpp>
 #include <ELGraphics/RenderCommand.hpp>
@@ -34,26 +35,27 @@ bool running = false;
 EngineInstance engine;
 RenderQueue renderQueue;
 RenderQueue uiQueue;
+World world(&engine.context);
 
 //LIGHTS
-Entity lightParent1;
+WorldObject* lightParent1;
 Vector3 rotationOffset1(0.f, 45, 0.f);
-Entity lightParent2;
+WorldObject* lightParent2;
 Vector3 rotationOffset2(-11, -30, 0.f);
-Entity lightParent3;
+WorldObject* lightParent3;
 Vector3 rotationOffset3(33, -2, 0.f);
-Entity lightParent4;
+WorldObject* lightParent4;
 Vector3 rotationOffset4(15, 12.88f, 0);
-EntLight light1;
-EntLight light2;
-EntLight light3;
-EntLight light4;
+OLight* light1;
+OLight* light2;
+OLight* light3;
+OLight* light4;
 
 //Other entities
-EntRenderable renderable;
-EntCamera camera;
-EntRenderable cube;
-Entity cubeParent;
+ORenderable* renderable;
+OCamera* camera;
+ORenderable* cube;
+WorldObject* cubeParent;
 Vector3 cubeParentRotationOffset(2.f, 11.7f, 0.f);
 Vector3 cubeRotationOffset(9.f, 23.f, 0.f);
 
@@ -183,6 +185,7 @@ int Main()
 	inputManager.BindKeyAxis(EKeycode::A, (float*)&axisX, -1);
 	inputManager.BindKeyAxis(EKeycode::D, (float*)&axisX, 1);
 	inputManager.BindKeyAxis(EKeycode::F, (float*)&axisY, -1);
+	inputManager.BindKeyAxis(EKeycode::LSHIFT, (float*)&axisY, -1);
 	inputManager.BindKeyAxis(EKeycode::SPACE, (float*)&axisY, 1);
 	inputManager.BindKeyAxis(EKeycode::S, (float*)&axisZ, -1);
 	inputManager.BindKeyAxis(EKeycode::W, (float*)&axisZ, 1);
@@ -220,47 +223,62 @@ int Main()
 	window.SetTitle("Creating World...");
 	//
 
+	camera = world.CreateObject<OCamera>();
 	if (ORTHO)
 	{
-		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-		camera.GetProjection().SetNearFar(-100000.f, 100000.f);
-		camera.GetProjection().SetOrthographicScale(128.f); //pixels per unit
-		camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
+		camera->GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
+		camera->GetProjection().SetNearFar(-100000.f, 100000.f);
+		camera->GetProjection().SetOrthographicScale(128.f); //pixels per unit
+		camera->SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
 	}
 	else
 	{
-		camera.GetProjection().SetType(EProjectionType::PERSPECTIVE);
-		camera.GetProjection().SetNearFar(0.001f, 100000.f);
-		camera.SetRelativePosition(Vector3(0.f, 0.f, -5.f));
+		camera->GetProjection().SetType(EProjectionType::PERSPECTIVE);
+		camera->GetProjection().SetNearFar(0.001f, 100000.f);
+		camera->SetRelativePosition(Vector3(0.f, 0.f, -5.f));
 	}
 
-	light1.SetRelativePosition(Vector3(0.f, 0.f, -4.f));
-	light2.SetRelativePosition(Vector3(0.f, 0.f, -3.5f));
-	light3.SetRelativePosition(Vector3(0.f, 0.f, -3.f));
-	light4.SetRelativePosition(Vector3(0.f, 0.f, -2.f));
+	light1 = world.CreateObject<OLight>();
+	light2 = world.CreateObject<OLight>();
+	light3 = world.CreateObject<OLight>();
+	light4 = world.CreateObject<OLight>();
 
-	light1.SetColour(Vector3(1.f, 0.f, 0.f));
-	light2.SetColour(Vector3(0.f, 1.f, 0.f));
-	light3.SetColour(Vector3(0.f, 0.f, 1.f));
+	light1->SetRelativePosition(Vector3(0.f, 0.f, -4.f));
+	light2->SetRelativePosition(Vector3(0.f, 0.f, -3.5f));
+	light3->SetRelativePosition(Vector3(0.f, 0.f, -3.f));
+	light4->SetRelativePosition(Vector3(0.f, 0.f, -2.f));
 
-	light1.SetRadius(5.f);
-	light2.SetRadius(5.f);
-	light3.SetRadius(5.f);
-	light4.SetRadius(10.f);
+	light1->SetColour(Vector3(1.f, 0.f, 0.f));
+	light2->SetColour(Vector3(0.f, 1.f, 0.f));
+	light3->SetColour(Vector3(0.f, 0.f, 1.f));
 
-	light1.SetParent(&lightParent1);
-	light2.SetParent(&lightParent2);
-	light3.SetParent(&lightParent3);
-	light4.SetParent(&lightParent4);
-	lightParent4.SetParent(&cube);
+	light1->SetRadius(5.f);
+	light2->SetRadius(5.f);
+	light3->SetRadius(5.f);
+	light4->SetRadius(10.f);
 
-	cube.SetRelativePosition(Vector3(2.f, 0.f, 0.f));
-	cube.SetParent(&cubeParent);
-	cube.SetModel(modelManager.Cube(), engine.context);
-	cube.SetMaterial("bricks", engine.context);
+	cubeParent = world.CreateObject<WorldObject>();
+	lightParent1 = world.CreateObject<WorldObject>();
+	lightParent2 = world.CreateObject<WorldObject>();
+	lightParent3 = world.CreateObject<WorldObject>();
+	lightParent4 = world.CreateObject<WorldObject>();
 
-	renderable.SetParent(&cubeParent);
-	renderable.SetModel(meshName, engine.context);
+	light1->SetParent(lightParent1, false);
+	light2->SetParent(lightParent2, false);
+	light3->SetParent(lightParent3, false);
+	light4->SetParent(lightParent4, false);
+
+	cube = world.CreateObject<ORenderable>();
+	lightParent4->SetParent(cube, false);
+
+	cube->SetRelativePosition(Vector3(2.f, 0.f, 0.f));
+	cube->SetParent(cubeParent, false);
+	cube->SetModel(modelManager.Cube(), engine.context);
+	cube->SetMaterial("bricks", engine.context);
+
+	renderable = world.CreateObject<ORenderable>();
+	renderable->SetParent(cubeParent, false);
+	renderable->SetModel(meshName, engine.context);
 
 	window.SetTitle("Window");
 
@@ -287,7 +305,7 @@ int Main()
 				const uint16& w = e.data.resize.w;
 				const uint16& h = e.data.resize.h;
 
-				camera.GetProjection().SetDimensions(Vector2T(w, h));
+				camera->GetProjection().SetDimensions(Vector2T(w, h));
 				uiProjectionMatrix = Matrix4::ProjectionOrtho(0.f, w, 0.f, h, -100.f, 100.f, 1.f);
 
 				if (running) Frame(); //Please pretend this line doesn't exist
@@ -338,19 +356,16 @@ void Frame()
 	float moveAmount = MOVERATE * dt;
 	float turnAmount = TURNRATE * dt;
 
-	camera.RelativeMove(camera.GetRelativeTransform().GetForwardVector() * (float)axisZ * moveAmount +
-		camera.GetRelativeTransform().GetRightVector() * (float)axisX * moveAmount +
-		camera.GetRelativeTransform().GetUpVector() * (float)axisY * moveAmount);
+	camera->MoveAligned(Vector3(axisX * moveAmount, axisY * moveAmount, axisZ * moveAmount));
+	camera->AddRelativeRotation(Vector3(lookX * turnAmount + mouseLookX * MOUSESENS, lookY * turnAmount + mouseLookY * MOUSESENS, lookZ * turnAmount));
 
-	camera.AddRelativeRotation(Vector3(lookX * turnAmount + mouseLookX * MOUSESENS, lookY * turnAmount + mouseLookY * MOUSESENS, lookZ * turnAmount));
+	lightParent1->RotateRelative(rotationOffset1 * dt);
+	lightParent2->RotateRelative(rotationOffset2 * dt);
+	lightParent3->RotateRelative(rotationOffset3 * dt);
+	lightParent4->RotateRelative(rotationOffset4 * dt);
 
-	lightParent1.RelativeRotate(rotationOffset1 * dt);
-	lightParent2.RelativeRotate(rotationOffset2 * dt);
-	lightParent3.RelativeRotate(rotationOffset3 * dt);
-	lightParent4.RelativeRotate(rotationOffset4 * dt);
-
-	cubeParent.RelativeRotate(cubeParentRotationOffset * dt);
-	cube.RelativeRotate(cubeRotationOffset * dt);
+	cubeParent->RotateRelative(cubeParentRotationOffset * dt);
+	cube->RotateRelative(cubeRotationOffset * dt);
 
 	//Update FPS counter
 	static StackAllocator ftAllocator(1024);
@@ -394,25 +409,20 @@ void Frame()
 		renderQueue.Clear();
 		uiQueue.Clear();
 
-		camera.Use(renderQueue, ERenderChannels::SURFACE | ERenderChannels::UNLIT); //Sky uses custom matrices
-		light1.Render(renderQueue);
-		light2.Render(renderQueue);
-		light3.Render(renderQueue);
-		light4.Render(renderQueue);
+		camera->Use(renderQueue, ERenderChannels::SURFACE | ERenderChannels::UNLIT); //Sky uses custom matrices
+		world.Render(renderQueue, nullptr);
 		sky.Render(renderQueue);
-		cube.Render(renderQueue);
-		renderable.Render(renderQueue);
-
+		
 		//grid
-		float limit = camera.GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC ? 1.f : 10.f;
+		float limit = camera->GetProjection().GetType() == EProjectionType::ORTHOGRAPHIC ? 1.f : 10.f;
 		RenderEntry& e = renderQueue.CreateEntry(ERenderChannels::UNLIT);
 		e.AddSetTexture(RCMDSetTexture::Type::WHITE, 0);
 		e.AddSetColour(Colour::Red);
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), EAxis::X, 1.f, limit, 0.f, 0.f);
+		e.AddGrid(camera->GetAbsoluteTransform(), camera->GetProjection(), EAxis::X, 1.f, limit, 0.f, 0.f);
 		e.AddSetColour(Colour::Green);
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), EAxis::Y, 1.f, limit, 0.f, 0.f);
+		e.AddGrid(camera->GetAbsoluteTransform(), camera->GetProjection(), EAxis::Y, 1.f, limit, 0.f, 0.f);
 		e.AddSetColour(Colour::Blue);
-		e.AddGrid(camera.GetWorldTransform(), camera.GetProjection(), EAxis::Z, 1.f, limit, 0.f, 0.f);
+		e.AddGrid(camera->GetAbsoluteTransform(), camera->GetProjection(), EAxis::Z, 1.f, limit, 0.f, 0.f);
 
 		//UI
 		//fps string
@@ -437,7 +447,7 @@ void Frame()
 		{
 			program_Lit.Use();
 
-			//The engine is a tad pooey in the aspect that the texture units 0, 1, 2, and 3 are always bound to the diffuse, normal, specular, and reflectivity textures respectively.
+			//The _engine is a tad pooey in the aspect that the texture units 0, 1, 2, and 3 are always bound to the diffuse, normal, specular, and reflectivity textures respectively.
 			//No PBR yet!
 			program_Lit.SetInt(DefaultUniformVars::intCubemap, 100);
 			program_Lit.SetInt(DefaultUniformVars::intTextureDiffuse, 0);
@@ -449,17 +459,17 @@ void Frame()
 		}
 
 		//Draw sky
-		if (camera.GetProjection().GetType() == EProjectionType::PERSPECTIVE)
+		if (camera->GetProjection().GetType() == EProjectionType::PERSPECTIVE)
 		{
 			program_Sky.Use();
 
 			//bind the view matrix to this instead of the default thing......
-			Matrix4 skyView = camera.GetInverseTransformationMatrix();
+			Matrix4 skyView = camera->GetAbsoluteTransform().GetInverseMatrix();
 
 			//....because I strip out the translation from the matrix
 			skyView[3][0] = skyView[3][1] = skyView[3][2] = 0;
 
-			program_Sky.SetMatrix4(DefaultUniformVars::mat4Projection, camera.GetProjection().GetMatrix());
+			program_Sky.SetMatrix4(DefaultUniformVars::mat4Projection, camera->GetProjection().GetMatrix());
 			program_Sky.SetMatrix4(DefaultUniformVars::mat4View, skyView);
 
 			glDepthFunc(GL_LEQUAL);

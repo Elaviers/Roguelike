@@ -1,19 +1,20 @@
 #pragma once
 #include "Tool.hpp"
-#include <Engine/EntConnector.hpp>
+#include <Engine/OConnector.hpp>
 
 class ToolConnector : public Tool
 {
 	bool _placing;
 
-	EntConnector _connector;
+	OConnector* _connector;
 
 	const PropertyCollection& _GetProperties();
 public:
-	ToolConnector(Editor &level) : Tool(level), _placing(false) {}
+	ToolConnector(Editor &level) : Tool(level), _placing(false), _connector(nullptr) {}
 	virtual ~ToolConnector() {}
 
 	virtual void Activate(UIContainer& properties, UIContainer& toolProperties) override;
+	virtual void Deactivate() override;
 
 	virtual void Cancel() override;
 

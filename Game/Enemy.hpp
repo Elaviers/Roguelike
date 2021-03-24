@@ -1,7 +1,7 @@
 #pragma once
-#include <Engine/Entity.hpp>
+#include <Engine/WorldObject.hpp>
 
-class Enemy : public Entity
+class Enemy : public WorldObject
 {
 
 

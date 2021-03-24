@@ -23,9 +23,9 @@ void GizmoPlane::Render(RenderQueue& q) const
 	else
 		e.AddSetColour(_colour);
 
-	e.AddSetTransform(_transform.GetTransformationMatrix());
+	e.AddSetTransform(_transform.GetMatrix());
 	e.AddCommand(RCMDRenderMesh::PLANE);
-	e.AddSetTransform(Matrix4::RotationY(180.f) * _transform.GetTransformationMatrix());
+	e.AddSetTransform(Matrix4::RotationY(180.f) * _transform.GetMatrix());
 	e.AddCommand(RCMDRenderMesh::PLANE);
 }
 

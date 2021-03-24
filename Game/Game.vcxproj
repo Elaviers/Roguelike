@@ -99,8 +99,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Engine.lib</AdditionalDependencies>
@@ -122,8 +122,8 @@ EXIT 0</Command>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Engine.lib</AdditionalDependencies>
@@ -147,8 +147,8 @@ EXIT 0</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -174,8 +174,8 @@ EXIT 0</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -195,7 +195,7 @@ EXIT 0</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="EntPlayer.cpp" />
+    <ClCompile Include="OPlayer.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameInstance.cpp" />
     <ClCompile Include="Item.cpp" />
@@ -208,7 +208,7 @@ EXIT 0</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Enemy.hpp" />
-    <ClInclude Include="EntPlayer.hpp" />
+    <ClInclude Include="OPlayer.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameInstance.hpp" />
     <ClInclude Include="Item.hpp" />

@@ -30,9 +30,6 @@
     <ClCompile Include="LevelGeneration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EntPlayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GameInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,6 +46,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,10 +80,10 @@
     <ClInclude Include="Enemy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EntPlayer.hpp">
+    <ClInclude Include="GameInstance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameInstance.hpp">
+    <ClInclude Include="OPlayer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

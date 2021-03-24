@@ -1,23 +1,23 @@
-#include "HierachyWindow.hpp"
+#include "HierarchyWindow.hpp"
 #include "Editor.hpp"
 #include "resource.h"
-#include <Engine/Entity.hpp>
+#include <Engine/WorldObject.hpp>
 #include <CommCtrl.h>
 #include <windowsx.h>
 
-LPCTSTR HierachyWindow::_className = TEXT("HWCLASS");
+LPCTSTR HierarchyWindow::_className = TEXT("HWCLASS");
 
 //static
-LRESULT HierachyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+LRESULT HierarchyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	HierachyWindow* hw = (HierachyWindow*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	HierarchyWindow* hw = (HierarchyWindow*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
 	switch (msg)
 	{
 	case WM_CREATE:
 	{
 		LPCREATESTRUCT create = (LPCREATESTRUCT)lparam;
-		hw = (HierachyWindow*)create->lpCreateParams;
+		hw = (HierarchyWindow*)create->lpCreateParams;
 		::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)hw);
 
 		RECT rect;
@@ -25,7 +25,7 @@ LRESULT HierachyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 		HINSTANCE instance = ::GetModuleHandle(NULL);
 
-		hw->_treeView = ::CreateWindowEx(0, WC_TREEVIEW, TEXT("Hierachy Tree"), WS_VISIBLE | WS_CHILD | WS_BORDER | TVS_HASBUTTONS | TVS_HASLINES | TVS_SHOWSELALWAYS, 
+		hw->_treeView = ::CreateWindowEx(0, WC_TREEVIEW, TEXT("Hierarchy Tree"), WS_VISIBLE | WS_CHILD | WS_BORDER | TVS_HASBUTTONS | TVS_HASLINES | TVS_SHOWSELALWAYS, 
 			0, 0, rect.right, rect.bottom, hwnd, (HMENU)1, instance, NULL);
 
 		const int imageCount = 2;
@@ -56,7 +56,7 @@ LRESULT HierachyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 		SHORT w = LOWORD(lparam);
 		SHORT h = HIWORD(lparam);
 
-		WindowFunctions::ResizeHWND(hw->_treeView, w, h);
+		WindowFunctions_Win32::ResizeHWND(hw->_treeView, w, h);
 	}
 	break;
 
@@ -80,8 +80,7 @@ LRESULT HierachyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 			LPNMTREEVIEW nmtv = (LPNMTREEVIEW)lparam;
 
-			hw->_owner->tools.select.Select(hw->_currentRoot->FindChild((uint32)nmtv->itemNew.lParam));
-			hw->_owner->FocusVPArea();
+			hw->_owner->tools.select.Select(hw->_owner->WorldRef().FindObject((uint32)nmtv->itemNew.lParam));
 		}
 			break;
 
@@ -101,7 +100,7 @@ LRESULT HierachyWindow::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 }
 
 //static
-void HierachyWindow::Initialise(HBRUSH brush)
+void HierarchyWindow::Initialise(HBRUSH brush)
 {
 	WNDCLASSEXA windowClass = {};
 	windowClass.cbSize = sizeof(WNDCLASSEXA);
@@ -115,13 +114,13 @@ void HierachyWindow::Initialise(HBRUSH brush)
 	::RegisterClassEx(&windowClass);
 }
 
-HTREEITEM HierachyWindow::_AddObject(Entity& obj, HTREEITEM parent, HTREEITEM after)
+HTREEITEM HierarchyWindow::_AddObject(WorldObject& obj, HTREEITEM parent, HTREEITEM after)
 {
-	const auto& regNode = _owner->engine.entRegistry.GetNode(obj.GetTypeID());
-	String name = regNode ? regNode->name : "???";
+	const auto& type = _owner->engine.objectTypes.GetType(obj.GetTypeID());
+	String name = type ? type->GetName() : "???";
 
-	if (obj.GetName().GetLength())
-		name += String(" - \"") + obj.GetName() + '\"';
+	if (obj.GetName().ToString().GetLength())
+		name += String(" - \"") + obj.GetName().ToString().GetLength() + '\"';
 
 	TVINSERTSTRUCT insertStruct = {};
 	insertStruct.hParent = parent;
@@ -138,23 +137,23 @@ HTREEITEM HierachyWindow::_AddObject(Entity& obj, HTREEITEM parent, HTREEITEM af
 	HTREEITEM item = (HTREEITEM)::SendMessage(_treeView, TVM_INSERTITEM, 0, (LPARAM)&insertStruct);
 	HTREEITEM prev = TVI_FIRST;
 
-	auto children = obj.Children();
-	for (size_t i = 0; i < children.GetSize(); ++i)
-		prev = _AddObject(*children[i], item, prev);
+	auto children = obj.GetChildren();
+	//for (size_t i = 0; i < children.GetSize(); ++i)
+	//	prev = _AddObject(*children[i], item, prev);
+	//todo
 
 	return item;
 }
 
-void HierachyWindow::Refresh(Entity& root)
+void HierarchyWindow::Refresh()
 {
-	_currentRoot = _owner->engine.pObjectTracker->Track(&root);
-
 	TreeView_DeleteAllItems(_treeView);
 
-	_AddObject(root, TVI_ROOT, TVI_ROOT);
+	//todo
+	//_AddObject(root, TVI_ROOT, TVI_ROOT);
 }
 
-void HierachyWindow::BeginDrag(LPNMTREEVIEW nmtv)
+void HierarchyWindow::BeginDrag(LPNMTREEVIEW nmtv)
 {
 	HIMAGELIST himl;    // handle to image list 
 	RECT rcItem;        // bounding rectangle of item 
@@ -174,10 +173,12 @@ void HierachyWindow::BeginDrag(LPNMTREEVIEW nmtv)
 	// parent window. 
 	ShowCursor(FALSE);
 	SetCapture(GetParent(_treeView));
-	_dragObj = _owner->engine.pObjectTracker->Track(_currentRoot->FindChild((uint32)nmtv->itemNew.lParam));
+	
+	//todo
+	//_dragObj = _owner->engine.pObjectTracker->Track(_currentRoot->FindChild((uint32)nmtv->itemNew.lParam));
 }
 
-void HierachyWindow::MouseMove(int x, int y)
+void HierarchyWindow::MouseMove(int x, int y)
 {
 	if (_dragObj)
 	{
@@ -207,7 +208,7 @@ void HierachyWindow::MouseMove(int x, int y)
 	}
 }
 
-void HierachyWindow::MouseUp()
+void HierarchyWindow::MouseUp()
 {
 	if (_dragObj)
 	{
@@ -221,12 +222,12 @@ void HierachyWindow::MouseUp()
 			
 			TreeView_GetItem(_treeView, &item);
 
-			Entity* go = _currentRoot->FindChild((uint32)item.lParam);
+			WorldObject* go = _owner->WorldRef().FindObject((uint32)item.lParam);
 
-			if (go != _dragObj.Ptr() && !go->IsChildOf(_dragObj.Ptr()))
+			if (go != _dragObj.Ptr() && !go->IsChildOf(*_dragObj))
 			{
-				_dragObj->SetParent(go);
-				Refresh(*_currentRoot);
+				_dragObj->SetParent(go, true);
+				Refresh();
 			}
 		}
 

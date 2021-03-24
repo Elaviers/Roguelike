@@ -1,80 +1,138 @@
 #pragma once
 #include <ELCore/Concepts.hpp>
-#include "Entity.hpp"
-#include "Geometry.hpp"
+#include <ELCore/Context.hpp>
+#include <ELCore/Types.hpp>
+#include <ELCore/Handle.hpp>
+#include <ELCore/Hashmap.hpp>
+#include <ELCore/List.hpp>
+#include <ELCore/SharedPointer.hpp>
+#include <ELPhys/PhysSimulation.hpp>
+#include <ELPhys/RaycastHitInformation.hpp>
+
+class String;
+class Text;
+
+template <typename T>
+class Buffer;
+
+class Context;
+class WorldObject;
+
+class RenderQueue;
+struct Frustum;
+
+class WorldObject;
+
+//dumb inheritance!
+struct RaycastResult : public RaycastHitInformation
+{
+	WorldObject* object;
+};
 
 class World
 {
 protected:
-	Entity _entRoot;
-	List<Geometry*> _geometry;
+	List<WorldObject*> _objects;
+
+	uint32 _nextUID;
+
+	PhysSimulation _physics;
+
+	const Context* _context;
+
+	struct AdditionalObjectData
+	{
+		Buffer<FixedBody*> fixedBodies;
+		Buffer<PhysicsBody*> physicsBodies;
+		SharedPointerData<WorldObject> spd;
+
+		AdditionalObjectData(WorldObject* object);
+
+		void ObjectDestroyed();
+		void TrySelfDelete();
+	};
+
+	Hashmap<uint32, AdditionalObjectData*> _additionalData;
+
+	AdditionalObjectData& _GetAdditionalObjectData(WorldObject* object);
 
 public:
-	World() : _entRoot(Entity::EFlags::NONE, "world") {}
+	World(const Context* context) : _nextUID(1), _context(context) {}
 	~World();
 
-	Entity& RootEntity() { return _entRoot; }
-	const Entity& RootEntity() const { return _entRoot; }
+	const List<WorldObject*>& GetObjects() const { return _objects; }
+	uint32 TakeNextUID() { return _nextUID++; }
+	const PhysSimulation& GetPhysics() const { return _physics; }
+	const Context* GetContext() const { return _context; }
+	
+	void SetContext(const Context* context) { _context = context;}
 
-	const List<Geometry*>& GetGeometry() const { return _geometry; }
+	template <typename T, typename... ARGS>
+	requires Concepts::DerivedFrom<T, WorldObject>
+	T* CreateObject(ARGS... args)
+	{
+		T* object = new T(*this, std::forward(args)...);
+		object->_OnCreated();
+		_objects.Emplace(object);
+		return object;
+	}
+
+	WorldObject* CloneObject(const WorldObject& object, bool deep);
 
 	template <typename T>
-	requires Concepts::DerivedFrom<T, Geometry>
-	void AddGeometry(const T& geometry) { _geometry.Add(new T(geometry)); }
-
-	void RemoveGeometry(uint32 uid)
+	T* FindFirstObjectOfType() const
 	{
-		for (List<Geometry*>::Iterator g = _geometry.begin(); g.IsValid(); ++g)
-			if ((*g)->GetUID() == uid)
-			{
-				delete *g;
-				_geometry.Remove(g);
-				return;
-			}
+		for (WorldObject* o : _objects)
+			if (T* ptr = dynamic_cast<T*>(o))
+				return ptr;
+
+		return nullptr;
 	}
 
-	void Initialise(const Context&);
+	WorldObject* FindObject(const Text& name) const;
+	WorldObject* FindObject(uint32 uid) const;
 
-	void Clear(const Context&);
+	SharedPointer<WorldObject> TrackObject(WorldObject* object)
+	{
+		return SharedPointer<WorldObject>(_GetAdditionalObjectData(object).spd);
+	}
+
+	void Initialise();
+
+	void Clear();
 
 	void Update(float deltaTime);
-	void Render(RenderQueue&, const Frustum& cameraFrustum) const;
+	void Render(RenderQueue&, const Frustum* cameraFrustum) const;
 
-	//Will add overlaps to results. Pairs consist of query result and penetration vector.
-	void GetOverlaps(List<Pair<EOverlapResult, Vector3>>& results, const Collider& collider, const Transform& transform, const Entity* ignore = nullptr, const Vector3& sweep = Vector3()) const;
+	//If parent is specified then all objects read will become children of it
+	bool ReadObjects(ByteReader& reader, WorldObject* parent = nullptr);
+	bool ReadObjects(const char* filename, WorldObject* parent = nullptr);
 
-	bool Read(const char* filename, const Context& ctx);
-	bool Write(const char* filename, const Context& ctx) const;
+	//If parent is specified, only children of parent will be written
+	bool WriteObjects(ByteWriter& writer, WorldObject* parent = nullptr) const;
+	bool WriteObjects(const char* filename, WorldObject* parent = nullptr) const;
 
-	//Renders scene where the colour uniform variable is unique per entity / geometry
-	void RenderIDMap(RenderQueue&, const Frustum& cameraFrustum) const;
+	Handle<FixedBody> CreateFixedBody(WorldObject* owner);
+	Handle<FixedBody> CreateFixedBody(WorldObject* owner, const FixedBody&);
 
-	struct IDMapResultConst
-	{
-		union
-		{
-			const Geometry* geometry;
-			const Entity* entity;
-		};
+	Handle<PhysicsBody> CreatePhysicsBody(WorldObject* owner);
+	Handle<PhysicsBody> CreatePhysicsBody(WorldObject* owner, const PhysicsBody&);
 
-		bool isEntity;
-	};
+	Buffer<WorldObject*> FindOverlaps(const Collider& collider, const Transform& transform, bool includeTouching = false) const;
+	Buffer<WorldObject*> FindObjectOverlaps(const WorldObject* a, bool includeTouching = false) const;
+	Buffer<RaycastResult> Raycast(const Ray& ray, ECollisionChannels channels) const;
 
-	struct IDMapResult
-	{
-		union
-		{
-			Geometry* geometry;
-			Entity* entity;
-		};
+	EOverlapResult ObjectsOverlap(const WorldObject& a, const WorldObject& b, Vector3* penetration) const;
+	float CalculateClosestPoints(const WorldObject& a, const WorldObject& b, Vector3& pointA, Vector3& pointB) const;
 
-		bool isEntity;
-	};
+public:
+	//Requires red and green channels to be uint32
+	void RenderID(RenderQueue&, const Frustum* cameraFrustum);
+	
+	WorldObject* DecodeIDMapValue(uint32 red, uint32 green) const;
 
-	IDMapResult DecodeIDMapValue(byte r, byte g, byte b);
-	IDMapResultConst DecodeIDMapValue(byte r, byte g, byte b) const 
-	{ 
-		IDMapResult result = const_cast<World*>(this)->DecodeIDMapValue(r, g, b);
-		return *reinterpret_cast<IDMapResultConst*>(&result); 
-	}
+private:
+	void _CMD_List(const Buffer<String>& tokens, const Context&);
+	void _CMD_Ent(const Buffer<String>& tokens, const Context&);
+
 };

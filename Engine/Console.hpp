@@ -8,7 +8,7 @@ class RenderQueue;
 
 class Console
 {
-	RigidPropertyCollection _cvars;
+	RigidPropertyCollection _properties;
 
 	Buffer<char> _charBuffer;
 
@@ -37,13 +37,13 @@ class Console
 public:
 	Console() : _nextBufferIndex(0), _prePrompt('>')
 	{
-		_cvars.CreateVar("Echo", CommandPtr(*this, &Console::_CMD_echo));
-		_cvars.CreateVar("Help", CommandPtr(*this, &Console::_CMD_help));
+		_properties.CreateVar("Echo", CommandPtr(*this, &Console::_CMD_echo));
+		_properties.CreateVar("Help", CommandPtr(*this, &Console::_CMD_help));
 	}
 
 	~Console() {}
 
-	RigidPropertyCollection& Cvars() { return _cvars; }
+	RigidPropertyCollection& Cvars() { return _properties; }
 
 	void Print(const char* string);
 	void InputChar(char key, const Context& ctx);

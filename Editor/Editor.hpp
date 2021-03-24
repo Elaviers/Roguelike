@@ -11,13 +11,12 @@
 #include <ELUI/Toolbar.hpp>
 #include <ELUI/Splitter.hpp>
 #include "FbxSdk.hpp"
-#include "HierachyWindow.hpp"
 #include "MouseData.hpp"
 #include "ToolIso.hpp"
 #include "ToolBrush2D.hpp"
 #include "ToolBrush3D.hpp"
 #include "ToolConnector.hpp"
-#include "ToolEntity.hpp"
+#include "ToolObject.hpp"
 #include "ToolSelect.hpp"
 #include "Viewport.hpp"
 #include <CommCtrl.h>
@@ -30,7 +29,7 @@ enum class ETool
 	ISO = 1,
 	BRUSH2D = 2,
 	BRUSH3D = 3,
-	ENTITY = 4,
+	OBJECT = 4,
 	CONNECTOR = 5
 };
 
@@ -47,15 +46,13 @@ private:
 
 	//Console
 	Window _consoleWindow;
-	EntCamera _consoleCamera;
-	EntCamera _uiCamera;
+	Projection _consoleCamera;
+	Projection _uiCamera;
 	SharedPointer<const Font> _consoleFont;
 	bool _consoleIsActive = false;
 
 	//Window stuff
 	Window_Win32 _window;
-	Window_Win32 _vpArea;
-	HierachyWindow _hierachyWindow;
 
 	UIContainer _ui;
 	UIContainer _vpAreaUI;
@@ -107,12 +104,16 @@ private:
 
 	float _gridUnit = 1.f;
 
+	uint16 _leftPanelSize = 256;
+
+	String _filename;
+
 	//imgui
 	bool showUtilsPanel = false;
 	bool showDemoPanel = false;
+	bool cullingDebug = false;
 
 	static LRESULT CALLBACK _WindowProc(HWND, UINT, WPARAM, LPARAM);
-	static LRESULT CALLBACK _vpAreaProc(HWND, UINT, WPARAM, LPARAM);
 
 	void _Init();
 	void _InitGL();
@@ -130,13 +131,13 @@ public:
 		ToolIso iso;
 		ToolBrush2D brush2D;
 		ToolBrush3D brush3D;
-		ToolEntity entity;
+		ToolObject object;
 		ToolConnector connector;
 
-		_EditorTools(Editor& editor) : select(editor), iso(editor), brush2D(editor), brush3D(editor), entity(editor), connector(editor) {}
+		_EditorTools(Editor& editor) : select(editor), iso(editor), brush2D(editor), brush3D(editor), object(editor), connector(editor) {}
 	} tools;
 
-	Editor() : _fbxManager(nullptr), _hierachyWindow(this), tools(*this), _gridZ(0.f) {}
+	Editor() : _fbxManager(nullptr), tools(*this), _gridZ(0.f), _world(&engine.context) {}
 	~Editor();
 
 	void TrySetCursor(ECursor cursor);
@@ -163,7 +164,6 @@ public:
 	void DecreaseGridUnit();
 
 	void ToggleConsole();
-	void RefreshLevel();
 
 	String SelectMaterialDialog();
 	String SelectModelDialog();
@@ -171,7 +171,7 @@ public:
 	void* GetPropertyObject() const;
 	void* GetToolPropertyObject() const;
 
-	void ChangePropertyEntity(Entity* ent);
+	void ChangePropertyWorldObject(WorldObject* ent);
 
 	void RefreshProperties();
 
@@ -186,8 +186,6 @@ public:
 	Viewport& GetVP(int index) { return _viewports[index]; }
 
 	void SetGridZ(float gridZ) { _gridZ = gridZ; }
-
-	void FocusVPArea() { _vpArea.Focus(); }
 
 	static constexpr const float PROPERTY_HEIGHT = 32;
 };

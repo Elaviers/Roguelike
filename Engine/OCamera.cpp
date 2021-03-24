@@ -1,37 +1,35 @@
-#include "EntCamera.hpp"
+#include "OCamera.hpp"
 #include <ELGraphics/RenderQueue.hpp>
 #include <ELSys/GLProgram.hpp>
 
-void EntCamera::Use(RenderQueue& queue, ERenderChannels channels) const
+void OCamera::Use(RenderQueue& queue, ERenderChannels channels) const
 {
-	RenderEntry& e = queue.CreateEntry(channels);
-	e.AddSetViewport(0, 0, _projection.GetDimensions().x, _projection.GetDimensions().y);
-	e.AddSetMat4(RCMDSetMat4::Type::VIEW, GetInverseTransformationMatrix());
-	e.AddSetMat4(RCMDSetMat4::Type::PROJECTION, _projection.GetMatrix());
+	queue.CreateCameraEntry(_projection, GetAbsoluteTransform(), channels);
 }
 
-void EntCamera::Use(RenderQueue& queue, int vpX, int vpY, ERenderChannels channels) const
+void OCamera::Use(RenderQueue& queue, int vpX, int vpY, ERenderChannels channels) const
 {
 	RenderEntry& e = queue.CreateEntry(channels);
 	e.AddSetViewport(vpX, vpY, _projection.GetDimensions().x, _projection.GetDimensions().y);
-	e.AddSetMat4(RCMDSetMat4::Type::VIEW, GetInverseTransformationMatrix());
+	e.AddSetMat4(RCMDSetMat4::Type::VIEW, GetAbsoluteTransform().GetInverseMatrix());
 	e.AddSetMat4(RCMDSetMat4::Type::PROJECTION, _projection.GetMatrix());
 }
 
-const PropertyCollection& EntCamera::GetProperties()
+const PropertyCollection& OCamera::GetProperties()
 {
-	static PropertyCollection properties;
+	static PropertyCollection properties(WorldObject::GetProperties());
 	DO_ONCE_BEGIN;
-	_AddBaseProperties(properties);
+	
+	//todo- camera properties
 
 	DO_ONCE_END;
 
 	return properties;
 }
 
-void EntCamera::WriteData(ByteWriter& writer, NumberedSet<String>& strings, const Context& ctx) const
+void OCamera::Write(ByteWriter& writer, ObjectIOContext& ctx) const
 {
-	Entity::WriteData(writer, strings, ctx);
+	WorldObject::Write(writer, ctx);
 
 	writer.Write_byte((byte)_projection.GetType());
 
@@ -46,9 +44,9 @@ void EntCamera::WriteData(ByteWriter& writer, NumberedSet<String>& strings, cons
 	writer.Write_uint16(_projection.GetDimensions().y);
 }
 
-void EntCamera::ReadData(ByteReader& reader, const NumberedSet<String>& strings, const Context& ctx)
+void OCamera::Read(ByteReader& reader, ObjectIOContext& ctx)
 {
-	Entity::ReadData(reader, strings, ctx);
+	WorldObject::Read(reader, ctx);
 
 	_projection.SetType(EProjectionType(reader.Read_byte()));
 

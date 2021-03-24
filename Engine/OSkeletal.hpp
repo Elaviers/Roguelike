@@ -1,8 +1,8 @@
 #pragma once
-#include "EntRenderable.hpp"
+#include "ORenderable.hpp"
 #include <ELGraphics/Animation.hpp>
 
-class EntSkeletal : public EntRenderable
+class OSkeletal : public ORenderable
 {
 	Buffer<Matrix4> _skinningMatrices;
 
@@ -13,11 +13,13 @@ class EntSkeletal : public EntRenderable
 
 	virtual void _OnMeshChanged() override;
 
-public:
-	Entity_FUNCS(EntSkeletal, EEntityID::SKELETAL);
+protected:
+	OSkeletal(World& world) : ORenderable(world), _currentTime(0.f) {}
 
-	EntSkeletal() : _currentTime(0.f) {}
-	virtual ~EntSkeletal() {}
+public:
+	WORLDOBJECT_VFUNCS(OSkeletal, EObjectID::SKELETAL);
+
+	virtual ~OSkeletal() {}
 
 	virtual void Update(float deltaTime) override;
 	virtual void Render(RenderQueue&) const override;

@@ -51,9 +51,9 @@ void Viewport::_OnComboBoxItemSelected(UIComboBox& comboBox)
 
 void Viewport::Resize(const Vector2T<uint16>& dimensions)
 {
-	camera.GetProjection().SetDimensions(dimensions);
+	cameraProjection.SetDimensions(dimensions);
 
-	_idMap.CreateColourDepth(dimensions.x, dimensions.y);
+	_idMap.Create_RG32UI_Depth(dimensions.x, dimensions.y);
 }
 
 void Viewport::SetCameraType(Viewport::ECameraType type)
@@ -65,50 +65,50 @@ void Viewport::SetCameraType(Viewport::ECameraType type)
 	case Viewport::ECameraType::PERSPECTIVE:
 		_comboBox.SetText(_textPerspective);
 		gridAxis = EAxis::Y;
-		camera.GetProjection().SetType(EProjectionType::PERSPECTIVE);
-		camera.GetProjection().SetNearFar(0.001f, 100.f);
-		camera.SetRelativePosition(Vector3(-5.f, 5.f, -5.f));
-		camera.SetRelativeRotation(Vector3(-45.f, 45.f, 0.f));
+		cameraProjection.SetType(EProjectionType::PERSPECTIVE);
+		cameraProjection.SetNearFar(0.001f, 100.f);
+		cameraTransform.SetPosition(Vector3(-5.f, 5.f, -5.f));
+		cameraTransform.SetRotation(Vector3(-45.f, 45.f, 0.f));
 		break;
 
 	case Viewport::ECameraType::ISOMETRIC:
 		_comboBox.SetText(_textIsometric);
 		gridAxis = EAxis::Y;
-		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-		camera.GetProjection().SetOrthographicScale(8.f);
-		camera.GetProjection().SetNearFar(0.f, 20000.f);
-		camera.SetRelativeRotation(Vector3(Maths::RadiansToDegrees(-Maths::ArcTan(1.f / Maths::SQRT2_F)), 45.f, 0.f));
-		camera.SetRelativePosition(camera.GetRelativeTransform().GetForwardVector() * -10000.f);
+		cameraProjection.SetType(EProjectionType::ORTHOGRAPHIC);
+		cameraProjection.SetOrthographicScale(8.f);
+		cameraProjection.SetNearFar(0.f, 20000.f);
+		cameraTransform.SetRotation(Vector3(Maths::RadiansToDegrees(-Maths::ArcTan(1.f / Maths::SQRT2_F)), 45.f, 0.f));
+		cameraTransform.SetPosition(cameraTransform.GetForwardVector() * -10000.f);
 		break;
 
 	case Viewport::ECameraType::ORTHO_X:
 		_comboBox.SetText(_textOrthoX);
 		gridAxis = EAxis::X;
-		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-		camera.GetProjection().SetOrthographicScale(8.f);
-		camera.GetProjection().SetNearFar(0.f, 20000.f);
-		camera.SetRelativeRotation(Vector3(0.f, -90.f, 0.f));
-		camera.SetRelativePosition(Vector3(10000.f, 0.f, 0.f));
+		cameraProjection.SetType(EProjectionType::ORTHOGRAPHIC);
+		cameraProjection.SetOrthographicScale(8.f);
+		cameraProjection.SetNearFar(0.f, 20000.f);
+		cameraTransform.SetPosition(Vector3(10000.f, 0.f, 0.f));
+		cameraTransform.SetRotation(Vector3(0.f, -90.f, 0.f));
 		break;
 
 	case Viewport::ECameraType::ORTHO_Y:
 		_comboBox.SetText(_textOrthoY);
 		gridAxis = EAxis::Y;
-		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-		camera.GetProjection().SetOrthographicScale(8.f);
-		camera.GetProjection().SetNearFar(0.f, 20000.f);
-		camera.SetRelativeRotation(Vector3(-90.f, 0.f, 0.f));
-		camera.SetRelativePosition(Vector3(0.f, 10000.f, 0.f));
+		cameraProjection.SetType(EProjectionType::ORTHOGRAPHIC);
+		cameraProjection.SetOrthographicScale(8.f);
+		cameraProjection.SetNearFar(0.f, 20000.f);
+		cameraTransform.SetPosition(Vector3(0.f, 10000.f, 0.f));
+		cameraTransform.SetRotation(Vector3(-90.f, 0.f, 0.f));
 		break;
 
 	case Viewport::ECameraType::ORTHO_Z:
 		_comboBox.SetText(_textOrthoZ);
 		gridAxis = EAxis::Z;
-		camera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-		camera.GetProjection().SetOrthographicScale(8.f);
-		camera.GetProjection().SetNearFar(0.f, 20000.f);
-		camera.SetRelativeRotation(Vector3(0.f, 0.f, 0.f));
-		camera.SetRelativePosition(Vector3(0.f, 0.f, -10000.f));
+		cameraProjection.SetType(EProjectionType::ORTHOGRAPHIC);
+		cameraProjection.SetOrthographicScale(8.f);
+		cameraProjection.SetNearFar(0.f, 20000.f);
+		cameraTransform.SetPosition(Vector3(0.f, 0.f, -10000.f));
+		cameraTransform.SetRotation(Vector3(0.f, 0.f, 0.f));
 		break;
 			
 	}

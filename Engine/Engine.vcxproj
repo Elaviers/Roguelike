@@ -21,16 +21,14 @@
   <ItemGroup>
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="EngineInstance.cpp" />
-    <ClCompile Include="EntBrush2D.cpp" />
-    <ClCompile Include="EntBrush3D.cpp" />
-    <ClCompile Include="EntCamera.cpp" />
-    <ClCompile Include="EntConnector.cpp" />
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="EntityIterator.cpp" />
-    <ClCompile Include="EntLight.cpp" />
-    <ClCompile Include="EntRenderable.cpp" />
-    <ClCompile Include="EntSkeletal.cpp" />
-    <ClCompile Include="EntSprite.cpp" />
+    <ClCompile Include="OBrush2D.cpp" />
+    <ClCompile Include="OBrush3D.cpp" />
+    <ClCompile Include="OCamera.cpp" />
+    <ClCompile Include="OConnector.cpp" />
+    <ClCompile Include="OLight.cpp" />
+    <ClCompile Include="ORenderable.cpp" />
+    <ClCompile Include="OSkeletal.cpp" />
+    <ClCompile Include="OSprite.cpp" />
     <ClCompile Include="GeoIsoTile.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -42,24 +40,28 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="EGeometryID.hpp" />
+    <ClCompile Include="OGeometryCollection.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileManager.cpp" />
     <ClCompile Include="World.cpp" />
+    <ClCompile Include="WorldObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Console.hpp" />
-    <ClInclude Include="EEntityID.hpp" />
+    <ClInclude Include="EObjectID.hpp" />
     <ClInclude Include="EngineInstance.hpp" />
-    <ClInclude Include="EntBrush2D.hpp" />
-    <ClInclude Include="EntBrush3D.hpp" />
-    <ClInclude Include="EntCamera.hpp" />
-    <ClInclude Include="EntConnector.hpp" />
-    <ClInclude Include="Entity.hpp" />
-    <ClInclude Include="EntityIterator.hpp" />
-    <ClInclude Include="EntLight.hpp" />
-    <ClInclude Include="EntRenderable.hpp" />
-    <ClInclude Include="EntSkeletal.hpp" />
-    <ClInclude Include="EntSprite.hpp" />
+    <ClInclude Include="GeometryType.hpp" />
+    <ClInclude Include="ObjectIOContext.hpp" />
+    <ClInclude Include="Register.hpp" />
+    <ClInclude Include="ObjectType.hpp" />
+    <ClInclude Include="OBrush2D.hpp" />
+    <ClInclude Include="OBrush3D.hpp" />
+    <ClInclude Include="OCamera.hpp" />
+    <ClInclude Include="OConnector.hpp" />
+    <ClInclude Include="OLight.hpp" />
+    <ClInclude Include="ORenderable.hpp" />
+    <ClInclude Include="OSkeletal.hpp" />
+    <ClInclude Include="OSprite.hpp" />
     <ClInclude Include="Geometry.hpp" />
     <ClInclude Include="GeoIsoTile.hpp" />
     <ClInclude Include="imgui\imconfig.h" />
@@ -72,10 +74,11 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Model.hpp" />
     <ClInclude Include="ModelManager.hpp" />
-    <ClInclude Include="Registry.hpp" />
+    <ClInclude Include="OGeometryCollection.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileManager.hpp" />
     <ClInclude Include="World.hpp" />
+    <ClInclude Include="WorldObject.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ELLib\ELAudio\ELAudio.vcxproj">
@@ -189,9 +192,9 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnablePREfast>true</EnablePREfast>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>ELAudio.lib;ELCore.lib;ELGraphics.lib;ELMaths.lib;ELPhys.lib;ELSys.lib;ELUI.lib</AdditionalDependencies>
@@ -206,9 +209,9 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnablePREfast>true</EnablePREfast>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>ELAudio.lib;ELCore.lib;ELGraphics.lib;ELMaths.lib;ELPhys.lib;ELSys.lib;ELUI.lib</AdditionalDependencies>
@@ -225,9 +228,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnablePREfast>true</EnablePREfast>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -248,9 +251,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnablePREfast>true</EnablePREfast>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

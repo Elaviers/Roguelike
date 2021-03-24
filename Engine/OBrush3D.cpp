@@ -1,12 +1,26 @@
-#include "EntBrush3D.hpp"
+#include "OBrush3D.hpp"
 #include <ELCore/Context.hpp>
 #include <ELCore/MacroUtilities.hpp>
+#include <ELCore/NumberedSet.hpp>
 #include <ELCore/Utilities.hpp>
 #include <ELGraphics/RenderCommand.hpp>
 #include <ELGraphics/RenderQueue.hpp>
+#include <ELPhys/CollisionBox.hpp>
 
-void EntBrush3D::_OnTransformChanged()
+void OBrush3D::_InitBody(FixedBody& body) const
 {
+	body.Collision() = Collider(ECollisionChannels::SURFACE, CollisionBox(Box(Vector3(), Vector3(.5f, .5f, .5f))));
+}
+
+void OBrush3D::_UpdateBody(FixedBody& body) const
+{
+	body.SetTransform(GetAbsoluteTransform());
+}
+
+void OBrush3D::_OnTransformChanged()
+{
+	ORenderable::_OnTransformChanged();
+
 	if (!_updatingTransform)
 	{
 		float hw = GetRelativeScale().x / 2.f;
@@ -18,7 +32,7 @@ void EntBrush3D::_OnTransformChanged()
 	}
 }
 
-void EntBrush3D::_OnPointChanged()
+void OBrush3D::_OnPointChanged()
 {
 	float x = (_point1.x + _point2.x) / 2.f;
 	float y = (_point1.y + _point2.y) / 2.f;
@@ -33,7 +47,7 @@ void EntBrush3D::_OnPointChanged()
 	_updatingTransform = false;
 }
 
-void EntBrush3D::Render(RenderQueue& q) const
+void OBrush3D::Render(RenderQueue& q) const
 {
 	if (_material)
 	{
@@ -42,20 +56,20 @@ void EntBrush3D::Render(RenderQueue& q) const
 		e.AddCommand(RCMDSetUVOffset::Default());
 		e.AddSetColour(Colour::White);
 		
-		Matrix4 pt = _parent ? _parent->GetTransformationMatrix() : Matrix4();
+		Matrix4 pt = GetParent() ? GetParent()->GetAbsoluteTransform().GetMatrix() : Matrix4();
 		Transform t;
 		
 		//Front
 		t.SetScale(Vector3(GetRelativeScale().x, GetRelativeScale().y, 1.f));
 		t.SetPosition(GetRelativePosition() + Vector3(0.f, 0.f, -GetRelativeScale().z / 2.f));
 		e.AddSetUVScale(Vector2(GetRelativeScale().x, GetRelativeScale().y));
-		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddSetTransform(t.MakeMatrix() * pt);
 		e.AddCommand(RCMDRenderMesh::PLANE);
 
 		//Back
 		t.SetRotation(Vector3(0.f, 180.f, 0.f));
 		t.Move(Vector3(0.f, 0.f, GetRelativeScale().z));
-		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddSetTransform(t.MakeMatrix() * pt);
 		e.AddCommand(RCMDRenderMesh::PLANE);
 
 		//Left
@@ -63,13 +77,13 @@ void EntBrush3D::Render(RenderQueue& q) const
 		t.SetRotation(Vector3(0.f, 90.f, 0.f));
 		t.SetPosition(Vector3(GetRelativePosition() - Vector3(GetRelativeScale().x / 2.f, 0.f, 0.f)));
 		e.AddSetUVScale(Vector2(GetRelativeScale().z, GetRelativeScale().y));
-		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddSetTransform(t.MakeMatrix() * pt);
 		e.AddCommand(RCMDRenderMesh::PLANE);
 
 		//Right
 		t.SetRotation(Vector3(0.f, -90.f, 0.f));
 		t.Move(Vector3(GetRelativeScale().x, 0.f, 0.f));
-		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddSetTransform(t.MakeMatrix() * pt);
 		e.AddCommand(RCMDRenderMesh::PLANE);
 
 		//Bottom
@@ -77,37 +91,24 @@ void EntBrush3D::Render(RenderQueue& q) const
 		t.SetRotation(Vector3(90.f, 0.f, 0.f));
 		t.SetPosition(GetRelativePosition() - Vector3(0.f, GetRelativeScale().y / 2.f, 0.f));
 		e.AddSetUVScale(Vector2(GetRelativeScale().x, GetRelativeScale().z));
-		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddSetTransform(t.MakeMatrix() * pt);
 		e.AddCommand(RCMDRenderMesh::PLANE);
 
 		//Top
 		t.SetRotation(Vector3(-90.f, 0.f, 0.f));
 		t.Move(Vector3(0.f, GetRelativeScale().y, 0.f));
-		e.AddSetTransform(t.MakeTransformationMatrix() * pt);
+		e.AddSetTransform(t.MakeMatrix() * pt);
 		e.AddCommand(RCMDRenderMesh::PLANE);
 	}
 }
 
-void EntBrush3D::WriteData(ByteWriter &writer, NumberedSet<String> &strings, const Context& ctx) const
+void OBrush3D::Read(ByteReader& reader, ObjectIOContext& ctx)
 {
-	Entity::WriteData(writer, strings, ctx);
+	WorldObject::Read(reader, ctx);
 
-	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();
-	if (materialManager && _material)
-	{
-		uint16 id = strings.Add(materialManager->FindNameOf(_material.Ptr()));
-		writer.Write_uint16(id);
-	}
-	else writer.Write_uint16(0);
-}
-
-void EntBrush3D::ReadData(ByteReader &reader, const NumberedSet<String> &strings, const Context& ctx)
-{
-	Entity::ReadData(reader, strings, ctx);
-
-	const String *materialName = strings.Get(reader.Read_uint16());
+	const String* materialName = ctx.strings.Get(reader.Read_uint16());
 	if (materialName)
-		SetMaterial(*materialName, ctx);
+		SetMaterial(*materialName, ctx.context);
 
 	_point1.x = GetRelativePosition().x - GetRelativeScale().x / 2.f;
 	_point1.y = GetRelativePosition().y - GetRelativeScale().y / 2.f;
@@ -117,31 +118,42 @@ void EntBrush3D::ReadData(ByteReader &reader, const NumberedSet<String> &strings
 	_point2.z = GetRelativePosition().z + GetRelativeScale().z / 2.f;
 }
 
-const PropertyCollection& EntBrush3D::GetProperties()
+void OBrush3D::Write(ByteWriter &writer, ObjectIOContext& ctx) const
 {
-	static PropertyCollection cvars;
+	WorldObject::Write(writer, ctx);
+
+	MaterialManager* materialManager = ctx.context.GetPtr<MaterialManager>();
+	if (materialManager && _material)
+	{
+		uint16 id = ctx.strings.Add(materialManager->FindNameOf(_material.Ptr()));
+		writer.Write_uint16(id);
+	}
+	else writer.Write_uint16(0);
+}
+
+const PropertyCollection& OBrush3D::GetProperties()
+{
+	static PropertyCollection properties(WorldObject::_GetNonTransformProperties());
 
 	DO_ONCE_BEGIN;
-	_AddBaseProperties(cvars);
-
-	cvars.Add(
+	properties.Add(
 		"Material", 
-		ContextualMemberGetter<EntBrush3D, String>(&EntBrush3D::GetMaterialName), 
-		ContextualMemberSetter<EntBrush3D, String>(&EntBrush3D::SetMaterial), 
+		ContextualMemberGetter<OBrush3D, String>(&OBrush3D::GetMaterialName), 
+		ContextualMemberSetter<OBrush3D, String>(&OBrush3D::SetMaterial), 
 		0,
 		PropertyFlags::MATERIAL);
 		
-	cvars.Add(
+	properties.Add(
 		"Point1", 
-		MemberGetter<EntBrush3D, const Vector3&>(&EntBrush3D::GetPoint1),
-		MemberSetter<EntBrush3D, Vector3>(&EntBrush3D::SetPoint1));
+		MemberGetter<OBrush3D, const Vector3&>(&OBrush3D::GetPoint1),
+		MemberSetter<OBrush3D, Vector3>(&OBrush3D::SetPoint1));
 
-	cvars.Add(
+	properties.Add(
 		"Point2",
-		MemberGetter<EntBrush3D, const Vector3&>(&EntBrush3D::GetPoint2),
-		MemberSetter<EntBrush3D, Vector3>(&EntBrush3D::SetPoint2));
+		MemberGetter<OBrush3D, const Vector3&>(&OBrush3D::GetPoint2),
+		MemberSetter<OBrush3D, Vector3>(&OBrush3D::SetPoint2));
 
 	DO_ONCE_END;
 
-	return cvars;
+	return properties;
 }

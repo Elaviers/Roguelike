@@ -1,41 +1,49 @@
 #pragma once
 #include <ELCore/NumberedSet.hpp>
-#include <ELMaths/Bounds.hpp>
 #include <ELPhys/Collider.hpp>
+#include "EGeometryID.hpp"
+#include "OGeometryCollection.hpp"
 
 class RenderQueue;
+class Volume;
+
+#define GEOMETRY_VFUNCS(CLASSNAME, ID)									\
+public:																	\
+	friend OGeometryCollection;											\
+	static const EGeometryID TypeID = ID;								\
+	virtual EGeometryID GetTypeID() const override { return TypeID; }			\
+	virtual const char* GetClassString() const override { return #CLASSNAME; }
 
 //Represents static geometry
 class Geometry
 {
+private:
+	OGeometryCollection* _collection;
+	uint32 _uid;
+
 protected:
-	static uint32 _TakeNextUID()
-	{
-		static uint32 uid = 1;
-		return uid++;
-	}
+	Geometry(OGeometryCollection& collection) : _collection(&collection), _uid(collection.TakeNextUID()) {}
+	Geometry(const Geometry& other) : _collection(other._collection), _uid(other._collection->TakeNextUID()) {}
+	Geometry(Geometry&& other) noexcept = delete;
 
-	const uint32 _uid;
-	
-	Geometry() : _uid(_TakeNextUID()) {}
-	Geometry(const Geometry& other) : _uid(_TakeNextUID()) {}
-	Geometry(Geometry&& other) noexcept : _uid(other._uid) {}
-
-	Geometry& operator=(const Geometry& other) { return *this; }
-	Geometry& operator=(Geometry&& other) noexcept { const_cast<uint32&>(_uid) = other._uid; return *this; }
+	Geometry& operator=(const Geometry& other) = delete;
+	Geometry& operator=(Geometry&& other) noexcept = delete;
 	
 public:
 	virtual ~Geometry() {}
 
+	OGeometryCollection* GetOwner() { return _collection; }
+	const OGeometryCollection* GetOwner() const { return _collection; }
 	uint32 GetUID() const { return _uid; }
 
 	virtual void Render(RenderQueue& q) const {}
 
-	virtual void WriteData(ByteWriter&, NumberedSet<String>& strings, const Context& ctx) const {}
-	virtual void ReadData(ByteReader&, const NumberedSet<String>& strings, const Context& ctx) {}
+	virtual void Read(ByteReader&, ObjectIOContext& ctx) {}
+	virtual void Write(ByteWriter&, ObjectIOContext& ctx) const {}
 
-	virtual byte GetTypeID() = 0;
+	virtual EGeometryID GetTypeID() const = 0;
+	virtual const char* GetClassString() const = 0;
 
-	virtual const Bounds& GetBounds() const { static Bounds bounds; return bounds; }
-	virtual EOverlapResult Overlaps(const Collider& collider, const Transform& transform, const Vector3& sweep, Vector3* penOut) const { return EOverlapResult::SEPERATE; }
+	//Note: for now, all geometry volumes are processed in world space!!!
+	virtual const Volume& GetVolume() const = 0;
 };

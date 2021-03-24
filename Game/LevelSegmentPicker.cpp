@@ -1,7 +1,7 @@
 #include "LevelSegmentPicker.hpp"
 #include <Engine/World.hpp>
 
-LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const String& rootLevelDir, const Context& ctx)
+LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const String& rootLevelDir, World& world)
 {
 	LevelSegmentPicker result;
 
@@ -28,19 +28,15 @@ LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const St
 			}
 			else if (tokens.GetSize() >= 2 && tokens[0] == "segment" && bag)
 			{
-				World subworld;
-				Entity* segment = Entity::Create();
-				if (subworld.Read(CSTR(rootLevelDir, tokens[1]), ctx))
+				WorldObject* segment = world.CreateObject<WorldObject>();
+				if (world.ReadObjects(CSTR(rootLevelDir, tokens[1]), segment))
 				{
-					while (subworld.RootEntity().Children().GetSize())
-						subworld.RootEntity().Children()[0]->SetParent(segment);
-
 					bag->bag.Add(segment, tokens.GetSize() > 2 ? tokens[2].ToFloat() : 1);
 					if (bagTotalOverride)
 						bag->bag.SetRemainingWeight(bagTotalOverride);
 				}
 				else
-					segment->Delete(ctx);
+					segment->Destroy();
 			}
 		}
 	}
@@ -48,7 +44,7 @@ LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const St
 	return result;
 }
 
-const Entity* LevelSegmentPicker::TakeNextSegment(Random& random, unsigned int depth)
+const WorldObject* LevelSegmentPicker::TakeNextSegment(Random& random, unsigned int depth)
 {
 	SegmentBag* bag = nullptr;
 
@@ -81,7 +77,7 @@ const Entity* LevelSegmentPicker::TakeNextSegment(Random& random, unsigned int d
 	if (numOptions > 0)
 	{
 		List<SegmentBag>::Iterator chosen = *options.Get(random.Next((uint32)numOptions));
-		const Entity* segment = chosen->bag.TakeNext(random, 1.f);
+		const WorldObject* segment = chosen->bag.TakeNext(random, 1.f);
 
 		if (chosen->bag.GetRemainingWeight() <= 0.f)
 			essential ? _essentialBags.Remove(chosen) : _otherBags.Remove(chosen);

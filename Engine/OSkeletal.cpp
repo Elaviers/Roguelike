@@ -1,24 +1,22 @@
-#include "EntSkeletal.hpp"
+#include "OSkeletal.hpp"
 #include <ELCore/Context.hpp>
 #include <ELGraphics/AnimationManager.hpp>
 #include <ELGraphics/Mesh_Skeletal.hpp>
 #include <ELGraphics/RenderCommand.hpp>
 #include <ELGraphics/RenderQueue.hpp>
 
-PropertyCollection& EntSkeletal::GetProperties()
+PropertyCollection& OSkeletal::GetProperties()
 {
-	static PropertyCollection properties;
+	static PropertyCollection properties(ORenderable::GetProperties());
 
 	DO_ONCE_BEGIN;
-	properties = EntRenderable::GetProperties();
-
-	properties.AddCommand("Play", MemberCommandPtr<EntSkeletal>(&EntSkeletal::_CMD_PlayAnimation));
+	properties.AddCommand("Play", MemberCommandPtr<OSkeletal>(&OSkeletal::_CMD_PlayAnimation));
 	DO_ONCE_END;
 
 	return properties;
 }
 
-void EntSkeletal::_CMD_PlayAnimation(const Buffer<String>& args, const Context& ctx)
+void OSkeletal::_CMD_PlayAnimation(const Buffer<String>& args, const Context& ctx)
 {
 	if (args.GetSize())
 	{
@@ -30,19 +28,19 @@ void EntSkeletal::_CMD_PlayAnimation(const Buffer<String>& args, const Context& 
 	}
 }
 
-void EntSkeletal::_OnMeshChanged()
+void OSkeletal::_OnMeshChanged()
 {
 	const Mesh_Skeletal* skeletal = dynamic_cast<const Mesh_Skeletal*>(_model->GetMesh().Ptr());
 	if (skeletal) _skinningMatrices.SetSize(skeletal->skeleton.GetJointCount());
 }
 
-void EntSkeletal::PlayAnimation(const SharedPointer<const Animation> &anim)
+void OSkeletal::PlayAnimation(const SharedPointer<const Animation> &anim)
 {
 	_animation = anim;
 	_currentTime = 0.f;
 }
 
-void EntSkeletal::Update(float deltaTime)
+void OSkeletal::Update(float deltaTime)
 {
 	_currentTime += deltaTime;
 
@@ -54,7 +52,7 @@ void EntSkeletal::Update(float deltaTime)
 	}
 }
 
-void EntSkeletal::Render(RenderQueue& q) const
+void OSkeletal::Render(RenderQueue& q) const
 {
 	if (_model)
 	{
@@ -68,7 +66,7 @@ void EntSkeletal::Render(RenderQueue& q) const
 		e.AddCommand(RCMDSetUVOffset::Default());
 		e.AddCommand(RCMDSetUVScale::Default());
 
-		e.AddSetTransform(GetTransformationMatrix());
+		e.AddSetTransform(GetAbsoluteTransform().GetMatrix());
 		e.AddSetColour(_colour);
 		e.AddSetSkinningMatrices(&_skinningMatrices);
 		e.AddRenderMesh(*_model->GetMesh());

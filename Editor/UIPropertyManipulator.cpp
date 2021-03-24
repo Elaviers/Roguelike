@@ -7,26 +7,22 @@
 #include <ELUI/Checkbox.hpp>
 #include <ELUI/TextButton.hpp>
 
-byte StringToClassID(const String& string, EngineInstance& engine)
+EObjectID StringToClassID(const String& string, EngineInstance& engine)
 {
-	Buffer<Pair<const byte*, RegistryNodeBase<Entity>* const*>> types = engine.entRegistry.GetRegisteredTypes();
-	for (size_t i = 0; i < types.GetSize(); ++i)
-	{
-		if ((*types[i].second)->name == string)
-			return *types[i].first;
-	}
+	const List<ObjectType>& types = engine.objectTypes.GetTypes();
+	for (const ObjectType& type : types)
+		if (type.GetName() == string)
+			return type.GetID();
 
-	return 0;
+	return EObjectID::NONE;
 }
 
-String ClassIDToString(byte id, EngineInstance& engine)
+String ClassIDToString(EObjectID id, EngineInstance& engine)
 {
-	Buffer<Pair<const byte*, RegistryNodeBase<Entity>* const*>> types = engine.entRegistry.GetRegisteredTypes();
-	for (size_t i = 0; i < types.GetSize(); ++i)
-	{
-		if (*types[i].first == id)
-			return (*types[i].second)->name;
-	}
+	const List<ObjectType>& types = engine.objectTypes.GetTypes();
+	for (const ObjectType& type : types)
+		if (type.GetID() == id)
+			return type.GetName();
 
 	return "ERROR";
 }
@@ -71,7 +67,7 @@ String GetPropertyString(Property& property, const void* object, EngineInstance&
 	if (property.GetFlags() & PropertyFlags::CLASSID)
 	{
 		VariableProperty<byte>* idProperty = dynamic_cast<VariableProperty<byte>*>(&property);
-		return ClassIDToString(idProperty->Get(object, engine.context), engine);
+		return ClassIDToString((EObjectID)idProperty->Get(object, engine.context), engine);
 	}
 	else
 		return property.GetAsString(object, engine.context);
@@ -82,7 +78,7 @@ void SetPropertyString(Property& property, void* object, const String& string, E
 	if (property.GetFlags() & PropertyFlags::CLASSID)
 	{
 		VariableProperty<byte>* idProperty = dynamic_cast<VariableProperty<byte>*>(&property);
-		idProperty->Set(object, StringToClassID(string, engine), engine.context);
+		idProperty->Set(object, (byte)StringToClassID(string, engine), engine.context);
 	}
 	else
 		property.SetAsString(object, string, engine.context);
@@ -164,11 +160,9 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 			}
 			else
 			{
-				auto types = instance.engine.entRegistry.GetRegisteredTypes();
-				for (uint32 i = 0; i < types.GetSize(); ++i)
-				{
-					comboBox->Add(Text((*types[i].second)->name));
-				}
+				const List<ObjectType>& types = instance.engine.objectTypes.GetTypes();
+				for (const ObjectType& type : types)
+					comboBox->Add(Text(type.GetName()));
 			}
 		}
 

@@ -1,11 +1,11 @@
 #pragma once
-#include "Entity.hpp"
+#include "WorldObject.hpp"
 #include <ELCore/Context.hpp>
 #include <ELGraphics/Colour.hpp>
 #include <ELGraphics/MaterialManager.hpp>
 #include <ELGraphics/Material_Sprite.hpp>
 
-class EntSprite : public Entity
+class OSprite : public WorldObject
 {
 	SharedPointer<const MaterialSprite> _material;
 	float _size;
@@ -13,27 +13,24 @@ class EntSprite : public Entity
 
 	bool _fixedYaw;
 
-public:
-	Entity_FUNCS(EntSprite, EEntityID::SPRITE)
+protected:
+	OSprite(World& world) : WorldObject(world), _size(1.f), _colour(Colour::White), _fixedYaw(true) {}
 
-	EntSprite(const MaterialSprite *material = nullptr, float size = 1.f) : 
-		_material(material), 
-		_size(size),
-		_colour(1.f, 1.f, 1.f),
-		_fixedYaw(true)
-	{}
-	virtual ~EntSprite() {}
+public:
+	WORLDOBJECT_VFUNCS(OSprite, EObjectID::SPRITE);
+
+	virtual ~OSprite() {}
 
 	float GetSize() const { return _size; }
 	const Colour& GetColour() const { return _colour; }
 
-	void SetSize(float size) { _size = size; SetWorldScale(Vector3(size, size, size)); }
+	void SetSize(float size) { _size = size; SetAbsoluteScale(Vector3(size, size, size)); }
 	void SetColour(const Colour& colour) { _colour = colour; }
 
 	virtual void Render(RenderQueue&) const override;
 
-	virtual Bounds GetBounds() const override { return Bounds(_size / 2.f); }
-
+	virtual bool IsVisible(const Frustum& view) const override;
+	
 	virtual const PropertyCollection& GetProperties() override;
 
 	SharedPointer<const MaterialSprite> GetMaterial() const { return _material; }
@@ -54,7 +51,6 @@ public:
 	}
 
 	//File IO
-	virtual void WriteData(ByteWriter&, NumberedSet<String>& strings, const Context& ctx) const override;
-	virtual void ReadData(ByteReader&, const NumberedSet<String>& strings, const Context& ctx) override;
+	virtual void Read(ByteReader& buffer, ObjectIOContext& ctx) override;
+	virtual void Write(ByteWriter& buffer, ObjectIOContext& ctx) const override;
 };
-

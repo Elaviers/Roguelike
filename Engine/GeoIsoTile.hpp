@@ -1,10 +1,13 @@
 #pragma once
 #include "Geometry.hpp"
 #include "Tile.hpp"
+#include <ELCore/Handle.hpp>
 #include <ELCore/SharedPointer.hpp>
 #include <ELGraphics/RenderEntry.hpp>
 #include <ELMaths/LineSegment.hpp>
 #include <ELMaths/Transform.hpp>
+#include <ELMaths/Volume.hpp>
+#include <ELPhys/Body.hpp>
 
 class GeoIsoTile : public Geometry
 {
@@ -15,33 +18,27 @@ private:
 protected:
 	Transform _renderTransform;
 
-	Bounds _bounds;
+	VBox _boundingBox;
 
 	SharedPointer<const Tile> _tile;
 
 	Vector2 _size;
 
+	Handle<FixedBody> _physics;
+
+protected:
+	GeoIsoTile(OGeometryCollection& g);
+	GeoIsoTile(const GeoIsoTile& other);
+
 public:
-	//Needed for registry
-	static const byte TypeID;
-
-	GeoIsoTile() : _renderEntry(ERenderChannels::UNLIT) { }
-	GeoIsoTile(const GeoIsoTile& other) : 
-		Geometry(other), 
-		_renderEntry(ERenderChannels::UNLIT), 
-		_renderTransform(other._renderTransform), 
-		_bounds(other._bounds), 
-		_tile(other._tile)
-	{
-		_UpdateRenderEntry();
-	}
-
 	virtual ~GeoIsoTile() {}
+
+	GEOMETRY_VFUNCS(GeoIsoTile, EGeometryID::ISO_TILE);
 
 	GeoIsoTile& operator=(const GeoIsoTile& other)
 	{
 		_renderTransform = other._renderTransform;
-		_bounds = other._bounds;
+		_boundingBox = other._boundingBox;
 		_tile = other._tile;
 		_UpdateRenderEntry();
 		return *this;
@@ -56,15 +53,13 @@ public:
 
 	virtual void Render(RenderQueue& q) const override;
 
-	virtual void WriteData(ByteWriter&, NumberedSet<String>& strings, const Context& ctx) const override;
-	virtual void ReadData(ByteReader&, const NumberedSet<String>& strings, const Context& ctx) override;
+	virtual void Read(ByteReader&, ObjectIOContext&) override;
+	virtual void Write(ByteWriter&, ObjectIOContext&) const override;
 
-	virtual byte GetTypeID() { return TypeID; }
-
-	virtual const Bounds& GetBounds() const { return _bounds; }
+	virtual const Volume& GetVolume() const override { return _boundingBox; }
 	virtual EOverlapResult Overlaps(const Collider& collider, const Transform& transform, const Vector3& sweep, Vector3* penOut) const 
 	{
 		LineSegment sweepLine(Vector3(), sweep);
-		return _tile->GetCollider().Overlaps(_renderTransform, collider, transform, &sweepLine, penOut);
+		return _tile->GetCollider().NarrowOverlapCheck(_renderTransform, collider, transform, &sweepLine, penOut);
 	}
 };

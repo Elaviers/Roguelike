@@ -24,7 +24,6 @@ EngineInstance::~EngineInstance()
 	delete pMeshManager;
 	delete pTextManager;
 	delete pTextureManager;
-	delete pObjectTracker;
 
 	FT_Done_FreeType(_ftLib);
 }
@@ -49,9 +48,9 @@ void EngineInstance::Init(EEngineCreateFlags flags)
 
 	context.Set(&_ftLib);
 	
-	_InitRegistries();
-	context.Set(&entRegistry);
-	context.Set(&geometryRegistry);
+	_InitRegisters();
+	context.Set(&objectTypes);
+	context.Set(&geometryTypes);
 
 	pConsole =			CREATE<Console>(flags, EEngineCreateFlags::CONSOLE, context);
 	pAnimationManager = CREATE<AnimationManager>(flags, EEngineCreateFlags::ANIMATIONMGR, context);
@@ -65,7 +64,6 @@ void EngineInstance::Init(EEngineCreateFlags flags)
 	pTextManager =		CREATE<TextManager>(flags, EEngineCreateFlags::TEXTMGR, context);
 	pTextureManager =	CREATE<TextureManager>(flags, EEngineCreateFlags::TEXTUREMGR, context);
 	pTileManager =		CREATE<TileManager>(flags, EEngineCreateFlags::TILEMGR, context);
-	pObjectTracker =	CREATE<Tracker<Entity>>(flags, EEngineCreateFlags::OBJTRACKER, context);
 
 	if (pConsole)
 	{
@@ -134,28 +132,45 @@ void EngineInstance::Init(EEngineCreateFlags flags)
 	}
 }
 
-#include "Entity.hpp"
-#include "EntRenderable.hpp"
-#include "EntSkeletal.hpp"
-#include "EntBrush3D.hpp"
-#include "EntBrush2D.hpp"
-#include "EntLight.hpp"
-#include "EntSprite.hpp"
-#include "EntConnector.hpp"
-#include "EntCamera.hpp"
+#include "World.hpp"
+#include "WorldObject.hpp"
+#include "ORenderable.hpp"
+#include "OSkeletal.hpp"
+#include "OBrush3D.hpp"
+#include "OBrush2D.hpp"
+#include "OLight.hpp"
+#include "OSprite.hpp"
+#include "OConnector.hpp"
+#include "OCamera.hpp"
+#include "OGeometryCollection.hpp"
 #include "GeoIsoTile.hpp"
 
-void EngineInstance::_InitRegistries()
-{
-	entRegistry.RegisterObjectClass<Entity>("Entity");
-	entRegistry.RegisterObjectClass<EntRenderable>("Renderable");
-	entRegistry.RegisterObjectClass<EntSkeletal>("Skeletal");
-	entRegistry.RegisterObjectClass<EntBrush3D>("Brush");
-	entRegistry.RegisterObjectClass<EntBrush2D>("Plane");
-	entRegistry.RegisterObjectClass<EntLight>("Light");
-	entRegistry.RegisterObjectClass<EntSprite>("Sprite");
-	entRegistry.RegisterObjectClass<EntConnector>("Level Connector");
-	entRegistry.RegisterObjectClass<EntCamera>("Camera");
+#include "Geometry.hpp"
+#include "GeoIsoTile.hpp"
 
-	geometryRegistry.RegisterObjectClass<GeoIsoTile>("Iso Tile");
+template <typename T>
+ObjectType MakeObjectType(const String& name) 
+{ 
+	return ObjectType(T::TypeID, name, MemberFunction<World, WorldObject*>((WorldObject* (World::*)())&World::CreateObject<T>)); 
+}
+
+template <typename T>
+GeometryType MakeGeometryType(const String& name)
+{
+	return GeometryType(T::TypeID, name, MemberFunction<OGeometryCollection, Geometry*>((Geometry * (OGeometryCollection::*)()) & OGeometryCollection::CreateGeometry<T>));
+}
+
+void EngineInstance::_InitRegisters()
+{
+	objectTypes.RegisterType(MakeObjectType<WorldObject>("WorldObject"));
+	objectTypes.RegisterType(MakeObjectType<ORenderable>("Renderable"));
+	objectTypes.RegisterType(MakeObjectType<OBrush3D>("Brush"));
+	objectTypes.RegisterType(MakeObjectType<OBrush2D>("Plane"));
+	objectTypes.RegisterType(MakeObjectType<OLight>("Light"));
+	objectTypes.RegisterType(MakeObjectType<OSprite>("Sprite"));
+	objectTypes.RegisterType(MakeObjectType<OConnector>("Level Connector"));
+	objectTypes.RegisterType(MakeObjectType<OCamera>("Camera"));
+	objectTypes.RegisterType(MakeObjectType<OGeometryCollection>("Geometry"));
+
+	geometryTypes.RegisterType(MakeGeometryType<GeoIsoTile>("Iso Tile"));
 }

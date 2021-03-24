@@ -338,10 +338,8 @@ public:
 					}
 
 					//Bounds
-					mesh->bounds.min = boundsMin;
-					mesh->bounds.max = boundsMax;
-					mesh->bounds.RecalculateSphereBounds();
-
+					mesh->BoundingBox().SetTransform(Transform((boundsMin + boundsMax) / 2.f, Rotation(), boundsMax - boundsMin));
+					
 					//Elements & TBN
 					for (size_t i = 0; i < _elements.GetSize(); ++i)
 					{
@@ -404,9 +402,7 @@ public:
 					}
 
 					//Bounds
-					mesh->bounds.min = boundsMin;
-					mesh->bounds.max = boundsMax;
-					mesh->bounds.RecalculateSphereBounds();
+					mesh->BoundingBox().SetTransform(Transform((boundsMin + boundsMax) / 2.f, Rotation(), boundsMax - boundsMin));
 
 					//Elements & TBN
 					for (size_t i = 0; i < _elements.GetSize(); ++i)

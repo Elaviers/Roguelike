@@ -1,14 +1,14 @@
 #pragma once
 #include <Engine/EngineInstance.hpp>
-#include <Engine/EntCamera.hpp>
 #include <Engine/World.hpp>
 #include <ELGraphics/RenderQueue.hpp>
+#include <ELMaths/Projection.hpp>
 #include <ELSys/GLContext.hpp>
 #include <ELSys/GLCubemap.hpp>
 #include <ELSys/GLProgram.hpp>
 #include <ELSys/InputManager.hpp> //For keycode
 #include <ELSys/Timer.hpp>
-#include <ELSys/Window.hpp>
+#include <ELSys/Window_Win32.hpp>
 #include <ELUI/Container.hpp>
 
 class Game
@@ -22,7 +22,7 @@ private:
 	float _deltaTime;
 
 	Timer _timer;
-	Window _window;
+	Window_Win32 _window;
 
 	GLContext _glContext;
 
@@ -33,17 +33,19 @@ private:
 	bool _uiIsActive;
 
 	UIContainer _ui;
-	EntCamera _uiCamera;
-
+	Projection _uiCamera;
+	
 	World _world;
 
 	GLCubemap _reflect;
 
+	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
 	void _InitGL();
 	void _Init();
 public:
-	Game() : _consoleIsActive(false), _uiIsActive(true), _running(false), _deltaTime(0.f) {}
-	~Game() {}
+	Game() : _consoleIsActive(false), _uiIsActive(true), _running(false), _deltaTime(0.f), _world(&_engine.context) {}
+	~Game();
 
 	const Context& GetContext() const { return _engine.context; }
 

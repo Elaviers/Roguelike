@@ -2,9 +2,9 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "Geometry.hpp"
-#include "Registry.hpp"
+#include "GeometryType.hpp"
+#include "ObjectType.hpp"
 #include <ELCore/Context.hpp>
-#include <ELCore/Tracker.hpp>
 
 class Console;
 class AnimationManager;
@@ -40,6 +40,7 @@ enum class EEngineCreateFlags : uint16
 	ALL = 0xFFFF
 };
 
+#include "WorldObject.hpp"
 #include <ELCore/MacroUtilities.hpp>
 DEFINE_BITMASK_FUNCS(EEngineCreateFlags, uint16)
 
@@ -48,11 +49,11 @@ class EngineInstance
 private:
 	FT_Library _ftLib;
 
-	void _InitRegistries();
+	void _InitRegisters();
 
 public:
-	Registry<Entity> entRegistry;
-	Registry<Geometry> geometryRegistry;
+	ObjectRegister objectTypes;
+	GeometryRegister geometryTypes;
 
 	Context context;
 
@@ -70,8 +71,6 @@ public:
 	TextProvider	*pTextProvider = nullptr;
 	TextureManager	*pTextureManager = nullptr;
 	TileManager		*pTileManager = nullptr;
-
-	Tracker<Entity> *pObjectTracker = nullptr;
 
 	EngineInstance() : _ftLib(0) {}
 	~EngineInstance();

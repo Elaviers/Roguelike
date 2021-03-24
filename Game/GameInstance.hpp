@@ -1,5 +1,5 @@
 #pragma once
-#include <Engine/EntCamera.hpp>
+#include <Engine/OCamera.hpp>
 
 class Game;
 class InputManager;
@@ -8,7 +8,7 @@ class World;
 class GameInstance
 {
 	Game* _game;
-	EntCamera* _activeCamera;
+	OCamera* _activeCamera;
 
 	float _axisMoveForward;
 	float _axisMoveRight;
@@ -36,7 +36,7 @@ public:
 
 	void OnResize(uint16 w, uint16 h);
 
-	void SetActiveCamera(EntCamera* camera)		
+	void SetActiveCamera(OCamera* camera)		
 	{ 
 		_activeCamera = camera; 
 		if (_activeCamera)
@@ -45,7 +45,7 @@ public:
 
 	void SetCursorPos(const Vector2& cursorPos) { _cursorPos = cursorPos; }
 
-	const EntCamera* GetActiveCamera() const	{ return _activeCamera; }
+	const OCamera* GetActiveCamera() const	{ return _activeCamera; }
 
 	float GetAxisMoveForward() const	{ return _axisMoveForward; }
 	float GetAxisMoveRight() const		{ return _axisMoveRight; }

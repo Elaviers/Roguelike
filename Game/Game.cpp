@@ -6,13 +6,23 @@
 #include <ELSys/IO.hpp>
 #include <ELSys/Utilities.hpp>
 #include <Engine/Console.hpp>
-#include <Engine/EntLight.hpp>
+#include <Engine/OLight.hpp>
 #include <Engine/GeoIsoTile.hpp>
+#include <Engine/imgui/imgui.h>
+#include <Engine/imgui/imgui_internal.h>
+#include <Engine/imgui/imgui_impl_opengl3.h>
+#include <Engine/imgui/imgui_impl_win32.h>
 #include <windowsx.h>
-#include "EntPlayer.hpp"
+#include "OPlayer.hpp"
 #include "GameInstance.hpp"
 #include "LevelGeneration.hpp"
 #include "MenuMain.hpp"
+
+Game::~Game()
+{
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+}
 
 void Game::_InitGL()
 {
@@ -56,15 +66,26 @@ void Game::_Init()
 	_engine.Init(EEngineCreateFlags::ALL);
 	_engine.pFontManager->AddPath(Utilities::GetSystemFontDir());
 
-	_world.Initialise(_engine.context);
+	_world.Initialise();
 	GameInstance::Instance().world = &_world;
 	GameInstance::Instance().Initialise(*this);
 
 	_consoleIsActive = false;
 	_uiIsActive = true;
 
-	_uiCamera.GetProjection().SetType(EProjectionType::ORTHOGRAPHIC);
-	_uiCamera.GetProjection().SetNearFar(-10.f, 10.f);
+	_uiCamera.SetType(EProjectionType::ORTHOGRAPHIC);
+	_uiCamera.SetNearFar(-10.f, 10.f);
+
+	//Third party (IMGUI)
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+
+	ImGui::StyleColorsDark();
+
+	ImGui::GetIO().IniFilename = NULL;
+
+	ImGui_ImplWin32_Init(_window.GetHWND());
+	ImGui_ImplOpenGL3_Init("#version 410");
 }
 
 void Game::Run()
@@ -73,7 +94,17 @@ void Game::Run()
 	dummy.CreateDummyAndUse();
 	GL::LoadDummyExtensions();
 
-	_window.Create("Window");
+	{
+		WNDCLASSEX windowClass = {};
+		windowClass.cbSize = sizeof(WNDCLASSEX);
+		windowClass.hInstance = ::GetModuleHandle(NULL);
+		windowClass.lpszClassName = "GamerWindow";
+		windowClass.lpfnWndProc = WindowProc;
+		windowClass.hIcon = windowClass.hIconSm = ::LoadIcon(NULL, IDI_APPLICATION);
+		::RegisterClassEx(&windowClass);
+	}
+
+	_window.Create("GamerWindow", "Window");
 
 	dummy.Delete();
 
@@ -162,23 +193,21 @@ void Game::StartLevel(const String& filename)
 
 	if (ext == ".txt")
 	{
-		_world.Clear(_engine.context);
+		_world.Clear();
 
 		String fileString = IO::ReadFileString(filename.GetData());
-		LevelGeneration::GenerateLevel(_world, fileString, _engine.context);
+		LevelGeneration::GenerateLevel(_world, fileString);
 	}
 	else
 	{
-		_world.Clear(_engine.context);
-		_world.Read(filename.GetData(), _engine.context);
+		_world.Clear();
+		_world.ReadObjects(filename.GetData());
 	}
 
-	EntPlayer* player = EntPlayer::Create();
-	player->SetParent(&_world.RootEntity());
-	player->Init(_engine.context);
-
-	EntLight* light = EntLight::Create();
-	light->SetParent(player);
+	OPlayer* player = _world.CreateObject<OPlayer>();
+	
+	OLight* light = _world.CreateObject<OLight>();
+	light->SetParent(player, false);
 
 	Transform spawnTransform(Vector3(0, 4.f, 0));
 	player->SetRelativeTransform(spawnTransform);
@@ -189,6 +218,10 @@ void Game::StartLevel(const String& filename)
 void Game::Frame()
 {
 	_engine.pAudioManager->FillBuffer();
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
 
 	_world.Update(_deltaTime);
 	_ui.Update(_deltaTime);
@@ -201,16 +234,16 @@ void Game::Render()
 	_renderQueue.Clear();
 	_uiQueue.Clear();
 
-	const EntCamera* activeCamera = GameInstance::Instance().GetActiveCamera();
+	const OCamera* activeCamera = GameInstance::Instance().GetActiveCamera();
 	if (activeCamera)
 	{
 		Frustum cameraFrustum;
-		activeCamera->GetProjection().ToFrustum(activeCamera->GetWorldTransform(), cameraFrustum);
+		activeCamera->GetProjection().ToFrustum(activeCamera->GetAbsoluteTransform(), cameraFrustum);
 		activeCamera->Use(_renderQueue);
-		_world.Render(_renderQueue, cameraFrustum);
+		_world.Render(_renderQueue, &cameraFrustum);
 	}
 
-	_uiCamera.Use(_uiQueue);
+	_uiQueue.CreateCameraEntry(_uiCamera, Transform(Vector3(_uiCamera.GetDimensions().x / 2.f, _uiCamera.GetDimensions().y / 2.f, 0.f)));
 
 	if (_uiIsActive)
 		_ui.Render(_uiQueue);
@@ -239,6 +272,12 @@ void Game::Render()
 		_renderQueue.Render(ERenderChannels::UNLIT, _engine.pMeshManager, _engine.pTextureManager, 0);
 	}
 
+	if (ImGui::GetCurrentContext() && ImGui::GetCurrentContext()->WithinFrameScope)
+	{
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
+
 	_window.SwapBuffers();
 }
 
@@ -247,21 +286,20 @@ void Game::Resize(uint16 w, uint16 h)
 	GameInstance::Instance().OnResize(w, h);
 
 	_ui.SetBounds(UIBounds(0.f, 0.f, UICoord(0.f, w), UICoord(0.f, h)));
-	_uiCamera.GetProjection().SetDimensions(Vector2T(w, h));
-	_uiCamera.SetRelativePosition(Vector3(w / 2.f, h / 2.f, 0.f));
+	_uiCamera.SetDimensions(Vector2T(w, h));
 }
 
 void Game::MouseMove(uint16 x, uint16 y)
 {
 	Vector2 cp(x, y);
-	cp /= _uiCamera.GetProjection().GetDimensions();
+	cp /= _uiCamera.GetDimensions();
 	cp.y = 1.f - cp.y;
 	cp += Vector2(-0.5f, -0.5f);
 	GameInstance::Instance().SetCursorPos(cp);
 
 	if (_uiIsActive)
 	{
-		_ui.SetCursorPos((float)x, (float)(_uiCamera.GetProjection().GetDimensions().y - y));
+		_ui.SetCursorPos((float)x, (float)(_uiCamera.GetDimensions().y - y));
 	}
 }
 
@@ -320,4 +358,24 @@ void Game::InputChar(char character)
 void Game::ButtonQuit()
 {
 	_running = false;
+}
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+LRESULT CALLBACK Game::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	if (ImGui::GetCurrentContext())
+	{
+		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+			return TRUE;
+
+		ImGuiIO& io = ImGui::GetIO();
+
+		if (io.WantCaptureMouse && WindowFunctions_Win32::IsMouseInput(msg))
+			return 0;
+		if (io.WantCaptureKeyboard && WindowFunctions_Win32::IsKeyInput(msg))
+			return 0;
+	}
+
+	return WindowFunctions_Win32::WindowProc(hwnd, msg, wparam, lparam);
 }

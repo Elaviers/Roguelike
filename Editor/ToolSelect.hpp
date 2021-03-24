@@ -1,7 +1,7 @@
 #pragma once
 #include "Tool.hpp"
 #include "Gizmo.hpp"
-#include <Engine/Entity.hpp>
+#include <Engine/WorldObject.hpp>
 #include <ELCore/Buffer.hpp>
 #include <ELCore/SharedPointer.hpp>
 
@@ -13,17 +13,17 @@ class ToolSelect : public Tool
 	bool _placing;
 	bool _shouldCopy;
 
-	EntityPointer _hoverObject;
+	SharedPointer<WorldObject> _hoverObject;
 	bool _hoverObjectIsSelected;
 
-	struct EntitySelection
+	struct WorldObjectSelection
 	{
-		EntityPointer entity;
+		SharedPointer<WorldObject> object;
 		float dragStartX;
 		float dragStartY;
 	};
 
-	Buffer<EntitySelection> _selection;
+	Buffer<WorldObjectSelection> _selection;
 
 	float _gridSnap;
 	bool _snapToWorld;
@@ -41,6 +41,8 @@ class ToolSelect : public Tool
 	Vector3 _sbPoint1;
 	Vector3 _sbPoint2;
 
+	void _OnSelectionChanged();
+
 	const PropertyCollection& _GetProperties();
 
 	Vector3 _GizmoMove(const Vector3& delta);
@@ -48,7 +50,7 @@ class ToolSelect : public Tool
 	void _GizmoSetSidePos(E2DBrushEdge edge, const Vector3& delta);
 	void _UpdateGizmoTransform();
 
-	void _SetHoverObject(Entity*);
+	void _SetHoverObject(WorldObject*);
 
 	void _CloneSelection();
 
@@ -67,6 +69,7 @@ public:
 		_gizmoIsLocal(0),
 		_activeGizmo(nullptr)
 	{}
+
 	virtual ~ToolSelect() {}
 
 	virtual void Initialise() override;
@@ -81,9 +84,12 @@ public:
 	virtual void KeySubmit() override;
 	virtual void KeyDelete() override;
 
+	virtual void Update(float deltaSeconds) override;
 	virtual void Render(RenderQueue&) const override;
 
-	void Select(Entity* object);
+	void Select(WorldObject* object);
 	void ClearSelection();
+	void GetSelection(Buffer<WorldObject*>& outSelection) const;
+	void SetSelection(const Buffer<WorldObject*>& selection);
 };
 

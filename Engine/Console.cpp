@@ -18,7 +18,7 @@ void Console::_CMD_echo(const Buffer<String>& tokens, const Context&)
 
 void Console::_CMD_help(const Buffer<String>& tokens, const Context&)
 {
-	auto all = _cvars.GetAll();
+	auto all = _properties.GetAll();
 
 	for (int i = 0; i < all.GetSize(); ++i)
 	{
@@ -86,7 +86,7 @@ void Console::SubmitPrompt(const Context& ctx)
 {
 	Print(CSTR(Colour::White.ToColourCode(), _prePrompt, _prompt, Colour::Grey.ToColourCode()));
 
-	String result = _cvars.HandleCommand(_prompt.Split(" "), ctx);
+	String result = _properties.HandleCommand(_prompt.Split(" "), ctx);
 	
 	if (result.GetLength())
 		Print(result.GetData());
