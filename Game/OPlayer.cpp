@@ -11,7 +11,10 @@
 void OPlayer::_OnTransformChanged()
 {
 	WorldObject::_OnTransformChanged();
-	_physics->SetTransform(GetAbsoluteTransform());
+
+	if (!_ticking)
+		_physics->SetTransform(GetAbsoluteTransform());
+	
 	_rootCameraTransform = GetAbsoluteTransform();
 	_rootCameraTransform.SetRotation(_camera->GetAbsoluteRotation());
 	_rootCameraTransform.Move(_camera->GetForwardVector() * -5000.f);
@@ -21,7 +24,8 @@ OPlayer::OPlayer(World& world) :
 	WorldObject(world),
 	_mesh(world.CreateObject<OSkeletal>()),
 	_camera(world.CreateObject<OCamera>()),
-	_physics(world.CreatePhysicsBody(this))
+	_physics(world.CreatePhysicsBody(this)),
+	_ticking(false)
 {
 	_mesh->SetParent(this, false);
 	_mesh->SetCollisionEnabled(false);
@@ -46,7 +50,8 @@ OPlayer::OPlayer(World& world) :
 }
 
 OPlayer::OPlayer(const OPlayer& other) :
-	WorldObject(other)
+	WorldObject(other),
+	_ticking(false)
 {
 	//todo
 }
@@ -86,7 +91,8 @@ float CalculateAccel(float inputAxis, float currentVel, float deltaTime, float s
 
 void OPlayer::Update(float deltaTime)
 {
-	SetAbsoluteTransform(_physics->GetTransform());
+	_ticking = true;
+	SetAbsoluteTransform(_physics->GetITransform());
 
 	//Camera
 	Ray r = _camera->GetProjection().ScreenToWorld(_rootCameraTransform, GameInstance::Instance().GetCursorPos());
@@ -135,15 +141,13 @@ void OPlayer::Update(float deltaTime)
 	ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiCond_FirstUseEver);
 	if (ImGui::Begin(CSTR("[", GetUID(), "](Player) \"", GetName().ToString(), "\""), &playerDebug))
 	{
-		Vector3 pos = GetAbsolutePosition();
-
-		if (ImGui::DragFloat3("Position", &pos[0]))
-			SetAbsolutePosition(pos);
-
-		ImGui::InputFloat3("TargetPos", &targetPos[0], "%.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("Position", &Vector3(_physics->GetPosition())[0]);
+		ImGui::InputFloat3("Velocity", &Vector3(_physics->GetVelocity())[0]);
 
 		ImGui::End();
 	}
+
+	_ticking = false;
 }
 
 void OPlayer::Render(RenderQueue& q) const

@@ -17,6 +17,8 @@ class OPlayer : public WorldObject
 
 	Handle<PhysicsBody> _physics;
 
+	bool _ticking;
+
 	void _Jump();
 
 
