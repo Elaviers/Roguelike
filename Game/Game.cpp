@@ -66,6 +66,8 @@ void Game::_Init()
 	_engine.Init(EEngineCreateFlags::ALL);
 	_engine.pFontManager->AddPath(Utilities::GetSystemFontDir());
 
+	_engine.pInputManager->BindKeyUp(EKeycode::F1, [this]() {_worldDebug = !_worldDebug; });
+
 	_world.Initialise();
 	GameInstance::Instance().world = &_world;
 	GameInstance::Instance().Initialise(*this);
@@ -222,6 +224,14 @@ void Game::Frame()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+
+	if (_worldDebug && ImGui::Begin("World", &_worldDebug))
+	{
+		Buffer<WorldObject*> selection;
+		EngineUtilities::WorldIMGUI(_world, selection);
+
+		ImGui::End();
+	}
 
 	_world.Update(_deltaTime);
 	_ui.Update(_deltaTime);

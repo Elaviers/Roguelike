@@ -1,4 +1,5 @@
 #pragma once
+#include <Engine/World.hpp>
 #include <Engine/WorldObject.hpp>
 #include "RandomBag.hpp"
 
@@ -14,11 +15,13 @@ class LevelSegmentPicker
 	List<SegmentBag> _essentialBags;
 	List<SegmentBag> _otherBags;
 	
+	World _world;
+
 public:
-	LevelSegmentPicker() {}
+	LevelSegmentPicker(const Context& context) : _world(&context) {}
 	~LevelSegmentPicker() {}
 
-	static LevelSegmentPicker FromString(const String& string, const String& rootLevelDir, World& world);
+	bool Load(const String& string, const String& rootLevelDir);
 
 	const WorldObject* TakeNextSegment(Random& random, unsigned int depth);
 	

@@ -1,6 +1,7 @@
 #include "Editor.hpp"
 #include "EditorUtil.hpp"
 #include <Engine/Console.hpp>
+#include <Engine/EngineUtilities.hpp>
 #include <Engine/OLight.hpp>
 #include <Engine/ORenderable.hpp>
 #include <Engine/imgui/imgui.h>
@@ -439,7 +440,7 @@ void Editor::Frame()
 			if (_currentTool == &tools.select)
 				tools.select.GetSelection(selection);
 
-			if (EditorUtil::WorldIMGUI(_world, selection))
+			if (EngineUtilities::WorldIMGUI(_world, selection))
 			{
 				OGeometryCollection* g;
 				if ((selection.GetSize() == 1) && (g = dynamic_cast<OGeometryCollection*>(selection[0])))

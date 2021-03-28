@@ -40,28 +40,30 @@ World::~World()
 
 World::AdditionalObjectData& World::_GetAdditionalObjectData(WorldObject* object)
 {
-	if (AdditionalObjectData** ptr = _additionalData.Get(object->GetUID()))
+	if (AdditionalObjectData** ptr = object->GetWorld()._additionalData.Get(object->GetUID()))
 		return **ptr;
 
-	return *(_additionalData[object->GetUID()] = new AdditionalObjectData(object));
+	return *(object->GetWorld()._additionalData[object->GetUID()] = new AdditionalObjectData(object));
 }
 
 WorldObject* World::CloneObject(const WorldObject& object, bool deep)
 {
-	if (&object.GetWorld() == this)
-	{
-		WorldObject* clone = object._Clone();
-		clone->_OnCloned();
-		_objects.Emplace(clone);
+	World* objWorld = &object.GetWorld();
+	World*& currentObjectWorld = const_cast<World*&>(object._world);
+	
+	//todo: this is pretty hacky... the source object's world temporarily changes to this world so the copy constructor works properly
+	currentObjectWorld = this;
+	WorldObject* clone = object._Clone();
+	currentObjectWorld = objWorld;
+	
+	clone->_OnCloned();
+	_objects.Emplace(clone);
 
-		if (deep)
-			for (const WorldObject* child : object.GetChildren())
-				CloneObject(*child, true)->SetParent(clone, false);
+	if (deep)
+		for (const WorldObject* child : object.GetChildren())
+			CloneObject(*child, true)->SetParent(clone, false);
 
-		return clone;
-	}
-
-	return nullptr;
+	return clone;
 }
 
 WorldObject* World::FindObject(const Text& name) const
@@ -224,23 +226,17 @@ Buffer<WorldObject*> World::FindObjectOverlaps(const WorldObject* object, bool i
 {
 	Buffer<WorldObject*> results;
 
-	AdditionalObjectData*const* data = _additionalData.Get(object->GetUID());
+	AdditionalObjectData*const* data = object->GetWorld()._additionalData.Get(object->GetUID());
 	if (data)
 	{
 		for (const FixedBody* fb : (*data)->fixedBodies)
-		{
-			WorldObject* owner = (WorldObject*)fb->GetUserData();
-			if (*owner != *object && !owner->IsChildOf(*object))
-				_AddUniqueOverlaps(results, fb->Collision(), fb->GetTransform(), _physics, includeTouching);
-		}
+			_AddUniqueOverlaps(results, fb->Collision(), fb->GetTransform(), _physics, includeTouching);
 
 		for (const PhysicsBody* pb : (*data)->physicsBodies)
-		{
-			WorldObject* owner = (WorldObject*)pb->GetUserData();
-			if (*owner != *object && !owner->IsChildOf(*object))
 			_AddUniqueOverlaps(results, pb->Collision(), pb->GetTransform(), _physics, includeTouching);
-		}
 	}
+
+	results.Remove([object](WorldObject* const& obj) { return obj == nullptr || *obj == *object; });
 
 	return results;
 }
@@ -316,8 +312,8 @@ EOverlapResult ProcessOverlaps(const Collider& collider, const Transform& transf
 
 EOverlapResult World::ObjectsOverlap(const WorldObject& a, const WorldObject& b, Vector3* penetration) const
 {
-	AdditionalObjectData*const* adata = _additionalData.Get(a.GetUID());
-	AdditionalObjectData*const* bdata = _additionalData.Get(b.GetUID());
+	AdditionalObjectData*const* adata = a.GetWorld()._additionalData.Get(a.GetUID());
+	AdditionalObjectData*const* bdata = b.GetWorld()._additionalData.Get(b.GetUID());
 
 	EOverlapResult result = EOverlapResult::SEPERATE;
 
@@ -375,8 +371,8 @@ void ProcessClosestPoints(const Collider& collider, const Transform& transform,
 
 float World::CalculateClosestPoints(const WorldObject& a, const WorldObject& b, Vector3& pointA, Vector3& pointB) const
 {
-	AdditionalObjectData* const* adata = _additionalData.Get(a.GetUID());
-	AdditionalObjectData* const* bdata = _additionalData.Get(b.GetUID());
+	AdditionalObjectData* const* adata = a.GetWorld()._additionalData.Get(a.GetUID());
+	AdditionalObjectData* const* bdata = b.GetWorld()._additionalData.Get(b.GetUID());
 
 	float d2 = INFINITY;
 

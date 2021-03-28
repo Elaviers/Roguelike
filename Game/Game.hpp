@@ -1,5 +1,6 @@
 #pragma once
 #include <Engine/EngineInstance.hpp>
+#include <Engine/EngineUtilities.hpp>
 #include <Engine/World.hpp>
 #include <ELGraphics/RenderQueue.hpp>
 #include <ELMaths/Projection.hpp>
@@ -39,12 +40,14 @@ private:
 
 	GLCubemap _reflect;
 
+	bool _worldDebug;
+
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 	void _InitGL();
 	void _Init();
 public:
-	Game() : _consoleIsActive(false), _uiIsActive(true), _running(false), _deltaTime(0.f), _world(&_engine.context) {}
+	Game() : _consoleIsActive(false), _uiIsActive(true), _running(false), _deltaTime(0.f), _world(&_engine.context), _worldDebug(false) {}
 	~Game();
 
 	const Context& GetContext() const { return _engine.context; }

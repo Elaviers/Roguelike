@@ -39,7 +39,8 @@ OPlayer::OPlayer(World& world) :
 	_camera->GetProjection().SetNearFar(0.f, 10000.f);
 	_camera->GetProjection().SetOrthographicScale(64.f);
 
-	_physics->Collision() = Collider(ECollisionChannels::PLAYER, CollisionCapsule(1.f, .5f));
+	//_physics->Collision() = Collider(ECollisionChannels::PLAYER, CollisionCapsule(1.f, .5f));
+	_physics->Collision() = Collider(ECollisionChannels::PLAYER, CollisionBox(Box(Vector3(), Vector3(.5f, 1.f, .5f))));
 	_physics->SetRotationLocked(true);
 
 	GameInstance::Instance().SetActiveCamera(_camera);
@@ -136,10 +137,10 @@ void OPlayer::Update(float deltaTime)
 
 
 	//debug window
-	static bool playerDebug = false;
+	static bool playerDebug = true;
 	
 	ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiCond_FirstUseEver);
-	if (ImGui::Begin(CSTR("[", GetUID(), "](Player) \"", GetName().ToString(), "\""), &playerDebug))
+	if (playerDebug && ImGui::Begin(CSTR("[", GetUID(), "](Player) \"", GetName().ToString(), "\""), &playerDebug))
 	{
 		ImGui::InputFloat3("Position", &Vector3(_physics->GetPosition())[0]);
 		ImGui::InputFloat3("Velocity", &Vector3(_physics->GetVelocity())[0]);

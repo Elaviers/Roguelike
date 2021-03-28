@@ -41,31 +41,33 @@ WorldObject* CreateConnectedSegment(World& world, const OConnector& parentConnec
 			if (connectorWt.GetScale() == pcWt.GetScale())
 			{
 				float angle = (pcWt.GetRotation().GetEuler().y - connectorWt.GetRotation().GetEuler().y) - 180.f;
-				Transform segWt = segment->GetAbsoluteTransform();
+				Transform destTransform = segment->GetAbsoluteTransform();
 
-				Vector3 connectorPosAfterSegmentRotation = VectorMaths::RotateAbout(connectorWt.GetPosition(), segWt.GetPosition(), Vector3(0.f, angle, 0.f));
+				Vector3 connectorPosAfterSegmentRotation = VectorMaths::RotateAbout(connectorWt.GetPosition(), destTransform.GetPosition(), Vector3(0.f, angle, 0.f));
 
-				segWt.AddRotation(Vector3(0.f, angle, 0.f));
-				segWt.Move(pcWt.GetPosition() - connectorPosAfterSegmentRotation);
+				destTransform.AddRotation(Vector3(0.f, angle, 0.f));
+				destTransform.Move(pcWt.GetPosition() - connectorPosAfterSegmentRotation);
+
+				Transform cCheckTransform = destTransform;
+				cCheckTransform.SetScale(cCheckTransform.GetScale() * .95f);
 
 				bool cannotFit = false;
-				for (const WorldObject* object : world.GetObjects())
+
 				{
-					Transform t = object->GetRelativeTransform();
+					WorldObject* hack = const_cast<WorldObject*>(segment);
+					Transform originalTransform = hack->GetAbsoluteTransform();
+					hack->SetAbsoluteTransform(cCheckTransform);
 
-					//Use slightly smaller version
-					t.SetScale(t.GetScale() * .95f);
-
-					for (const WorldObject* obj = object->GetParent(); obj && obj != segment; obj = obj->GetParent())
-						t = t * obj->GetRelativeTransform();
-
-					t = t * segWt;
-
-					if (world.FindObjectOverlaps(object, false).GetSize() > 0)
+					for (const WorldObject* object : hack->GetChildren())
 					{
-						cannotFit = true;
-						break;
+						if (world.FindObjectOverlaps(object, false).GetSize() > 0)
+						{
+							cannotFit = true;
+							break;
+						}
 					}
+
+					hack->SetAbsoluteTransform(originalTransform);
 				}
 					
 				if (cannotFit) continue;
@@ -73,12 +75,8 @@ WorldObject* CreateConnectedSegment(World& world, const OConnector& parentConnec
 				//Okay, we can add to world now
 				item.TakeFromRelevantBag(1.f);
 
-				WorldObject* newSegment = world.CreateObject<WorldObject>();
-				newSegment->SetParent(nullptr, true);
-				newSegment->SetAbsoluteTransform(segWt);
-
-				for (const WorldObject* child : segment->GetChildren())
-					world.CloneObject(*child, true)->SetParent(newSegment, true);
+				WorldObject* newSegment = world.CloneObject(*segment, true);
+				newSegment->SetAbsoluteTransform(destTransform);
 
 				for (WorldObject* child : newSegment->GetChildren())
 				{
@@ -117,8 +115,9 @@ bool LevelGeneration::GenerateLevel(World& world, const String &string)
 	const Context& ctx = *world.GetContext();
 	Random random(Time::GetRandSeed());
 
-	LevelSegmentPicker picker = LevelSegmentPicker::FromString(string, ROOT_DIR, world);
-
+	LevelSegmentPicker picker(ctx);
+	picker.Load(string, ROOT_DIR);
+	
 	int depth = 10;
 
 	Buffer<String> lines = string.Split("\r\n");

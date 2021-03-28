@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="EngineInstance.cpp" />
+    <ClCompile Include="EngineUtilities.cpp" />
     <ClCompile Include="OBrush2D.cpp" />
     <ClCompile Include="OBrush3D.cpp" />
     <ClCompile Include="OCamera.cpp" />
@@ -48,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Console.hpp" />
+    <ClInclude Include="EngineUtilities.hpp" />
     <ClInclude Include="EObjectID.hpp" />
     <ClInclude Include="EngineInstance.hpp" />
     <ClInclude Include="GeometryType.hpp" />

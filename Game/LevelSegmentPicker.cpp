@@ -1,10 +1,8 @@
 #include "LevelSegmentPicker.hpp"
 #include <Engine/World.hpp>
 
-LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const String& rootLevelDir, World& world)
+bool LevelSegmentPicker::Load(const String& string, const String& rootLevelDir)
 {
-	LevelSegmentPicker result;
-
 	SegmentBag* bag = nullptr;
 	float bagTotalOverride = 0.f;
 
@@ -18,9 +16,9 @@ LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const St
 			if (tokens[0] == "bag" || tokens[0] == "ebag")
 			{
 				if (tokens[0] == "ebag") // :/
-					bag = &*result._essentialBags.Emplace();
+					bag = &*_essentialBags.Emplace();
 				else
-					bag = &*result._otherBags.Emplace();
+					bag = &*_otherBags.Emplace();
 
 				bagTotalOverride = tokens.GetSize() >= 2 ? tokens[1].ToFloat() : 0.f;
 				bag->minimumDepth = tokens.GetSize() >= 3 ? tokens[2].ToInt() : 0;
@@ -28,8 +26,8 @@ LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const St
 			}
 			else if (tokens.GetSize() >= 2 && tokens[0] == "segment" && bag)
 			{
-				WorldObject* segment = world.CreateObject<WorldObject>();
-				if (world.ReadObjects(CSTR(rootLevelDir, tokens[1]), segment))
+				WorldObject* segment = _world.CreateObject<WorldObject>();
+				if (_world.ReadObjects(CSTR(rootLevelDir, tokens[1]), segment))
 				{
 					bag->bag.Add(segment, tokens.GetSize() > 2 ? tokens[2].ToFloat() : 1);
 					if (bagTotalOverride)
@@ -41,7 +39,7 @@ LevelSegmentPicker LevelSegmentPicker::FromString(const String& string, const St
 		}
 	}
 
-	return result;
+	return true;
 }
 
 const WorldObject* LevelSegmentPicker::TakeNextSegment(Random& random, unsigned int depth)
