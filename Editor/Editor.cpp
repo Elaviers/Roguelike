@@ -112,14 +112,14 @@ void Editor::_Init()
 	inputManager->BindKeyAxis(EKeycode::RIGHT, &_axisLookX, 1.f);
 	inputManager->BindKeyAxis(EKeycode::LEFT, &_axisLookX, -1.f);
 
-	inputManager->BindKeyDown(EKeycode::ENTER, Callback(*this, &Editor::KeySubmit));
-	inputManager->BindKeyDown(EKeycode::ESCAPE, Callback(*this, &Editor::KeyCancel));
-	inputManager->BindKeyDown(EKeycode::DEL, Callback(*this, &Editor::KeyDelete));
+	inputManager->BindKeyDown(EKeycode::ENTER, Callback(&Editor::KeySubmit, *this));
+	inputManager->BindKeyDown(EKeycode::ESCAPE, Callback(&Editor::KeyCancel, *this));
+	inputManager->BindKeyDown(EKeycode::DEL, Callback(&Editor::KeyDelete, *this));
 
-	inputManager->BindKeyDown(EKeycode::TILDE, Callback(*this, &Editor::ToggleConsole));
+	inputManager->BindKeyDown(EKeycode::TILDE, Callback(&Editor::ToggleConsole, *this));
 
-	inputManager->BindKeyDown(EKeycode::SQBRACKETLEFT, Callback(*this, &Editor::DecreaseGridUnit));
-	inputManager->BindKeyDown(EKeycode::SQBRACKETRIGHT, Callback(*this, &Editor::IncreaseGridUnit));
+	inputManager->BindKeyDown(EKeycode::SQBRACKETLEFT, Callback(&Editor::DecreaseGridUnit, *this));
+	inputManager->BindKeyDown(EKeycode::SQBRACKETRIGHT, Callback(&Editor::IncreaseGridUnit, *this));
 
 	inputManager->BindKeyDown(EKeycode::F1, [this]() { showUtilsPanel = !showUtilsPanel; });
 
@@ -182,7 +182,7 @@ void Editor::_Init()
 	_toolbar.AddButton(Text("Brush3D"), engine.pTextureManager->Get("editor/tools/brush3d", engine.context), (uint16)ETool::BRUSH3D);
 	_toolbar.AddButton(Text("Object"), engine.pTextureManager->Get("editor/tools/object", engine.context), (uint16)ETool::OBJECT);
 	//_toolbar.AddButton("Connector", _engine.pTextureManager->Get("editor/tools/connector", _engine.context), (uint16)ETool::CONNECTOR);
-	_toolbar.onItemSelected += Function<void, UIToolbarItem&>(*this, &Editor::_OnToolbarItemSelection);
+	_toolbar.onItemSelected += Function(&Editor::_OnToolbarItemSelection, *this);
 
 	UIColour splitterColour(Colour::White, Colour(1.f, 1.f, 1.f, 0.5f));
 	UISplitter* splitterHoriz = new UISplitter(&_vpAreaUI);
@@ -1087,7 +1087,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 					editor->KeyCancel();
 					editor->SetTool(ETool::SELECT);
 					editor->_world.Clear();
-					editor->_world.ReadObjects(editor->_filename.GetData());
+					editor->_world.ReadObjects(editor->_filename.begin());
 
 					::EnableMenuItem(::GetMenu(hwnd), ID_FILE_SAVE, MF_ENABLED);
 				}
@@ -1096,7 +1096,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 			case ID_FILE_SAVE:
 				if (editor->_filename.GetLength())
-					editor->_world.WriteObjects(editor->_filename.GetData());
+					editor->_world.WriteObjects(editor->_filename.begin());
 
 				break;
 
@@ -1105,7 +1105,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 				editor->_filename = IO::SaveFileDialog(L"\\Data\\Levels", levelDialogFilter);
 				if (editor->_filename.GetLength())
 				{
-					editor->_world.WriteObjects(editor->_filename.GetData());
+					editor->_world.WriteObjects(editor->_filename.begin());
 
 					::EnableMenuItem(::GetMenu(hwnd), ID_FILE_SAVE, MF_ENABLED);
 				}
@@ -1123,7 +1123,7 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 					if (dynamic_cast<const Mesh_Skeletal*>(model->GetMesh().Ptr()))
 						++i;
 					else
-						skeletalModelNames.RemoveIndex(i);
+						skeletalModelNames.Remove(i);
 				}
 
 				String choice = StringSelect::Dialog(editor->_window.GetHWND(), skeletalModelNames, "Pick a skeleton...");
@@ -1142,13 +1142,13 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 							if (filename.GetLength() == 0)
 								break;
 
-							Animation* animation = EditorIO::ReadFBXAnimation(editor->_fbxManager, filename.GetData(), skeletalMesh->skeleton);
+							Animation* animation = EditorIO::ReadFBXAnimation(editor->_fbxManager, filename.begin(), skeletalMesh->skeleton);
 
 							if (animation)
 							{
 								String dest = IO::SaveFileDialog(L"\\Data\\Animations", saveAnimationFilter);
 								if (dest.GetLength())
-									IO::WriteFile(dest.GetData(), animation->GetAsData());
+									IO::WriteFile(dest.begin(), animation->GetAsData());
 								else
 									Debug::Error("Okay, I guess you don't want to import an animation after all...");
 							}
@@ -1171,15 +1171,15 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 				if (Utilities::GetExtension(filename) == ".fbx")
 				{
-					mesh = EditorIO::ReadFBXMesh(editor->_fbxManager, filename.GetData());
+					mesh = EditorIO::ReadFBXMesh(editor->_fbxManager, filename.begin());
 				}
 				else if (Utilities::GetExtension(filename) == ".obj")
 				{
-					mesh = IO::ReadOBJFile(filename.GetData());
+					mesh = IO::ReadOBJFile(filename.begin());
 				}
 				else
 				{
-					Buffer<byte> data = IO::ReadFile(filename.GetData());
+					Buffer<byte> data = IO::ReadFile(filename.begin());
 					if (data.GetSize() <= 0)
 						break;
 
@@ -1192,19 +1192,21 @@ LRESULT CALLBACK Editor::_WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM 
 
 					if (dest.GetLength())
 					{
-						IO::WriteFile(dest.GetData(), mesh->GetAsData());
+						IO::WriteFile(dest.begin(), mesh->GetAsData());
 					
 						Mesh_Skeletal* skeletal = dynamic_cast<Mesh_Skeletal*>(mesh);
 						if (skeletal && ::MessageBox(NULL, "Do you want to import the animation too?", "Hey", MB_YESNO) == IDYES)
 						{
-							Animation* anim = EditorIO::ReadFBXAnimation(editor->_fbxManager, filename.GetData(), skeletal->skeleton);
+							Animation* anim = EditorIO::ReadFBXAnimation(editor->_fbxManager, filename.begin(), skeletal->skeleton);
 
 							if (anim)
 							{
 								String animDest = IO::SaveFileDialog(L"\\Data\\Animations", saveAnimationFilter);
 
 								if (animDest.GetLength())
-									IO::WriteFile(animDest.GetData(), anim->GetAsData());
+								{
+									IO::WriteFile(animDest.begin(), anim->GetAsData());
+								}
 							}
 						}
 					}

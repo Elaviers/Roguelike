@@ -1,8 +1,8 @@
 #pragma once
 #include "EObjectID.hpp"
 #include "Register.hpp"
+#include <ELCore/MemberFunction.hpp>
 #include <ELCore/String.hpp>
-#include <ELCore/Function.hpp>
 
 class World;
 class WorldObject;

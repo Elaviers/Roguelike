@@ -1,7 +1,6 @@
 #include "OBrush3D.hpp"
 #include <ELCore/Context.hpp>
 #include <ELCore/MacroUtilities.hpp>
-#include <ELCore/NumberedSet.hpp>
 #include <ELCore/Utilities.hpp>
 #include <ELGraphics/RenderCommand.hpp>
 #include <ELGraphics/RenderQueue.hpp>
@@ -106,7 +105,7 @@ void OBrush3D::Read(ByteReader& reader, ObjectIOContext& ctx)
 {
 	WorldObject::Read(reader, ctx);
 
-	const String* materialName = ctx.strings.Get(reader.Read_uint16());
+	const String* materialName = ctx.strings.TryGet(reader.Read_uint16());
 	if (materialName)
 		SetMaterial(*materialName, ctx.context);
 

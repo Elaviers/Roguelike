@@ -9,7 +9,7 @@ class OSkeletal : public ORenderable
 	SharedPointer<const Animation> _animation;
 	float _currentTime;
 
-	void _CMD_PlayAnimation(const Buffer<String>& args, const Context&);
+	void _CMD_PlayAnimation(const Array<String>& args, const Context&);
 
 	virtual void _OnMeshChanged() override;
 

@@ -5,6 +5,7 @@
 #include <Engine/World.hpp>
 #include <ELCore/StackAllocator.hpp>
 #include <ELGraphics/FontManager.hpp>
+#include <ELGraphics/Material_Surface.hpp>
 #include <ELGraphics/RenderCommand.hpp>
 #include <ELGraphics/RenderQueue.hpp>
 #include <ELGraphics/Skybox.hpp>
@@ -276,9 +277,15 @@ int Main()
 	cube->SetModel(modelManager.Cube(), engine.context);
 	cube->SetMaterial("bricks", engine.context);
 
+	SharedPointer<MaterialSurface> shiny = SharedPointer<MaterialSurface>::Create(new MaterialSurface);
+	shiny->SetDiffuse(textureManager.White());
+	shiny->SetSpecular(textureManager.White());
+	shiny->SetReflection(textureManager.White());
+
 	renderable = world.CreateObject<ORenderable>();
 	renderable->SetParent(cubeParent, false);
 	renderable->SetModel(meshName, engine.context);
+	renderable->SetMaterial(shiny.Cast<const Material>());
 
 	window.SetTitle("Window");
 
@@ -429,7 +436,7 @@ void Frame()
 		static Transform fontTransform(Vector3(0, 0, 0), Rotation(), Vector3(64, 0, 0));
 		RenderEntry& strEntry = uiQueue.CreateEntry(ERenderChannels::UNLIT);
 		strEntry.AddSetColour(Colour::Yellow);
-		engine.pFontManager->Get(fontName, engine.context)->RenderString(strEntry, fpsString.GetData(), fontTransform);
+		engine.pFontManager->Get(fontName, engine.context)->RenderString(strEntry, fpsString.begin(), fontTransform);
 
 		//Begin drawing
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

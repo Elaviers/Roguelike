@@ -30,7 +30,7 @@ public:
 	T* CreateGeometry() 
 	{
 		T* g = new T(*this);
-		_geometry.Add(g);
+		_geometry.AddBack(g);
 		return g;
 	}
 

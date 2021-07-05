@@ -1,5 +1,6 @@
 #pragma once
 #include <ELCore/Hashmap.hpp>
+#include <ELCore/IteratorUtils.hpp>
 
 template <typename T, typename ID_TYPE>
 class Register
@@ -32,7 +33,7 @@ public:
 			return;
 		}
 
-		ptr = &*_types.Emplace(type);
+		ptr = &_types.EmplaceBack(type);
 		if (_lut.GetSize()) _lut[(int)id] = ptr;
 	}
 
@@ -42,8 +43,8 @@ public:
 		if (_lut.GetSize()) ptr = _lut[(int)id];
 		else
 		{
-			auto find = _types.FirstWhere([this, id](const T& type) { return _GetTypeID(type) == id; });
-			if (find.IsValid())
+			auto find = IteratorUtils::FirstWhere(_types.begin(), _types.end(), [this, id](const auto& it) { return _GetTypeID(*it) == id; });
+			if (find != _types.end())
 				ptr = &*find;
 		}
 

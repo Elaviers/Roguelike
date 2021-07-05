@@ -17,7 +17,7 @@ const PropertyCollection& Model::GetProperties()
 	return properties;
 }
 
-void Model::_CMD_mesh(const Buffer<String>& args, const Context& ctx)
+void Model::_CMD_mesh(const Array<String>& args, const Context& ctx)
 {
 	if (args.GetSize() > 0)
 	{
@@ -29,7 +29,7 @@ void Model::_CMD_mesh(const Buffer<String>& args, const Context& ctx)
 #include <ELPhys/CollisionCapsule.hpp>
 #include <ELPhys/CollisionSphere.hpp>
 
-void Model::_CMD_collision(const Buffer<String>& args, const Context& ctx)
+void Model::_CMD_collision(const Array<String>& args, const Context& ctx)
 {
 	if (args.GetSize() > 0)
 	{

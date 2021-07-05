@@ -314,10 +314,10 @@ INT_PTR RSDialog::DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 			String fullpath = rs->GetRootPath() + rs->currentName + ".txt";
 
-			::SendDlgItemMessage(hwnd, IDC_NAME, WM_SETTEXT, 0, (LPARAM)fullpath.GetData());
+			::SendDlgItemMessage(hwnd, IDC_NAME, WM_SETTEXT, 0, (LPARAM)fullpath.begin());
 
 			::SendDlgItemMessage(hwnd, IDC_INFO, WM_SETTEXT, 0, 
-				(LPARAM)Utilities::WithCarriageReturns(IO::ReadFileString(fullpath.GetData(), true)).GetData());
+				(LPARAM)Utilities::WithCarriageReturns(IO::ReadFileString(fullpath.begin(), true)).begin());
 		}
 	}
 	break;

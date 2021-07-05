@@ -1,7 +1,7 @@
 #include "World.hpp"
 #include "Console.hpp"
 #include "WorldObject.hpp"
-#include <ELCore/NumberedSet.hpp>
+#include <ELCore/Sorting.hpp>
 #include <ELGraphics/RenderQueue.hpp>
 #include <ELMaths/Frustum.hpp>
 #include <ELMaths/LineSegment.hpp>
@@ -28,11 +28,9 @@ void World::AdditionalObjectData::TrySelfDelete()
 
 World::~World()
 {
-	_additionalData.ForEach([](uint32 id, AdditionalObjectData* ptr) 
-		{
-			if (ptr)
-				ptr->ObjectDestroyed();
-		});
+	for (const Pair<const uint32, AdditionalObjectData*>& kv : _additionalData)
+		if (kv.second)
+			kv.second->ObjectDestroyed();
 
 	for (WorldObject* object : _objects)
 		delete object;
@@ -40,7 +38,7 @@ World::~World()
 
 World::AdditionalObjectData& World::_GetAdditionalObjectData(WorldObject* object)
 {
-	if (AdditionalObjectData** ptr = object->GetWorld()._additionalData.Get(object->GetUID()))
+	if (AdditionalObjectData** ptr = object->GetWorld()._additionalData.TryGet(object->GetUID()))
 		return **ptr;
 
 	return *(object->GetWorld()._additionalData[object->GetUID()] = new AdditionalObjectData(object));
@@ -57,7 +55,7 @@ WorldObject* World::CloneObject(const WorldObject& object, bool deep)
 	currentObjectWorld = objWorld;
 	
 	clone->_OnCloned();
-	_objects.Emplace(clone);
+	_objects.EmplaceBack(clone);
 
 	if (deep)
 		for (const WorldObject* child : object.GetChildren())
@@ -87,17 +85,15 @@ WorldObject* World::FindObject(uint32 uid) const
 void World::Initialise()
 {
 	Console* pConsole = _context->GetPtr<Console>();
-	pConsole->Cvars().CreateVar("Ents", CommandPtr(*this, &World::_CMD_List));
-	pConsole->Cvars().CreateVar("Ent", CommandPtr(*this, &World::_CMD_Ent));
+	pConsole->Cvars().CreateVar("Ents", CommandPtr(&World::_CMD_List, *this));
+	pConsole->Cvars().CreateVar("Ent", CommandPtr(&World::_CMD_Ent, *this));
 }
 
 void World::Clear()
 {
-	_additionalData.ForEach([](uint32 id, AdditionalObjectData* ptr)
-		{
-			if (ptr)
-				ptr->ObjectDestroyed();
-		});
+	for (const Pair<const uint32, AdditionalObjectData*>& kv : _additionalData)
+		if (kv.second)
+			kv.second->ObjectDestroyed();
 
 	for (WorldObject* object : _objects)
 		delete object;
@@ -108,10 +104,10 @@ void World::Clear()
 
 void World::Update(float deltaTime)
 {
-	for (List<WorldObject*>::Iterator it = _objects.begin(); it.IsValid();)
+	for (List<WorldObject*>::Iterator it = _objects.begin(); it;)
 		if ((*it)->IsPendingDestruction())
 		{
-			if (AdditionalObjectData** adata = _additionalData.Get((*it)->GetUID()))
+			if (AdditionalObjectData** adata = _additionalData.TryGet((*it)->GetUID()))
 			{
 				(*adata)->ObjectDestroyed();
 				*adata = nullptr;
@@ -202,14 +198,14 @@ void _AddUniqueOverlaps(Buffer<WorldObject*>& results, const Collider& collider,
 		for (const PhysSimulation::OverlapInformation<FixedBody>& info : overlaps.fixedBodies)
 		{
 			WorldObject* obj = (WorldObject*)info.body->GetUserData();
-			if ((includeTouches || info.type == EOverlapResult::OVERLAPPING) && results.IndexOfFirst(obj) < 0)
+			if ((includeTouches || info.type == EOverlapResult::OVERLAPPING) && IteratorUtils::IndexOf(results.begin(), results.end(), obj) != IteratorUtils::INVALID_INDEX)
 				results[i++] = obj;
 		}
 
 		for (const PhysSimulation::OverlapInformation<PhysicsBody>& info : overlaps.physicsBodies)
 		{
 			WorldObject* obj = (WorldObject*)info.body->GetUserData();
-			if ((includeTouches || info.type == EOverlapResult::OVERLAPPING) && results.IndexOfFirst(obj) < 0)
+			if ((includeTouches || info.type == EOverlapResult::OVERLAPPING) && IteratorUtils::IndexOf(results.begin(), results.end(), obj) != IteratorUtils::INVALID_INDEX)
 				results[i++] = obj;
 		}
 	}
@@ -226,7 +222,7 @@ Buffer<WorldObject*> World::FindObjectOverlaps(const WorldObject* object, bool i
 {
 	Buffer<WorldObject*> results;
 
-	AdditionalObjectData*const* data = object->GetWorld()._additionalData.Get(object->GetUID());
+	AdditionalObjectData*const* data = object->GetWorld()._additionalData.TryGet(object->GetUID());
 	if (data)
 	{
 		for (const FixedBody* fb : (*data)->fixedBodies)
@@ -236,7 +232,12 @@ Buffer<WorldObject*> World::FindObjectOverlaps(const WorldObject* object, bool i
 			_AddUniqueOverlaps(results, pb->Collision(), pb->GetTransform(), _physics, includeTouching);
 	}
 
-	results.Remove([object](WorldObject* const& obj) { return obj == nullptr || *obj == *object; });
+	while (true)
+	{
+		WorldObject** it = IteratorUtils::FirstWhere(results.begin(), results.end(), [object](const auto& obj) { return (*obj) == nullptr || **obj == *object; });
+		if (it == results.end()) break;
+		results.Remove(results.PositionToIndex(it));
+	}
 
 	return results;
 }
@@ -262,8 +263,8 @@ Buffer<RaycastResult> World::Raycast(const Ray& ray, ECollisionChannels channels
 		}
 	}
 	
-	results.Sort<float>([](const RaycastResult& rr) {return rr.time; });
-
+	Sorting::Quicksort<RaycastResult, float>(results.begin(), 0, results.GetSize() - 1, [](const RaycastResult& rr) { return rr.time; });
+	
 	return results;
 }
 
@@ -312,8 +313,8 @@ EOverlapResult ProcessOverlaps(const Collider& collider, const Transform& transf
 
 EOverlapResult World::ObjectsOverlap(const WorldObject& a, const WorldObject& b, Vector3* penetration) const
 {
-	AdditionalObjectData*const* adata = a.GetWorld()._additionalData.Get(a.GetUID());
-	AdditionalObjectData*const* bdata = b.GetWorld()._additionalData.Get(b.GetUID());
+	AdditionalObjectData*const* adata = a.GetWorld()._additionalData.TryGet(a.GetUID());
+	AdditionalObjectData*const* bdata = b.GetWorld()._additionalData.TryGet(b.GetUID());
 
 	EOverlapResult result = EOverlapResult::SEPERATE;
 
@@ -371,8 +372,8 @@ void ProcessClosestPoints(const Collider& collider, const Transform& transform,
 
 float World::CalculateClosestPoints(const WorldObject& a, const WorldObject& b, Vector3& pointA, Vector3& pointB) const
 {
-	AdditionalObjectData* const* adata = a.GetWorld()._additionalData.Get(a.GetUID());
-	AdditionalObjectData* const* bdata = b.GetWorld()._additionalData.Get(b.GetUID());
+	AdditionalObjectData* const* adata = a.GetWorld()._additionalData.TryGet(a.GetUID());
+	AdditionalObjectData* const* bdata = b.GetWorld()._additionalData.TryGet(b.GetUID());
 
 	float d2 = INFINITY;
 
@@ -446,7 +447,10 @@ bool World::ReadObjects(ByteReader& reader, WorldObject* parent)
 			switch (reader.Read_byte())
 			{
 			case LevelMessages::STRING:
-				ioContext.strings[reader.Read_uint16()].Read(reader);
+			{
+				uint16 id = reader.Read_uint16();
+				ioContext.strings.Set(id, reader.Read<String>());
+			}
 				break;
 			case LevelMessages::ENTITIES:
 				//Do nothing
@@ -454,6 +458,9 @@ bool World::ReadObjects(ByteReader& reader, WorldObject* parent)
 			case LevelMessages::GEOMETRY:
 				Debug::Error("Top-level geometry data is deprecated for newer levels! No additional level data can be loaded!");
 				return true;
+
+			default:
+				Debug::Error(CSTR("Unhandled level message!"));
 			}
 		}
 		else
@@ -511,13 +518,13 @@ inline void WriteStringMessage(ByteWriter& buffer, const String& string, uint16 
 	string.Write(buffer);
 }
 
-void WriteObject(WorldObject* object, ByteWriter& writer, ObjectIOContext& ctx)
+void WriteObjectRecursive(WorldObject* object, ByteWriter& writer, ObjectIOContext& ctx)
 {
 	writer.Write_byte((byte)object->GetTypeID());
 	object->Write(writer, ctx);
 
 	for (WorldObject* child : object->GetChildren())
-		WriteObject(child, writer, ctx);
+		WriteObjectRecursive(child, writer, ctx);
 }
 
 bool World::WriteObjects(ByteWriter& writer, WorldObject* parent) const
@@ -535,18 +542,20 @@ bool World::WriteObjects(ByteWriter& writer, WorldObject* parent) const
 	if (parent)
 	{
 		for (WorldObject* object : parent->GetChildren())
-			WriteObject(object, writer2, ioContext);
+			WriteObjectRecursive(object, writer2, ioContext);
 	}
 	else
 		for (WorldObject* object : _objects)
-			WriteObject(object, writer2, ioContext);
+		{
+			writer.Write_byte((byte)object->GetTypeID());
+			object->Write(writer, ioContext);
+		}
 
-	auto stringBuffer = ioContext.strings.ToKVBuffer();
-	for (uint32 i = 0; i < stringBuffer.GetSize(); ++i)
-		WriteStringMessage(writer1, stringBuffer[i]->second, stringBuffer[i]->first);
+	for (const Pair<const uint32, String>& kv : ioContext.strings)
+		WriteStringMessage(writer1, kv.second, kv.first);
 
-	writer.Write(buffer1.Elements(), buffer1.GetSize());
-	writer.Write(buffer2.Elements(), buffer2.GetSize());
+	writer.Write(buffer1.begin(), buffer1.GetSize());
+	writer.Write(buffer2.begin(), buffer2.GetSize());
 	return true;
 }
 
@@ -556,12 +565,12 @@ bool World::WriteObjects(const char* filename, WorldObject* parent) const
 	ByteWriter writer(data);
 
 	if (WriteObjects(writer, parent))
-		return IO::WriteFile(filename, data.Elements(), (uint32)data.GetSize());
+		return IO::WriteFile(filename, data.begin(), (uint32)data.GetSize());
 
 	return false;
 }
 
-void World::_CMD_List(const Buffer<String>& tokens, const Context& ctx)
+void World::_CMD_List(const Array<String>& tokens, const Context& ctx)
 {
 	Console* console = ctx.GetPtr<Console>();
 
@@ -569,7 +578,7 @@ void World::_CMD_List(const Buffer<String>& tokens, const Context& ctx)
 		console->Print(CSTR("[", object->GetClassString(), "]", " \"", object->GetName(), "\"\t\t0x", String::FromInt(object->GetUID(), 0, 16), '\n'));
 }
 
-void World::_CMD_Ent(const Buffer<String>& tokens, const Context& ctx)
+void World::_CMD_Ent(const Array<String>& tokens, const Context& ctx)
 {
 	if (tokens.GetSize() >= 1)
 	{
@@ -582,7 +591,7 @@ void World::_CMD_Ent(const Buffer<String>& tokens, const Context& ctx)
 			if (tokens.GetSize() >= 2)
 			{
 				Buffer<String> objTokens(&tokens[1], tokens.GetSize() - 1);
-				console->Print(obj->GetProperties().HandleCommand(obj, objTokens, ctx).GetData());
+				console->Print(obj->GetProperties().HandleCommand(obj, objTokens, ctx).begin());
 			}
 			else
 			{

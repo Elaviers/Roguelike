@@ -1,7 +1,6 @@
 #include "ORenderable.hpp"
 #include "World.hpp"
 #include <ELCore/Context.hpp>
-#include <ELCore/NumberedSet.hpp>
 #include <ELGraphics/MaterialParam.hpp>
 #include <ELGraphics/MeshManager.hpp>
 #include <ELGraphics/RenderCommand.hpp>
@@ -10,8 +9,6 @@
 ORenderable::ORenderable(World& world) :
 	WorldObject(world),
 	_renderEntry(ERenderChannels::SURFACE),
-	_model(nullptr),
-	_material(nullptr),
 	_colour(1.f, 1.f, 1.f),
 	_materialIsDefault(false),
 	_static(false),
@@ -189,10 +186,10 @@ void ORenderable::Read(ByteReader &reader, ObjectIOContext& ctx)
 
 	const String *string;
 
-	if (string = ctx.strings.Get(reader.Read_uint16()))
+	if (string = ctx.strings.TryGet(reader.Read_uint16()))
 		SetModel(*string, ctx.context);
 	
-	if (string = ctx.strings.Get(reader.Read_uint16()))
+	if (string = ctx.strings.TryGet(reader.Read_uint16()))
 		SetMaterial(*string, ctx.context);
 
 	((Vector4&)_colour).Read(reader);

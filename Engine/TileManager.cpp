@@ -1,8 +1,8 @@
 #include "TileManager.hpp"
 
-Tile* TileManager::_CreateResource(const Buffer<byte>& data, const String& name, const String& extension, const Context& ctx)
+Tile* TileManager::_CreateResource(const Array<byte>& data, const String& name, const String& extension, const Context& ctx)
 {
-	return new Tile(Tile::FromText(data, ctx));
+	return new Tile(Tile::FromText(String(data.begin(), data.GetSize()), ctx));
 }
 
 #include <ELGraphics/MaterialManager.hpp>

@@ -228,10 +228,10 @@ void ToolSelect::Initialise()
 	_brushGizmo.AddComponent(GizmoBrushSizer2D(Colour::Yellow, E2DBrushEdge::NEG_Y));
 	_brushGizmo.AddComponent(GizmoBrushSizer2D(Colour::Yellow, E2DBrushEdge::POS_Y));
 
-	_gizmo.SetMoveFunction(Function<Vector3, const Vector3&>(*this, &ToolSelect::_GizmoMove));
-	_gizmo.SetRotateFunction(Function<float, const Vector3&, float>(*this, &ToolSelect::_GizmoRotate));
+	_gizmo.SetMoveFunction(Function(&ToolSelect::_GizmoMove, *this));
+	_gizmo.SetRotateFunction(Function(&ToolSelect::_GizmoRotate, *this));
 
-	_brushGizmo.SetSideFunction(Function<void, E2DBrushEdge, const Vector3&>(*this, &ToolSelect::_GizmoSetSidePos));
+	_brushGizmo.SetSideFunction(Function(&ToolSelect::_GizmoSetSidePos, *this));
 }
 
 void ToolSelect::Activate(UIContainer& properties, UIContainer& toolProperties)
@@ -461,7 +461,7 @@ void ToolSelect::KeySubmit()
 	}
 
 	if (_selection.GetSize() > 0)
-		_owner.ChangePropertyWorldObject(_selection.Last().object.Ptr());
+		_owner.ChangePropertyWorldObject(_selection[_selection.GetSize() - 1].object.Ptr());
 }
 
 void ToolSelect::KeyDelete()
@@ -481,7 +481,7 @@ void ToolSelect::Update(float deltaSeconds)
 		if (!_selection[i].object)
 		{
 			pruned = true;
-			_selection.RemoveIndex(i);
+			_selection.Remove(i);
 		}
 		else ++i;
 	}
@@ -594,7 +594,7 @@ void ToolSelect::_OnSelectionChanged()
 		else
 			_activeGizmo = &_gizmo;
 
-		_owner.ChangePropertyWorldObject(_selection.Last().object.Ptr());
+		_owner.ChangePropertyWorldObject(_selection[_selection.GetSize() - 1].object.Ptr());
 	}
 	else
 		_owner.ClearProperties();
@@ -615,5 +615,5 @@ void ToolSelect::_CloneSelection()
 	}
 	
 	_hoverObjectIsSelected = true;
-	_owner.ChangePropertyWorldObject(_selection.Last().object.Ptr());
+	_owner.ChangePropertyWorldObject(_selection[_selection.GetSize() - 1].object.Ptr());
 }

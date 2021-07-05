@@ -6,9 +6,6 @@
 #include <ELMaths/Frustum.hpp>
 #include <ELMaths/Transform.hpp>
 
-template <typename T>
-class NumberedSet;
-
 class Collider;
 class PropertyCollection;
 class RenderQueue;

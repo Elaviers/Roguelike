@@ -25,8 +25,8 @@ class UIPropertyManipulator : public UIContainer
 	UICheckbox* _checkbox;
 	UIComboBox* _combobox;
 
-	void _OnStringChanged(UITextbox&);
-	void _OnStringChanged(UIComboBox&);
+	void _OnTextboxStringChanged(UITextbox&);
+	void _OnComboboxStringChanged(UIComboBox&);
 
 	void _OnPressed(UIButton&);
 	void _OnStateChanged(UICheckbox&);

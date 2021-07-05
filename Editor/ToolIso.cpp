@@ -204,8 +204,8 @@ void ToolIso::Activate(UIContainer& properties, UIContainer& toolProperties)
 			.SetPanelColourSelected(UIColour(Colour(0.f, 0.f, 1.f, .5f), Colour::Black))
 			.SetTile(tileManager->Get(tilename, _owner.engine.context));
 		ts->SetBounds(UIBounds(c * w, UICoord(1.f, -y), w, UICoord(0.f, h)));
-		ts->onPressed += Function(*this, &ToolIso::TileSelected);
-		_tileSelectors.Add(ts);
+		ts->onPressed += Function(&ToolIso::TileSelected, *this);
+		_tileSelectors.AddBack(ts);
 
 		if (++c >= columns)
 		{

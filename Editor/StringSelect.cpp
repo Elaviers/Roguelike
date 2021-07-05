@@ -22,7 +22,7 @@ INT_PTR DialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		::SetWindowTextA(hwnd, ss->title);
 
 		for (size_t i = 0; i < ss->strings.GetSize(); ++i)
-			::SendDlgItemMessage(hwnd, IDC_LIST, LB_ADDSTRING, 0, (LPARAM)ss->strings[i].GetData());
+			::SendDlgItemMessage(hwnd, IDC_LIST, LB_ADDSTRING, 0, (LPARAM)ss->strings[i].begin());
 
 		break;
 

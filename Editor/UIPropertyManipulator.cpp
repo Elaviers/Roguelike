@@ -84,13 +84,13 @@ void SetPropertyString(Property& property, void* object, const String& string, E
 		property.SetAsString(object, string, engine.context);
 }
 
-void UIPropertyManipulator::_OnStringChanged(UITextbox& textbox)
+void UIPropertyManipulator::_OnTextboxStringChanged(UITextbox& textbox)
 {
 	if (!_refreshing)
 		SetPropertyString(_property, _object, textbox.GetText().ToString(), _editorInstance.engine);
 }
 
-void UIPropertyManipulator::_OnStringChanged(UIComboBox& combobox)
+void UIPropertyManipulator::_OnComboboxStringChanged(UIComboBox& combobox)
 {
 	if (!_refreshing)
 		SetPropertyString(_property, _object, combobox.GetText().ToString(), _editorInstance.engine);
@@ -131,7 +131,7 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 			.SetMaterial(btnMat).SetBorderSize(borderSize)
 			.SetColour(buttonColourInactive).SetColourHover(buttonColourHover).SetColourHold(buttonColourHold);
 
-		browse->onPressed += Function<void, UIButton&>(*this, &UIPropertyManipulator::_OnPressed);
+		browse->onPressed += Function<void, UIButton&>(&UIPropertyManipulator::_OnPressed, *this);
 	}
 	else if (property.GetFlags() & PropertyFlags::DIRECTION || property.GetFlags() & PropertyFlags::CLASSID || comboText.GetSize())
 	{
@@ -144,7 +144,7 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 
 		if (!readOnly)
 		{
-			comboBox->onSelectionChanged += Function<void, UIComboBox&>(*this, &UIPropertyManipulator::_OnStringChanged);
+			comboBox->onSelectionChanged += Function(&UIPropertyManipulator::_OnComboboxStringChanged, *this);
 
 			if (comboText.GetSize())
 			{
@@ -179,7 +179,7 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 			SetMaterial(btnMat).SetBorderSize(borderSize).SetColourFalse(buttonColourInactive).SetColourTrue(buttonColourInactive).SetColourHover(buttonColourHover).SetColourHold(buttonColourHold);
 		
 		if (!readOnly)
-			check->onStateChanged += Function<void, UICheckbox&>(*this, &UIPropertyManipulator::_OnStateChanged);
+			check->onStateChanged += Function(&UIPropertyManipulator::_OnStateChanged, *this);
 	}
 
 	_textbox = new UITextbox(this);
@@ -189,7 +189,7 @@ UIPropertyManipulator::UIPropertyManipulator(const UICoord& y, float h, Editor& 
 		.SetText(Text(GetPropertyString(_property, _object, _editorInstance.engine))).SetColour(textboxColour);
 
 	if (!readOnly)
-		_textbox->onStringChanged += Function<void, UITextbox&>(*this, &UIPropertyManipulator::_OnStringChanged);
+		_textbox->onStringChanged += Function(&UIPropertyManipulator::_OnTextboxStringChanged, *this);
 }
 
 void UIPropertyManipulator::Refresh()

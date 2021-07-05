@@ -74,7 +74,7 @@ void GeoIsoTile::Read(ByteReader& data, ObjectIOContext& ctx)
 	Vector3 pos = data.Read<Vector3>();
 	Vector2 size = data.Read<Vector2>();
 	
-	const String* tname = ctx.strings.Get(data.Read_uint16());
+	const String* tname = ctx.strings.TryGet(data.Read_uint16());
 	if (tname)
 		_tile = ctx.context.GetPtr<TileManager>()->Get(*tname, ctx.context);
 

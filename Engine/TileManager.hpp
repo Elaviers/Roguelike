@@ -4,7 +4,7 @@
 
 class TileManager : public AssetManager<Tile>
 {
-	virtual Tile* _CreateResource(const Buffer<byte>& data, const String& name, const String& extension, const Context&) override;
+	virtual Tile* _CreateResource(const Array<byte>& data, const String& name, const String& extension, const Context&) override;
 	virtual bool _CreateAlternative(Tile*& resource, const String& name, const Context& ctx) override;
 
 	virtual Buffer<const AssetManagerBase*> _GetFallbackManagers(const Context&) const override;

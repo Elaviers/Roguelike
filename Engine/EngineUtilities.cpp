@@ -10,22 +10,22 @@ bool ObjectIMGUI(WorldObject* object, Buffer<WorldObject*>& selection)
 	if (object->GetChildren().GetSize() <= 0)
 		flags |= ImGuiTreeNodeFlags_Leaf;
 
-	if (selection.IndexOfFirst(object) >= 0)
+	if (IteratorUtils::IndexOf(selection.begin(), selection.end(), object) != IteratorUtils::INVALID_INDEX)
 		flags |= ImGuiTreeNodeFlags_Selected;
 
 	bool hasName = object->GetName().ToString().GetLength() > 0;
 
 	String fmtStr = hasName ? "[%d][%s] \"%s\"" : "[%d][%s]";
-	const char* fmt = fmtStr.GetData();
+	const char* fmt = fmtStr.begin();
 
 	bool expanded = ImGui::TreeNodeEx(
 		(void*)object->GetUID(), flags,
-		fmt, object->GetUID(), object->GetClassString(), object->GetName().ToString().GetData());
+		fmt, object->GetUID(), object->GetClassString(), object->GetName().ToString().begin());
 
 	if (ImGui::BeginDragDropSource())
 	{
 		ImGui::SetDragDropPayload("WorldObject", &object, sizeof(WorldObject*));
-		ImGui::Text(fmt, object->GetUID(), object->GetClassString(), object->GetName().ToString().GetData());
+		ImGui::Text(fmt, object->GetUID(), object->GetClassString(), object->GetName().ToString().begin());
 		ImGui::EndDragDropSource();
 	}
 

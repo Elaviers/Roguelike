@@ -115,7 +115,7 @@ void Game::Run()
 
 	MenuMain *menu = new MenuMain();
 	menu->SetBounds(UIBounds(UICoord(0.5f, -256.f), UICoord(0.5f, -256.f), UICoord(0.f, 512.f), UICoord(0.f, 512.f)));
-	menu->Initialise(Function<void, const String&>(*this, &Game::StartLevel), Callback(*this, &Game::ButtonQuit), _engine);
+	menu->Initialise(Function(&Game::StartLevel, *this), Callback(&Game::ButtonQuit, *this), _engine);
 	menu->SetParent(&_ui);
 
 	_window.Show();
@@ -197,13 +197,13 @@ void Game::StartLevel(const String& filename)
 	{
 		_world.Clear();
 
-		String fileString = IO::ReadFileString(filename.GetData());
+		String fileString = IO::ReadFileString(filename.begin());
 		LevelGeneration::GenerateLevel(_world, fileString);
 	}
 	else
 	{
 		_world.Clear();
-		_world.ReadObjects(filename.GetData());
+		_world.ReadObjects(filename.begin());
 	}
 
 	OPlayer* player = _world.CreateObject<OPlayer>();

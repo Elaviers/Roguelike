@@ -81,7 +81,7 @@ void OBrush2D::Read(ByteReader &reader, ObjectIOContext& ctx)
 {
 	WorldObject::Read(reader, ctx);
 
-	const String *materialName = ctx.strings.Get(reader.Read_uint16());
+	const String *materialName = ctx.strings.TryGet(reader.Read_uint16());
 	if (materialName)
 		SetMaterial(*materialName, ctx.context);
 

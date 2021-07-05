@@ -1,5 +1,4 @@
 #pragma once
-#include <ELCore/NumberedSet.hpp>
 #include <ELPhys/Collider.hpp>
 #include "EGeometryID.hpp"
 #include "OGeometryCollection.hpp"

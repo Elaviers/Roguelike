@@ -79,7 +79,7 @@ class FbxMeshDataImporter
 
 		uint32 index = (uint32)_vertices.GetSize();
 		_vertices.Add(vertex);
-		_vertsForCP[vertex.cpIndex].Add(index);
+		_vertsForCP[vertex.cpIndex].AddBack(index);
 		_totalVertexCount++;
 		return index;
 	}
@@ -353,7 +353,7 @@ public:
 					for (size_t jointIndex = 0; jointIndex < _skeleton.GetJointCount(); ++jointIndex)
 					{
 						Joint* joint = _skeleton.GetJointWithID((int)jointIndex);
-						Buffer<VertexMapping>* vertGroups = _vertexGroups.Get(joint->name);
+						Buffer<VertexMapping>* vertGroups = _vertexGroups.TryGet(joint->name);
 						if (vertGroups)
 						{
 							for (size_t vgIndex = 0; vgIndex < vertGroups->GetSize(); ++vgIndex)

@@ -27,7 +27,7 @@ void MenuStartLevel::Initialise(const Function<void, const String&> &onLevelChos
 		button->SetFont(_buttonFont);
 		button->SetBounds(UIBounds(0.f, UICoord(1.f, -((i + 1) * btnH)), 1.f, UICoord(0.f, btnH)));
 		button->SetBorderSize(_buttonBorderSize);
-		button->onPressed += Function<void, UIButton&>(*this, &MenuStartLevel::ButtonLevel);
+		button->onPressed += Function(&MenuStartLevel::ButtonLevel, *this);
 		button->SetColour(_buttonColourInactive);
 		button->SetColourHold(_buttonColourActive);
 		button->SetMaterial(_buttonMaterial);

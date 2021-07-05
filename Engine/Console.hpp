@@ -30,15 +30,15 @@ class Console
 
 	void _ExpandBuffer();
 
-	void _CMD_echo(const Buffer<String>& tokens, const Context&);
-	void _CMD_help(const Buffer<String>& tokens, const Context&);
+	void _CMD_echo(const Array<String>& tokens, const Context&);
+	void _CMD_help(const Array<String>& tokens, const Context&);
 
 
 public:
 	Console() : _nextBufferIndex(0), _prePrompt('>')
 	{
-		_properties.CreateVar("Echo", CommandPtr(*this, &Console::_CMD_echo));
-		_properties.CreateVar("Help", CommandPtr(*this, &Console::_CMD_help));
+		_properties.CreateVar("Echo", CommandPtr(&Console::_CMD_echo, *this));
+		_properties.CreateVar("Help", CommandPtr(&Console::_CMD_help, *this));
 	}
 
 	~Console() {}
@@ -52,5 +52,5 @@ public:
 
 	void Render(RenderQueue& q, const Font& font, float deltaTime);
 	
-	void CMD_texmgr(const Buffer<String>& tokens, const Context&);
+	void CMD_texmgr(const Array<String>& tokens, const Context&);
 };

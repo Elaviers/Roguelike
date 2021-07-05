@@ -22,13 +22,13 @@ WorldObject::WorldObject(const WorldObject& other) :
 	_absoluteTransform(other._absoluteTransform)
 {
 	if (_parent)
-		_parent->_children.Emplace(this);
+		_parent->_children.EmplaceBack(this);
 }
 
 WorldObject::~WorldObject()
 {
 	if (_parent)
-		_parent->_children.Remove(this);
+		_parent->_children.Remove(IteratorUtils::FirstEqualPosition(_parent->_children.begin(), _parent->_children.end(), this));
 
 	//All children are orphaned as this won't be valid anymore
 	for (WorldObject* child : _children)
@@ -82,8 +82,8 @@ void WorldObject::SetParent(WorldObject* parent, bool keepWorldTransform)
 		return;
 	}
 
-	if (_parent) _parent->_children.Remove(this);
-	if (_parent = parent) _parent->_children.Emplace(this);
+	if (_parent) _parent->_children.Remove(IteratorUtils::FirstEqualPosition(_parent->_children.begin(), _parent->_children.end(), this));
+	if (_parent = parent) _parent->_children.EmplaceBack(this);
 
 	if (keepWorldTransform) _Absolute2Relative();
 	else _Relative2Absolute();
@@ -112,7 +112,7 @@ void WorldObject::Read(ByteReader& reader, ObjectIOContext& ctx)
 	ctx.objects[ctx.index++] = this;
 
 	uint32 parentIndex = reader.Read_uint32();
-	SetParent(parentIndex > 0 ? *ctx.objects.Get(parentIndex) : nullptr, false);
+	SetParent(parentIndex > 0 ? *ctx.objects.TryGet(parentIndex) : nullptr, false);
 
 	_name = Text::FromString(reader.Read<String>()); //todo- read text, not string
 	_relativeTransform.Read(reader);

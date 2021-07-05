@@ -2,7 +2,7 @@
 #include "EGeometryID.hpp"
 #include "Register.hpp"
 #include <ELCore/String.hpp>
-#include <ELCore/Function.hpp>
+#include <ELCore/MemberFunction.hpp>
 
 class Geometry;
 class OGeometryCollection;

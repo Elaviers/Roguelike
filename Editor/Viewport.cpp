@@ -10,7 +10,7 @@ Viewport::Viewport() : _cameraType(ECameraType::PERSPECTIVE)
 	_comboBox.SetTextAlignment(ETextAlignment::RIGHT).SetTextMargin(0.f).SetColour(Colour::Invisible).SetColourHover(Colour(0.f, 0.f, 1.f, 0.25f)).SetColourHold(Colour(0.f, 0.f, 1.f, 0.5f)).SetBorderSize(0.f);
 	_comboBox.SetListColour(Colour::Invisible).SetListTextAlignment(ETextAlignment::RIGHT).SetListTextMargin(0.f).SetListItemHeight(16.f);
 	
-	_comboBox.onSelectionChanged += Function(*this, &Viewport::_OnComboBoxItemSelected);
+	_comboBox.onSelectionChanged += Function(&Viewport::_OnComboBoxItemSelected, *this);
 }
 
 Viewport::~Viewport()

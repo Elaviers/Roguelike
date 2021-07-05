@@ -16,7 +16,7 @@ PropertyCollection& OSkeletal::GetProperties()
 	return properties;
 }
 
-void OSkeletal::_CMD_PlayAnimation(const Buffer<String>& args, const Context& ctx)
+void OSkeletal::_CMD_PlayAnimation(const Array<String>& args, const Context& ctx)
 {
 	if (args.GetSize())
 	{

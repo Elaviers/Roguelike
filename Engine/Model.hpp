@@ -11,8 +11,8 @@ protected:
 	String _defaultMaterialName;
 	Collider _collider;
 
-	void _CMD_mesh(const Buffer<String>& args, const Context&);
-	void _CMD_collision(const Buffer<String>& args, const Context&);
+	void _CMD_mesh(const Array<String>& args, const Context&);
+	void _CMD_collision(const Array<String>& args, const Context&);
 
 public:
 	Model() {}

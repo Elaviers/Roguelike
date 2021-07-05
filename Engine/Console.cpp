@@ -10,13 +10,13 @@ const int allocUnitSize = 128;
 
 const int linesToDraw = 128;
 
-void Console::_CMD_echo(const Buffer<String>& tokens, const Context&)
+void Console::_CMD_echo(const Array<String>& tokens, const Context&)
 {
 	if (tokens.GetSize() > 0)
 		Print(CSTR(Colour::Cyan.ToColourCode(), tokens[0], '\n'));
 }
 
-void Console::_CMD_help(const Buffer<String>& tokens, const Context&)
+void Console::_CMD_help(const Array<String>& tokens, const Context&)
 {
 	auto all = _properties.GetAll();
 
@@ -77,7 +77,7 @@ void Console::Backspace()
 {
 	if (_prompt.GetLength())
 	{
-		_prompt.Shrink(1);
+		_prompt.ShrinkTo(_prompt.GetLength() - 1);
 		_ResetBlink();
 	}
 }
@@ -89,7 +89,7 @@ void Console::SubmitPrompt(const Context& ctx)
 	String result = _properties.HandleCommand(_prompt.Split(" "), ctx);
 	
 	if (result.GetLength())
-		Print(result.GetData());
+		Print(result.begin());
 
 	_prompt.Clear();
 	_ResetBlink();
@@ -170,7 +170,7 @@ void Console::Render(RenderQueue& q, const Font& font, float deltaTime)
 constexpr const char* MAXANISOTROPY = "max_aniso";
 constexpr const char* MAXMIPS = "max_mip_levels";
 
-void Console::CMD_texmgr(const Buffer<String>& args, const Context& ctx)
+void Console::CMD_texmgr(const Array<String>& args, const Context& ctx)
 {
 	TextureManager* textureManager = ctx.GetPtr<TextureManager>();
 	MaterialManager* materialManager = ctx.GetPtr<MaterialManager>();

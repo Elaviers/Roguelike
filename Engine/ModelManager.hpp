@@ -7,7 +7,7 @@ class MeshManager;
 class ModelManager : public AssetManager<Model>
 {
 protected:
-	virtual Model* _CreateResource(const Buffer<byte>& data, const String& name, const String& extension, const Context&) override;
+	virtual Model* _CreateResource(const Array<byte>& data, const String& name, const String& extension, const Context&) override;
 
 	virtual bool _CreateAlternative(Model*& resource, const String& name, const Context& ctx) override;
 

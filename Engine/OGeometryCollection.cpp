@@ -21,7 +21,7 @@ OGeometryCollection::~OGeometryCollection()
 void OGeometryCollection::DeleteGeometry(Geometry* geometry)
 {
 	if (geometry)
-		for (auto it = _geometry.begin(); it.IsValid(); ++it)
+		for (auto it = _geometry.begin(); it; ++it)
 			if ((*it)->GetUID() == geometry->GetUID())
 			{
 				_geometry.Remove(it);

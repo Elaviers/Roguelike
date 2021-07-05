@@ -1,4 +1,5 @@
 #pragma once
+#include <ELCore/Buffer.hpp>
 #include <ELCore/Concepts.hpp>
 #include <ELCore/Context.hpp>
 #include <ELCore/Types.hpp>
@@ -9,11 +10,7 @@
 #include <ELPhys/PhysSimulation.hpp>
 #include <ELPhys/RaycastHitInformation.hpp>
 
-class String;
 class Text;
-
-template <typename T>
-class Buffer;
 
 class Context;
 class WorldObject;
@@ -73,7 +70,7 @@ public:
 	{
 		T* object = new T(*this, std::forward(args)...);
 		object->_OnCreated();
-		_objects.Emplace(object);
+		_objects.EmplaceBack(object);
 		return object;
 	}
 
@@ -132,7 +129,7 @@ public:
 	WorldObject* DecodeIDMapValue(uint32 red, uint32 green) const;
 
 private:
-	void _CMD_List(const Buffer<String>& tokens, const Context&);
-	void _CMD_Ent(const Buffer<String>& tokens, const Context&);
+	void _CMD_List(const Array<String>& tokens, const Context&);
+	void _CMD_Ent(const Array<String>& tokens, const Context&);
 
 };

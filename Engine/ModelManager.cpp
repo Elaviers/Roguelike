@@ -3,9 +3,9 @@
 #include <ELGraphics/MeshManager.hpp>
 #include <ELPhys/CollisionBox.hpp>
 
-Model* ModelManager::_CreateResource(const Buffer<byte>& data, const String& name, const String& extension, const Context& ctx)
+Model* ModelManager::_CreateResource(const Array<byte>& data, const String& name, const String& extension, const Context& ctx)
 {
-	Model* model = Asset::FromText<Model>(data, ctx);
+	Model* model = Asset::FromText<Model>(String(data.begin(), data.GetSize()), ctx);
 	if (model == nullptr)
 		Debug::Error(CSTR("Could not load model \"", name, "\""));
 

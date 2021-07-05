@@ -1,6 +1,5 @@
 #pragma once
 #include <ELCore/Context.hpp>
-#include <ELCore/Hashmap.hpp>
 #include <ELCore/NumberedSet.hpp>
 #include <ELCore/String.hpp>
 

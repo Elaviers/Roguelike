@@ -61,7 +61,7 @@ public:
 
 	template <typename T>
 	requires Concepts::DerivedFrom<T, GizmoComponent>
-	void AddComponent(const T& component) { (*_components.Add(new T(component)))->_owner = this;  }
+	void AddComponent(const T& component) { _components.AddBack(new T(component))->_owner = this;  }
 	void ClearComponents() 
 	{ 
 		for (GizmoComponent* c : _components)

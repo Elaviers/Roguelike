@@ -45,7 +45,7 @@ OPlayer::OPlayer(World& world) :
 
 	GameInstance::Instance().SetActiveCamera(_camera);
 
-	world.GetContext()->GetPtr<InputManager>()->BindKeyDown(EKeycode::SPACE, Callback(*this, &OPlayer::_Jump));
+	world.GetContext()->GetPtr<InputManager>()->BindKeyDown(EKeycode::SPACE, Callback(&OPlayer::_Jump, *this));
 
 	_targetTexture = world.GetContext()->GetPtr<TextureManager>()->Get("iso/targ_temp", *world.GetContext());
 }

@@ -16,9 +16,9 @@ bool LevelSegmentPicker::Load(const String& string, const String& rootLevelDir)
 			if (tokens[0] == "bag" || tokens[0] == "ebag")
 			{
 				if (tokens[0] == "ebag") // :/
-					bag = &*_essentialBags.Emplace();
+					bag = &_essentialBags.EmplaceBack();
 				else
-					bag = &*_otherBags.Emplace();
+					bag = &_otherBags.EmplaceBack();
 
 				bagTotalOverride = tokens.GetSize() >= 2 ? tokens[1].ToFloat() : 0.f;
 				bag->minimumDepth = tokens.GetSize() >= 3 ? tokens[2].ToInt() : 0;
@@ -48,25 +48,25 @@ const WorldObject* LevelSegmentPicker::TakeNextSegment(Random& random, unsigned 
 
 	List<List<SegmentBag>::Iterator> options;
 
-	for (auto it = _essentialBags.begin(); it.IsValid(); ++it)
+	for (auto it = _essentialBags.begin(); it; ++it)
 	{
 		if (depth >= it->minimumDepth && depth <= it->maximumDepth)
 		{
-			options.Add(it);
+			options.AddBack(it);
 		}
 	}
 
 	bool essential = true;
 
-	if (!options.begin().IsValid())
+	if (!options.begin())
 	{
 		essential = false;
 
-		for (auto it = _otherBags.begin(); it.IsValid(); ++it)
+		for (auto it = _otherBags.begin(); it; ++it)
 		{
 			if (depth >= it->minimumDepth && depth <= it->maximumDepth)
 			{
-				options.Add(it);
+				options.AddBack(it);
 			}
 		}
 	}
@@ -74,7 +74,7 @@ const WorldObject* LevelSegmentPicker::TakeNextSegment(Random& random, unsigned 
 	size_t numOptions = options.GetSize();
 	if (numOptions > 0)
 	{
-		List<SegmentBag>::Iterator chosen = *options.Get(random.Next((uint32)numOptions));
+		List<SegmentBag>::Iterator chosen = *IteratorUtils::Offset(options.begin(), random.Next((uint32)numOptions));
 		const WorldObject* segment = chosen->bag.TakeNext(random, 1.f);
 
 		if (chosen->bag.GetRemainingWeight() <= 0.f)
@@ -128,7 +128,7 @@ void LevelSegmentPicker::BagItem::TakeFromRelevantBag(float weight) const
 
 	if (_isEssential)
 	{
-		for (auto it = _owner->_essentialBags.begin(); it.IsValid();)
+		for (auto it = _owner->_essentialBags.begin(); it;)
 		{
 			if (it->bag.GetRemainingWeight() <= 0.f)
 				it = _owner->_essentialBags.Remove(it);
@@ -138,7 +138,7 @@ void LevelSegmentPicker::BagItem::TakeFromRelevantBag(float weight) const
 	}
 	else
 	{
-		for (auto it = _owner->_otherBags.begin(); it.IsValid();)
+		for (auto it = _owner->_otherBags.begin(); it;)
 		{
 			if (it->bag.GetRemainingWeight() <= 0.f)
 				it = _owner->_otherBags.Remove(it);

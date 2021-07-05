@@ -29,15 +29,15 @@ void MenuMain::Initialise(const Function<void, const String&> &onLevelChosen, co
 	
 	_buttonStart.SetParent(this);
 	_buttonStart.SetBounds(UIBounds(0.f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f)));
-	_buttonStart.onPressed += Function<void, UIButton&>(*this, &MenuMain::ButtonStart);
+	_buttonStart.onPressed += Function(&MenuMain::ButtonStart, *this);
 	
 	_buttonQuit.SetParent(this);
 	_buttonQuit.SetBounds(UIBounds(.6f, UICoord(1.f, -64.f), .4f, UICoord(0.f, 64.f)));
-	_buttonQuit.onPressed += Function<void, UIButton&>(*this, &MenuMain::ButtonQuit);
+	_buttonQuit.onPressed += Function(&MenuMain::ButtonQuit, *this);
 
 	_buttonSingleLevel.SetParent(this);
 	_buttonSingleLevel.SetBounds(UIBounds(0.f, 0.f, 1.f, UICoord(0.f, 64.f)));
-	_buttonSingleLevel.onPressed += Function<void, UIButton&>(*this, &MenuMain::ButtonSingleLevel);
+	_buttonSingleLevel.onPressed += Function(&MenuMain::ButtonSingleLevel, *this);
 
 	_buttonStart.SetMaterial(material);
 	_buttonQuit.SetMaterial(material);

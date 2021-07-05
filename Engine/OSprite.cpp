@@ -55,7 +55,7 @@ void OSprite::Read(ByteReader& reader, ObjectIOContext& ctx)
 	_size = reader.Read_float();
 	((Vector4&)_colour).Read(reader);
 	
-	const String* materialName = ctx.strings.Get(reader.Read_uint16());
+	const String* materialName = ctx.strings.TryGet(reader.Read_uint16());
 
 	MaterialManager* materialManager = ctx.context.GetPtr<MaterialManager>();
 	if (materialName)
